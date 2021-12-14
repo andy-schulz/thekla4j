@@ -74,7 +74,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd_HH-mm</maven.build.timestamp.format>
 
         <!-- Für log4j2 -->
-        <Log4jReleaseVersion>2.12.1</Log4jReleaseVersion>
+        <Log4jReleaseVersion>2.16.0</Log4jReleaseVersion>
         <slf4jVersion>1.7.28</slf4jVersion>
         <maven.test.failure.ignore>true</maven.test.failure.ignore>
 
