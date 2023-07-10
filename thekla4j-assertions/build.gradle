@@ -1,0 +1,20 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id "io.freefair.lombok" version "6.6.1"
+}
+
+group 'com.teststeps'
+version '1.0.0'
+
+description = 'thekla4j-assertions'
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    implementation project(":thekla4j-commons")
+}
+
+test {
+    useJUnitPlatform()
+}
