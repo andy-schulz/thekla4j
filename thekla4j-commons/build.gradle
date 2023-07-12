@@ -1,0 +1,5 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+}
+
+description = 'thekla4j-commons'

@@ -21,9 +21,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.regex.Pattern;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import static io.vavr.API.*;
 
 @Workflow("ask if @{activity} is matching the validations  (retry for @{retries} time(s))")
 @Log4j2
