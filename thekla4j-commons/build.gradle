@@ -1,5 +1,14 @@
 plugins {
     id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
 }
 
-description = 'thekla4j-commons'
+description = 'commonly used files in library'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'thekla4j-commons'
+        }
+    }
+}

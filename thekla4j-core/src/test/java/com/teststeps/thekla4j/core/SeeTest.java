@@ -6,11 +6,10 @@ import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class SeeTest {

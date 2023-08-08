@@ -5,7 +5,7 @@ import com.teststeps.thekla4j.http.spp.Request;
 
 import java.io.File;
 
-@Action("POST to resource: '@{resource}' with options: @{options}")
+@Action("POST  a file to resource: '@{resource}' with options: @{options}")
 public class PostFile extends RequestInteraction<PostFile> {
   public static PostFileHelper file(File file, String fieldName) {
     return new PostFileHelper(file, fieldName);

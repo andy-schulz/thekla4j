@@ -1,15 +1,14 @@
 package com.teststeps.thekla4j.core.base.persona;
 
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
 
 public class Cast {
 
-    private HashMap<String, Actor> crew = new HashMap<String, Actor>();
+    private HashMap<String, Actor> crew = HashMap.empty();
     private Actor currentActor;
-    private List<String> currentActorAlias = Arrays.asList("he", "she", "it", "");
+    private final List<String> currentActorAlias = List.of("he", "she", "it", "");
 
     public static Cast setScene() {
         return new Cast();
@@ -21,13 +20,17 @@ public class Cast {
             return this.currentActor();
 
         if (crew.containsKey(actorName))
-            this.currentActor = crew.get(actorName);
+            this.currentActor = crew.get(actorName).get();
         else {
-            crew.put(actorName, Actor.named(actorName));
-            this.currentActor = crew.get(actorName);
+            crew = crew.put(actorName, Actor.named(actorName));
+            this.currentActor = crew.get(actorName).get();
         }
 
         return this.currentActor;
+    }
+
+    public HashMap<String, Actor> crew() {
+        return this.crew;
     }
 
     public Actor currentActor() {

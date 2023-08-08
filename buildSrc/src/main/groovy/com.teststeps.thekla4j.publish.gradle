@@ -1,0 +1,63 @@
+plugins {
+    id 'signing'
+    id 'maven-publish'
+}
+
+signing {
+    useGpgCmd()
+    sign configurations.archives
+}
+
+publishing {
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = project.findProperty('sonatypeUsername')
+                password = project.findProperty('sonatypePassword')
+            }
+        }
+    }
+
+    publications {
+
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.test-steps.thekla4j'
+            artifactId = 'thekla4j-activityLog'
+            version = project.version
+
+
+            pom {
+                name = 'thekla4j'
+                description = 'a screenplay pattern implementation in java'
+                url = 'https://github.com/andy-schulz/thekla4j'
+
+                licenses {
+                    license {
+                        name = 'The MIT License'
+                        url = 'https://github.com/andy-schulz/thekla4j/blob/master/LICENSE.md'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'andy-schulz'
+                        name = 'Andy Schulz'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/andy-schulz/thekla4j.git'
+                    developerConnection = 'https://github.com/andy-schulz/thekla4j.git'
+                    url = 'https://github.com/andy-schulz/thekla4j'
+                }
+            }
+        }
+    }
+}
+
+
+

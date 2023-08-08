@@ -1,7 +1,9 @@
 package com.teststeps.thekla4j.http.httpConn;
 
+import com.teststeps.thekla4j.http.core.Cookie;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.core.HttpResult;
+import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.http.httpConn.functions.ConectionFunctions;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import io.vavr.Function1;
@@ -269,16 +271,20 @@ public class HcHttpRequest implements HttpRequest {
 
       BufferedReader br = con.getResponseCode() < 400 ?
           new BufferedReader(
-              new InputStreamReader(con.getInputStream() == null ?
-                  new ByteArrayInputStream(new byte[0]) :
-                  con.getInputStream(),
-                  StandardCharsets.UTF_8)) :
+              new InputStreamReader(
+                  con.getInputStream() == null ?
+                      new ByteArrayInputStream(new byte[0]) :
+                      con.getInputStream(),
+                  StandardCharsets.UTF_8
+              )) :
 
           new BufferedReader(
-              new InputStreamReader(con.getErrorStream() == null ?
-                  new ByteArrayInputStream(new byte[0]) :
-                  con.getErrorStream(),
-                  StandardCharsets.UTF_8));
+              new InputStreamReader(
+                  con.getErrorStream() == null ?
+                      new ByteArrayInputStream(new byte[0]) :
+                      con.getErrorStream(),
+                  StandardCharsets.UTF_8
+              ));
 
 
       StringBuilder response = new StringBuilder();
@@ -287,22 +293,35 @@ public class HcHttpRequest implements HttpRequest {
         response.append(responseLine.trim());
       }
 
-      log.debug("Response: {}", () -> {
+      if (!log.isTraceEnabled())
+        log.debug("Response: {}", () -> {
+          String resp = response.toString();
+          return resp.length() > 1000 ? resp.substring(0, 1000) + "...." : resp;
+        });
+
+      log.trace("Response: {}", () -> {
         String resp = response.toString();
-//        return resp;
-        return resp.length() > 1000 ? resp.substring(0, 1000) + "...." : resp;
+        return resp;
       });
 
-      io.vavr.collection.HashMap<String, List<String>> headers = HashMap.ofAll(con.getHeaderFields())
-          .mapValues(List::ofAll);
-
+      io.vavr.collection.HashMap<String, List<String>> headers =
+          HashMap.ofAll(con.getHeaderFields())
+              .mapValues(List::ofAll);
       log.debug("Response Headers: {}", () -> headers);
+
+      io.vavr.collection.List<Cookie> cookies =
+          headers.filter((k, v) -> Objects.equals(k, "Set-Cookie"))
+              .toList()
+              .flatMap(tuple -> tuple._2)
+              .map(CookieFunctions.toCookie);
+      log.debug("Cookies: {}", () -> cookies);
+
 
       return HcHttpResult
           .response(response.toString())
           .statusCode(con.getResponseCode())
-          .headers(headers);
-
+          .headers(headers)
+          .cookies(cookies);
     });
 
     con.disconnect();

@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import static io.vavr.API.*;
 
-@Workflow("ask if @{activity} is matching the validations  (retry for @{retries} time(s))")
+@Workflow("ask if @{activity} is matching the validations (retry for @{retries} time(s))")
 @Log4j2
 public class See<P, M> extends Interaction<P, P> {
 

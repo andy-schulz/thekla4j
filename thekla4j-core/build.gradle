@@ -1,12 +1,20 @@
 plugins {
     id 'com.teststeps.java-conventions'
-    id "io.freefair.lombok" version "6.6.1"
+    id 'com.teststeps.thekla4j.publish'
 }
 
 dependencies {
-    implementation project(':thekla4j-assertions')
-    implementation project(':thekla4j-activityLog')
-    implementation project(':thekla4j-commons')
+    api project(':thekla4j-assertions')
+    api project(':thekla4j-activityLog')
+    api project(':thekla4j-commons')
 }
 
-description = 'thekla4j-core'
+description = 'main activity implementation for See, map, retry etc.'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'thekla4j-core'
+        }
+    }
+}

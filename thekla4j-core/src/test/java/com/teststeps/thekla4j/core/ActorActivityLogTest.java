@@ -6,8 +6,8 @@ import com.teststeps.thekla4j.core.activities.Sleep;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
@@ -58,8 +58,8 @@ class T_V2V_Failing extends Task<Void, Void> {
 public class ActorActivityLogTest {
   private Actor John = Actor.named("John");
 
-  @Before
-  public void init() {
+  @BeforeAll
+  public static void init() {
   }
 
   @Test

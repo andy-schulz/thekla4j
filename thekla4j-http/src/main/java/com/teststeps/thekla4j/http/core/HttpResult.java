@@ -7,6 +7,7 @@ public interface HttpResult {
     Integer statusCode();
     String response();
     HashMap<String, List<String>> headers();
+    List<Cookie> cookies();
 
     String toString();
 

@@ -1,0 +1,23 @@
+plugins {
+    id "java"
+}
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDirs = ['src/main/resources', "./../properties"]
+        }
+    }
+
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+}
+

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration package="log4j.test" status="INFO">
+<Configuration package="log4j.test" status="ERROR">
 <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
         <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </Console>
 </Appenders>
 <Loggers>
-    <Logger name="log4j.test.Log4jTest" level="trace">
+    <Logger name="log4j.test.Log4jTest" level="error">
         <AppenderRef ref="Console"/>
     </Logger>
-    <Logger name="org.apache.http.headers" level="error" />
-    <Logger name="org.apache.http" level="error" />
-    <Root level="trace">
+    <Root level="error">
         <AppenderRef ref="Console"/>
     </Root>
 </Loggers>

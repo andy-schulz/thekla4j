@@ -236,8 +236,8 @@ public class ProcessLogAnnotation<P1, R1> {
           // flatten the annotation list again
           .flatMap(t -> t.apply((t1, t2) -> t2.map(a -> Tuple.of(t1, a))))
           // get the replacements from parameter
-          // if its a nested object traverse it e.g.(Called(name = "myName", value = "nested1.nested2"))
-          // if its just a plain object just return it e.g.(Called(name = "myName"))
+          // if it's a nested object traverse it e.g.(Called(name = "myName", value = "nested1.nested2"))
+          // if it's just a plain object just return it e.g.(Called(name = "myName"))
           .map(t -> t.map(p -> extractMyAttribute.apply(p, t._2.value()), Called::name))
           // create the replacement string to search for in the description
           .map(t -> t.map2(s -> "@{" + s + "}"))
