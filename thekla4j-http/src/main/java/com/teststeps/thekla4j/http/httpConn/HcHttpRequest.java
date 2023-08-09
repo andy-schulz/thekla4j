@@ -4,7 +4,7 @@ import com.teststeps.thekla4j.http.core.Cookie;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
-import com.teststeps.thekla4j.http.httpConn.functions.ConectionFunctions;
+import com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import io.vavr.Function1;
 import io.vavr.Function3;
@@ -128,21 +128,21 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeFormParameter = con -> Try.of(() -> {
 
-    byte[] formContent = ConectionFunctions.getFormContent.apply(this.opts);
+    String formContent = ConnectionFunctions.getFormContent.apply(this.opts);
+    log.debug("Writing Form Parameter: {}", formContent);
 
-    log.debug("Writing Form Parameter: {}", this.opts.formParameters);
-
-    con.setRequestProperty("Content-Length", Integer.toString(formContent.length));
+    byte[] bytes = formContent.getBytes(StandardCharsets.UTF_8);
+    con.setRequestProperty("Content-Length", Integer.toString(bytes.length));
 
     OutputStream os = new DataOutputStream(con.getOutputStream());
-    os.write(formContent, 0, formContent.length);
+    os.write(bytes, 0, bytes.length);
 
     return con;
   });
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeContent =
 
-      con -> ConectionFunctions.isXWwwFormUrlencoded.apply(this.opts)
+      con -> ConnectionFunctions.isXWwwFormUrlencoded.apply(this.opts)
           .map(isForm -> isForm ?
               writeFormParameter :
               writeBody)

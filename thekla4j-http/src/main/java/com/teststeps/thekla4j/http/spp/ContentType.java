@@ -1,8 +1,6 @@
 package com.teststeps.thekla4j.http.spp;
 
-import static io.vavr.API.*;
-
-public enum CONTENT_TYPE {
+public enum ContentType {
   APPLICATION_JAVA_ARCHIVE("application/java-archive"),
   APPLICATION_EDI_X12("application/EDI-X12"),
   APPLICATION_JAVASCRIPT("application/javascript"),
@@ -20,7 +18,7 @@ public enum CONTENT_TYPE {
 
   public final String asString;
 
-  CONTENT_TYPE(String s) {
+  ContentType(String s) {
     this.asString = s;
   }
 }

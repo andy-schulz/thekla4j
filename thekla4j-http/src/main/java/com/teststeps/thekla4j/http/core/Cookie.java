@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @With
@@ -14,7 +16,7 @@ public class Cookie {
 
   public String domain;
   public String path;
-  public String expires;
+  public LocalDateTime expires;
   public String sameSite;
   public String maxAge;
   public boolean httpOnly;

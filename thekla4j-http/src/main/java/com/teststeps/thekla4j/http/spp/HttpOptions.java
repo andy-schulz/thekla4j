@@ -288,23 +288,19 @@ public class HttpOptions {
     this.responseTimeout = responseTimeout;
     this.disableSSLCertificateValidation = disableSSLCertificateValidation;
 
-    Type type = new TypeTokenT4j<HashMap<String, String>>() {
 
-    }.getType();
+    // deep clone??
+    String headersJson = JSON.valueAsString(headers).get();
+    this.headers = JSON.stringToValue(headersJson, HashMap.class).get();
 
+    String parametersJson = JSON.valueAsString(queryParameters).get();
+    this.queryParameters = JSON.stringToValue(parametersJson, HashMap.class).get();
 
-    String headersJson = JSON.stringify(headers);
-    ;
-    this.headers = JSON.parse(headersJson, type);
+    String propertiesJson = JSON.valueAsString(pathParameters).get();
+    this.pathParameters = JSON.stringToValue(propertiesJson, HashMap.class).get();
 
-    String parametersJson = JSON.stringify(queryParameters);
-    this.queryParameters = JSON.parse(parametersJson, type);
-
-    String propertiesJson = JSON.stringify(pathParameters);
-    this.pathParameters = JSON.parse(propertiesJson, type);
-
-    String formJson = JSON.stringify(formParameters);
-    this.formParameters = JSON.parse(formJson, type);
+    String formJson = JSON.valueAsString(formParameters).get();
+    this.formParameters = JSON.stringToValue(formJson, HashMap.class).get();
   }
 
   private HttpOptions() {

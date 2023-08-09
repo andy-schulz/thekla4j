@@ -182,6 +182,6 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    * @return JSON-formatted string of the activityLog with its tree structure
    */
   public String toJson(){
-    return JSON.stringify(rootActivityLogEntry.getLogTree());
+    return JSON.jStringify(rootActivityLogEntry.getLogTree());
   }
 }

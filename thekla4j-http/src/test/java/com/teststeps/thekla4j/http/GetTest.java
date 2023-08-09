@@ -4,7 +4,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.http.core.Cookie;
 import com.teststeps.thekla4j.http.httpConn.HcHttpClient;
-import com.teststeps.thekla4j.http.spp.CONTENT_TYPE;
+import com.teststeps.thekla4j.http.spp.ContentType;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import com.teststeps.thekla4j.http.spp.abilities.UseTheRestApi;
@@ -44,6 +44,10 @@ public class GetTest {
     Actor tester = Actor.named("Tester")
         .whoCan(UseTheRestApi.with(HcHttpClient.using(HttpOptions.empty())));
 
+    Cookie replacedCookie = Cookie.empty()
+        .withName("JSESSION")
+        .withValue("w45324523452345");
+
     Cookie cookie = Cookie.empty()
         .withName("JSESSION")
         .withValue("DSKDNFKDDFJKNVJVN");
@@ -55,7 +59,9 @@ public class GetTest {
     HttpOptions opts = HttpOptions.empty()
         .cookies(List.of(cookie, cookie2));
 
-    Request postRequest = Request.on("http://localhost:8888/post");
+    Request postRequest = Request
+        .on("http://localhost:8888/post")
+        .withOptions(HttpOptions.empty().cookies(List.of(replacedCookie)));
 
     tester.attemptsTo(
             Post.to(postRequest).options(opts))
@@ -67,6 +73,7 @@ public class GetTest {
 
   @Test
   public void setContentType() {
-    assertThat(CONTENT_TYPE.APPLICATION_X_WWW_FORM_URLENCODED.asString, equalTo("application/x-www-form-urlencoded"));
+
+    assertThat(ContentType.APPLICATION_X_WWW_FORM_URLENCODED.asString, equalTo("application/x-www-form-urlencoded"));
   }
 }

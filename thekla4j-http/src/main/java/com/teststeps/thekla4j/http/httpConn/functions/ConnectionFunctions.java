@@ -9,19 +9,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ConectionFunctions {
+import static com.teststeps.thekla4j.http.spp.ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
+import static com.teststeps.thekla4j.http.spp.HttpHeaderType.CONTENT_TYPE;
 
-  public static Function1<HttpOptions, byte[]> getFormContent =
+public class ConnectionFunctions {
+
+  public static Function1<HttpOptions, String> getFormContent =
     opts -> HashMap.ofAll(opts.formParameters)
                    .toList()
                    .map(tuple -> tuple._1 + "=" + tuple._2)
-                   .collect(Collectors.joining("&"))
-                   .getBytes(StandardCharsets.UTF_8);
+                   .collect(Collectors.joining("&"));
 
 
   public static Function<HttpOptions, Try<Boolean>> isXWwwFormUrlencoded =
     opts -> {
-      if (opts.headers.containsKey("Content-Type") && opts.headers.get("Content-Type").equals("application/x-www-form-urlencoded")) {
+      if (opts.headers.containsKey(CONTENT_TYPE.asString) && opts.headers.get(CONTENT_TYPE.asString).contains(APPLICATION_X_WWW_FORM_URLENCODED.asString)) {
         return opts.formParameters.isEmpty() ?
           Try.failure(new Throwable("Content-Type is set to 'x-www-form-urlencoded' but Form Parameters are missing")) :
           Try.success(true);
