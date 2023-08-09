@@ -4,15 +4,28 @@ import com.teststeps.thekla4j.http.core.Cookie;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.collection.List;
+import io.vavr.control.Try;
 
 import java.time.LocalDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
+import java.time.format.SignStyle;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.vavr.API.*;
+import static java.time.temporal.ChronoField.*;
 
 public class CookieFunctions {
+
+  private static final String europeanDatePattern = "E, dd-LLL-yyyy HH:mm:ss O";
+  private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(europeanDatePattern)
+      .localizedBy(Locale.US);
 
   public static final Function1<List<Cookie>, String> toCookieString =
       cookieList -> cookieList
@@ -49,9 +62,12 @@ public class CookieFunctions {
 
   private static final Function1<List<String>, LocalDateTime> parseExpireValue =
       list -> list.getOption(1)
-          .map(value -> LocalDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(value)))
+          .map(value -> Try.of(() -> DateTimeFormatter.RFC_1123_DATE_TIME.parse(value))
+              .getOrElseTry(() -> formatter.parse(value)))
+          .map(LocalDateTime::from)
           .getOrNull();
 
   private static final Function1<Cookie, String> cookieToString =
       cookie -> cookie.name + "=" + cookie.value;
+
 }
