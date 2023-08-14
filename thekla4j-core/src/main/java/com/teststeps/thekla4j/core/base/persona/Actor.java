@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class Actor implements PerformsTask, UsesAbilities {
+public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     private final HashMap<String, Ability> abilityMap = new HashMap<>();
     private final String name;
     public final TheklaActivityLog activityLog;
+
+    private ActorsWorld world;
 
     public static Actor named(String name) {
         return new Actor(name);
@@ -698,5 +700,16 @@ public class Actor implements PerformsTask, UsesAbilities {
     private Actor(String name) {
         this.name = name;
         this.activityLog = new TheklaActivityLog(name);
+    }
+
+    @Override
+    public ActorsWorld getWorld() {
+        return world;
+    }
+
+    @Override
+    public Actor withWorld(ActorsWorld world) {
+        this.world = world;
+        return this;
     }
 }
