@@ -3,11 +3,9 @@ package com.teststeps.thekla4j.core;
 import com.teststeps.thekla4j.core.activities.Sleep;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.ActorsWorld;
-import io.vavr.Function1;
 import lombok.*;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.time.Duration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
