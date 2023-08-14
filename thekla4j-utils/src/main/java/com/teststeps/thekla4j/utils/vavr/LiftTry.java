@@ -32,13 +32,7 @@ public class LiftTry {
 
 
   public static <U1, U2> Function2<Try<U1>, Try<U2>, Try<Tuple2<U1, U2>>> toTuple2() {
-    return (t1, t2) -> {
-      return t1.flatMap((u1) -> {
-        return t2.map((u2) -> {
-          return Tuple.of(u1, u2);
-        });
-      });
-    };
+    return (t1, t2) -> t1.flatMap((u1) -> t2.map((u2) -> Tuple.of(u1, u2)));
   }
 
   /**
