@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.assertions.lib.ExecuteAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
+import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function0;
 import io.vavr.Function1;
@@ -15,6 +16,7 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
@@ -102,6 +104,10 @@ public class See<P, M> extends Interaction<P, P> {
     return new See<>(PassedActivityResult.ofLastActivity());
   }
 
+  public static <V> See<Void, V> ifValue(V value) {
+    return new See<>(new Value<>(value));
+  }
+
   public See<P, M> is(ExecuteAssertion<M> matcher) {
     this.matchers = this.matchers.append(ValidateResult.with(matcher, "expected to match validation"));
     return this;
@@ -122,5 +128,13 @@ public class See<P, M> extends Interaction<P, P> {
     return this;
   }
 
+  @AllArgsConstructor
+  private static class Value<I> extends Task<Void, I> {
 
+    private final I val;
+    @Override
+    protected Either<ActivityError, I> performAs(Actor actor, Void result) {
+      return Either.right(val);
+    }
+  }
 }
