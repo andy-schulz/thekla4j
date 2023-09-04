@@ -6,9 +6,12 @@ import com.teststeps.thekla4j.utils.json.JSON;
 import com.teststeps.thekla4j.utils.json.TypeTokenT4j;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import lombok.NonNull;
 
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
