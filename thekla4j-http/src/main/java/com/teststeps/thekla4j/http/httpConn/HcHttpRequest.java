@@ -6,8 +6,7 @@ import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
-import io.vavr.Function1;
-import io.vavr.Function3;
+import io.vavr.*;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -18,15 +17,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -36,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -84,11 +76,11 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function3<File, String, HttpURLConnection, Try<HttpURLConnection>> writeFile = (file, fieldName, con) -> Try.of(() -> {
 
-    String boundary = "*****";
+    String boundary = UUID.randomUUID().toString().replace("-", "");
     String crlf = "\r\n";
     String twoHyphens = "--";
 
-    String LINE = "\r\n";
+    String LINE = crlf;
 
     con.setRequestMethod("POST");
     con.setRequestProperty("Connection", "Keep-Alive");
@@ -101,11 +93,17 @@ public class HcHttpRequest implements HttpRequest {
     // add file part
     String fileName = file.getName();
 
-    writer.append("--" + boundary).append(LINE);
-    writer.append("Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\"").append(LINE);
-    writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(fileName)).append(LINE);
-    writer.append("Content-Transfer-Encoding: binary").append(LINE);
-    writer.append(LINE);
+    StringWriter sw = new StringWriter();
+    this.appendFormParameters.apply(this.opts, boundary, LINE, sw);
+
+    sw.append(twoHyphens + boundary).append(LINE);
+    sw.append("Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\"").append(LINE);
+    sw.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(fileName)).append(LINE);
+    sw.append("Content-Transfer-Encoding: binary").append(LINE);
+    sw.append(LINE);
+
+    log.trace(() -> "Content: " + sw);
+    writer.append(sw.toString());
     writer.flush();
 
     FileInputStream inputStream = new FileInputStream(file);
@@ -119,12 +117,29 @@ public class HcHttpRequest implements HttpRequest {
     writer.append(LINE);
     writer.flush();
 
-    writer.flush();
-    writer.append("--" + boundary + "--").append(LINE);
+    writer.append(twoHyphens + boundary + twoHyphens).append(LINE);
     writer.close();
 
     return con;
   });
+
+  private final Function4<HttpOptions, String, String, StringWriter, StringWriter> appendFormParameters = (opts, boundary, LINE, writer) -> {
+    HashMap.ofAll(opts.formParameters)
+        .forEach((k,v) -> this.appendFormParameter.apply(k, v, boundary, LINE, writer));
+    return null;
+  };
+
+  private final Function5<String, String, String, String, StringWriter, Void> appendFormParameter = (key, value, boundary, LINE, writer) -> {
+
+    writer.append("--").append(boundary).append(LINE)
+        .append("Content-Disposition: form-data; name=\"" + key + "\"")
+        .append(LINE)
+        .append(LINE)
+        .append(value)
+        .append(LINE);
+
+    return null;
+  };
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeFormParameter = con -> Try.of(() -> {
 

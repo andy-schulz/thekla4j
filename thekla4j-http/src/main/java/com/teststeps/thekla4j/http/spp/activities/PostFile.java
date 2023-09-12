@@ -29,6 +29,4 @@ public class PostFile extends RequestInteraction<PostFile> {
       this.fieldName = fieldName;
     }
   }
-
-
 }
