@@ -9,6 +9,7 @@ import io.vavr.Tuple3;
 import io.vavr.Tuple4;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 
@@ -190,6 +191,15 @@ public class LiftTry {
     return hashMap -> hashMap.foldLeft(
       Try.success(HashMap.empty()),
       (theTry, entry) -> theTry.flatMap(newMap -> entry._2.map(value -> newMap.put(entry._1, value))));
+  }
+
+
+  public static <S, T> Function1<Map<S, Try<T>>, Try<Map<S, T>>> fromMap() {
+    return map -> map.foldLeft(
+        // have to remove all entries from the map as I don't know which type of map it is (e.g. HashMap, TreeMap, ...)
+        // values mapping has to be done so that the return types match, it has no effect as the map is already empty
+        Try.success(map.removeAll(map.keySet()).mapValues(Try::get)),
+        (theTry, entry) -> theTry.flatMap(newMap -> entry._2.map(value -> newMap.put(entry._1, value))));
   }
 
   public static <T> Function1<List<Try<T>>, Try<List<T>>> fromList() {
