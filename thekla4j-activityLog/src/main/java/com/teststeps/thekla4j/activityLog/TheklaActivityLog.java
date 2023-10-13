@@ -93,11 +93,16 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     if (logPrefix == null)
       logPrefix = " ";
 
-    this.setRootNodeStatus();
-    ActivityLogNode logTree = this.rootActivityLogEntry.getLogTree();
+    ActivityLogNode logTree = getLogTree();
 
     return LogFormatter.formatLogWithPrefix(logPrefix, 0, logTree);
   }
+
+  private ActivityLogNode getLogTree() {
+    this.setRootNodeStatus();
+    return this.rootActivityLogEntry.getLogTree();
+  }
+
 
   /**
    * the encoded structured activity log as text
@@ -118,9 +123,12 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    */
   @Override
   public String getStructuredHtmlLog() {
-    this.setRootNodeStatus();
-    ActivityLogNode logTree = this.rootActivityLogEntry.getLogTree();
+    ActivityLogNode logTree = getLogTree();
     return LogFormatter.formatLogAsHtmlTree(logTree);
+  }
+
+  public static String getStructuredHtmlListLog(List<TheklaActivityLog> logs) {
+    return LogFormatter.formatLogAsHtmlTree(logs.map(TheklaActivityLog::getLogTree));
   }
 
   transient private final Function<ActivityLogNode, ActivityLogNode> removeIO = node -> {
@@ -140,8 +148,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    */
   @Override
   public String getStructuredHtmlLogWithoutIO() {
-    this.setRootNodeStatus();
-    ActivityLogNode logTree = this.rootActivityLogEntry.getLogTree();
+    ActivityLogNode logTree = getLogTree();;
     return LogFormatter.formatLogAsHtmlTree(removeIO.apply(logTree));
   }
 
