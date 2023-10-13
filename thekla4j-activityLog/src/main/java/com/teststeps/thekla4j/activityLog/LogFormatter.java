@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.activityLog;
 
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 
 import java.io.BufferedReader;
@@ -107,6 +108,11 @@ public class LogFormatter {
     return "<ul id = \"ActivityLog\">" + formatNodeToHtml(logNode) + "</ul>";
   }
 
+  static String formatLogWithHtmlTags(List<ActivityLogNode> logNodes) {
+    return logNodes.map(LogFormatter::formatLogWithHtmlTags)
+        .collect(Collectors.joining("<br>"));
+  }
+
 
   /**
    * format the node to an html tree and add the style and JS function to the html representation
@@ -125,6 +131,26 @@ public class LogFormatter {
                                  LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
                                  formatLogWithHtmlTags(logNode),
                                  functionScript);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return returnText;
+  }
+
+  public static String formatLogAsHtmlTree(List<ActivityLogNode> logNode) {
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    String formattedText = "<style>\n%s\n</style> " +
+        "\n\n%s " +
+        "\n\n%s";
+    String returnText = "";
+    try {
+      returnText = String.format(formattedText,
+          LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
+          formatLogWithHtmlTags(logNode),
+          functionScript);
 
     } catch (IOException e) {
       e.printStackTrace();
