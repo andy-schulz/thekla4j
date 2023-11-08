@@ -4,12 +4,14 @@
 
 plugins {
     id 'java-library'
+    id "pl.allegro.tech.build.axion-release"
     id "io.freefair.lombok"
     id "com.teststeps.thekla4j.logging"
 }
 
 group 'com.test-steps.thekla4j'
-version '1.0.0-SNAPSHOT'
+//version '1.0.0-SNAPSHOT'
+version scmVersion.version
 
 repositories {
     mavenCentral()
