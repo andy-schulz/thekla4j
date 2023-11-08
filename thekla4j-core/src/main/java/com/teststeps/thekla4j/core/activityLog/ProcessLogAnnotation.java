@@ -73,11 +73,11 @@ public class ProcessLogAnnotation<P1, R1> {
   private Try<ActivityLogData> process() {
     if (this.activity == null)
       return Try.failure(DetectedNullObject.forProperty(this.getClass()
-                                                            .getSimpleName() + "::activity"));
+          .getSimpleName() + "::activity"));
 
     if (this.actor == null)
       return Try.failure(DetectedNullObject.forProperty(this.getClass()
-                                                            .getSimpleName() + "::actor"));
+          .getSimpleName() + "::actor"));
 
     Class<?> clazz = this.activity.getClass();
 
@@ -86,19 +86,21 @@ public class ProcessLogAnnotation<P1, R1> {
 
     if (flowAnT == null && interactionAnT == null)
       return Try.failure(DoesNotHave
-                             .logAnnotation(Workflow.class.getSimpleName() + " or " + Action.class.getSimpleName())
-                             .in(this.activity));
+          .logAnnotation(Workflow.class.getSimpleName() + " or " + Action.class.getSimpleName())
+          .in(this.activity));
 
     TASK_LOG logType = flowAnT == null ? interactionAnT.log() : flowAnT.log();
 
-    return Try.of(() -> createLogDescription(flowAnT != null ?
-                                                 flowAnT.value() :
-                                                 interactionAnT.value(),
-                                             clazz,
-                                             (Option<Object>) this.parameter))
-              .map(desc -> new ActivityLogData(desc, flowAnT != null ?
-                  ActivityLogEntryType.Task :
-                  ActivityLogEntryType.Interaction, logType));
+    return Try.of(() -> createLogDescription(
+            flowAnT != null ?
+                flowAnT.value() :
+                interactionAnT.value(),
+            clazz,
+            (Option<Object>) this.parameter
+                                            ))
+        .map(desc -> new ActivityLogData(desc, flowAnT != null ?
+            ActivityLogEntryType.Task :
+            ActivityLogEntryType.Interaction, logType));
   }
 
 
@@ -107,8 +109,15 @@ public class ProcessLogAnnotation<P1, R1> {
    */
   private final Function1<List<Annotation>, List<Annotation>> filterAnnotations =
       list -> list.filter(annotation ->
-                              annotation instanceof CalledList ||
-                                  annotation instanceof Called);
+          annotation instanceof CalledList ||
+              annotation instanceof Called);
+
+  private final Function1<Field, Field> makePrivateFieldAccessible = field -> {
+    if (Modifier.isPrivate(field.getModifiers())) {
+      field.setAccessible(true);
+    }
+    return field;
+  };
 
   /**
    * construct a tuple with field value and field annotations
@@ -118,12 +127,12 @@ public class ProcessLogAnnotation<P1, R1> {
   private final Function2<Activity<P1, R1>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getFieldValueAndAnnotations =
       (actvty, clazz) -> {
 
-        Function1<Field, Field> makePrivateFieldAccessible = field -> {
-          if (Modifier.isPrivate(field.getModifiers())) {
-            field.setAccessible(true);
-          }
-          return field;
-        };
+//        Function1<Field, Field> makePrivateFieldAccessible = field -> {
+//          if (Modifier.isPrivate(field.getModifiers())) {
+//            field.setAccessible(true);
+//          }
+//          return field;
+//        };
 
     /*
     get field value, if the field is a function execute it and take the result
@@ -141,15 +150,14 @@ public class ProcessLogAnnotation<P1, R1> {
         };
 
         return List.of(clazz.getFields())
-                   .appendAll(Arrays.asList(clazz.getDeclaredFields()))
-
-                   .map(field -> Tuple.of(field, field.getAnnotations()))
-                   .map(t -> t.map2(List::of))
-                   .map(t -> t.map2(filterAnnotations))
-                   .filter(t -> !t._2.isEmpty())
-                   .map(t -> t.map1(makePrivateFieldAccessible))
-                   .map(t -> t.map1(getFieldValue))
-                   .map(t -> t.map1(Option::of));
+            .appendAll(Arrays.asList(clazz.getDeclaredFields()))
+            .map(field -> Tuple.of(field, field.getAnnotations()))
+            .map(t -> t.map2(List::of))
+            .map(t -> t.map2(filterAnnotations))
+            .filter(t -> !t._2.isEmpty())
+            .map(t -> t.map1(makePrivateFieldAccessible))
+            .map(t -> t.map1(getFieldValue))
+            .map(t -> t.map1(Option::of));
       };
 
 
@@ -158,33 +166,39 @@ public class ProcessLogAnnotation<P1, R1> {
    */
   private final Function2<Option<Object>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getAnnotationsOfParameters1 =
       (object, clazz) -> List.of(clazz.getDeclaredMethods())
-                             // the annotation is only valid for the performAs method
-                             // other methods cant be supported
-                             .filter(method -> method.getName()
-                                                     .equals("performAs"))
-                             .map(method -> Tuple.of(object, method.getParameterAnnotations()))
-                             // select only annotations of performAs second parameter
-                             .map(t -> t.map2(annos -> annos[1]))
-                             .map(t -> t.map2(List::of))
-                             // only Called and CalledList annotations are of interest
-                             .map(t -> t.map2(filterAnnotations));
+          // the annotation is only valid for the performAs method
+          // other methods cant be supported
+          .filter(method -> method.getName()
+              .equals("performAs"))
+          .map(method -> Tuple.of(object, method.getParameterAnnotations()))
+          // select only annotations of performAs second parameter
+          .map(t -> t.map2(annos -> annos[1]))
+          .map(t -> t.map2(List::of))
+          // only Called and CalledList annotations are of interest
+          .map(t -> t.map2(filterAnnotations));
+
+
+  private final Function2<Class<? extends Object>, String, Try<Field>> getFieldByName =
+      (clazz, fieldName) -> Try.of(() -> clazz.getDeclaredField(fieldName))
+          .map(makePrivateFieldAccessible);
 
 
   /*
    * get the value of fieldName from object (by reflection)
    */
-  Function2<Option<Object>, String, Option<Object>> getAttribute =
+  private final Function2<Option<Object>, String, Option<Object>> getAttribute =
       (obj, fieldName) ->
           obj.map(Object::getClass)
-             .flatMap(clz -> Try
-                 // dont try to find a field for fieldName "" in the object, just return the object
-                 .of(() -> fieldName.equals("") ?
-                     obj.get() :
-                     clz.getField(fieldName)
-                        .get(obj.get()))
-                 .onFailure(ex -> ProcessLogAnnotation.log.error(ex + " in object of type " + clz.getSimpleName()))
-                 // toOption is used so that i can use flatMap
-                 .toOption());
+              .flatMap(clz -> Try
+                  // don't try to find a field for fieldName "" in the object, just return the object
+                  .of(() -> fieldName.equals("") ?
+                      obj.get() :
+                      getFieldByName.apply(clz, fieldName)
+                          .mapTry(f -> f.get(obj.get()))
+                          .get())
+                  .onFailure(ex -> log.error(ex + " in object of type " + clz.getSimpleName()))
+                  // toOption is used so that I can use flatMap
+                  .toOption());
 
 
   private final Function1<CalledList, List<Called>> processAnnotationList =
@@ -194,28 +208,23 @@ public class ProcessLogAnnotation<P1, R1> {
   /**
    * extract the value of attributeString from parameter
    * <p>
-   * e.g.
-   * let attributeString = "referencedObject.name"
+   * e.g. let attributeString = "referencedObject.name"
    * <p>
    * and parameter is an object of:
    * <p>
-   * MyObject1(
-   * MyObject2 referencedObject = obj;
-   * )
+   * MyObject1( MyObject2 referencedObject = obj; )
    * <p>
    * with:
    * <p>
-   * MyObject2(
-   * String name = "MyObjectName"
-   * )
+   * MyObject2( String name = "MyObjectName" )
    * <p>
    * then "MyObjectName" will be returned
    */
   private final Function2<Option<Object>, String, String> extractMyAttribute =
       (param, attributeString) -> List.of(attributeString.split("\\."))
-                                      .foldLeft(param, getAttribute)
-                                      .map(Object::toString)
-                                      .getOrElse("not found");
+          .foldLeft(param, getAttribute)
+          .map(Object::toString)
+          .getOrElse("not found");
 
   private final Function2<String, Tuple2<String, String>, String> replaceSingleAttributeInString =
       (theDesc, tu) -> theDesc.replace(tu._2, tu._1);
@@ -232,7 +241,8 @@ public class ProcessLogAnnotation<P1, R1> {
           .map(tuple -> tuple
               .map2(annotation -> Match(annotation).of(
                   Case($(a -> a instanceof CalledList), a -> processAnnotationList.apply((CalledList) a)),
-                  Case($(a -> a instanceof Called), a -> List.of((Called) a)))))
+                  Case($(a -> a instanceof Called), a -> List.of((Called) a))
+                                                      )))
           // flatten the annotation list again
           .flatMap(t -> t.apply((t1, t2) -> t2.map(a -> Tuple.of(t1, a))))
           // get the replacements from parameter
@@ -249,11 +259,11 @@ public class ProcessLogAnnotation<P1, R1> {
 
 
     return Option.of(description)
-                 // process and replace the fields
-                 .map(processAnnotationsAndReplace.apply(getFieldValueAndAnnotations.apply(this.activity, clazz)))
-                 // process and replace the parameter in the performAs method
-                 .map(processAnnotationsAndReplace.apply(getAnnotationsOfParameters1.apply(param, clazz)))
-                 .get();
+        // process and replace the fields
+        .map(processAnnotationsAndReplace.apply(getFieldValueAndAnnotations.apply(this.activity, clazz)))
+        // process and replace the parameter in the performAs method
+        .map(processAnnotationsAndReplace.apply(getAnnotationsOfParameters1.apply(param, clazz)))
+        .get();
   }
 
   ProcessLogAnnotation(Activity<P1, R1> activity, Option<P1> param, Actor actor) {

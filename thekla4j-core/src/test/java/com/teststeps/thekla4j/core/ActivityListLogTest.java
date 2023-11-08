@@ -1,17 +1,14 @@
 package com.teststeps.thekla4j.core;
 
-import com.teststeps.thekla4j.activityLog.*;
+import com.teststeps.thekla4j.activityLog.ActivityLogEntry;
+import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
+import com.teststeps.thekla4j.activityLog.ActivityStatus;
+import com.teststeps.thekla4j.activityLog.LogFormatter;
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import io.vavr.collection.List;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ActivityListLogTest {
     static ActivityLogEntry childA1, childA2, parentA1, parentA2, grandParentA;
