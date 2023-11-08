@@ -9,4 +9,5 @@ include(':thekla4j-http')
 include(':thekla4j-utils')
 include(':thekla4j-assertions')
 include(':thekla4j-commons')
+include(':thekla4j-websocket')
 
