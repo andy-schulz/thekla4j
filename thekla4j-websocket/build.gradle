@@ -3,9 +3,19 @@ plugins {
     id 'com.teststeps.thekla4j.publish'
 }
 
+
 dependencies {
     api project(':thekla4j-core')
     implementation project(':thekla4j-utils')
+
+    implementation group: 'org.springframework', name: 'spring-websocket', version: '6.1.0'
+    implementation group: "org.springframework", name: "spring-messaging", version: "6.1.0"
+
+    // NoClassDefFound javax/websocket/ClientEndpointConfig$Configurator
+    implementation group: 'org.glassfish.tyrus.bundles', name: 'tyrus-standalone-client', version: '2.1.4'
+
+    // for SockJs message codec
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.0'
 }
 
 description = 'websocket activity implementation'
