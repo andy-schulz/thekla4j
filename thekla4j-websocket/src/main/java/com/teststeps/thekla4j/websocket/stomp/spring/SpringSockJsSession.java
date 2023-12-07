@@ -8,16 +8,14 @@ import org.springframework.messaging.simp.stomp.StompSession;
 public record SpringSockJsSession(
     String url,
     StompSession session,
-    SpringStompSessionHandler connectSessionHandler,
-    List<SpringStompDestination> destinations
+    SpringStompSessionConnectHandler connectSessionHandler
 ) {
 
   public static SpringSockJsSession empty() {
     return new SpringSockJsSession(
         null,
         null,
-        null,
-        List.empty()
+        null
     );
   }
 }

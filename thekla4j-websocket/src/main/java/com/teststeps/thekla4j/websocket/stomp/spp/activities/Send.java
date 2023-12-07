@@ -36,6 +36,7 @@ public class Send extends Interaction<Void, Receipt> {
   public static Send payload(Object payload) {
     return new Send(payload, Option.none(), StompHeaders.empty());
   }
+
   public Send to(Destination destination) {
     return new Send(payload, Option.of(destination), headers);
   }

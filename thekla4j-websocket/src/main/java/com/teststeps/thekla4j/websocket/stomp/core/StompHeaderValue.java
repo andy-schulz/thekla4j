@@ -24,8 +24,7 @@ public enum StompHeaderValue {
   MESSAGE_ID("message-id"),
   RECEIPT_ID("receipt-id"),
 
-  UNKNOWN("unknown")
-  ;
+  UNKNOWN("unknown");
 
   private final String label;
 

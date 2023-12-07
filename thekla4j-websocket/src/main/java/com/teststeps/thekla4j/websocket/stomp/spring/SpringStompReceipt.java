@@ -14,6 +14,7 @@ public class SpringStompReceipt implements Receipt {
   public static SpringStompReceipt of(StompSession.Receiptable receiptable) {
     return new SpringStompReceipt(receiptable);
   }
+
   @Override
   public String receiptId() {
     return receiptable.getReceiptId();

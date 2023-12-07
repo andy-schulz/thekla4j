@@ -4,20 +4,17 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
-import com.teststeps.thekla4j.websocket.stomp.core.Destination;
-import com.teststeps.thekla4j.websocket.stomp.core.StompClient;
-import com.teststeps.thekla4j.websocket.stomp.core.StompDestination;
+import com.teststeps.thekla4j.websocket.stomp.core.*;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 
 public class UseWebsocketWithStomp implements Ability {
 
 
-
   private final StompClient stompClient;
 
-  public static Either<ActivityError, UseWebsocketWithStomp> as(UsesAbilities actor)  {
-    return Try.of(() -> (UseWebsocketWithStomp)actor.withAbilityTo(UseWebsocketWithStomp.class))
+  public static Either<ActivityError, UseWebsocketWithStomp> as(UsesAbilities actor) {
+    return Try.of(() -> (UseWebsocketWithStomp) actor.withAbilityTo(UseWebsocketWithStomp.class))
         .transform(LiftTry.toEither(ActivityError::with));
   }
 
@@ -27,6 +24,11 @@ public class UseWebsocketWithStomp implements Ability {
 
   public Either<ActivityError, StompDestination> atDestination(Destination spe) {
     return this.stompClient.getDestination(spe)
+        .transform(LiftTry.toEither(ActivityError::with));
+  }
+
+  public Either<ActivityError, StompHeaders> connectTo(Endpoint endpoint) {
+    return this.stompClient.connectTo(endpoint)
         .transform(LiftTry.toEither(ActivityError::with));
   }
 

@@ -43,14 +43,14 @@ public class SpringStompDestination implements StompDestination {
   public Either<ActivityError, Receipt> send(StompHeaders headers, Object payload) {
 
     return destination.transform(LiftEither.fromOption(() -> ActivityError.with("no Destination to send a message to found")))
-            .map(dest -> {
+        .map(dest -> {
 
-              StompSession.Receiptable receiptable =
-                  session.session().send(SpringFunctions.toSpringStompHeaders.apply(dest, headers), payload);
+          StompSession.Receiptable receiptable =
+              session.session().send(SpringFunctions.toSpringStompHeaders.apply(dest, headers), payload);
 
-              this.receipt = Option.of(SpringStompReceipt.of(receiptable));
-              return receipt.get();
-            });
+          this.receipt = Option.of(SpringStompReceipt.of(receiptable));
+          return receipt.get();
+        });
   }
 
   public Boolean equals(Destination destination) {
@@ -81,7 +81,8 @@ public class SpringStompDestination implements StompDestination {
         Option.of(destination.destination()),
         Option.none(),
         Option.none(),
-        new SpringStompSessionHandler(destination.destination()));
+        new SpringStompSessionHandler(destination.destination())
+    );
 
   }
 

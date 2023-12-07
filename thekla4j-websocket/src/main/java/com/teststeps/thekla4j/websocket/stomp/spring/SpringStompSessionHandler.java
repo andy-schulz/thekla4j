@@ -30,11 +30,15 @@ public class SpringStompSessionHandler implements StompSessionHandler {
     return errors;
   }
 
+  public com.teststeps.thekla4j.websocket.stomp.core.StompHeaders connectHeaders;
+
   @Override
   public void afterConnected(@NonNull StompSession session, @NonNull StompHeaders connectedHeaders) {
 
     log.info(prefix + ": connected");
     System.out.println(connectedHeaders);
+
+    this.connectHeaders = SpringFunctions.toStompHeaders.apply(connectedHeaders);
 
   }
 
@@ -47,7 +51,8 @@ public class SpringStompSessionHandler implements StompSessionHandler {
             ERROR,
             SpringFunctions.toStompHeaders.apply(headers),
             payload,
-            exception));
+            exception
+                     ));
   }
 
   @Override
@@ -59,7 +64,8 @@ public class SpringStompSessionHandler implements StompSessionHandler {
             ERROR,
             com.teststeps.thekla4j.websocket.stomp.core.StompHeaders.empty(),
             null,
-            exception));
+            exception
+                     ));
 
   }
 
@@ -74,7 +80,7 @@ public class SpringStompSessionHandler implements StompSessionHandler {
   public void handleFrame(@NonNull StompHeaders headers, Object payload) {
 
     System.out.println(payload.getClass().getSimpleName());
-    System.out.println( new String((byte[])payload, StandardCharsets.UTF_8));
+    System.out.println(new String((byte[]) payload, StandardCharsets.UTF_8));
 
     log.debug(() -> prefix + " frame: " + payload);
 
@@ -82,7 +88,8 @@ public class SpringStompSessionHandler implements StompSessionHandler {
         StompFrame.of(
             MESSAGE,
             SpringFunctions.toStompHeaders.apply(headers),
-            payload));
+            payload
+                     ));
   }
 
   public SpringStompSessionHandler(String prefix) {

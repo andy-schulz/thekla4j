@@ -1,9 +1,9 @@
 package com.teststeps.thekla4j.websocket.stomp.spp.activities;
 
+import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
-import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Task;
+import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.websocket.stomp.core.Destination;
 import com.teststeps.thekla4j.websocket.stomp.core.StompHeaders;
@@ -15,8 +15,8 @@ import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Workflow("subscribe to destination @{destination}")
-public class Subscribe extends Task<Void, Subscription> {
+@Action("subscribe to destination @{destination}")
+public class Subscribe extends Interaction<Void, Subscription> {
 
   @Called(name = "destination", value = "destination")
   private Destination destination;

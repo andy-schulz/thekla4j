@@ -5,7 +5,6 @@ import com.teststeps.thekla4j.websocket.stomp.core.Destination;
 import com.teststeps.thekla4j.websocket.stomp.core.Endpoint;
 import com.teststeps.thekla4j.websocket.stomp.core.StompClient;
 import com.teststeps.thekla4j.websocket.stomp.core.StompDestination;
-import com.teststeps.thekla4j.websocket.stomp.spring.functions.ClientConfiguration;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -13,6 +12,7 @@ import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.WebSocketContainer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.messaging.converter.SimpleMessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -27,6 +27,7 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -34,7 +35,7 @@ import static com.teststeps.thekla4j.websocket.stomp.spring.functions.ClientConf
 
 @Log4j2(topic = "SpringSockJsClient")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SpringSockJsClient implements StompClient {
+public class SpringStompClient implements StompClient {
 
 
   private Option<Endpoint> defaultEndpoint;
@@ -42,12 +43,8 @@ public class SpringSockJsClient implements StompClient {
   private List<SpringStompDestination> destinations;
 
 
-  public static SpringSockJsClient connectingTo(Endpoint endpoint) {
-    return new SpringSockJsClient(Option.of(endpoint), List.empty(), List.empty());
-  }
-
-  public static SpringSockJsClient connectingToMultipleEndpoints() {
-    return new SpringSockJsClient(Option.none(), List.empty(), List.empty());
+  public static SpringStompClient usingSockJs() {
+    return new SpringStompClient(Option.none(), List.empty(), List.empty());
   }
 
   @Override
@@ -57,6 +54,18 @@ public class SpringSockJsClient implements StompClient {
         .map(Try::success)
         .getOrElse(() -> createNewDestination(destination))
         .map(Function.identity());
+  }
+
+  @Override
+  public Try<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> connectTo(@NonNull Endpoint endpoint) {
+
+    if (defaultEndpoint.isDefined())
+      return Try.failure(new IllegalStateException("Default endpoint already set. Cannot set another endpoint by using CONNECT task."));
+
+    this.defaultEndpoint = Option.of(endpoint);
+
+    return sessionForEndpoint(Option.of(endpoint))
+        .flatMap(sess -> sess.connectSessionHandler().getConnectionHeaders());
   }
 
   private SpringSockJsSession addSession(SpringSockJsSession session) {
@@ -82,7 +91,7 @@ public class SpringSockJsClient implements StompClient {
 
     return
         endpoint.transform(LiftTry.fromOption(
-            "No endpoint found. Set a default endpoint when creating the ability or provide an endpoint for each destination"))
+                "No endpoint found. Set a default endpoint when creating the ability or provide an endpoint for each destination"))
             .flatMap(ep -> sessions
                 .filter(s -> s.url().equals(ep.url()))
                 .map(Try::success)
@@ -111,11 +120,17 @@ public class SpringSockJsClient implements StompClient {
 
           endpoint.headers().headerList().forEach(header -> stompHeaders.add(header.name(), header.value()));
 
-          SpringStompSessionHandler sessionHandler = new SpringStompSessionHandler(endpoint.name());
+          CompletableFuture<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> future = new CompletableFuture<>();
+
+          SpringStompSessionConnectHandler sessionHandler = new SpringStompSessionConnectHandler(
+              endpoint.url(),
+              future,
+              endpoint.connectionTimeout()
+          );
 
           WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
 
-          if(endpoint.trackReceipts())
+          if (endpoint.trackReceipts())
             setTaskScheduler.apply(stompClient);
 
           stompClient.setMessageConverter(new SimpleMessageConverter());
