@@ -1,22 +1,36 @@
 package com.teststeps.thekla4j.utils.vavr;
 
-import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.Function3;
-import io.vavr.Function4;
-import io.vavr.Function5;
-import io.vavr.Tuple;
-import io.vavr.Tuple1;
-import io.vavr.Tuple2;
-import io.vavr.Tuple3;
-import io.vavr.Tuple4;
-import io.vavr.Tuple5;
+import io.vavr.*;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 
 
 public class LiftEither {
+
+  /**
+   * transforming an Either{L,R} into a Try{R}
+   *
+   * @param either Either{L,R}
+   * @return Either{L,R}
+   */
+  public static <U,E> Try<U> toTry(Either<E, U> either) {
+    return either.isLeft() ? Try.failure((Throwable) either.getLeft()) : Try.success(either.get());
+  }
+
+  /**
+   * transforming an Option{R} into an Either{L,R}
+   *
+   * @param errorFunction creating the error object of type L
+   * @return Either{L,R}
+   */
+  public static <L, R> Function1<Option<R>, Either<L, R>> fromOption(Function0<L> errorFunction) {
+    return option -> option.isEmpty() ? Either.left(errorFunction.apply()) :
+        Either.right(option.get());
+  }
+
 
   /**
    * returns a function that transforms a Tuple1{Either{T}} to Either{Tuple1{T}}
@@ -88,7 +102,11 @@ public class LiftEither {
    * @param <U>
    * @return
    */
-  public static <E extends Throwable, T, U, V> Function1<Tuple3<Either<E, T>, Either<E, U>, Either<E, V>>, Either<E, Tuple3<T, U, V>>> fromTuple3() {
+  public static <E extends Throwable, T, U, V> Function1<Tuple3<
+      Either<E, T>,
+      Either<E, U>,
+      Either<E, V>>,
+      Either<E, Tuple3<T, U, V>>> fromTuple3() {
     return tuple3 -> tuple3.apply(toTuple3());
   }
 
@@ -98,6 +116,51 @@ public class LiftEither {
       Either<E, U3>,
       Either<E, Tuple3<U1, U2, U3>>> toTuple3() {
     return (t1, t2, t3) -> t1.flatMap(u1 -> t2.flatMap(u2 -> t3.map(u3 -> Tuple.of(u1, u2, u3))));
+  }
+
+  /**
+   * returns a function that transforms a Tuple3{Either{T}, U, V} to Either{Tuple3{T,U,V}}
+   */
+
+  public static <E extends Throwable, T, U, V>
+  Function1<Tuple3<Either<E, T>, U, V>, Either<E, Tuple3<T, U, V>>> fromTuple3$1() {
+    return tup3 -> tup3.apply(toTuple3$1());
+  }
+
+  public static <E extends Throwable, U1, U2, U3> Function3<
+      Either<E, U1>, U2, U3,
+      Either<E, Tuple3<U1, U2, U3>>> toTuple3$1() {
+    return (et1, t2, t3) -> et1.map(u1 -> Tuple.of(u1, t2, t3));
+  }
+
+  /**
+   * returns a function that transforms a Tuple3{T, Either{U}, V} to Either{Tuple3{T,U,V}}
+   */
+
+  public static <E extends Throwable, T, U, V>
+  Function1<Tuple3<T, Either<E, U>, V>, Either<E, Tuple3<T, U, V>>> fromTuple3$2() {
+    return tup3 -> tup3.apply(toTuple3$2());
+  }
+
+  public static <E extends Throwable, U1, U2, U3> Function3<
+      U1, Either<E, U2>, U3,
+      Either<E, Tuple3<U1, U2, U3>>> toTuple3$2() {
+    return (t1, et2, t3) -> et2.map(u2 -> Tuple.of(t1, u2, t3));
+  }
+
+  /**
+   * returns a function that transforms a Tuple3{T, U, Either{V)} to Either{Tuple3{T,U,V}}
+   */
+
+  public static <E extends Throwable, T, U, V>
+  Function1<Tuple3<T, U, Either<E, V>>, Either<E, Tuple3<T, U, V>>> fromTuple3$3() {
+    return tup3 -> tup3.apply(toTuple3$3());
+  }
+
+  public static <E extends Throwable, U1, U2, U3> Function3<
+      U1, U2, Either<E, U3>,
+      Either<E, Tuple3<U1, U2, U3>>> toTuple3$3() {
+    return (t1, t2, et3) -> et3.map(u3 -> Tuple.of(t1, t2, u3));
   }
 
 

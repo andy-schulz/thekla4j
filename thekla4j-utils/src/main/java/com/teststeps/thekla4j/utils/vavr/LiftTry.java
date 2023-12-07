@@ -1,19 +1,37 @@
 package com.teststeps.thekla4j.utils.vavr;
 
-import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.Function3;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
-import io.vavr.Tuple3;
-import io.vavr.Tuple4;
+import io.vavr.*;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 
 public class LiftTry {
+
+  /**
+   * transforming a Try{R} into an Either{L,R}
+   *
+   * @param toErrorFunction Either{L,R}
+   * @return Either{L,R}
+   */
+  public static <L, R> Function1<Try<R>, Either<L, R>> toEither(Function1<Throwable, L> toErrorFunction) {
+    return tryObj -> tryObj.isFailure() ? Either.left(toErrorFunction.apply(tryObj.getCause())) :
+        Either.right(tryObj.get());
+  }
+
+  /**
+   * transforming an Option{R} into an Either{L,R}
+   *
+   * @param errorMessage in case the Option is empty create a failing Try with this error message
+   * @return Either{L,R}
+   */
+  public static <R> Function1<Option<R>, Try<R>> fromOption(String errorMessage) {
+    return option -> option.isEmpty() ? Try.failure(new Throwable(errorMessage)) :
+        Try.success(option.get());
+  }
 
 
   /**
