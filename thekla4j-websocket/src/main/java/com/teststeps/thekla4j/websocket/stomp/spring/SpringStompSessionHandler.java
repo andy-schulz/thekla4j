@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import static com.teststeps.thekla4j.websocket.stomp.core.StompCommand.ERROR;
 import static com.teststeps.thekla4j.websocket.stomp.core.StompCommand.MESSAGE;
 
-@Log4j2(topic = "SpringSockJsSessionHandler")
+@Log4j2(topic = "SpringStompSessionHandler")
 public class SpringStompSessionHandler implements StompSessionHandler {
   public String prefix;
   private List<StompFrame> messages = List.empty();

@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-@Log4j2(topic = "SpringSockJsSessionHandler")
+@Log4j2(topic = "SpringStompSessionConnectHandler")
 public class SpringStompSessionConnectHandler implements StompSessionHandler {
   private final String prefix;
   private final CompletableFuture<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> future;

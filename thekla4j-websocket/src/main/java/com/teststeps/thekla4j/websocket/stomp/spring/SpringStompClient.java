@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 import static com.teststeps.thekla4j.websocket.stomp.spring.functions.ClientConfiguration.setTaskScheduler;
 
-@Log4j2(topic = "SpringSockJsClient")
+@Log4j2(topic = "SpringStompClient")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpringStompClient implements StompClient {
 
