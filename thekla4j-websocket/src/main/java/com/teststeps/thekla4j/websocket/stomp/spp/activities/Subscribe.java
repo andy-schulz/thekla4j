@@ -27,7 +27,7 @@ public class Subscribe extends Interaction<Void, Subscription> {
   protected Either<ActivityError, Subscription> performAs(Actor actor, Void result) {
     return UseWebsocketWithStomp.as(actor)
         .flatMap(session -> session.atDestination(destination))
-        .flatMap(dest -> dest.subscribe(StompHeaders.empty()));
+        .flatMap(dest -> dest.subscribe(headers));
   }
 
   public static Subscribe to(Destination destination) {

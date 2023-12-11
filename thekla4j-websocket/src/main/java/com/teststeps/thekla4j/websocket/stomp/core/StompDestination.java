@@ -9,6 +9,8 @@ public interface StompDestination {
 
   public Either<ActivityError, Subscription> subscribe(StompHeaders options);
 
+  public String subscriptionId();
+
   public Either<ActivityError, Receipt> send(StompHeaders options, Object payload);
 
   public Either<ActivityError, List<StompFrame>> messages();

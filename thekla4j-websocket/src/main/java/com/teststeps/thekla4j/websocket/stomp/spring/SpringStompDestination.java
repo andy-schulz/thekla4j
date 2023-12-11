@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.With;
 import org.springframework.messaging.simp.stomp.StompSession;
 
+import java.util.UUID;
+
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @With
@@ -23,6 +25,8 @@ public class SpringStompDestination implements StompDestination {
   private Option<Subscription> subscription;
   private Option<Receipt> receipt;
   private SpringStompSessionHandler sessionHandler;
+
+  private final String subscriptionId = UUID.randomUUID().toString();
 
   @Override
   public Either<ActivityError, Subscription> subscribe(StompHeaders headers) {
@@ -40,6 +44,11 @@ public class SpringStompDestination implements StompDestination {
   }
 
   @Override
+  public String subscriptionId() {
+    return this.subscriptionId;
+  }
+
+  @Override
   public Either<ActivityError, Receipt> send(StompHeaders headers, Object payload) {
 
     return destination.transform(LiftEither.fromOption(() -> ActivityError.with("no Destination to send a message to found")))
@@ -52,6 +61,8 @@ public class SpringStompDestination implements StompDestination {
           return receipt.get();
         });
   }
+
+
 
   public Boolean equals(Destination destination) {
     return this.destination

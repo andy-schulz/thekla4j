@@ -23,7 +23,7 @@ public class SpringStompSessionConnectHandler implements StompSessionHandler {
   @Override
   public void afterConnected(@NonNull StompSession session, @NonNull StompHeaders connectedHeaders) {
 
-    log.info(prefix + ": connected");
+    log.error(prefix + ": connected");
     System.out.println(connectedHeaders);
 
     this.future.complete(SpringFunctions.toStompHeaders.apply(connectedHeaders));
@@ -38,10 +38,12 @@ public class SpringStompSessionConnectHandler implements StompSessionHandler {
 
   @Override
   public void handleException(@NonNull StompSession session, StompCommand command, @NonNull StompHeaders headers, byte[] payload, @NonNull Throwable exception) {
+    log.error(() -> prefix + ": exception: " + exception.getMessage());
   }
 
   @Override
   public void handleTransportError(@NonNull StompSession session, @NonNull Throwable exception) {
+    log.error(() -> prefix + ": TransportError: " + exception.getMessage());
   }
 
   @Override
@@ -52,6 +54,7 @@ public class SpringStompSessionConnectHandler implements StompSessionHandler {
 
   @Override
   public void handleFrame(@NonNull StompHeaders headers, Object payload) {
+    log.error(() -> prefix + ": frame: " + payload + "\nheaders: " + headers);
   }
 
   public SpringStompSessionConnectHandler(

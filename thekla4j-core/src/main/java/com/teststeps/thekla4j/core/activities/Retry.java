@@ -12,12 +12,14 @@ import io.vavr.Function1;
 import io.vavr.Function6;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import lombok.AllArgsConstructor;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Workflow("retry executing task for as long as @{timeout} and retry every @{delay}")
 public class Retry<I, O> extends Task<I, O> {
 
@@ -25,13 +27,15 @@ public class Retry<I, O> extends Task<I, O> {
   private final Activity<I, O> activity;
 
   @Called(name = "timeout")
-  private Duration forAsLongAs = Duration.ofSeconds(5);
+  private Duration forAsLongAs;
   @Called(name = "delay")
-  private Duration pauseBetweenRetries = Duration.ofSeconds(1);
+  private Duration pauseBetweenRetries;
 
-  private Predicate<O> untilFunction = o -> true;
+  private Predicate<O> untilFunction;
 
-  Function6<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
+  private String reason;
+
+  private final Function6<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
       (ends, timeWaiting, pause, func, intermediateResult, taskName) -> {
 
         Function1<Either<ActivityError, O>, Function<Void, Either<ActivityError, O>>> f =
@@ -43,7 +47,7 @@ public class Retry<I, O> extends Task<I, O> {
                   String.format("Retrying task %s timed out after %s seconds with Error: \n\t %s",
                                 taskName, timeWaiting.getSeconds(), x.getMessage())))
               .flatMap(r -> Either.left(
-                  ActivityTimeOutError.with(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s", taskName, timeWaiting.getSeconds(), r))));
+                  ActivityTimeOutError.with(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s", taskName, timeWaiting.getSeconds(), r, reason))));
 
 
         Either<ActivityError, O> res = func.apply();
@@ -79,11 +83,15 @@ public class Retry<I, O> extends Task<I, O> {
 
 
   public static <K, P> Retry<K, P> task(Activity<K, P> task) {
-    return new Retry<>(task);
+    return new Retry<>(task,
+        Duration.ofSeconds(5),
+        Duration.ofSeconds(1),
+        o -> false, "until predicate not set 'Retry.task(TASK).until(PREDICATE)'");
   }
 
-  public Retry<I, O> until(Predicate<O> until) {
+  public Retry<I, O> until(Predicate<O> until, String reason) {
     this.untilFunction = until;
+    this.reason = reason;
     return this;
   }
 
@@ -97,7 +105,4 @@ public class Retry<I, O> extends Task<I, O> {
     return this;
   }
 
-  public Retry(Activity<I, O> activity) {
-    this.activity = activity;
-  }
 }

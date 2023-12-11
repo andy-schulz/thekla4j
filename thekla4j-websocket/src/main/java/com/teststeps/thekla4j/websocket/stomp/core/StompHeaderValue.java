@@ -32,6 +32,10 @@ public enum StompHeaderValue {
     return new StompHeader(label, value);
   }
 
+  public String label() {
+    return this.label;
+  }
+
   StompHeaderValue(String label) {
     this.label = label;
   }
