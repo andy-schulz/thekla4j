@@ -28,6 +28,9 @@ public class HttpOptions {
   public String baseUrl = "";
   public String body = "";
   public Boolean disableSSLCertificateValidation = false;
+
+  public Boolean followRedirects = true;
+
   /**
    * Default timeout to receive a response from server. Overwrite this value for long running requests where needed, calling responseTimeout() setter
    */
@@ -138,6 +141,11 @@ public class HttpOptions {
         .setDisableSSLCertificateValidation(disable);
   }
 
+  public HttpOptions followRedirects(boolean followRedirects) {
+    return getNewRestOptions()
+        .setFollowRedirects(followRedirects);
+  }
+
   public HttpOptions responseTimeout(int timeOut) {
     return getNewRestOptions()
         .setResponseTimeout(timeOut);
@@ -163,6 +171,9 @@ public class HttpOptions {
     if (this.disableSSLCertificateValidation)
       clone.setDisableSSLCertificateValidation(this.disableSSLCertificateValidation);
 
+    if (!this.followRedirects)
+      clone.followRedirects = this.followRedirects;
+
     if (this.responseTimeout != mergedOpts.responseTimeout)
       clone.setResponseTimeout(this.responseTimeout);
 
@@ -185,7 +196,7 @@ public class HttpOptions {
   private HttpOptions getNewRestOptions() {
     return new HttpOptions(
         this.headers, this.queryParameters, this.pathParameters, this.formParameters, this.baseUrl, this.port, this.body,
-        this.disableSSLCertificateValidation, this.responseTimeout
+        this.disableSSLCertificateValidation, this.responseTimeout, this.followRedirects
     );
   }
 
@@ -229,6 +240,11 @@ public class HttpOptions {
 
   private HttpOptions setDisableSSLCertificateValidation(boolean disable) {
     this.disableSSLCertificateValidation = disable;
+    return this;
+  }
+
+  private HttpOptions setFollowRedirects(boolean followRedirects) {
+    this.followRedirects = followRedirects;
     return this;
   }
 
@@ -281,7 +297,8 @@ public class HttpOptions {
       int port,
       String body,
       Boolean disableSSLCertificateValidation,
-      int responseTimeout
+      int responseTimeout,
+      Boolean followRedirects
   ) {
     // clone fields of request
 
@@ -290,6 +307,7 @@ public class HttpOptions {
     this.port = port;
     this.responseTimeout = responseTimeout;
     this.disableSSLCertificateValidation = disableSSLCertificateValidation;
+    this.followRedirects = followRedirects;
 
 
     // deep clone??

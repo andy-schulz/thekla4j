@@ -27,6 +27,10 @@ public class ConnectionFunctions {
       content -> Try.of(() -> URLEncoder.encode(content, StandardCharsets.UTF_8))
           .getOrElseThrow(x -> new RuntimeException("Could not url-encode parameter: " + content, x));
 
+  public static Function1<String, String> percentEncode =
+      content -> Try.of(() -> URLEncoder.encode(content, StandardCharsets.UTF_8).replaceAll("\\+", "%20"))
+          .getOrElseThrow(x -> new RuntimeException("Could not percent encode parameter: " + content, x));
+
   public static Function<HttpOptions, Try<Boolean>> isXWwwFormUrlencoded =
       opts -> {
         if (opts.headers.containsKey(CONTENT_TYPE.asString) && opts.headers.get(CONTENT_TYPE.asString)

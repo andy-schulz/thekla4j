@@ -17,6 +17,9 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   protected Request request;
   protected HttpOptions httpOptions = HttpOptions.empty();
+
+  protected boolean followRedirects = true;
+
   private final Function<HttpRequest, Either<Throwable, HttpResult>> requestMethod;
 
   @Called(name = "resource") // is set when request is assigned to Post interaction
@@ -28,8 +31,10 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
   @Override
   public Either<ActivityError, HttpResult> performAs(Actor actor, Void result) {
 
+    HttpOptions opts = !this.followRedirects ? this.httpOptions.followRedirects(false) : this.httpOptions;;
+
     return UseTheRestApi.as(actor)
-        .map(useRestAbility -> useRestAbility.send(this.request, this.httpOptions))
+        .map(useRestAbility -> useRestAbility.send(this.request, opts))
         .map(eReq -> eReq.flatMap(this.requestMethod))
         .toEither()
         .flatMap(Function.identity())
@@ -42,6 +47,11 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
     // logging purpose
     this.logOptions = opts.mergeOnTopOf(this.logOptions);
 
+    return (ReqT) this;
+  }
+
+  public ReqT followRedirects(boolean followRedirects) {
+    this.followRedirects = followRedirects;
     return (ReqT) this;
   }
 

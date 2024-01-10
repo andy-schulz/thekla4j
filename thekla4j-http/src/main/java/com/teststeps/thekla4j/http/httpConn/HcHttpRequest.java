@@ -31,6 +31,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.encodeParameter;
+import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.percentEncode;
+
 @Log4j2(topic = "HcHttpRequest")
 public class HcHttpRequest implements HttpRequest {
 
@@ -171,6 +174,7 @@ public class HcHttpRequest implements HttpRequest {
     return
         Try.of(() -> {
           this.connection.setRequestMethod(method);
+          this.connection.setInstanceFollowRedirects(opts.followRedirects);
           return this.connection;
         }).map(con -> {
           con.setDoOutput(true);
@@ -259,23 +263,24 @@ public class HcHttpRequest implements HttpRequest {
     return con;
   }
 
-  private String getUrl(String baseUrl, int port, String resource, Map<String, String> parameters, Map<String, String> properties) {
+  private String getUrl(String baseUrl, int port, String resource, Map<String, String> queryParameters, Map<String, String> pathParameters) {
     String url = (baseUrl.length() > 0 ?
         baseUrl.concat(port > 0 ? ":" + port + resource : resource) :
         resource)
-        .concat(parameters != null && parameters.size() > 0 ? "?" : "")
-        .concat(getParameterString(parameters));
+        .concat(queryParameters != null && queryParameters.size() > 0 ? "?" : "")
+        .concat(getParameterString(queryParameters));
 
-    return properties.entrySet().stream()
+    return pathParameters.entrySet().stream()
         .map(entry -> (Function<String, String>) s -> s.replaceAll(":" + entry.getKey(), entry.getValue()))
         .reduce(Function.identity(), Function::andThen)
         .apply(url);
   }
 
   private String getParameterString(Map<String, String> params) {
-    return params.entrySet()
+    return params
+        .entrySet()
         .stream()
-        .map(entry -> entry.getKey() + "=" + entry.getValue())
+        .map(entry -> entry.getKey() + "=" + percentEncode.apply(entry.getValue()))
         .collect(Collectors.joining("&"));
   }
 
