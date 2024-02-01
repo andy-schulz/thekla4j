@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.websocket.stomp.core;
 
+import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
 import lombok.AllArgsConstructor;
 import lombok.With;
@@ -29,4 +30,8 @@ public class StompHeaders{
       (expectedHeader)  -> headerList.exists(
           header -> header.name().equals(expectedHeader.name())
               && header.value().equals(expectedHeader.value()));
+
+  public String toString() {
+    return JSON.logOf(headerList);
+  }
 }
