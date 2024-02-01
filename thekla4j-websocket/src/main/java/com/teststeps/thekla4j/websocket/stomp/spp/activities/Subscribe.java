@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.websocket.stomp.core.Destination;
+import com.teststeps.thekla4j.websocket.stomp.core.StompHeaderValue;
 import com.teststeps.thekla4j.websocket.stomp.core.StompHeaders;
 import com.teststeps.thekla4j.websocket.stomp.core.Subscription;
 import com.teststeps.thekla4j.websocket.stomp.spp.abilities.UseWebsocketWithStomp;
@@ -36,5 +37,9 @@ public class Subscribe extends Interaction<Void, Subscription> {
 
   public Subscribe using(StompHeaders headers) {
     return new Subscribe(this.destination, headers);
+  }
+
+  public Subscribe expectingReceipt(String receiptId) {
+    return new Subscribe(this.destination, headers.append(StompHeaderValue.RECEIPT.of(receiptId)));
   }
 }
