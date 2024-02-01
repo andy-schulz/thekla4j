@@ -79,7 +79,7 @@ public class SpringStompClient implements StompClient {
   }
 
   private Try<SpringStompDestination> createNewDestination(Destination destination) {
-    log.debug(() -> "Creating new destination: \n" + destination);
+    log.debug(() -> String.format("Creating new destination: \n%s", destination));
     Option<Endpoint> ep = destination.endpoint().isEmpty() ? defaultEndpoint : destination.endpoint();
 
     return sessionForEndpoint(ep)

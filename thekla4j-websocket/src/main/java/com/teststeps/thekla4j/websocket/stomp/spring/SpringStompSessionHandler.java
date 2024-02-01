@@ -79,17 +79,13 @@ public class SpringStompSessionHandler implements StompSessionHandler {
   @Override
   public void handleFrame(@NonNull StompHeaders headers, Object payload) {
 
-    System.out.println(payload.getClass().getSimpleName());
-    System.out.println(new String((byte[]) payload, StandardCharsets.UTF_8));
-
-    log.debug(() -> prefix + " frame: " + payload);
+    log.debug(() -> prefix + " Payload: " + new String((byte[]) payload, StandardCharsets.UTF_8));
 
     this.messages = messages.append(
         StompFrame.of(
             MESSAGE,
             SpringFunctions.toStompHeaders.apply(headers),
-            payload
-                     ));
+            payload));
   }
 
   public SpringStompSessionHandler(String prefix) {

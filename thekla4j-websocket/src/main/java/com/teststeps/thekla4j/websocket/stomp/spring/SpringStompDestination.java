@@ -92,7 +92,7 @@ public class SpringStompDestination implements StompDestination {
         Option.of(destination.destination()),
         Option.none(),
         Option.none(),
-        new SpringStompSessionHandler(destination.destination())
+        new SpringStompSessionHandler(destination.destination() + String.format(" (%s)", destination.name()))
     );
 
   }

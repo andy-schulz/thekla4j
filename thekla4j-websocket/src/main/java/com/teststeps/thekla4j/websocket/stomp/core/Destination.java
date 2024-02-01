@@ -7,11 +7,13 @@ import lombok.With;
 @With
 public record Destination(
     String destination,
-    Option<Endpoint> endpoint
+    Option<Endpoint> endpoint,
+
+    String name
 ) {
 
   public static Destination at(String destination) {
-    return new Destination(destination, Option.none());
+    return new Destination(destination, Option.none(), "");
   }
 
   public String toString() {
