@@ -126,6 +126,15 @@ public class HttpOptions {
         .setFormPropertyValues(propertyName, propertyValue);
   }
 
+  public HttpOptions formParameter(@NonNull String propertyName, @NonNull Option<String> propertyValue) {
+    return
+        propertyValue
+            .map(val -> getNewRestOptions()
+                .setFormPropertyValues(propertyName, Objects.toString(val)))
+            .getOrElse(this)
+        ;
+  }
+
   public HttpOptions port(int port) {
     return getNewRestOptions()
         .setPort(port);
