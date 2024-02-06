@@ -5,7 +5,9 @@ import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * The activity log
+ */
 public interface ActivityLog {
 
     ActivityLogEntry addActivityLogEntry(

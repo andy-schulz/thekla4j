@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+/**
+ * A log entry for an activity
+ */
 @Log4j2(topic = "ActivityLogEntry")
 public class ActivityLogEntry implements Serializable {
 
@@ -78,16 +81,29 @@ public class ActivityLogEntry implements Serializable {
         return this.activityStatus;
     }
 
+    /**
+     * set the input information
+     * @param input the input information
+     * @return the current activity log entry
+     */
     public ActivityLogEntry setInput(String input) {
         this.input = input;
         return this;
     }
 
+    /**
+     * set the output information
+     * @param output the output information
+     * @return the current activity log entry
+     */
     public ActivityLogEntry setOutput(String output) {
         this.output = output;
         return this;
     }
 
+    /**
+     * calculate the log tree status
+     */
     public void calculateStatus() {
 
         Function2<ActivityStatus, ActivityStatus, ActivityStatus> testStatus =
