@@ -330,7 +330,7 @@ public class HcHttpRequest implements HttpRequest {
       log.debug("Response Headers: {}", () -> headers);
 
       io.vavr.collection.List<Cookie> cookies =
-          headers.filter((k, v) -> Objects.equals(k, "Set-Cookie"))
+          headers.filter((k, v) -> Objects.equals(k.toLowerCase(), "set-cookie"))
               .toList()
               .flatMap(tuple -> tuple._2)
               .map(CookieFunctions.toCookie);
