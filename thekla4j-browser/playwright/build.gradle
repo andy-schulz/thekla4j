@@ -1,0 +1,19 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+}
+
+dependencies {
+    implementation project(":thekla4j-commons")
+}
+
+tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            artifactId = 'thekla4j-browser-playwright'
+            description = 'screenplay browser implementation using playwright for thekla4j'
+        }
+    }
+}

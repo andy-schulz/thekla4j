@@ -6,12 +6,3 @@ plugins {
 dependencies {
     implementation project(":thekla4j-commons")
 }
-
-publishing {
-    publications {
-        pluginMaven(MavenPublication) {
-            artifactId = 'thekla4j-browser'
-            description = 'screenplay browser implementation for thekla4j'
-        }
-    }
-}
