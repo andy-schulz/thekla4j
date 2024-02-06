@@ -10,6 +10,7 @@ import io.vavr.*;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
@@ -330,7 +331,7 @@ public class HcHttpRequest implements HttpRequest {
       log.debug("Response Headers: {}", () -> headers);
 
       io.vavr.collection.List<Cookie> cookies =
-          headers.filter((k, v) -> Objects.equals(k.toLowerCase(), "set-cookie"))
+          headers.filter((k, v) -> Objects.equals(Option.of(k).map(String::toLowerCase).getOrNull(), "set-cookie"))
               .toList()
               .flatMap(tuple -> tuple._2)
               .map(CookieFunctions.toCookie);
