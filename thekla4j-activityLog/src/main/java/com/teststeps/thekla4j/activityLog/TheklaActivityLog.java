@@ -10,12 +10,30 @@ import java.util.Objects;
 import java.util.function.Function;
 
 
+/**
+ * The activity log
+ */
 public class TheklaActivityLog implements ActivityLog, Serializable {
+  /**
+   * the root activity log entry
+   */
   private final ActivityLogEntry rootActivityLogEntry;
   @SuppressWarnings("java:S116")
   // naming convention
+  /**
+   * the current activity log entry
+   */
   transient private ActivityLogEntry _currentActivity;
 
+  /**
+   * adds a new activity log entry to the current activity
+   * @param activityName - the name of the added activity
+   * @param activityDescription - the description of the added activity
+   * @param activityType - the type of the added activity
+   * @param activityLogType - the log type of the added activity
+   * @param activityStatus - the status of the added activity
+   * @return the current activity log entry
+   */
   @Override
   public ActivityLogEntry addActivityLogEntry(
     String activityName,
@@ -37,14 +55,22 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return logEntry;
   }
 
+
+  /**
+   * adds a new task group to the current activity
+   * @param groupName - the name of the added activity
+   * @param groupDescription - the description of the added activity
+   * @return the current activity log entry
+   */
   @Override
   public ActivityLogEntry addGroup(
-    String activityName,
-    String activityDescription) {
+    String groupName,
+    String groupDescription
+                                  ) {
 
     final ActivityLogEntry logEntry = new ActivityLogEntry(
-      activityName,
-      activityDescription,
+        groupName,
+        groupDescription,
       ActivityLogEntryType.Group,
       ActivityStatus.running,
       TASK_LOG.FULL_LOG,
@@ -98,6 +124,10 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return LogFormatter.formatLogWithPrefix(logPrefix, 0, logTree);
   }
 
+  /**
+   * return the structured activity log as a tree
+   * @return the structured activity log
+   */
   private ActivityLogNode getLogTree() {
     this.setRootNodeStatus();
     return this.rootActivityLogEntry.getLogTree();
@@ -127,6 +157,11 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return LogFormatter.formatLogAsHtmlTree(logTree);
   }
 
+  /**
+   * get Structured html log of activity log list
+   * @param logs - the activity log list
+   * @return the html log
+   */
   public static String getStructuredHtmlListLog(List<TheklaActivityLog> logs) {
     return LogFormatter.formatLogAsHtmlTree(logs.map(TheklaActivityLog::getLogTree));
   }
@@ -172,6 +207,10 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return LogFormatter.encodeLog(getStructuredHtmlLogWithoutIO());
   }
 
+  /**\
+   * create an activity log for an actor
+   * @param actorName - the name of the actor
+   */
   public TheklaActivityLog(String actorName) {
     this._currentActivity = new ActivityLogEntry(
       "START",
