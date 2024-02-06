@@ -3,12 +3,12 @@ plugins {
     id 'com.teststeps.thekla4j.publish'
 }
 
-description = 'commonly used files in library'
 
 publishing {
     publications {
         pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-commons'
+            description = 'commonly used features in thekla4j frameworks'
         }
     }
 }

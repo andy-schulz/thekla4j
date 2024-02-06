@@ -7,12 +7,11 @@ dependencies {
     implementation project(':thekla4j-utils')
 }
 
-description = 'activity log implementation (@Action, @Workflow, @Called)'
-
 publishing {
     publications {
         pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-activityLog'
+            description = 'activity log implementation (@Action, @Workflow, @Called)'
         }
     }
 }
