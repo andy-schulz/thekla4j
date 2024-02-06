@@ -8,12 +8,12 @@ dependencies {
     implementation project(':thekla4j-utils')
 }
 
-description = 'http activity implementation for GET, POST, DELETE, PUT etc.'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-http'
+            description = 'http activity implementation for GET, POST, DELETE, PUT etc.'
         }
     }
 }

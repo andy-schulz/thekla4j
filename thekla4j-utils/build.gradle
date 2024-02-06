@@ -10,12 +10,13 @@ dependencies {
 
 }
 
-description = 'support files'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-utils'
+            description = 'common utilities for thekla4j framework (e.g. JSON, VAVR, etc.)'
+
         }
     }
 }

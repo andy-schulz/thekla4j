@@ -1,28 +1,21 @@
 plugins {
+//    id 'java-library'
     id 'signing'
     id 'maven-publish'
 }
 
-tasks.register('javadocJar', Jar) {
-    archiveClassifier  = 'javadoc'
-    from javadoc
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-tasks.register('sourcesJar', Jar) {
-    archiveClassifier  = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-signing {
-    useGpgCmd()
-    sign configurations.archives
+tasks.named('sourcesJar') {
+    duplicatesStrategy = 'include'
 }
 
 publishing {
+
     repositories {
         maven {
             def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
@@ -38,19 +31,13 @@ publishing {
 
     publications {
 
-        mavenJavadoc(MavenPublication) {
-            artifact(javadocJar) {
-                classifier "javadoc"
-            }
-        }
+        pluginMaven(MavenPublication) {
 
-        mavenJava(MavenPublication) {
             from components.java
 
             groupId = 'com.test-steps.thekla4j'
             archivesBaseName = "test-steps-thekla4j"
             version = project.version
-
 
             pom {
                 name = 'thekla4j'
@@ -78,6 +65,12 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    useGpgCmd()
+//    sign configurations.archives
+    sign publishing.publications.pluginMaven
 }
 
 

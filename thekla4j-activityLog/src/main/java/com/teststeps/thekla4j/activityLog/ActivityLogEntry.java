@@ -13,21 +13,64 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+/**
+ * A log entry for an activity
+ */
 @Log4j2(topic = "ActivityLogEntry")
 public class ActivityLogEntry implements Serializable {
 
+    /**
+     * the sub entries of the activity
+     */
     private List<ActivityLogEntry> subEntries = List.empty();
 
+    /**
+     * the start time of the activity
+     */
     private final Date startedAt;
+    /**
+     * the name of the activity
+     */
     private final String activityName;
+    /**
+     * the description of the activity
+     */
     private final String activityDescription;
+    /**
+     * the input of the activity
+     */
     private String input = "";
+    /**
+     * the output of the activity
+     */
     private String output = "";
+    /**
+     * the type of the activity
+     */
     private final ActivityLogEntryType activityType;
+    /**
+     * the status of the activity
+     */
     private ActivityStatus activityStatus;
+    /**
+     * the log type of the activity
+     */
     private TASK_LOG activityLogType;
+
+    /**
+     * the parent activity log entry
+     */
     public final ActivityLogEntry parent;
 
+    /**
+     * create an ActivityLogEntry
+     * @param activityName - the name of the activity
+     * @param activityDescription - the description of the activity
+     * @param activityType - the type of the activity
+     * @param activityStatus - the status of the activity
+     * @param activityLogType - the log type of the activity
+     * @param parent - the parent activity log entry
+     */
     public ActivityLogEntry(
         String activityName,
         String activityDescription,
@@ -73,21 +116,36 @@ public class ActivityLogEntry implements Serializable {
 
     /**
      * get the node status information
+     *
+     * @return the node status
      */
     public ActivityStatus status() {
         return this.activityStatus;
     }
 
+    /**
+     * set the input information
+     * @param input the input information
+     * @return the current activity log entry
+     */
     public ActivityLogEntry setInput(String input) {
         this.input = input;
         return this;
     }
 
+    /**
+     * set the output information
+     * @param output the output information
+     * @return the current activity log entry
+     */
     public ActivityLogEntry setOutput(String output) {
         this.output = output;
         return this;
     }
 
+    /**
+     * calculate the log tree status
+     */
     public void calculateStatus() {
 
         Function2<ActivityStatus, ActivityStatus, ActivityStatus> testStatus =
@@ -118,6 +176,7 @@ public class ActivityLogEntry implements Serializable {
 
     /**
      * get a list(array) of all node status
+     * @return a list of all node status
      */
     public List<ActivityStatus> getSubTreeStatusList() {
 
@@ -127,7 +186,8 @@ public class ActivityLogEntry implements Serializable {
     }
 
     /**
-     * get the the JSON tree of the current node
+     * get the log tree of the current node
+     * @return the log tree of the current node
      */
     public ActivityLogNode getLogTree() {
 

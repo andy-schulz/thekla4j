@@ -12,8 +12,21 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
+/**
+ * A class to format the activity log to a text or html representation
+ *
+ */
 public class LogFormatter {
 
+  /**
+   * format the content of the node as text
+   *
+   * @param logPrefix - the prefix which will be added to the log
+   * @param repeat - the number of times the prefix will be repeated
+   * @param logNode - the node which will be converted to the text representation
+   * @return the text representation of the node
+   */
   public static String formatToText(String logPrefix, int repeat, ActivityLogNode logNode) {
     String formattedText = "%s[%s %s] - %s%s";
     String indents = new String(new char[repeat]).replace("\0", logPrefix);
@@ -35,8 +48,9 @@ public class LogFormatter {
    * it is the inner content of the ul/li html list
    *
    * @param node - the node which will be converted to the html list
+   * @return the html representation of the node content
    */
-  public static String formatShortLogContentToHtml(ActivityLogNode node) {
+  private static String formatShortLogContentToHtml(ActivityLogNode node) {
     return "<span class=\"logMessage\"><span class = \"timestamp\">" + node.startedAt + " - </span>" +
         "<span class=\"activityName\">" + "[" + node.name + "]</span> - " +
         "<span class=\"activityDescription\"> " + (node.description.length() > 100 ? node.description.substring(0, 90) : node.description) + "</span>" +
@@ -48,8 +62,9 @@ public class LogFormatter {
    * if the node contains sub node, they will be formatted recursively
    *
    * @param logNode the log node
+   * @return the html representation of the node
    */
-  public static String formatNodeToHtml(ActivityLogNode logNode) {
+  private static String formatNodeToHtml(ActivityLogNode logNode) {
 
     Option<String> descr = Option.of(logNode.description);
 
@@ -103,12 +118,13 @@ public class LogFormatter {
    * The node will be a foldable list (ul)
    *
    * @param logNode - the log node to create a html list from
+   * @return the html representation of the node
    */
-  static String formatLogWithHtmlTags(ActivityLogNode logNode) {
+  private static String formatLogWithHtmlTags(ActivityLogNode logNode) {
     return "<ul id = \"ActivityLog\">" + formatNodeToHtml(logNode) + "</ul>";
   }
 
-  static String formatLogWithHtmlTags(List<ActivityLogNode> logNodes) {
+  private static String formatLogWithHtmlTags(List<ActivityLogNode> logNodes) {
     return logNodes.map(LogFormatter::formatLogWithHtmlTags)
         .collect(Collectors.joining("<br>"));
   }
@@ -118,6 +134,7 @@ public class LogFormatter {
    * format the node to an html tree and add the style and JS function to the html representation
    *
    * @param logNode - the log node to create a html list from
+   * @return the html representation of the node
    */
   public static String formatLogAsHtmlTree(ActivityLogNode logNode) {
 
@@ -139,7 +156,12 @@ public class LogFormatter {
     return returnText;
   }
 
-  public static String formatLogAsHtmlTree(List<ActivityLogNode> logNode) {
+  /**
+   * format a list of nodes to an html tree and add the style and JS function to the html representation
+   * @param logNodes - the list of nodes to create an html list from
+   * @return the html representation of the node list
+   */
+  public static String formatLogAsHtmlTree(List<ActivityLogNode> logNodes) {
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     String formattedText = "<style>\n%s\n</style> " +
@@ -149,7 +171,7 @@ public class LogFormatter {
     try {
       returnText = String.format(formattedText,
           LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
-          formatLogWithHtmlTags(logNode),
+          formatLogWithHtmlTags(logNodes),
           functionScript);
 
     } catch (IOException e) {
@@ -159,6 +181,12 @@ public class LogFormatter {
     return returnText;
   }
 
+  /**
+   * format the input and output of the activity node to html
+   * @param input - the input of the activity
+   * @param output - the output of the activity
+   * @return the html representation of the input and output of an activity
+   */
   private static String formatIOElement(String input, String output) {
 
     return (Objects.isNull(input) || Objects.equals(input, "")) &&
@@ -177,10 +205,22 @@ public class LogFormatter {
             "</span>", input, output);
   }
 
+  /**
+   * prefix each line of the text log with the given prefix
+   * @param logPrefix - the prefix to add to each line
+   * @param repeat - the number of times the prefix will be repeated
+   * @param logNode - the node to convert to text
+   * @return the text representation of the node
+   */
   public static String formatLogWithPrefix(String logPrefix, int repeat, ActivityLogNode logNode) {
     return formatToText(logPrefix, repeat, logNode);
   }
 
+  /**
+   * encode the given source to a base64 string
+   * @param source - the source to encode
+   * @return the base64 encoded string
+   */
   public static String encodeLog(String source) {
     return Base64.getEncoder().encodeToString(source.getBytes());
   }
@@ -205,18 +245,21 @@ public class LogFormatter {
     }
   }
 
-  public static final String STYLE = "";
+  /**
+   * The style which is applied to the HTML tree
+   */
+  private static final String STYLE = "";
 
   /**
    * The style which is added to the HTML tree
    * a css file is read from the file system
    */
-  static String htmlStyle = String.format("<style>${activityLogStyle.toString()}</style>", LogFormatter.STYLE);
+  private static String htmlStyle = String.format("<style>${activityLogStyle.toString()}</style>", LogFormatter.STYLE);
 
   /**
    * the function script which is added to the HTML tree
    */
-  static String functionScript =
+  private static String functionScript =
       "<script>\n" +
           "var toggler = document.querySelectorAll(\".task\");\n" +
           "var inToggler = document.querySelectorAll(\".label.inContentButton\");\n" +

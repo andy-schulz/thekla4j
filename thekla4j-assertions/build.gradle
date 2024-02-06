@@ -3,16 +3,15 @@ plugins {
     id 'com.teststeps.thekla4j.publish'
 }
 
-description = 'assertion implementation for See action (see core)'
-
 dependencies {
     implementation project(":thekla4j-commons")
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-assertions'
+            description = 'assertion implementation for See action (see core)'
         }
     }
 }
