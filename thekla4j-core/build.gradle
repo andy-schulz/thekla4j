@@ -13,7 +13,7 @@ description = 'main activity implementation for See, map, retry etc.'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-core'
         }
     }

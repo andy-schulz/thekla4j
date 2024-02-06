@@ -22,7 +22,7 @@ description = 'websocket activity implementation'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-websocket'
         }
     }

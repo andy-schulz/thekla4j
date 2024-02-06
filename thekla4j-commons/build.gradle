@@ -7,7 +7,7 @@ description = 'commonly used files in library'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-commons'
         }
     }

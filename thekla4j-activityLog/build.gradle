@@ -11,7 +11,7 @@ description = 'activity log implementation (@Action, @Workflow, @Called)'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-activityLog'
         }
     }

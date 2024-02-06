@@ -14,7 +14,7 @@ description = 'support files'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-utils'
         }
     }
