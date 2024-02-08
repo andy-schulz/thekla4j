@@ -3,6 +3,9 @@ plugins {
     id 'com.teststeps.thekla4j.publish'
 }
 
+tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
+tasks.withType(PublishToMavenLocal).configureEach { it.enabled = false }
+
 dependencies {
     implementation project(":thekla4j-commons")
 }
