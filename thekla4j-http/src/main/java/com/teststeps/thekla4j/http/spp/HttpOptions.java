@@ -94,36 +94,45 @@ public class HttpOptions {
     return opts;
   }
 
-  public <T> HttpOptions queryParameter(@NonNull String parameterName, @NonNull Option<T> parameterValue) {
+  public <T> HttpOptions queryParameter(@NonNull String queryParameterName, @NonNull Option<T> queryParameterValue) {
     return
-        parameterValue
+        queryParameterValue
             .map(val -> getNewRestOptions()
-                .setParameterValue(parameterName, Objects.toString(val)))
+                .setParameterValue(queryParameterName, Objects.toString(val)))
             .getOrElse(this)
         ;
   }
 
-  public HttpOptions queryParameter(@NonNull String parameterName, @NonNull String parameterValue) {
+  public HttpOptions queryParameter(@NonNull String queryParameterName, @NonNull String queryParameterValue) {
     return getNewRestOptions()
-        .setParameterValue(parameterName, parameterValue);
+        .setParameterValue(queryParameterName, queryParameterValue);
   }
 
-  public <T> HttpOptions queryParameterArray(@NonNull String parameterName, @NonNull List<T> parameterValues) {
+  public <T> HttpOptions queryParameterArray(@NonNull String queryParameterName, @NonNull List<T> queryParameterValues) {
     return getNewRestOptions()
         .setParameterValue(
-            parameterName,
-            parameterValues.foldLeft("", (l, v) -> l + (l.length() > 0 ? "&" + parameterName + "=" : "") + v)
+            queryParameterName,
+            queryParameterValues.foldLeft("", (l, v) -> l + (l.length() > 0 ? "&" + queryParameterName + "=" : "") + v)
         );
   }
 
-  public HttpOptions pathParameter(@NonNull String propertyName, @NonNull String propertyValue) {
+  public HttpOptions pathParameter(@NonNull String pathParameterName, @NonNull String pathParameterValue) {
     return getNewRestOptions()
-        .setPathPropertyValues(propertyName, propertyValue);
+        .setPathPropertyValues(pathParameterName, pathParameterValue);
   }
 
-  public HttpOptions formParameter(@NonNull String propertyName, @NonNull String propertyValue) {
+  public HttpOptions formParameter(@NonNull String formParameterName, @NonNull String formParameterValue) {
     return getNewRestOptions()
-        .setFormPropertyValues(propertyName, propertyValue);
+        .setFormPropertyValues(formParameterName, formParameterValue);
+  }
+
+  public HttpOptions formParameter(@NonNull String formParameterName, @NonNull Option<String> formParameterValue) {
+    return
+        formParameterValue
+            .map(val -> getNewRestOptions()
+                .setFormPropertyValues(formParameterName, Objects.toString(val)))
+            .getOrElse(this)
+        ;
   }
 
   public HttpOptions port(int port) {
