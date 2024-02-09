@@ -4,8 +4,15 @@ plugins {
 }
 
 dependencies {
-    implementation project(":thekla4j-commons")
-    implementation project(":thekla4j-browser:core")
+    api project(":thekla4j-core")
+    api project(":thekla4j-commons")
+    api project(":thekla4j-browser:core")
+
+    implementation project(":thekla4j-utils")
+
+
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.17.0'
+
 }
 
 publishing {

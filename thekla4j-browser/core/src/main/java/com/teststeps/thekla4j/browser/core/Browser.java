@@ -1,14 +1,20 @@
 package com.teststeps.thekla4j.browser.core;
 
+import io.vavr.control.Try;
+
 public interface Browser {
 
-  public void navigateTo(String url);
+  public Try<Void> navigateTo(String url);
 
-  public void clickOn(Element element);
+  public Try<Void> clickOn(Element element);
 
-  public void EnterTextInto(String text, Element element);
+  public Try<Void> enterTextInto(String text, Element element);
 
-  public String getTextFrom(Element element);
+  public Try<String> textOf(Element element);
 
-  public String valueOf(Element element);
+  public Try<String> valueOf(Element element);
+
+  public Try<String> attributeValueOf(String attribute, Element element);
+
+  public Try<Void> quit();
 }

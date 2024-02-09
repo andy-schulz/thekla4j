@@ -4,7 +4,11 @@ plugins {
 }
 
 dependencies {
-    implementation project(":thekla4j-commons")
+    api project(':thekla4j-core')
+    api project(":thekla4j-activityLog")
+    api project(":thekla4j-commons")
+
+    implementation project(":thekla4j-utils")
 }
 
 publishing {

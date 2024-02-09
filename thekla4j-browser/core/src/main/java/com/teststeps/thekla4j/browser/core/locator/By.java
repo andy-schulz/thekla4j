@@ -5,6 +5,10 @@ public class By {
         return new CssLocator(cssSelector);
     }
 
+    public static Locator id(String id) {
+        return new IdLocator(id);
+    }
+
     public static Locator xpath(String xpath) {
         return new XpathLocator(xpath);
     }

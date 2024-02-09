@@ -9,12 +9,16 @@ public class TextLocator implements Locator {
   }
 
   @Override
-  public String locator() {
+  public String locatorString() {
     return text;
   }
 
   @Override
   public LocatorType type() {
     return LocatorType.TEXT;
+  }
+
+  public String toString() {
+    return "text=" + this.text;
   }
 }

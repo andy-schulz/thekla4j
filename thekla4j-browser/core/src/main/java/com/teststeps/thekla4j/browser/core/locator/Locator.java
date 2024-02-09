@@ -2,6 +2,6 @@ package com.teststeps.thekla4j.browser.core.locator;
 
 public interface Locator {
 
-  public String locator();
+  public String locatorString();
   public LocatorType type();
 }

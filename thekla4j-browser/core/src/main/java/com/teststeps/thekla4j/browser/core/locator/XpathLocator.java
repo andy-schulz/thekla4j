@@ -9,12 +9,16 @@ public class XpathLocator implements Locator {
   }
 
   @Override
-  public String locator() {
+  public String locatorString() {
     return xpath;
   }
 
   @Override
   public LocatorType type() {
     return LocatorType.XPATH;
+  }
+
+  public String toString() {
+    return "xpath=" + this.xpath;
   }
 }

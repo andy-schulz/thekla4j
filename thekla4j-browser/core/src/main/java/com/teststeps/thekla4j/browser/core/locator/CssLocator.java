@@ -8,12 +8,16 @@ public class CssLocator implements Locator {
   }
 
   @Override
-  public String locator() {
+  public String locatorString() {
     return css;
   }
 
   @Override
   public LocatorType type() {
     return LocatorType.CSS;
+  }
+
+  public String toString() {
+    return "css=" + this.css;
   }
 }
