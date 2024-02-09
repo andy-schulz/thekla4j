@@ -171,8 +171,8 @@ public class ProcessLogAnnotation<P1, R1> {
           .filter(method -> method.getName()
               .equals("performAs"))
           .map(method -> Tuple.of(object, method.getParameterAnnotations()))
-          // select only annotations of performAs second parameter
-          .map(t -> t.map2(annos -> annos[1]))
+          // select only annotations of performAs second parameter (if it exists)
+          .map(t -> t.map2(annos -> annos.length > 1 ? annos[1] : new Annotation[]{}))
           .map(t -> t.map2(List::of))
           // only Called and CalledList annotations are of interest
           .map(t -> t.map2(filterAnnotations));
