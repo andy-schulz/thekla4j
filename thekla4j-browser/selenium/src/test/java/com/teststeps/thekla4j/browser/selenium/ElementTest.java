@@ -38,5 +38,8 @@ public class ElementTest {
 
         .getOrElseThrow(Function.identity());
 
+
+    actor.cleansStage();
+
   }
 }
