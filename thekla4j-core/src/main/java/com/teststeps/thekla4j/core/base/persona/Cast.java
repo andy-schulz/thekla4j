@@ -41,6 +41,10 @@ public class Cast {
         return this.currentActor;
     }
 
+    public void cleanStage() {
+        this.crew.mapValues(Actor::cleansStage);
+    }
+
     public Cast() {
 
     }
