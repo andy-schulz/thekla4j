@@ -2,7 +2,7 @@ package com.teststeps.thekla4j.core.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
-import com.teststeps.thekla4j.assertions.lib.ExecuteAssertion;
+import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.*;
@@ -108,12 +109,12 @@ public class See<P, M> extends Interaction<P, P> {
     return new See<>(new Value<>(value));
   }
 
-  public See<P, M> is(ExecuteAssertion<M> matcher) {
+  public See<P, M> is(SeeAssertion<M> matcher) {
     this.matchers = this.matchers.append(ValidateResult.with(matcher, "expected to match validation"));
     return this;
   }
 
-  public See<P, M> is(Tuple2<String, ExecuteAssertion<M>> matcher) {
+  public See<P, M> is(Tuple2<String, SeeAssertion<M>> matcher) {
     this.matchers = this.matchers.append(ValidateResult.with(matcher._2, matcher._1));
     return this;
   }
