@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation project(":thekla4j-commons")
+    implementation project(":thekla4j-utils")
 }
 
 publishing {

@@ -7,19 +7,12 @@ import io.vavr.collection.List;
 import io.vavr.control.Try;
 
 import java.time.LocalDateTime;
-import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.time.format.SignStyle;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.vavr.API.*;
-import static java.time.temporal.ChronoField.*;
 
 public class CookieFunctions {
 
