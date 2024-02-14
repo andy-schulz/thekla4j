@@ -34,7 +34,7 @@ public class ElementHelperFunctions {
           return element;
         }
 
-        if (!Objects.isNull(hlx.lastChangedWebElement.get()) && hlx.lastChangedWebElement.get().isDisplayed()) {
+        if (!Objects.isNull(hlx.lastChangedWebElement.get())) {
           Try.of(() ->
               hlx.lastChangedWebElement.get().isDisplayed() ?
                   setBorder.apply(driver, hlx.lastChangedWebElement.get(), hlx.lastChangedElementStyle.get()) :
