@@ -6,10 +6,7 @@ import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
 import com.teststeps.thekla4j.browser.selenium.waiter.SeleniumElementStatus;
 import com.teststeps.thekla4j.browser.spp.activities.State;
-import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.Function3;
-import io.vavr.Function4;
+import io.vavr.*;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
@@ -31,7 +28,8 @@ public class ElementFunctions {
         ElementFunctions.locateElement.apply(driver),
         locateElement.apply(driver).apply(element),
         element,
-        Instant.now())
+        Instant.now(),
+        Duration.ofSeconds(0))
         .map(highlightElement.apply(driver, highlightContext));
   }
 
@@ -41,8 +39,11 @@ public class ElementFunctions {
               .mapTry(l -> l.getOrElseThrow(() -> ElementNotFoundError.of("Could not find " + element)));
 
 
-  private static final Function4<Function1<Element, Try<WebElement>>, Try<WebElement>, Element, Instant, Try<WebElement>> retryUntil =
-      (elementFinder, webElement, element, start) -> {
+  private static final Function5<Function1<Element, Try<WebElement>>, Try<WebElement>, Element, Instant, Duration, Try<WebElement>> retryUntil =
+      (elementFinder, webElement, element, start, waitFor) -> {
+
+        Try.run(() -> Thread.sleep(waitFor.toMillis()))
+            .onFailure(log::error);
 
         Duration timeout = element.waiter().timeout();
 
@@ -54,7 +55,7 @@ public class ElementFunctions {
         }
 
         if (webElement.isFailure()) {
-          return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start);
+          return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500));
         }
 
         return webElement
@@ -64,8 +65,8 @@ public class ElementFunctions {
             .flatMap(elemStatus ->
                 elemStatus ?
                     webElement :
-                    ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start))
-            .transform(tr -> tr.isSuccess() ? tr : ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start));
+                    ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500)))
+            .transform(tr -> tr.isSuccess() ? tr : ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500)));
       };
 
   private static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
