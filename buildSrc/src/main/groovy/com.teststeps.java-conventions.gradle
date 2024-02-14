@@ -7,8 +7,10 @@ plugins {
 
 group 'com.test-steps.thekla4j'
 
-
+// ATTENTION: always set scmVersion properties before assigning the version to the version property
 scmVersion {
+    //TODO remove the following line after the first release
+    versionIncrementer("incrementMinor")
     monorepo {
         include(rootProject.subprojects.collect({p -> p.name}))
     }

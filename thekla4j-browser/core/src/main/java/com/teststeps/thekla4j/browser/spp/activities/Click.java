@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.control.Either;
 
 @Action("click on @{element}")
@@ -16,7 +17,7 @@ public class Click extends BasicInteraction {
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
            .flatMap(b -> b.clickOn(element))
-                     .toEither(ActivityError.with("could not click on element " + element));
+                     .transform(LiftTry.toEither(x -> ActivityError.with(x.getMessage())));
   }
 
   public static Click on(Element element ) {

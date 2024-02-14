@@ -20,7 +20,8 @@ public class BrowseTheWeb implements Ability {
 
   @Override
   public void destroy() {
-    browser.quit();
+    browser.quit()
+        .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   private BrowseTheWeb(Browser browser) {

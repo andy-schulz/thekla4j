@@ -19,27 +19,25 @@ public class Enter extends BasicInteraction {
   private String text;
   @Called(name = "element")
   private Element element;
+
   @Override
+
   protected Either<ActivityError, Void> performAs(Actor actor) {
+    if (element == null) {
+      return Either.left(ActivityError.with("No element to enter text into"));
+    }
+
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.enterTextInto(text, element))
         .transform(LiftTry.toEither(
             x -> ActivityError.with(x.getMessage() + " while entering text " + text + " into element " + element)));
   }
 
-  public static EnterText text(String text) {
-    return new EnterText(text);
+  public static Enter text(String text) {
+    return new Enter(text, null);
   }
 
-  public static class EnterText {
-    private final String text;
-
-    public EnterText(String text) {
-      this.text = text;
-    }
-
-    protected Enter into(Element element) {
-      return new Enter(text, element);
-    }
+  public Enter into(Element element) {
+    return new Enter(text, element);
   }
 }

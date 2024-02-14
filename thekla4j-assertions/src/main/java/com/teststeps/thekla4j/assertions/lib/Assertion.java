@@ -8,6 +8,7 @@ import io.vavr.Tuple2;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static io.vavr.API.$;
@@ -33,6 +34,10 @@ public class Assertion implements TheklaAssertion {
         .peek(r -> log.debug(() -> "Assertion Result: " + r))
         .onFailure(log::error)
         .transform(LiftTry.toEither(ActivityError::with));
+  }
+
+  public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
+    return assertion.apply(true);
   }
 
   @Override

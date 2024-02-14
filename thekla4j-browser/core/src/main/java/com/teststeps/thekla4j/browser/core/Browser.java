@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.browser.core;
 
+import com.teststeps.thekla4j.browser.spp.activities.State;
 import io.vavr.control.Try;
 
 public interface Browser {
@@ -15,6 +16,12 @@ public interface Browser {
   public Try<String> valueOf(Element element);
 
   public Try<String> attributeValueOf(String attribute, Element element);
+
+  public Try<State> getState(Element element);
+
+  public Try<String> title();
+
+  public Try<String> url();
 
   public Try<Void> quit();
 }
