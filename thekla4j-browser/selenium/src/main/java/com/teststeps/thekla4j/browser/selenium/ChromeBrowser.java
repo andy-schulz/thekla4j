@@ -1,12 +1,14 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.core.Browser;
+import com.teststeps.thekla4j.browser.core.Cookie;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.Function1;
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -91,6 +93,31 @@ public class ChromeBrowser implements Browser {
   @Override
   public Try<String> url() {
     return getUrl.apply(driver);
+  }
+
+  @Override
+  public Try<Cookie> getCookie(String name) {
+    return getCookie.apply(driver, name);
+  }
+
+  @Override
+  public Try<List<Cookie>> getAllCookies() {
+    return getAllCookies.apply(driver);
+  }
+
+  @Override
+  public Try<Void> addCookie(Cookie cookie) {
+    return addCookie.apply(driver, cookie);
+  }
+
+  @Override
+  public Try<Void> deleteCookie(String name) {
+    return deleteCookie.apply(driver, name);
+  }
+
+  @Override
+  public Try<Void> deleteAllCookies() {
+    return deleteAllCookies.apply(driver);
   }
 
   @Override

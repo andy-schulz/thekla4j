@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
 import com.teststeps.thekla4j.browser.selenium.waiter.SeleniumElementStatus;
+import com.teststeps.thekla4j.browser.core.Cookie;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import io.vavr.*;
 import io.vavr.collection.List;
@@ -15,6 +16,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.function.BiFunction;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
@@ -29,7 +31,7 @@ public class ElementFunctions {
         locateElement.apply(driver).apply(element),
         element,
         Instant.now(),
-        Duration.ofSeconds(0))
+        Duration.ofMillis(0))
         .map(highlightElement.apply(driver, highlightContext));
   }
 
@@ -45,17 +47,18 @@ public class ElementFunctions {
         Try.run(() -> Thread.sleep(waitFor.toMillis()))
             .onFailure(log::error);
 
+        Duration waitForNextIteration = Duration.ofMillis(500);
+
         Duration timeout = element.waiter().timeout();
 
         log.debug("Retrying to find element: {}", element);
-        log.debug("Time status: {}", Instant.now().isBefore(start.plus(timeout))) ;
 
         if (Instant.now().isAfter(start.plus(timeout))) {
           return webElement;
         }
 
         if (webElement.isFailure()) {
-          return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500));
+          return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration);
         }
 
         return webElement
@@ -65,8 +68,8 @@ public class ElementFunctions {
             .flatMap(elemStatus ->
                 elemStatus ?
                     webElement :
-                    ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500)))
-            .transform(tr -> tr.isSuccess() ? tr : ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, Duration.ofSeconds(500)));
+                    ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration))
+            .transform(tr -> tr.isSuccess() ? tr : ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration));
       };
 
   private static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
@@ -142,5 +145,30 @@ public class ElementFunctions {
   protected final static Function1<RemoteWebDriver, Try<String>> getUrl =
       driver -> Try.of(driver::getCurrentUrl)
           .onFailure(log::error);
+
+  protected final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
+      (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))
+          .map(c -> Cookie.of(c.getName(), c.getValue()))
+            .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<List<Cookie>>> getAllCookies =
+      (driver) -> Try.of(() -> driver.manage().getCookies())
+          .map(List::ofAll)
+          .map(c -> c.map(c1 -> Cookie.of(c1.getName(), c1.getValue())))
+          .onFailure(log::error);
+
+  protected final static Function2<RemoteWebDriver, Cookie, Try<Void>> addCookie =
+      (driver, cookie) -> Try.run(() -> driver.manage().addCookie(new org.openqa.selenium.Cookie(cookie.name(), cookie.value())))
+          .onFailure(log::error);
+
+  protected final static Function2<RemoteWebDriver, String, Try<Void>> deleteCookie =
+      (driver, name) -> Try.run(() -> driver.manage().deleteCookieNamed(name))
+          .onFailure(log::error);
+
+  // deleteAllCookies
+  protected final static Function1<RemoteWebDriver, Try<Void>> deleteAllCookies =
+      (driver) -> Try.run(() -> driver.manage().deleteAllCookies())
+          .onFailure(log::error);
+
 
 }

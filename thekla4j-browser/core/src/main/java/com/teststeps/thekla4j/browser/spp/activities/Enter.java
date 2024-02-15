@@ -24,13 +24,12 @@ public class Enter extends BasicInteraction {
 
   protected Either<ActivityError, Void> performAs(Actor actor) {
     if (element == null) {
-      return Either.left(ActivityError.with("No element to enter text into"));
+      return Either.left(ActivityError.with("No element to enter text into. Did you set the element with Enter.text(\"1234\").into(ELEMENT)? "));
     }
 
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.enterTextInto(text, element))
-        .transform(LiftTry.toEither(
-            x -> ActivityError.with(x.getMessage() + " while entering text " + text + " into element " + element)));
+        .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
   }
 
   public static Enter text(String text) {

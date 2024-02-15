@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.spp.activities.State;
+import io.vavr.collection.List;
 import io.vavr.control.Try;
 
 public interface Browser {
@@ -22,6 +23,16 @@ public interface Browser {
   public Try<String> title();
 
   public Try<String> url();
+
+  public Try<Cookie> getCookie(String name);
+
+  public Try<List<Cookie>> getAllCookies();
+
+  public Try<Void> addCookie(Cookie cookie);
+
+  public Try<Void> deleteCookie(String name);
+
+  public Try<Void> deleteAllCookies();
 
   public Try<Void> quit();
 }
