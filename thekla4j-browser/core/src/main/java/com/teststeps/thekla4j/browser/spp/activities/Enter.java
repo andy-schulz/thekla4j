@@ -1,7 +1,9 @@
 package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.activityLog.annotations.AttachOnError;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
+import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -10,6 +12,10 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
+
+import java.io.File;
+
+import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.takeScreenshot;
 
 @AllArgsConstructor
 @Action("Enter text '@{text}' into @{element}")
@@ -20,6 +26,9 @@ public class Enter extends BasicInteraction {
   @Called(name = "element")
   private Element element;
 
+  @AttachOnError(name = "screenshot", type = LogAttachmentType.IMAGE_PNG)
+  private File screenshot = null;
+
   @Override
 
   protected Either<ActivityError, Void> performAs(Actor actor) {
@@ -28,15 +37,16 @@ public class Enter extends BasicInteraction {
     }
 
     return BrowseTheWeb.as(actor)
-        .flatMap(b -> b.enterTextInto(text, element))
-        .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
+      .flatMap(b -> b.enterTextInto(text, element))
+      .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element))
+      .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 
   public static Enter text(String text) {
-    return new Enter(text, null);
+    return new Enter(text, null, null);
   }
 
   public Enter into(Element element) {
-    return new Enter(text, element);
+    return new Enter(text, element, null);
   }
 }

@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
+import io.vavr.control.Option;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -19,12 +20,28 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    * the root activity log entry
    */
   private final ActivityLogEntry rootActivityLogEntry;
-  @SuppressWarnings("java:S116")
-  // naming convention
+
+
   /**
    * the current activity log entry
    */
+  @SuppressWarnings("java:S116")
+  // naming convention
   transient private ActivityLogEntry _currentActivity;
+  /**
+   * the failed activity log entry
+   */
+  @SuppressWarnings("java:S116")
+  // naming convention
+  transient private Option<ActivityLogEntry> _failedActivity = Option.none();
+
+  /**
+   * the current activity log entry
+   * @return the current activity log entry
+   */
+  public Option<ActivityLogEntry> getFailedActivity() {
+    return this._failedActivity;
+  }
 
   /**
    * adds a new activity log entry to the current activity
@@ -89,6 +106,10 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    */
   @Override
   public void reset(ActivityLogEntry entry) {
+
+    if(entry.status() == ActivityStatus.failed && this._failedActivity.isEmpty())
+      this._failedActivity = Option.of(entry);
+
     entry.calculateStatus();
 
     if (entry.parent != null)
@@ -168,7 +189,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
   }
 
   transient private final Function<ActivityLogNode, ActivityLogNode> removeIO = node -> {
-    if (!Objects.isNull(node.activityNodes) && node.activityNodes.size() > 0)
+    if (!Objects.isNull(node.activityNodes) && !node.activityNodes.isEmpty())
       node.activityNodes.forEach(this.removeIO::apply);
 
     node.input = null;

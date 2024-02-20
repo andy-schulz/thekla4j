@@ -9,13 +9,11 @@ import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.google.gson.internal.bind.TypeAdapters.URL;
 import static io.vavr.API.*;
 
 
@@ -242,7 +240,6 @@ public class LogFormatter {
   }
 
   private static String formatPngBase64FileAttachment(String base64Attachment) {
-    System.out.println("Base64Attachment: " + base64Attachment);
     return "<div class=\"attachment\"><img src=\"data:image/png;base64," + base64Attachment + "\"/></div>";
   }
 
