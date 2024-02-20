@@ -13,6 +13,7 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.File;
 import java.time.Duration;
 
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
@@ -118,6 +119,11 @@ public class ChromeBrowser implements Browser {
   @Override
   public Try<Void> deleteAllCookies() {
     return deleteAllCookies.apply(driver);
+  }
+
+  @Override
+  public Try<File> takeScreenShot() {
+    return takeScreenShot.apply(driver);
   }
 
   @Override

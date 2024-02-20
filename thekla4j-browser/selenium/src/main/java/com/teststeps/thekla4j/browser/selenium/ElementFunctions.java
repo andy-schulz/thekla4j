@@ -4,7 +4,7 @@ import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
-import com.teststeps.thekla4j.browser.selenium.waiter.SeleniumElementStatus;
+import com.teststeps.thekla4j.browser.selenium.status.SeleniumElementStatus;
 import com.teststeps.thekla4j.browser.core.Cookie;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import io.vavr.*;
@@ -14,9 +14,10 @@ import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.function.BiFunction;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
@@ -168,6 +169,10 @@ public class ElementFunctions {
   // deleteAllCookies
   protected final static Function1<RemoteWebDriver, Try<Void>> deleteAllCookies =
       (driver) -> Try.run(() -> driver.manage().deleteAllCookies())
+          .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<File>> takeScreenShot =
+      (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
           .onFailure(log::error);
 
 

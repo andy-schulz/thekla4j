@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.core;
+package com.teststeps.thekla4j.activityLog;
 
 import com.teststeps.thekla4j.activityLog.*;
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;

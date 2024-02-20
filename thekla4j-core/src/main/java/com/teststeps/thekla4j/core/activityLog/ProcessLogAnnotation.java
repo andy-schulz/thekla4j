@@ -1,16 +1,11 @@
 package com.teststeps.thekla4j.core.activityLog;
 
 import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
-import com.teststeps.thekla4j.activityLog.annotations.Action;
-import com.teststeps.thekla4j.activityLog.annotations.Called;
-import com.teststeps.thekla4j.activityLog.annotations.CalledList;
-import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
-import com.teststeps.thekla4j.activityLog.annotations.Workflow;
+import com.teststeps.thekla4j.activityLog.annotations.*;
 import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.errors.DetectedNullObject;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.Tuple;
@@ -23,11 +18,11 @@ import lombok.extern.log4j.Log4j2;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.Objects;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
+import static io.vavr.API.*;
 
 @Log4j2(topic = "ProcessLogAnnotation")
 public class ProcessLogAnnotation<P1, R1> {
@@ -112,13 +107,6 @@ public class ProcessLogAnnotation<P1, R1> {
           annotation instanceof CalledList ||
               annotation instanceof Called);
 
-  private final Function1<Field, Field> makePrivateFieldAccessible = field -> {
-    if (Modifier.isPrivate(field.getModifiers())) {
-      field.setAccessible(true);
-    }
-    return field;
-  };
-
   /**
    * construct a tuple with field value and field annotations
    */
@@ -127,36 +115,16 @@ public class ProcessLogAnnotation<P1, R1> {
   private final Function2<Activity<P1, R1>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getFieldValueAndAnnotations =
       (actvty, clazz) -> {
 
-//        Function1<Field, Field> makePrivateFieldAccessible = field -> {
-//          if (Modifier.isPrivate(field.getModifiers())) {
-//            field.setAccessible(true);
-//          }
-//          return field;
-//        };
 
-    /*
-    get field value, if the field is a function execute it and take the result
-     */
-        Function1<Field, Object> getFieldValue = field -> {
-          try {
-            return (field.get(actvty) instanceof Function0) ?
-                ((Function0<Object>) field.get(actvty)).apply() :
-                field.get(actvty) == null ? "null" : field.get(actvty);
-
-          } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return "Error: Cant access field " + field.getName();
-          }
-        };
 
         return List.of(clazz.getFields())
-            .appendAll(Arrays.asList(clazz.getDeclaredFields()))
+            .appendAll(List.of(clazz.getDeclaredFields()))
             .map(field -> Tuple.of(field, field.getAnnotations()))
             .map(t -> t.map2(List::of))
             .map(t -> t.map2(filterAnnotations))
             .filter(t -> !t._2.isEmpty())
             .map(t -> t.map1(makePrivateFieldAccessible))
-            .map(t -> t.map1(getFieldValue))
+            .map(t -> t.map1(getFieldValueOfActivity(actvty)))
             .map(t -> t.map1(Option::of));
       };
 

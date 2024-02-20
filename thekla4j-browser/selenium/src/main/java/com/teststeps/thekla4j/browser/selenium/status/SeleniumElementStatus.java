@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.browser.selenium.waiter;
+package com.teststeps.thekla4j.browser.selenium.status;
 
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.status.ElementStatusType;

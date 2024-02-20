@@ -16,16 +16,14 @@ import java.time.Duration;
 @Action("pause all activities for @{duration} @{reason}")
 public class Sleep<T> extends Interaction<T, T> {
 
-  private Duration duration;
+  private final Duration duration;
 
   @Called(name = "duration")
-  private Function0<String> durationText = () -> "" + duration.getSeconds() + " Seconds (" + duration.toMillis() + " ms)";
-
-
-  private String reason = "";
+  private final String durationText;
 
   @Called(name = "reason")
-  private Function0<String> getReason = () -> reason.equals("") ? "" : "with reason '" + reason + "'";
+  private String reason = "";
+
 
 
   /**
@@ -61,7 +59,7 @@ public class Sleep<T> extends Interaction<T, T> {
    * @return Sleep action
    */
   public Sleep<T> because(String reason) {
-    this.reason = reason;
+    this.reason = "with reason '" + reason + "'";
     return this;
   }
 
@@ -71,6 +69,8 @@ public class Sleep<T> extends Interaction<T, T> {
    * @param duration duration of sleep
    */
   private Sleep(Duration duration) {
+
     this.duration = duration;
+    this.durationText = duration.getSeconds() + " Seconds (" + duration.toMillis() + " ms)";
   }
 }

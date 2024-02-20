@@ -86,6 +86,11 @@ transform: rotate(90deg);
     padding-left: 2em;
 }
 
+.attachmentInfo {
+    display: none;
+    padding-left: 2em;
+}
+
 .infoHeader {
     background: lightgray;
     border-radius: 1em;
@@ -113,6 +118,10 @@ transform: rotate(90deg);
 }
 
 .inActive {
+    display: block;
+}
+
+.attachmentActive {
     display: block;
 }
 
@@ -185,4 +194,8 @@ pre {
     white-space:pre-wrap;
     overflow-wrap: break-word;
     margin-right: 30px;
+}
+
+.attachmentContainer img {
+    width: 100%;
 }

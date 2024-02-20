@@ -1,23 +1,32 @@
 package com.teststeps.thekla4j.commons.properties;
 
+import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Properties;
 
 import static io.vavr.API.*;
 
+@Log4j2(topic = "Thekla4jProperty")
 public class Thekla4jProperty {
 
   private final static String PROPERTY_FILE = "thekla4j.properties";
 
-  public static final Function1<PropertyElement, String> of = TestPropertyHelper._withName.memoized();
+  private static Function1<PropertyElement, String> of = TestPropertyHelper._withName.memoized();
 
   public static String of(PropertyElement element) {
     return Thekla4jProperty.of.apply(element);
   }
+
+  public static void resetPropertyCache() {
+    Thekla4jProperty.of = TestPropertyHelper._withName.memoized();
+    TestPropertyHelper.resetPropertyFileCache();
+  }
+
 
   static final class TestPropertyHelper {
 
@@ -31,9 +40,13 @@ public class Thekla4jProperty {
               prop.load(stream);
               return prop;
             });
-    private static final Function1<String, Try<Properties>> loadPropertyFile = _loadProperty
-        .memoized();
 
+    private static Function1<String, Try<Properties>> loadPropertyFile = TestPropertyHelper._loadProperty.memoized();
+
+
+    public static void resetPropertyFileCache() {
+      TestPropertyHelper.loadPropertyFile = TestPropertyHelper._loadProperty.memoized();
+    }
 
     /**
      * get property from property object
@@ -46,11 +59,9 @@ public class Thekla4jProperty {
     /**
      * check if the property is empty
      */
-    private static final Function2<String, String, Try<String>> checkEmptyValue = (name, value) -> Match(value).of(
-        Case($(""::equals), () -> Try.failure(
-            new Exception("Property " +
-                name +
-                " is empty"))),
+    private static final Function2<String, String, Try<String>> checkEmptyValue =
+        (name, value) -> Match(value).of(
+        Case($(""::equals), () -> Try.failure(new Exception("Property '" + name + "' is empty"))),
         Case($(), () -> Try.success(value)));
 
     /**
@@ -58,7 +69,7 @@ public class Thekla4jProperty {
      */
     private static final Function1<String, Try<String>> loadSystemProperty =
         propertyName -> Option.of(System.getProperty(propertyName))
-            .toTry(() -> new Exception("Property " + propertyName + " does not exist"))
+            .toTry(() -> new Exception("System Property '" + propertyName + "' does not exist"))
             .flatMap(checkEmptyValue.apply(propertyName));
 
     /**
@@ -79,10 +90,14 @@ public class Thekla4jProperty {
       if (system.isSuccess())
         return system.get();
 
+      system.onFailure(x -> log.debug(x.getMessage() + " - trying to load from property file"));
+
       Try<String> envProperty = TestPropertyHelper.loadFileProperty.apply(property.name());
 
       if (envProperty.isSuccess())
         return envProperty.get();
+
+      envProperty.onFailure(x -> log.debug(x.getMessage() + " - loading default value now"));
 
       return property.defaultValue();
     };

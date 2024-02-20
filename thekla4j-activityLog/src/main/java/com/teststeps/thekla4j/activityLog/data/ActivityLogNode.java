@@ -3,7 +3,6 @@ package com.teststeps.thekla4j.activityLog.data;
 import com.google.gson.annotations.Expose;
 import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
 import com.teststeps.thekla4j.activityLog.ActivityStatus;
-import lombok.AllArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -42,6 +41,13 @@ public class ActivityLogNode implements Serializable {
    */
   @Expose
   public String output = "";
+
+  /**
+   * The attachments of the activity
+   */
+  @Expose
+  public List<NodeAttachment> attachments;
+
   /**
    * The type of the activity (Task, Interaction, Group)
    */
@@ -65,16 +71,27 @@ public class ActivityLogNode implements Serializable {
    * @param startedAt - The time the activity was started
    * @param input - The input to the activity
    * @param output - The output of the activity (result or error message)
+   * @param attachments - The attachments of the activity (PNG, PDF, etc.)
    * @param logType - The type of the activity (Task, Interaction, Group)
    * @param status - The status of the activity (running, failed, passed)
    * @param activityNodes - The children of the activity
    */
-  public ActivityLogNode(final String name, final String description, final String startedAt, final String input, final String output, final ActivityLogEntryType logType, final ActivityStatus status, final List<ActivityLogNode> activityNodes) {
+  public ActivityLogNode(
+      final String name,
+      final String description,
+      final String startedAt,
+      final String input,
+      final String output,
+      final List<NodeAttachment> attachments,
+      final ActivityLogEntryType logType,
+      final ActivityStatus status,
+      final List<ActivityLogNode> activityNodes) {
     this.name = name;
     this.description = description;
     this.startedAt = startedAt;
     this.input = input;
     this.output = output;
+    this.attachments = attachments;
     this.logType = logType;
     this.status = status;
     this.activityNodes = activityNodes;

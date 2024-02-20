@@ -1,4 +1,4 @@
-package com.tetsteps.thekla4j.browser;
+package com.teststeps.thekla4j.browser;
 
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import org.junit.jupiter.api.Test;
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+
 
 public class BrowserPropertiesTest {
 

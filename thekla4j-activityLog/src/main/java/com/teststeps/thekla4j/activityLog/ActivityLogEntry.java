@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.activityLog;
 
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
+import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import io.vavr.Function2;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +46,12 @@ public class ActivityLogEntry implements Serializable {
      * the output of the activity
      */
     private String output = "";
+
+    /**
+     * the attachments of the activity
+     */
+    private List<NodeAttachment> attachments = List.empty();
+
     /**
      * the type of the activity
      */
@@ -143,6 +151,11 @@ public class ActivityLogEntry implements Serializable {
         return this;
     }
 
+    public ActivityLogEntry appendAttachment(NodeAttachment attachment) {
+        this.attachments = this.attachments.append(attachment);
+        return this;
+    }
+
     /**
      * calculate the log tree status
      */
@@ -199,6 +212,7 @@ public class ActivityLogEntry implements Serializable {
             (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(this.startedAt),
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.input,
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.output,
+            Objects.isNull(this.attachments) ? null : this.attachments.toJavaList(),
             this.activityType,
             this.activityStatus,
             this.subEntries.map(ActivityLogEntry::getLogTree)

@@ -4,6 +4,8 @@ import com.teststeps.thekla4j.browser.spp.activities.State;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 
+import java.io.File;
+
 public interface Browser {
 
   public Try<Void> navigateTo(String url);
@@ -33,6 +35,8 @@ public interface Browser {
   public Try<Void> deleteCookie(String name);
 
   public Try<Void> deleteAllCookies();
+
+  public Try<File> takeScreenShot();
 
   public Try<Void> quit();
 }

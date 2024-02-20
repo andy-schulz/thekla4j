@@ -6,8 +6,11 @@ public enum DefaultThekla4jBrowserProperties {
 
   HIGHLIGHT_ELEMENTS(PropertyElement.of("thekla4j.highlightElements", "true")),
   SLOW_DOWN_EXECUTION(PropertyElement.of("thekla4j.slowDownExecution", "false")),
-  SLOW_DOWN_TIME(PropertyElement.of("thekla4j.slowDownTimeInSeconds", "1"));
+  SLOW_DOWN_TIME(PropertyElement.of("thekla4j.slowDownTimeInSeconds", "1")),
 
+  SCREENSHOT_RELATIVE_PATH(PropertyElement.of("thekla4j.browser.screenshot.relativePath", "")),
+
+  SCREENSHOT_ABSOLUTE_PATH(PropertyElement.of("thekla4j.browser.screenshot.absolutePath", System.getProperty("user.dir")));
 
   final PropertyElement property;
 

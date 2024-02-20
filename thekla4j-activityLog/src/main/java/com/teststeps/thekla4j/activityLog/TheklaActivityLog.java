@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.activityLog;
 
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
+import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
 
@@ -128,7 +129,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    * return the structured activity log as a tree
    * @return the structured activity log
    */
-  private ActivityLogNode getLogTree() {
+  public ActivityLogNode getLogTree() {
     this.setRootNodeStatus();
     return this.rootActivityLogEntry.getLogTree();
   }
@@ -205,6 +206,22 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
   @Override
   public String getEncodedStructuredHtmlLogWithoutIO() {
     return LogFormatter.encodeLog(getStructuredHtmlLogWithoutIO());
+  }
+
+  private List<NodeAttachment> getFailedNodeAttachment(ActivityLogNode node) {
+    if(node.activityNodes.isEmpty())
+      return List.ofAll(node.attachments);
+
+    List<ActivityLogNode> failedNode = List.ofAll(node.activityNodes).filter(n -> n.status == ActivityStatus.failed);
+
+    if(failedNode.isEmpty())
+      return List.empty();
+
+    return getFailedNodeAttachment(failedNode.head());
+  }
+
+  public List<NodeAttachment> getLastLogAttachments() {
+    return getFailedNodeAttachment(this.rootActivityLogEntry.getLogTree());
   }
 
   /**\
