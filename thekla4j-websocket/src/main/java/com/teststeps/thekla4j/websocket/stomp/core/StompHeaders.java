@@ -26,6 +26,10 @@ public class StompHeaders{
     return new StompHeaders(headerList.append(header));
   }
 
+  public StompHeaders append(StompHeaders headers) {
+    return new StompHeaders(headers.headerList.foldLeft(headerList, List::append));
+  }
+
   public final Predicate<StompHeader> contains =
       (expectedHeader)  -> headerList.exists(
           header -> header.name().equals(expectedHeader.name())
