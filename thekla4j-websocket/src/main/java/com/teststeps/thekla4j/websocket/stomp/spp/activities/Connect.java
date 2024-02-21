@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.websocket.stomp.core.Endpoint;
+import com.teststeps.thekla4j.websocket.stomp.core.StompHeader;
 import com.teststeps.thekla4j.websocket.stomp.core.StompHeaders;
 import com.teststeps.thekla4j.websocket.stomp.spp.abilities.UseWebsocketWithStomp;
 import io.vavr.control.Either;
@@ -31,6 +32,11 @@ public class Connect extends Interaction<Void, StompHeaders> {
 
   public Connect using(StompHeaders headers) {
     this.endpoint = this.endpoint.withHeaders(endpoint.headers().append(headers));
+    return this;
+  }
+
+  public Connect using(StompHeader header) {
+    this.endpoint = this.endpoint.withHeaders(endpoint.headers().append(header));
     return this;
   }
 }
