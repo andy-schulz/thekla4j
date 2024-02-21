@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.http.core.functions;
 
-import com.teststeps.thekla4j.http.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.collection.List;
@@ -22,7 +22,7 @@ public class CookieFunctions {
 
   public static final Function1<List<Cookie>, String> toCookieString =
       cookieList -> cookieList
-          .filter(c -> Objects.isNull(c.expires) || c.expires.isAfter(LocalDateTime.now()))
+          .filter(c -> Objects.isNull(c.expires()) || c.expires().isAfter(LocalDateTime.now()))
           .map(CookieFunctions.cookieToString)
           .collect(Collectors.joining(";"));
 
@@ -38,7 +38,7 @@ public class CookieFunctions {
 
   private static final Function1<String, Function1<Cookie, Cookie>> applyCookieValues =
       cookieValue -> cookie -> Match(List.of(cookieValue.split("="))).of(
-          Case($(l -> Objects.isNull(cookie.name) || Objects.equals(cookie.name, "")), nV -> CookieFunctions.setNameAndValue.apply(nV, cookie)),
+          Case($(l -> Objects.isNull(cookie.name()) || Objects.equals(cookie.name(), "")), nV -> CookieFunctions.setNameAndValue.apply(nV, cookie)),
           Case($(l -> Objects.equals(l.get(0).toLowerCase(), "expires")), l -> cookie.withExpires(CookieFunctions.parseExpireValue.apply(l))),
           Case($(l -> Objects.equals(l.get(0).toLowerCase(), "domain")), l -> cookie.withDomain(l.getOrElse(1, null))),
           Case($(l -> Objects.equals(l.get(0).toLowerCase(), "httponly")), l -> cookie.withHttpOnly(true)),
@@ -61,6 +61,6 @@ public class CookieFunctions {
           .getOrNull();
 
   private static final Function1<Cookie, String> cookieToString =
-      cookie -> cookie.name + "=" + cookie.value;
+      cookie -> cookie.name() + "=" + cookie.value();
 
 }

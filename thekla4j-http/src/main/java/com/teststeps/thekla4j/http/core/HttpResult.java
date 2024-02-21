@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.http.core;
 
+import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 

@@ -2,7 +2,7 @@ package com.teststeps.thekla4j.http;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.http.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.httpConn.HcHttpClient;
 import com.teststeps.thekla4j.http.spp.ContentType;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
@@ -32,10 +32,10 @@ public class GetTest {
     tester.attemptsTo(
             Get.from(httpBin))
         .peek(r -> assertThat("number of cookies:", r.cookies().size(), equalTo(1)))
-        .peek(r -> assertThat("cookie name", r.cookies().get(0).name, equalTo("test")))
-        .peek(r -> assertThat("cookie value", r.cookies().get(0).value, equalTo("testValue")))
-        .peek(r -> assertThat("cookie path", r.cookies().get(0).path, equalTo("/")))
-        .peek(r -> assertThat("cookie domain", r.cookies().get(0).domain, equalTo("test-step.de/")))
+        .peek(r -> assertThat("cookie name", r.cookies().get(0).name(), equalTo("test")))
+        .peek(r -> assertThat("cookie value", r.cookies().get(0).value(), equalTo("testValue")))
+        .peek(r -> assertThat("cookie path", r.cookies().get(0).path(), equalTo("/")))
+        .peek(r -> assertThat("cookie domain", r.cookies().get(0).domain(), equalTo("test-step.de/")))
         .getOrElseThrow(Function.identity());
   }
 

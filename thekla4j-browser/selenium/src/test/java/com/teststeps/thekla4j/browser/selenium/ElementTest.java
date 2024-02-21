@@ -31,7 +31,7 @@ public class ElementTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
     Element header = Element.found(By.css(".headerElement"));

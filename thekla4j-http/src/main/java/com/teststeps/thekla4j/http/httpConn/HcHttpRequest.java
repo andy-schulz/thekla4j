@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.http.httpConn;
 
-import com.teststeps.thekla4j.http.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
@@ -32,7 +32,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.encodeParameter;
 import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.percentEncode;
 
 @Log4j2(topic = "HcHttpRequest")

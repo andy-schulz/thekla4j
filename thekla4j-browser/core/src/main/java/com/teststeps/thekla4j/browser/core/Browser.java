@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.spp.activities.State;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 

@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api project(':thekla4j-core')
+    api project(':thekla4j-http-commons')
     implementation project(':thekla4j-utils')
 }
 

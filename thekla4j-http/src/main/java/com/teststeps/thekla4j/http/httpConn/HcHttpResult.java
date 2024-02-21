@@ -1,8 +1,7 @@
 package com.teststeps.thekla4j.http.httpConn;
 
-import com.teststeps.thekla4j.http.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.core.HttpResult;
-import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 

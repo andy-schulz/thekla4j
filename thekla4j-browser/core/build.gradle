@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api project(':thekla4j-core')
+    api project(':thekla4j-http-commons')
     api project(":thekla4j-activityLog")
     api project(":thekla4j-commons")
 

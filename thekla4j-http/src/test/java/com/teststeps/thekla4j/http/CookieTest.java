@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.http;
 
-import com.teststeps.thekla4j.http.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -17,14 +17,14 @@ public class CookieTest {
 
     Cookie cookie = CookieFunctions.toCookie.apply(cookieString);
 
-    assertThat(cookie.name, equalTo("test"));
-    assertThat(cookie.value, equalTo("value"));
-    assertThat(cookie.domain, equalTo("test-steps.de/"));
-    assertThat(cookie.secure, equalTo(true));
-    assertThat(cookie.httpOnly, equalTo(true));
-    assertThat(cookie.partitioned, equalTo(false));
+    assertThat(cookie.name(), equalTo("test"));
+    assertThat(cookie.value(), equalTo("value"));
+    assertThat(cookie.domain(), equalTo("test-steps.de/"));
+    assertThat(cookie.secure(), equalTo(true));
+    assertThat(cookie.httpOnly(), equalTo(true));
+    assertThat(cookie.partitioned(), equalTo(false));
 
-    assertThat(cookie.expires, equalTo(null));
+    assertThat(cookie.expires(), equalTo(null));
   }
 
   @Test
@@ -33,17 +33,17 @@ public class CookieTest {
 
     Cookie cookie = CookieFunctions.toCookie.apply(cookieString);
 
-    assertThat(cookie.name, equalTo("test"));
-    assertThat(cookie.value, equalTo("value"));
+    assertThat(cookie.name(), equalTo("test"));
+    assertThat(cookie.value(), equalTo("value"));
 
-    assertThat(cookie.secure, equalTo(false));
-    assertThat(cookie.httpOnly, equalTo(false));
-    assertThat(cookie.partitioned, equalTo(false));
+    assertThat(cookie.secure(), equalTo(false));
+    assertThat(cookie.httpOnly(), equalTo(false));
+    assertThat(cookie.partitioned(), equalTo(false));
 
-    assertThat(cookie.domain, equalTo(null));
-    assertThat(cookie.expires, equalTo(null));
-    assertThat(cookie.sameSite, equalTo(null));
-    assertThat(cookie.maxAge, equalTo(null));
+    assertThat(cookie.domain(), equalTo(null));
+    assertThat(cookie.expires(), equalTo(null));
+    assertThat(cookie.sameSite(), equalTo(null));
+    assertThat(cookie.maxAge(), equalTo(null));
   }
 
   @Test
@@ -52,17 +52,17 @@ public class CookieTest {
 
     Cookie cookie = CookieFunctions.toCookie.apply(cookieString);
 
-    assertThat(cookie.name, equalTo("test"));
-    assertThat(cookie.value, equalTo("value"));
+    assertThat(cookie.name(), equalTo("test"));
+    assertThat(cookie.value(), equalTo("value"));
 
-    assertThat(cookie.secure, equalTo(false));
-    assertThat(cookie.httpOnly, equalTo(false));
-    assertThat(cookie.partitioned, equalTo(false));
+    assertThat(cookie.secure(), equalTo(false));
+    assertThat(cookie.httpOnly(), equalTo(false));
+    assertThat(cookie.partitioned(), equalTo(false));
 
-    assertThat(cookie.domain, equalTo(null));
-    assertThat(cookie.expires, equalTo(null));
-    assertThat(cookie.sameSite, equalTo(null));
-    assertThat(cookie.maxAge, equalTo(null));
+    assertThat(cookie.domain(), equalTo(null));
+    assertThat(cookie.expires(), equalTo(null));
+    assertThat(cookie.sameSite(), equalTo(null));
+    assertThat(cookie.maxAge(), equalTo(null));
   }
 
   @Test
@@ -71,7 +71,7 @@ public class CookieTest {
 
     Cookie cookie = CookieFunctions.toCookie.apply("test=testValue;Expires=" + isoDate);
 
-    assertThat("checking RFC format", cookie.expires, equalTo(LocalDateTime.of(2023, 8, 9, 10, 26, 52)));
+    assertThat("checking RFC format", cookie.expires(), equalTo(LocalDateTime.of(2023, 8, 9, 10, 26, 52)));
   }
 
   @Test
@@ -80,6 +80,6 @@ public class CookieTest {
 
     Cookie cookie = CookieFunctions.toCookie.apply("test=testValue;Expires=" + isoDate);
 
-    assertThat("checking RFC format", cookie.expires, equalTo(LocalDateTime.of(2023, 8, 9, 10, 26, 52)));
+    assertThat("checking RFC format", cookie.expires(), equalTo(LocalDateTime.of(2023, 8, 9, 10, 26, 52)));
   }
 }

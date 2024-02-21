@@ -2,7 +2,7 @@ package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.browser.core.Browser;
-import com.teststeps.thekla4j.browser.core.Cookie;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
