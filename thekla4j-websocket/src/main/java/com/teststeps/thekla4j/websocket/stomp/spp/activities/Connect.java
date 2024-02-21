@@ -22,10 +22,15 @@ public class Connect extends Interaction<Void, StompHeaders> {
   @Override
   protected Either<ActivityError, StompHeaders> performAs(Actor actor, Void result) {
     return UseWebsocketWithStomp.as(actor)
-        .flatMap(ability -> ability.connectTo(endpoint));
+      .flatMap(ability -> ability.connectTo(endpoint));
   }
 
   public static Connect to(Endpoint endpoint) {
     return new Connect(endpoint);
+  }
+
+  public Connect using(StompHeaders headers) {
+    this.endpoint = this.endpoint.withHeaders(endpoint.headers().append(headers));
+    return this;
   }
 }
