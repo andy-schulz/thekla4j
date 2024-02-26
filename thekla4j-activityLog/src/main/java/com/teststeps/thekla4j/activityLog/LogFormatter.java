@@ -36,14 +36,14 @@ public class LogFormatter {
     String indents = new String(new char[repeat]).replace("\0", logPrefix);
 
     return String.format(formattedText,
-        indents,
-        logNode.status == ActivityStatus.failed ? "✗" : "✓",
-        logNode.name,
-        logNode.description.replace("\n", "\n" + new String(new char[indents.length() + 7 + logNode.name.length()]).replace("\0", " ")),
-        logNode.activityNodes.stream().reduce(
-            "",
-            (acc, logEntry) -> acc + "\n" + LogFormatter.formatToText(logPrefix, repeat + 1, logEntry),
-            (s1, s2) -> null)
+      indents,
+      logNode.status == ActivityStatus.failed ? "✗" : "✓",
+      logNode.name,
+      logNode.description.replace("\n", "\n" + new String(new char[indents.length() + 7 + logNode.name.length()]).replace("\0", " ")),
+      logNode.activityNodes.stream().reduce(
+        "",
+        (acc, logEntry) -> acc + "\n" + LogFormatter.formatToText(logPrefix, repeat + 1, logEntry),
+        (s1, s2) -> null)
                         );
   }
 
@@ -55,10 +55,10 @@ public class LogFormatter {
    */
   private static String formatShortLogContentToHtml(ActivityLogNode node) {
     return "<span class=\"logMessage\"><span class = \"timestamp\">" + node.startedAt + " - </span>" +
-        "<span class=\"activityName\">" + "[" + node.name + "]</span> - " +
-        "<span class=\"activityDescription\"> " + (node.description.length() > 100 ? node.description.substring(0, 90) :
-        node.description) + "</span>" +
-        "</span>";
+      "<span class=\"activityName\">" + "[" + node.name + "]</span> - " +
+      "<span class=\"activityDescription\"> " + (node.description.length() > 100 ? node.description.substring(0, 90) :
+      node.description) + "</span>" +
+      "</span>";
   }
 
   /**
@@ -74,50 +74,50 @@ public class LogFormatter {
     if (logNode.logType.equals(ActivityLogEntryType.Task) || logNode.logType.equals(ActivityLogEntryType.Group)) {
 
       String formattedText = "<li><span class=\"task %s\">%s</span>" +
-          // ... in case the message is to long
-          (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
-          (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-              "<span class=\"label contentButton inContentButton\">In</span>") +
-          (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-              "<span class=\"label contentButton outContentButton\">Out</span>") +
-          (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-              "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
-          "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
-          .length() <= 100 ? "" : logNode.description) + "</pre></div></div>" +
-          // IO Element
-          "%s" +
-          "<ul class=\"nested\">%s</ul>" +
-          "</li>";
+        // ... in case the message is to long
+        (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
+        (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
+          "<span class=\"label contentButton inContentButton\">In</span>") +
+        (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
+          "<span class=\"label contentButton outContentButton\">Out</span>") +
+        (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
+          "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
+        "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
+        .length() <= 100 ? "" : logNode.description) + "</pre></div></div>" +
+        // IO Element
+        "%s" +
+        "<ul class=\"nested\">%s</ul>" +
+        "</li>";
 
       return String.format(formattedText,
-          logNode.status,
-          formatShortLogContentToHtml(logNode),
-          formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)),
-          logNode.activityNodes.stream().reduce(
-              "",
-              (acc, logEntry) -> acc + formatNodeToHtml(logEntry),
-              (s1, s2) -> null));
+        logNode.status,
+        formatShortLogContentToHtml(logNode),
+        formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)),
+        logNode.activityNodes.stream().reduce(
+          "",
+          (acc, logEntry) -> acc + formatNodeToHtml(logEntry),
+          (s1, s2) -> null));
 
     } else if (logNode.logType == ActivityLogEntryType.Interaction) {
 
       String formattedText = "<li class=\"interaction %s\">%s" +
-          (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
-          (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-              "<span class=\"label contentButton inContentButton\">In</span>") +
-          (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-              "<span class=\"label contentButton outContentButton\">Out</span>") +
-          (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-              "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
-          "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
-          .length() <= 100 ? "" : logNode.description.replace("%", "%%")) + "</pre></div></div>" +
-          // IO Element
-          "%s" +
-          "</li>";
+        (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
+        (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
+          "<span class=\"label contentButton inContentButton\">In</span>") +
+        (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
+          "<span class=\"label contentButton outContentButton\">Out</span>") +
+        (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
+          "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
+        "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
+        .length() <= 100 ? "" : logNode.description.replace("%", "%%")) + "</pre></div></div>" +
+        // IO Element
+        "%s" +
+        "</li>";
 
       return String.format(formattedText,
-          logNode.status,
-          formatShortLogContentToHtml(logNode),
-          formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)));
+        logNode.status,
+        formatShortLogContentToHtml(logNode),
+        formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)));
     } else {
       throw new Error("Unknown Node Type ${logNode.logType}");
     }
@@ -135,9 +135,8 @@ public class LogFormatter {
 
   private static String formatLogWithHtmlTags(List<ActivityLogNode> logNodes) {
     return logNodes.map(LogFormatter::formatLogWithHtmlTags)
-        .collect(Collectors.joining("<br>"));
+      .collect(Collectors.joining("<br>"));
   }
-
 
   /**
    * format the node to an html tree and add the style and JS function to the html representation
@@ -149,14 +148,14 @@ public class LogFormatter {
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     String formattedText = "<style>\n%s\n</style> " +
-        "\n\n%s " +
-        "\n\n%s";
+      "\n\n%s " +
+      "\n\n%s";
     String returnText = "";
     try {
       returnText = String.format(formattedText,
-          LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
-          formatLogWithHtmlTags(logNode),
-          functionScript);
+        LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
+        formatLogWithHtmlTags(logNode),
+        functionScript);
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -175,14 +174,14 @@ public class LogFormatter {
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     String formattedText = "<style>\n%s\n</style> " +
-        "\n\n%s " +
-        "\n\n%s";
+      "\n\n%s " +
+      "\n\n%s";
     String returnText = "";
     try {
       returnText = String.format(formattedText,
-          LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
-          formatLogWithHtmlTags(logNodes),
-          functionScript);
+        LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
+        formatLogWithHtmlTags(logNodes),
+        functionScript);
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -201,59 +200,88 @@ public class LogFormatter {
   private static String formatIOElement(String input, String output, List<NodeAttachment> attachments) {
 
     return (Objects.isNull(input) || Objects.equals(input, "")) &&
-        (Objects.isNull(output) || Objects.equals(output, "")) ? "" : String.format(
-        "<span class=\"with options\">\n" +
-            "                <div class=\"inInfo\">\n" +
-            "                    <div class=\"ioContent\"><div class=\"infoHeader\">Input</div>" +
-            "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
-            "                    </div>\n" +
-            "                </div>" +
-            "                <div class=\"outInfo\">\n" +
-            "                    <div class=\"ioContent\"><div class=\"infoHeader\">Output</div>" +
-            "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
-            "                    </div>\n" +
-            "                </div>" +
-            "                <div class=\"attachmentInfo\">\n" +
-            "                    <div class=\"ioContent\"><div class=\"infoHeader\">Attachment</div>" +
-            "                        <div class=\"infoMessage attachmentContainer\">%s</div>\n" +
-            "                    </div>\n" +
-            "                </div>" +
-            "</span>", input, output, formatAttachments(attachments));
+      (Objects.isNull(output) || Objects.equals(output, "")) ? "" : String.format(
+      "<span class=\"with options\">\n" +
+        "                <div class=\"inInfo\">\n" +
+        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Input</div>" +
+        "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
+        "                    </div>\n" +
+        "                </div>" +
+        "                <div class=\"outInfo\">\n" +
+        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Output</div>" +
+        "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
+        "                    </div>\n" +
+        "                </div>" +
+        "                <div class=\"attachmentInfo\">\n" +
+        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Attachment</div>" +
+        "                        <div class=\"infoMessage attachmentContainer\">%s</div>\n" +
+        "                    </div>\n" +
+        "                </div>" +
+        "</span>", input, output, formatAttachments(attachments));
   }
 
+  /**
+   * format all attachments as list
+   *
+   * @param attachments - the list of attachments to format
+   * @return the html representation of the attachments
+   */
   private static String formatAttachments(List<NodeAttachment> attachments) {
     return String.format("<div class=\"attachments\">%s</div>", attachments.map(LogFormatter::formatAttachment)
-        .collect(Collectors.joining("<br>")));
+      .collect(Collectors.joining("<br>")));
   }
 
+  /**
+   * format the attachment to the html representation
+   *
+   * @param attachment - the attachment to format
+   * @return the html representation of the attachment
+   */
   private static String formatAttachment(NodeAttachment attachment) {
     return Match(attachment.type()).of(
-        Case($(LogAttachmentType.TEXT_PLAIN), () -> formatTextAttachment(attachment.content())),
-        Case($(LogAttachmentType.IMAGE_PNG), () -> fileToBase64String(attachment)),
-        Case($(LogAttachmentType.IMAGE_BASE64), () -> formatPngBase64FileAttachment(attachment.content())),
-        Case($(), () -> "<div class=\"attachment\"><pre>" + attachment.content() + "</pre></div>")
+      Case($(LogAttachmentType.TEXT_PLAIN), () -> formatTextAttachment(attachment.content())),
+      Case($(LogAttachmentType.IMAGE_PNG), () -> fileToBase64String(attachment)),
+      Case($(LogAttachmentType.IMAGE_BASE64), () -> formatPngBase64FileAttachment(attachment.content())),
+      Case($(), () -> "<div class=\"attachment\"><pre>" + attachment.content() + "</pre></div>")
                                       );
   }
 
+
+  /**
+   * format the text attachment to the html representation
+   *
+   * @param attachment - the attachment to format
+   * @return the html representation of the attachment
+   */
   private static String formatTextAttachment(String attachment) {
     return "<div class=\"attachment\"><pre>" + attachment + "</pre></div>";
   }
 
+  /**
+   * format the base64 encoded png file to the html representation
+   *
+   * @param base64Attachment - the base64 encoded png file
+   * @return the html representation of the attachment
+   */
   private static String formatPngBase64FileAttachment(String base64Attachment) {
     return "<div class=\"attachment\"><img src=\"data:image/png;base64," + base64Attachment + "\"/></div>";
   }
 
+  /**
+   * convert the file to a base64 encoded string
+   *
+   * @param attachment - the attachment to convert
+   * @return the base64 encoded string
+   */
   private static String fileToBase64String(NodeAttachment attachment) {
 
-    return
-
-        Try.of(() -> new File(attachment.content()))
-            .map(File::toPath)
-            .mapTry(Files::readAllBytes)
-            .map(Base64.getEncoder()::encodeToString)
-            .map(LogFormatter::formatPngBase64FileAttachment)
-            .onFailure(log::error)
-            .getOrElse("");
+    return Try.of(() -> new File(attachment.content()))
+      .map(File::toPath)
+      .mapTry(Files::readAllBytes)
+      .map(Base64.getEncoder()::encodeToString)
+      .map(LogFormatter::formatPngBase64FileAttachment)
+      .onFailure(log::error)
+      .getOrElse("");
   }
 
   /**
@@ -292,8 +320,8 @@ public class LogFormatter {
       if (is == null)
         return null;
       try (
-          InputStreamReader isr = new InputStreamReader(is);
-          BufferedReader reader = new BufferedReader(isr)
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader reader = new BufferedReader(isr)
       ) {
         return reader.lines().collect(Collectors.joining(System.lineSeparator()));
       }
@@ -314,47 +342,47 @@ public class LogFormatter {
    * the function script which is added to the HTML tree
    */
   private static String functionScript =
-      "<script>\n" +
-          "var toggler = document.querySelectorAll(\".task\");\n" +
-          "var inToggler = document.querySelectorAll(\".label.inContentButton\");\n" +
-          "var outToggler = document.querySelectorAll(\".label.outContentButton\");\n" +
-          "var attachmentToggler = document.querySelectorAll(\".label.attachmentContentButton\");\n" +
-          "var descToggler = document.querySelectorAll(\".ellipses\");\n" +
-          "var i;\n" +
-          "\n" +
-          "for (i = 0; i < toggler.length; i++) {\n" +
-          "  toggler[i].addEventListener(\"click\", function() {\n" +
-          "    this.parentElement.querySelector(\".nested\").classList.toggle(\"active\");\n" +
-          "    this.classList.toggle(\"task-open\");\n" +
-          "  });\n" +
-          "}\n" +
-          "\n" +
-          "for (i = 0; i < inToggler.length; i++) {\n" +
-          "    inToggler[i].addEventListener(\"click\", function() {\n" +
-          "        this.parentElement.querySelector(\".inInfo\").classList.toggle(\"inActive\");\n" +
-          "        this.classList.toggle(\"active\");\n" +
-          "    });\n" +
-          "}\n" +
-          "\n" +
-          "for (i = 0; i < outToggler.length; i++) {\n" +
-          "    outToggler[i].addEventListener(\"click\", function() {\n" +
-          "        this.parentElement.querySelector(\".outInfo\").classList.toggle(\"outActive\");\n" +
-          "        this.classList.toggle(\"active\");\n" +
-          "    });\n" +
-          "}\n" +
-          "for (i = 0; i < descToggler.length; i++) {\n" +
-          "    descToggler[i].addEventListener(\"click\", function() {\n" +
-          "        this.parentElement.querySelector(\".longDescription\").classList.toggle(\"descriptionActive\");\n" +
-          "        this.classList.toggle(\"active\");\n" +
-          "    });\n" +
-          "}\n" +
-          "for (i = 0; i < attachmentToggler.length; i++) {\n" +
-          "    attachmentToggler[i].addEventListener(\"click\", function() {\n" +
-          "        this.parentElement.querySelector(\".attachmentInfo\").classList.toggle(\"attachmentActive\");\n" +
-          "        this.classList.toggle(\"active\");\n" +
-          "    });\n" +
-          "}\n" +
-          "</script>";
+    "<script>\n" +
+      "var toggler = document.querySelectorAll(\".task\");\n" +
+      "var inToggler = document.querySelectorAll(\".label.inContentButton\");\n" +
+      "var outToggler = document.querySelectorAll(\".label.outContentButton\");\n" +
+      "var attachmentToggler = document.querySelectorAll(\".label.attachmentContentButton\");\n" +
+      "var descToggler = document.querySelectorAll(\".ellipses\");\n" +
+      "var i;\n" +
+      "\n" +
+      "for (i = 0; i < toggler.length; i++) {\n" +
+      "  toggler[i].addEventListener(\"click\", function() {\n" +
+      "    this.parentElement.querySelector(\".nested\").classList.toggle(\"active\");\n" +
+      "    this.classList.toggle(\"task-open\");\n" +
+      "  });\n" +
+      "}\n" +
+      "\n" +
+      "for (i = 0; i < inToggler.length; i++) {\n" +
+      "    inToggler[i].addEventListener(\"click\", function() {\n" +
+      "        this.parentElement.querySelector(\".inInfo\").classList.toggle(\"inActive\");\n" +
+      "        this.classList.toggle(\"active\");\n" +
+      "    });\n" +
+      "}\n" +
+      "\n" +
+      "for (i = 0; i < outToggler.length; i++) {\n" +
+      "    outToggler[i].addEventListener(\"click\", function() {\n" +
+      "        this.parentElement.querySelector(\".outInfo\").classList.toggle(\"outActive\");\n" +
+      "        this.classList.toggle(\"active\");\n" +
+      "    });\n" +
+      "}\n" +
+      "for (i = 0; i < descToggler.length; i++) {\n" +
+      "    descToggler[i].addEventListener(\"click\", function() {\n" +
+      "        this.parentElement.querySelector(\".longDescription\").classList.toggle(\"descriptionActive\");\n" +
+      "        this.classList.toggle(\"active\");\n" +
+      "    });\n" +
+      "}\n" +
+      "for (i = 0; i < attachmentToggler.length; i++) {\n" +
+      "    attachmentToggler[i].addEventListener(\"click\", function() {\n" +
+      "        this.parentElement.querySelector(\".attachmentInfo\").classList.toggle(\"attachmentActive\");\n" +
+      "        this.classList.toggle(\"active\");\n" +
+      "    });\n" +
+      "}\n" +
+      "</script>";
 
   private LogFormatter() {
   }
