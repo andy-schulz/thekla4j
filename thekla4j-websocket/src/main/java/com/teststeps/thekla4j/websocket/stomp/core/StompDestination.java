@@ -13,6 +13,6 @@ public interface StompDestination {
 
   public Either<ActivityError, Receipt> send(StompHeaders options, Object payload);
 
-  public Either<ActivityError, List<StompFrame>> messages();
+  public Either<ActivityError, List<StompFrame<Object>>> messages();
 
 }

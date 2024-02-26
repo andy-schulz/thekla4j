@@ -75,7 +75,7 @@ public class SpringStompDestination implements StompDestination {
       handl -> !handl.errors().isEmpty() ? Either.left(ActivityError.with(handl.errors().toString())) :
           Either.right(handl);
 
-  public Either<ActivityError, List<StompFrame>> messages() {
+  public Either<ActivityError, List<StompFrame<Object>>> messages() {
     return Either.<ActivityError, SpringStompSessionHandler>right(sessionHandler)
         .flatMap(failOnExistingErrors)
         .map(SpringStompSessionHandler::messages);

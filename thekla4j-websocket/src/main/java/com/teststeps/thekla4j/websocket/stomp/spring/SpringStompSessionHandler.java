@@ -19,14 +19,14 @@ import static com.teststeps.thekla4j.websocket.stomp.core.StompCommand.MESSAGE;
 @Log4j2(topic = "SpringStompSessionHandler")
 public class SpringStompSessionHandler implements StompSessionHandler {
   public String prefix;
-  private List<StompFrame> messages = List.empty();
-  private List<StompFrame> errors = List.empty();
+  private List<StompFrame<Object>> messages = List.empty();
+  private List<StompFrame<Object>> errors = List.empty();
 
-  public List<StompFrame> messages() {
+  public List<StompFrame<Object>> messages() {
     return messages;
   }
 
-  public List<StompFrame> errors() {
+  public List<StompFrame<Object>> errors() {
     return errors;
   }
 
