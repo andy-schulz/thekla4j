@@ -64,17 +64,20 @@ public class SeleniumBrowser implements Browser {
 
   @Override
   public Try<String> textOf(Element element) {
-    return getTextFromElement.apply(driver, highlightContext, element);
+    return getTextFromElement.apply(driver, highlightContext, element)
+      .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<String> valueOf(Element element) {
-    return getValueOfElement.apply(driver, highlightContext, element);
+    return getValueOfElement.apply(driver, highlightContext, element)
+      .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
-    return getAttributeFromElement.apply(driver, highlightContext, element, attribute);
+    return getAttributeFromElement.apply(driver, highlightContext, element, attribute)
+      .map(applyExecutionSlowDown());
   }
 
   @Override
