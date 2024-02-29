@@ -47,7 +47,7 @@ public class Retry<I, O> extends Task<I, O> {
                   String.format("Retrying task %s timed out after %s seconds with Error: \n\t %s",
                                 taskName, timeWaiting.getSeconds(), x.getMessage())))
               .flatMap(r -> Either.left(
-                  ActivityTimeOutError.with(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s", taskName, timeWaiting.getSeconds(), r, reason))));
+                  ActivityTimeOutError.with(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s\n", taskName, timeWaiting.getSeconds(), r, reason))));
 
 
         Either<ActivityError, O> res = func.apply();
