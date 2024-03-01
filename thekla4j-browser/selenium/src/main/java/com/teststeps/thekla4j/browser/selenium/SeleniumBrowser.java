@@ -11,7 +11,7 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import org.openqa.selenium.chrome.ChromeDriver;
+import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
@@ -19,7 +19,8 @@ import java.time.Duration;
 
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 
-public class SeleniumBrowser implements Browser {
+@Log4j2(topic = "Browser")
+class SeleniumBrowser implements Browser {
 
   private final RemoteWebDriver driver;
   private final HighlightContext highlightContext = new HighlightContext();
@@ -31,10 +32,10 @@ public class SeleniumBrowser implements Browser {
   private <T> Function1<T, T> applyExecutionSlowDown() {
 
     boolean slowDownExecution = Boolean.parseBoolean(
-        Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION.property()));
+      Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION.property()));
 
     Duration slowDownTime = Duration.ofSeconds(
-        Long.parseLong(Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME.property())));
+      Long.parseLong(Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME.property())));
 
     return any -> {
       if (slowDownExecution)
@@ -47,19 +48,19 @@ public class SeleniumBrowser implements Browser {
   @Override
   public Try<Void> navigateTo(String url) {
     return navigateTo.apply(driver, url)
-        .map(applyExecutionSlowDown());
+      .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<Void> clickOn(Element element) {
     return clickOnElement.apply(driver, highlightContext, element)
-        .map(applyExecutionSlowDown());
+      .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<Void> enterTextInto(String text, Element element) {
     return enterTextIntoElement.apply(driver, highlightContext, element, text)
-        .map(applyExecutionSlowDown());
+      .map(applyExecutionSlowDown());
   }
 
   @Override
@@ -128,7 +129,14 @@ public class SeleniumBrowser implements Browser {
   @Override
   public Try<Void> quit() {
     Option.of(driver)
-        .forEach(RemoteWebDriver::quit);
+      .toTry()
+      .mapTry(d -> Try.run(d::quit))
+      .onFailure(log::error);
     return Try.success(null);
+  }
+
+  @Override
+  public Try<String> getSessionId() {
+    return Try.of(() -> driver.getSessionId().toString());
   }
 }

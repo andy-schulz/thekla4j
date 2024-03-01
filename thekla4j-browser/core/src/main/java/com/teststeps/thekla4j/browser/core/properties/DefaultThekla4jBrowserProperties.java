@@ -4,9 +4,9 @@ import com.teststeps.thekla4j.commons.properties.PropertyElement;
 
 public enum DefaultThekla4jBrowserProperties {
 
-  HIGHLIGHT_ELEMENTS(PropertyElement.of("thekla4j.highlightElements", "true")),
-  SLOW_DOWN_EXECUTION(PropertyElement.of("thekla4j.slowDownExecution", "false")),
-  SLOW_DOWN_TIME(PropertyElement.of("thekla4j.slowDownTimeInSeconds", "1")),
+  HIGHLIGHT_ELEMENTS(PropertyElement.of("thekla4j.browser.highlightElements", "true")),
+  SLOW_DOWN_EXECUTION(PropertyElement.of("thekla4j.browser.slowDownExecution", "false")),
+  SLOW_DOWN_TIME(PropertyElement.of("thekla4j.browser.slowDownTimeInSeconds", "1")),
 
   SCREENSHOT_RELATIVE_PATH(PropertyElement.of("thekla4j.browser.screenshot.relativePath", "")),
 

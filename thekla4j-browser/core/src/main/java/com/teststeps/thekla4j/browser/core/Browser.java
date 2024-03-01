@@ -40,4 +40,6 @@ public interface Browser {
   public Try<File> takeScreenShot();
 
   public Try<Void> quit();
+
+  public Try<String> getSessionId();
 }
