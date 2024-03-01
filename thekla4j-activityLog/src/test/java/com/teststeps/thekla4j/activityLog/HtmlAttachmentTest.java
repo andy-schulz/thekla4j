@@ -9,8 +9,8 @@ import io.vavr.collection.List;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
-import static com.teststeps.thekla4j.activityLog.TestFunctions.readStringFromFile;
 import static com.teststeps.thekla4j.activityLog.TestFunctions.writeContentToIndexFile;
+import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromResourceFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -58,7 +58,8 @@ public class HtmlAttachmentTest {
 //  @Test
   public void loadRedDotTest2() throws FileNotFoundException {
 
-    String index = readStringFromFile.apply("redDotExample.html");
+    String index = readStringFromResourceFile.apply("redDotExample.html")
+      .getOrElseThrow(x -> new RuntimeException("Error loading redDotExample.png file", x));
 
     assertThat("", index, equalTo(LogFormatter.formatLogAsHtmlTree(rootLoc)));
   }
