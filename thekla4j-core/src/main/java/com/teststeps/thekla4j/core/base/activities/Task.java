@@ -22,5 +22,10 @@ public abstract class Task<PT, RT> implements Activity<PT, RT> {
         return evaluationResult.getOrElseThrow(() -> TaskIsNotEvaluated.called(this));
     }
 
+    @Override
+    final public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
     protected abstract Either<ActivityError, RT> performAs(Actor actor, PT result);
 }
