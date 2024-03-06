@@ -37,6 +37,8 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
 
   private Status status;
 
+  private Boolean mapFailure;
+
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
 
@@ -55,12 +57,18 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
       config.get().bStack().accessKey().isEmpty()) {
       log.debug("No username or access key found in selenium config, cannot set status on Browserstack");
       return Either.left(ActivityError.with(new RuntimeException("No username or access key found in selenium config, cannot set status on Browserstack")));
+
     }
 
-    return BrowseTheWeb.as(actor)
+    Either<ActivityError, String> out =
+      BrowseTheWeb.as(actor)
       .flatMap(Browser::getSessionId)
       .flatMap(sid -> config.flatMap(c -> sendStatus(sid, status, c.bStack().userName(), c.bStack().accessKey())))
       .transform(ActivityError.toEither("Could not set status on Browserstack"));
+
+    return mapFailure && out.isLeft() ?
+      Either.right("Failed to set status on Browserstack: " + out.getLeft().getMessage()) :
+      out;
   }
 
   private Try<String> sendStatus(String sessionId, Status stat, String username, String accessKey) {
@@ -104,11 +112,11 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
    * @return the activity
    */
   public static SetBrowserstackStatus toFailed(String reason) {
-    return new SetBrowserstackStatus( Status.failed(reason));
+    return new SetBrowserstackStatus( Status.failed(reason), true);
   }
 
   public static SetBrowserstackStatus toPassed() {
-    return new SetBrowserstackStatus( Status.passed());
+    return new SetBrowserstackStatus( Status.passed(), true);
   }
 
   /**
@@ -118,6 +126,11 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
    */
   public SetBrowserstackStatus withReason(String reason) {
     this.status = status.withReason(reason);
+    return this;
+  }
+
+  public SetBrowserstackStatus throwOnError() {
+    this.mapFailure = false;
     return this;
   }
 
