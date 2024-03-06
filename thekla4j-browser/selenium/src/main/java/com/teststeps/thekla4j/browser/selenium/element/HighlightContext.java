@@ -6,4 +6,9 @@ public class HighlightContext {
 
   public final ThreadLocal<WebElement> lastChangedWebElement = new ThreadLocal<>();
   public final ThreadLocal<String> lastChangedElementStyle = new ThreadLocal<>();
+
+  public void release() {
+    lastChangedWebElement.remove();
+    lastChangedElementStyle.remove();
+  }
 }
