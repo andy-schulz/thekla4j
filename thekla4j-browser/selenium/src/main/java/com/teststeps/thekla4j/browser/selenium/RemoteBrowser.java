@@ -4,7 +4,6 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function1;
-import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
