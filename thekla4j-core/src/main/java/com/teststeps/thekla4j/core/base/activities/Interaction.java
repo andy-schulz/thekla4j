@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.core.base.errors.TaskIsNotEvaluated;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import lombok.NonNull;
 
 public abstract class Interaction<PT, RT> implements Activity<PT, RT> {
 
@@ -18,7 +19,7 @@ public abstract class Interaction<PT, RT> implements Activity<PT, RT> {
     }
 
     @Override
-    final public Either<ActivityError, RT> perform(Actor actor, PT result){
+    final public Either<ActivityError, RT> perform(@NonNull Actor actor, PT result){
         Either<ActivityError, RT> res = performAs(actor, result);
         evaluationResult = Option.of(res);
         return res;
