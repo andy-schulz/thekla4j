@@ -26,9 +26,9 @@ import java.util.function.BiFunction;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
 
 @Log4j2(topic = "Element Operations")
-public class ElementFunctions {
+class ElementFunctions {
 
-  private static Try<WebElement> findElement(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
+  static Try<WebElement> findElement(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
 
     return retryUntil.apply(
         ElementFunctions.locateElement.apply(driver),

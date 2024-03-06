@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class ElementTest {
 
   Actor actor = Actor.named("Test Actor");
-
+  Element header = Element.found(By.css(".headerElement"));
   @AfterEach
   public void tearDown() throws InterruptedException {
     Thread.sleep(10);
@@ -34,7 +34,7 @@ public class ElementTest {
         .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
-    Element header = Element.found(By.css(".headerElement"));
+
 
     String url = "http://localhost:3000";
 
@@ -58,8 +58,6 @@ public class ElementTest {
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
-
-    Element header = Element.found(By.css(".headerElement"));
 
     String url = "http://localhost:3000/elementStates";
 

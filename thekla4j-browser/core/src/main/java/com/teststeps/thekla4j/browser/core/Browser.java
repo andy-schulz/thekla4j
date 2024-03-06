@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.browser.core;
 
+import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
@@ -38,6 +39,8 @@ public interface Browser {
   public Try<Void> deleteAllCookies();
 
   public Try<File> takeScreenShot();
+
+  public Try<Void> drawShape(Shape shape, Element element);
 
   public Try<Void> quit();
 

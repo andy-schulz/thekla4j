@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
+import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
@@ -126,12 +127,19 @@ class SeleniumBrowser implements Browser {
     return takeScreenShot.apply(driver);
   }
 
+  public Try<Void> drawShape(Shape shape,  Element element) {
+    return DrawingFunctions.drawShape(driver, highlightContext, element, shape);
+  }
+
   @Override
   public Try<Void> quit() {
     Option.of(driver)
       .toTry()
       .mapTry(d -> Try.run(d::quit))
       .onFailure(log::error);
+
+    highlightContext.release();
+
     return Try.success(null);
   }
 
