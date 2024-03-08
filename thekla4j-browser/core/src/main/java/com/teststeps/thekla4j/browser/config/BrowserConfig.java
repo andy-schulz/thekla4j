@@ -7,11 +7,12 @@ public record BrowserConfig(
   OperatingSystem os,
   String osVersion,
   BrowserName browserName,
-  String browserVersion
+  String browserVersion,
+  ChromeOptions chromeOptions
 ) {
 
   public static BrowserConfig of(BrowserName browserName) {
-    return new BrowserConfig(null, null, browserName, null);
+    return new BrowserConfig(null, null, browserName, null, null);
   }
 
   @Override
@@ -21,6 +22,7 @@ public record BrowserConfig(
       ", osVersion='" + osVersion + '\'' +
       ", browserName=" + browserName +
       ", browserVersion='" + browserVersion + '\'' +
+      ", chromeOptions=" + chromeOptions +
       '}';
   }
 }
