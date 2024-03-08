@@ -5,18 +5,18 @@ import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
 import com.teststeps.thekla4j.browser.selenium.status.SeleniumElementStatus;
-import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.browser.spp.activities.State;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.*;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.function.BiFunction;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
+import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
 
 @Log4j2(topic = "Element Operations")
 class ElementFunctions {
@@ -36,7 +37,8 @@ class ElementFunctions {
         element,
         Instant.now(),
         Duration.ofMillis(0))
-      .map(highlightElement.apply(driver, highlightContext));
+      .map(highlightElement.apply(driver, highlightContext))
+      .flatMap(scrollIntoView.apply(driver));
   }
 
   private static final Function1<RemoteWebDriver, Function1<Element, Try<WebElement>>> locateElement =
@@ -103,7 +105,16 @@ class ElementFunctions {
 
   protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clickOnElement =
     (driver, hlx, element) -> findElement(driver, hlx, element)
-      .flatMap(elem -> Try.run(elem::click))
+      .flatMapTry(elem -> Try.run(elem::click))
+      .onFailure(log::error)
+      .map(x -> null);
+
+
+  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> doubleClickOnElement =
+    (driver, hlx, element) -> findElement(driver, hlx, element)
+      .flatMap(elem -> Try.of(() -> new Actions(driver))
+        .map(actions -> actions.doubleClick(elem))
+        .peek(Actions::perform))
       .onFailure(log::error)
       .map(x -> null);
 

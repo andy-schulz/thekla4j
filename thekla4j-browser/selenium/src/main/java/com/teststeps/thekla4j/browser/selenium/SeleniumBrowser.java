@@ -28,6 +28,7 @@ class SeleniumBrowser implements Browser {
 
   SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
+    this.driver.manage().window().maximize();
   }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
@@ -55,6 +56,12 @@ class SeleniumBrowser implements Browser {
   @Override
   public Try<Void> clickOn(Element element) {
     return clickOnElement.apply(driver, highlightContext, element)
+      .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Try<Void> doubleClickOn(Element element) {
+    return doubleClickOnElement.apply(driver, highlightContext, element)
       .map(applyExecutionSlowDown());
   }
 
@@ -127,8 +134,8 @@ class SeleniumBrowser implements Browser {
     return takeScreenShot.apply(driver);
   }
 
-  public Try<Void> drawShape(Shape shape,  Element element) {
-    return DrawingFunctions.drawShape(driver, highlightContext, element, shape);
+  public Try<Void> drawShapes(List<Shape> shapes,  Element element, Boolean releaseAndHold, Option<Duration> pause) {
+    return DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes);
   }
 
   @Override
