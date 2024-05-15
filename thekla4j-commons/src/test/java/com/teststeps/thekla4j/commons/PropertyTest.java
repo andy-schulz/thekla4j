@@ -15,7 +15,7 @@ public class PropertyTest {
 
     PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyFile", "defaultValue");
 
-    String property = Thekla4jProperty.of.apply(propertyElement);
+    String property = Thekla4jProperty.of(propertyElement);
 
     assertThat("property is load from file", property, equalTo("propertyValueSetInFile"));
 
@@ -28,7 +28,7 @@ public class PropertyTest {
 
     PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
 
-    String property = Thekla4jProperty.of.apply(propertyElement);
+    String property = Thekla4jProperty.of(propertyElement);
 
     assertThat("property is load from system", property, equalTo("propertyValueSetInSystem"));
 
@@ -39,7 +39,7 @@ public class PropertyTest {
 
     PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyDefault", "defaultValue");
 
-    String property = Thekla4jProperty.of.apply(propertyElement);
+    String property = Thekla4jProperty.of(propertyElement);
 
     assertThat("property is load from default", property, equalTo("defaultValue"));
 
