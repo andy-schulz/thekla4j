@@ -11,7 +11,8 @@ public class ActivityError extends Throwable {
   }
 
   public ActivityError(String message, Throwable cause) {
-    super(message, cause);
+
+    super(message + "\ncaused By:\n" + cause, cause);
   }
 
   public static ActivityError with(Throwable ex) {
