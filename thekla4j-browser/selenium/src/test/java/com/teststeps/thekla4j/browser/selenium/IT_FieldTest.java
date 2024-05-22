@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-public class FieldTest {
+public class IT_FieldTest {
 
   private Actor actor;
 

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.function.Function;
 
-public class ElementTest {
+public class IT_ElementTest {
 
   Actor actor = Actor.named("Test Actor");
   Element header = Element.found(By.css(".headerElement"));
@@ -51,7 +51,7 @@ public class ElementTest {
   }
 
   @Test
-  public void waitForElementTBeEnabled() throws ActivityError {
+  public void waitForElementToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
         .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));

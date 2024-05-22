@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.data;
 
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.browser.core.Element;

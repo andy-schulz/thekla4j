@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-public class DrawTest {
+public class IT_DrawTest {
   private Actor actor;
 
   Element header = Element.found(By.css(".headerElement"));

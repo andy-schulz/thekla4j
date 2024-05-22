@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-public class CookieTest {
+public class IT_CookieTest {
 
   private static Actor actor;
 

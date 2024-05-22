@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
-public class ElementStateTest {
+public class IT_ElementStateTest {
 
   private Actor actor;
 

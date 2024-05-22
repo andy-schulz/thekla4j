@@ -83,18 +83,18 @@ public class TestNavigation {
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(chromeMock));
 
-    String actualUrl = "theUrl";
-    String expectedUrl = "theUrl";
+    String url = "theUrl";
 
     actor.attemptsTo(
-        Navigate.to(actualUrl))
+        Navigate.to(url))
       .getOrElseThrow(Function.identity());
 
     verify(chromeMock).navigateTo(urlCaptor.capture());
     verify(driverMock, times(1)).navigate();
+    verify(navigationMock, times(1)).to(url);
 
 
     String urlValue = urlCaptor.getValue();
-    assertThat(urlValue, equalTo(expectedUrl));
+    assertThat(urlValue, equalTo(url));
   }
 }
