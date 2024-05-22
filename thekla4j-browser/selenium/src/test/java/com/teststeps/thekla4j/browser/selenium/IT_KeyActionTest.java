@@ -37,7 +37,7 @@ public class IT_KeyActionTest {
   }
 
   @Test
-  public void testKeyDown() throws ActivityError {
+  public void testKeyPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
@@ -51,6 +51,32 @@ public class IT_KeyActionTest {
         Navigate.to(url),
 
         DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER),
+
+        See.ifThe(ElementState.of(clientButton))
+          .is(Expected.to.be(visible))
+          .forAsLongAs(Duration.ofSeconds(5)))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testMultipleKeyPressActions() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    String url = "http://localhost:3000";
+
+    Element clientButton = Element.found(By.css("#stateSwitchingButton"));
+
+
+    actor.attemptsTo(
+        Navigate.to(url),
+
+        DoKey.press(Key.TAB),
+        DoKey.press(Key.TAB),
+        DoKey.press(Key.TAB),
+        DoKey.press(Key.ENTER),
 
         See.ifThe(ElementState.of(clientButton))
           .is(Expected.to.be(visible))
