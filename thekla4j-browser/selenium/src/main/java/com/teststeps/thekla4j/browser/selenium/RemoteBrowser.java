@@ -25,6 +25,7 @@ class RemoteBrowser {
         return caps;
       })
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
+      .peek(driver -> System.out.println("Connecting to: " + seleniumConfig.remoteUrl()))
       .peek(driver -> System.out.println("SessionID: " + driver.getSessionId()))
       .onFailure(System.err::println)
       .map(SeleniumBrowser::new);

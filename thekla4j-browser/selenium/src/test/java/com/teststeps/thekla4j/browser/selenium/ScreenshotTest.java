@@ -30,7 +30,7 @@ public class ScreenshotTest {
 
     actor.attemptsTo$(
 
-      UiTest.doSomeThing(),
+      UiTest.failOnNotExistingElement(),
 
       "Step", "Click on element");
 

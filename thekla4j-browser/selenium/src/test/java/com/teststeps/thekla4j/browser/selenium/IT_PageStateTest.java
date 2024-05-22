@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-public class PageStateTest {
+public class IT_PageStateTest {
 
   private Actor actor;
 
@@ -26,36 +26,35 @@ public class PageStateTest {
   @Test
   public void getTitleFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
 
     String url = "http://localhost:3000";
 
     actor.attemptsTo(
 
-            Navigate.to(url),
+        Navigate.to(url),
 
-            See.ifThe(Title.ofPage())
-                .is(Expected.to.equal("Framework Tester")))
+        See.ifThe(Title.ofPage())
+          .is(Expected.to.equal("Framework Tester")))
 
-        .getOrElseThrow(Function.identity());
+      .getOrElseThrow(Function.identity());
   }
 
   @Test
   public void getUrlFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
 
     String url = "http://localhost:3000/elementStates";
 
     actor.attemptsTo(
 
-            Navigate.to(url),
+        Navigate.to(url),
 
-            See.ifThe(Url.ofPage())
-                .is(Expected.to.equal(url)))
+        See.ifThe(Url.ofPage())
+          .is(Expected.to.equal(url)))
 
-        .getOrElseThrow(Function.identity());
+      .getOrElseThrow(Function.identity());
   }
-
 
 }

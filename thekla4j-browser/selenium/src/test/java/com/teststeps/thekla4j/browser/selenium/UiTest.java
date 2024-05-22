@@ -25,7 +25,7 @@ public class UiTest extends Task<Void, Void> {
       Click.on(element));
   }
 
-  public static UiTest doSomeThing() {
+  public static UiTest failOnNotExistingElement() {
     return new UiTest();
   }
 }

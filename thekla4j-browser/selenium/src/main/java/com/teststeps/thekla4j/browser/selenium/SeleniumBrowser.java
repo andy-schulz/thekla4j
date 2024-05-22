@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
@@ -13,6 +14,7 @@ import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
@@ -153,5 +155,10 @@ class SeleniumBrowser implements Browser {
   @Override
   public Try<String> getSessionId() {
     return Try.of(() -> driver.getSessionId().toString());
+  }
+
+  @Override
+  public Try<KeyActions> executeKeyActions() {
+    return Try.of(() -> new SeleniumKeyAction(new Actions(driver)));
   }
 }
