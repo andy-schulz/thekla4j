@@ -8,6 +8,8 @@ import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.Text;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -121,6 +123,33 @@ public class IT_ElementTest {
                 .is(Expected.to.equal("Clicked on Button: Visible Button")))
 
         .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testSelectionOfFocusedElement() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    Element focusedElement = Element.found(By.css(":focus"));
+
+    String url = "http://localhost:3000/elementStates";
+
+    actor.attemptsTo(
+
+        Navigate.to(url),
+
+        DoKey.press(Key.TAB, Key.TAB, Key.TAB),
+
+        See.ifThe(Text.of(focusedElement))
+          .is(Expected.to.equal("Element States")),
+
+        DoKey.press(Key.TAB),
+
+        See.ifThe(Text.of(focusedElement))
+          .is(Expected.to.equal("Canvas")))
+
+      .getOrElseThrow(Function.identity());
   }
 
 }
