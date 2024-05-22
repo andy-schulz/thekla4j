@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.spp.activities.State;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -12,43 +13,45 @@ import java.time.Duration;
 
 public interface Browser {
 
-  public Try<Void> navigateTo(String url);
+  Try<Void> navigateTo(String url);
 
-  public Try<Void> clickOn(Element element);
+  Try<Void> clickOn(Element element);
 
-  public Try<Void> doubleClickOn(Element element);
+  Try<Void> doubleClickOn(Element element);
 
-  public Try<Void> enterTextInto(String text, Element element);
+  Try<Void> enterTextInto(String text, Element element);
 
-  public Try<String> textOf(Element element);
+  Try<String> textOf(Element element);
 
-  public Try<String> valueOf(Element element);
+  Try<String> valueOf(Element element);
 
-  public Try<String> attributeValueOf(String attribute, Element element);
+  Try<String> attributeValueOf(String attribute, Element element);
 
-  public Try<State> getState(Element element);
+  Try<State> getState(Element element);
 
-  public Try<String> title();
+  Try<String> title();
 
-  public Try<String> url();
+  Try<String> url();
 
-  public Try<Cookie> getCookie(String name);
+  Try<Cookie> getCookie(String name);
 
-  public Try<List<Cookie>> getAllCookies();
+  Try<List<Cookie>> getAllCookies();
 
-  public Try<Void> addCookie(Cookie cookie);
+  Try<Void> addCookie(Cookie cookie);
 
-  public Try<Void> deleteCookie(String name);
+  Try<Void> deleteCookie(String name);
 
-  public Try<Void> deleteAllCookies();
+  Try<Void> deleteAllCookies();
 
-  public Try<File> takeScreenShot();
+  Try<File> takeScreenShot();
 
-  public Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
+  Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
 
-  public Try<Void> quit();
+  Try<Void> quit();
 
-  public Try<String> getSessionId();
+  Try<String> getSessionId();
+
+  Try<KeyActions> executeKeyActions();
 
 
 }
