@@ -11,6 +11,7 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 
@@ -19,6 +20,7 @@ import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.tak
 
 @AllArgsConstructor
 @Action("navigate to @{url}")
+@Log4j2(topic = "Navigate")
 public class Navigate extends BasicInteraction {
 
   @Called(name = "url")
@@ -30,6 +32,7 @@ public class Navigate extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+      .peek(browser -> log.info("Navigating to {}", url))
       .flatMap(browser -> browser.navigateTo(url))
       .transform(LiftTry.toEither(x -> ActivityError.with(x.getMessage() + " while navigating to " + url)))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
