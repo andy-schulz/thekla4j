@@ -36,7 +36,7 @@ public class Attribute extends Task<Void, String> {
       this.name = name;
     }
 
-    protected Attribute of(Element element) {
+    public Attribute of(Element element) {
       return new Attribute(name, element);
     }
   }
