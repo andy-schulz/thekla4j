@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.elementStates;
+import static com.teststeps.thekla4j.browser.selenium.Constants.url;
+
 public class IT_ElementTest {
 
   Actor actor = Actor.named("Test Actor");
@@ -37,9 +40,6 @@ public class IT_ElementTest {
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
-
-    String url = "http://localhost:3000";
-
     actor.attemptsTo(
 
             Navigate.to(url),
@@ -53,6 +53,29 @@ public class IT_ElementTest {
   }
 
   @Test
+  public void testChainedElement() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
+
+    Element chainedButton = Element
+      .found(By.xpath("//*[@class='parentOne']"))
+      .andThenFound(By.css(".chainedButton"));
+
+
+    actor.attemptsTo(
+
+        Navigate.to(url),
+
+        Click.on(chainedButton),
+
+        See.ifThe(Text.of(header))
+          .is(Expected.to.equal("Clicked on Button: First Chained Button")))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+  @Test
   public void waitForElementToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
@@ -61,11 +84,9 @@ public class IT_ElementTest {
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
 
-    String url = "http://localhost:3000/elementStates";
-
     actor.attemptsTo(
 
-            Navigate.to(url),
+            Navigate.to(elementStates),
 
             Click.on(clientButton),
 
@@ -86,11 +107,9 @@ public class IT_ElementTest {
 
     Element header = Element.found(By.css(".headerElement"));
 
-    String url = "http://localhost:3000/elementStates";
-
     actor.attemptsTo(
 
-            Navigate.to(url),
+            Navigate.to(elementStates),
 
             Click.on(clientButton),
 
@@ -111,11 +130,9 @@ public class IT_ElementTest {
 
     Element header = Element.found(By.css(".headerElement"));
 
-    String url = "http://localhost:3000/elementStates";
-
     actor.attemptsTo(
 
-            Navigate.to(url),
+            Navigate.to(elementStates),
 
             Click.on(clientButton),
 
@@ -133,11 +150,9 @@ public class IT_ElementTest {
 
     Element focusedElement = Element.found(By.css(":focus"));
 
-    String url = "http://localhost:3000/elementStates";
-
     actor.attemptsTo(
 
-        Navigate.to(url),
+        Navigate.to(elementStates),
 
         DoKey.press(Key.TAB, Key.TAB, Key.TAB),
 

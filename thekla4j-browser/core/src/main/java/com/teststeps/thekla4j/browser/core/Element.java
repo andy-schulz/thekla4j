@@ -27,6 +27,10 @@ public record Element(
         .collect(Collectors.joining(" > ")));
   }
 
+  public Element andThenFound(Locator locator) {
+    return new Element(locators.append(locator), name, waiter);
+  }
+
   public Element wait(UntilElement waiter) {
     return new Element(locators, name, waiter);
   }
