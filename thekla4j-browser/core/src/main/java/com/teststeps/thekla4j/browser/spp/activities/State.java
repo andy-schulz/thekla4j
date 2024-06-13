@@ -7,10 +7,11 @@ import lombok.With;
 public record State(
     Element element,
     Boolean isVisible,
-    Boolean isEnabled
+    Boolean isEnabled,
+    Boolean isPresent
 ) {
 
   public static State of(Element element) {
-    return new State(element, false, false);
+    return new State(element, false, false, false);
   }
 }

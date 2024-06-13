@@ -150,9 +150,11 @@ class ElementFunctions {
       findElement(driver, hlx, element)
         .map(webElement ->
           State.of(element)
+            .withIsPresent(true)
             .withIsEnabled(webElement.isEnabled())
             .withIsVisible(webElement.isDisplayed()))
-        .onFailure(log::error);
+        .onFailure(log::error)
+        .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
   protected final static Function1<RemoteWebDriver, Try<String>> getTitle =
     driver -> Try.of(driver::getTitle)

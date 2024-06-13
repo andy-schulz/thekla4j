@@ -47,4 +47,29 @@ public class ElementState extends Task<Void, State> {
         return Either.left(ActivityError.with(String.format("%s should %sbe visible, but it is %svisible" , state.element(),  expectedMessage, actualMessage)));
       }
     };
+
+
+  public static Function<Boolean, SeeAssertion<State>> enabled =
+    checkForTrue -> state -> {
+      String expectedMessage = checkForTrue ? "" : "not ";
+      String actualMessage = checkForTrue ? "not " : "";
+
+      if (state.isEnabled() == checkForTrue) {
+        return Either.right(null);
+      } else {
+        return Either.left(ActivityError.with(String.format("%s should %sbe enabled, but it is %senabled" , state.element(),  expectedMessage, actualMessage)));
+      }
+    };
+
+  public static Function<Boolean, SeeAssertion<State>> present =
+    checkForTrue -> state -> {
+      String expectedMessage = checkForTrue ? "" : "not ";
+      String actualMessage = checkForTrue ? "not " : "";
+
+      if (state.isEnabled() == checkForTrue) {
+        return Either.right(null);
+      } else {
+        return Either.left(ActivityError.with(String.format("%s should %sbe present in DOM, but it is %spresent" , state.element(),  expectedMessage, actualMessage)));
+      }
+    };
 }

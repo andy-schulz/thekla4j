@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
+import com.teststeps.thekla4j.browser.spp.activities.ElementState;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.Text;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
@@ -21,6 +22,7 @@ import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.elementStates;
 import static com.teststeps.thekla4j.browser.selenium.Constants.url;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.*;
 
 public class IT_ElementTest {
 
@@ -95,6 +97,47 @@ public class IT_ElementTest {
 
         .getOrElseThrow(Function.identity());
   }
+
+  @Test
+  public void checkForElementNotToBeEnabled() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    Element clientButton = Element.found(By.css("div > #stateSwitchingButton"));
+
+    actor.attemptsTo(
+
+        Navigate.to(elementStates),
+
+        See.ifThe(ElementState.of(clientButton))
+          .is(Expected.not.to.be(enabled))
+          .forAsLongAs(Duration.ofSeconds(3)))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void checkElementIsNotPresent() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    Element clientButton = Element.found(By.css("div > #doesNotExist"));
+
+    actor.attemptsTo(
+
+        Navigate.to(elementStates),
+
+        See.ifThe(ElementState.of(clientButton))
+          .is(Expected.not.to.be(present))
+          .is(Expected.not.to.be(visible))
+          .forAsLongAs(Duration.ofSeconds(5)))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+
 
   @Test
   public void waitForElementToBeClickable() throws ActivityError {
