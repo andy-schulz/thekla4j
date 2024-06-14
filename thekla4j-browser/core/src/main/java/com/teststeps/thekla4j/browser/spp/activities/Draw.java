@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
@@ -18,7 +19,9 @@ import java.time.Duration;
 @Action("draw shape @{shape} to @{element}")
 public class Draw extends BasicInteraction {
 
+  @Called(name = "shape")
   private List<Shape> shapes;
+  @Called(name = "element")
   private Element element;
   private Boolean releaseAndHold;
   private Option<Duration> pause;

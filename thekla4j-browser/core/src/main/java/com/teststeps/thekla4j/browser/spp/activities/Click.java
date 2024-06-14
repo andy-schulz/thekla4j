@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.AttachOnError;
+import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
@@ -20,6 +21,7 @@ import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.tak
 @Action("click on @{element}")
 public class Click extends BasicInteraction {
 
+  @Called(name = "element")
   private final Element element;
 
   @AttachOnError(name = "screenshot", type = LogAttachmentType.IMAGE_PNG)
