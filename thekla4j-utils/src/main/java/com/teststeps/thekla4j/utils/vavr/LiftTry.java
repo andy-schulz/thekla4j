@@ -205,10 +205,23 @@ public class LiftTry {
   }
 
 
-  public static <S, T> Function1<HashMap<S, Try<T>>, Try<HashMap<S, T>>> fromHashMap() {
+  public static <S, T> Function1<HashMap<S, Try<T>>, Try<HashMap<S, T>>> fromHashMapValue() {
     return hashMap -> hashMap.foldLeft(
       Try.success(HashMap.empty()),
       (theTry, entry) -> theTry.flatMap(newMap -> entry._2.map(value -> newMap.put(entry._1, value))));
+  }
+
+  public static <S, T> Function1<HashMap<Try<S>, T>, Try<HashMap<S, T>>> fromHashMapKey() {
+    return hashMap -> hashMap.foldLeft(
+      Try.success(HashMap.empty()),
+      (theTry, entry) -> theTry.flatMap(newMap -> entry._1.map(key -> newMap.put(key, entry._2))));
+  }
+
+
+  public static <S,T> Function1<HashMap<Try<S>, Try<T>>, Try<HashMap<S,T>>> fromHashMap() {
+    return hashMap -> hashMap.foldLeft(
+      Try.success(HashMap.empty()),
+      (theTry, entry) -> theTry.flatMap(accMap -> entry._1.flatMap(key -> entry._2.map(value -> accMap.put(key, value)))));
   }
 
 
