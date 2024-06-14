@@ -10,6 +10,9 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
@@ -29,7 +32,7 @@ public class ActivityLogEntry implements Serializable {
     /**
      * the start time of the activity
      */
-    private final Date startedAt;
+    private final LocalDateTime startedAt;
     /**
      * the name of the activity
      */
@@ -92,7 +95,7 @@ public class ActivityLogEntry implements Serializable {
         this.activityType = activityType;
         this.activityStatus = activityStatus;
         this.activityLogType = activityLogType;
-        this.startedAt = new Date();
+        this.startedAt = LocalDateTime.now();
         this.parent = parent;
 
         if (parent != null)
@@ -209,7 +212,7 @@ public class ActivityLogEntry implements Serializable {
         return new ActivityLogNode(
             this.activityName,
             this.activityDescription,
-            (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(this.startedAt),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").format(this.startedAt),
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.input,
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.output,
             Objects.isNull(this.attachments) ? null : this.attachments.toJavaList(),
