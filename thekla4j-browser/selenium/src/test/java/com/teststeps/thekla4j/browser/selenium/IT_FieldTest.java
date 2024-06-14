@@ -31,11 +31,9 @@ public class IT_FieldTest {
 
     Element textField = Element.found(By.css("#first_name"));
 
-    String url = "http://localhost:3000";
-
     actor.attemptsTo(
 
-            Navigate.to(url),
+            Navigate.to(Constants.url),
 
             Enter.text("Test Entry").into(textField),
 
@@ -43,5 +41,59 @@ public class IT_FieldTest {
                 .is(Expected.to.equal("Test Entry")))
 
         .getOrElseThrow(Function.identity());
+  }
+
+
+  @Test
+  public void enterTextIntoClearedFieldByActor() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    Element textField = Element.found(By.css("#first_name"));
+
+    actor.attemptsTo(
+
+        Navigate.to(Constants.url),
+
+        Enter.text("Test Entry").into(textField),
+
+        See.ifThe(Value.of(textField))
+          .is(Expected.to.equal("Test Entry")),
+
+        Enter.text("Second Test Entry").intoCleared(textField),
+
+        See.ifThe(Value.of(textField))
+          .is(Expected.to.equal("Second Test Entry")))
+
+
+      .getOrElseThrow(Function.identity());
+  }
+
+
+  @Test
+  public void enterTextTwiceIntoClearedFieldByActor() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+
+    Element textField = Element.found(By.css("#first_name"));
+
+    actor.attemptsTo(
+
+        Navigate.to(Constants.url),
+
+        Enter.text("Test Entry").into(textField),
+
+        See.ifThe(Value.of(textField))
+          .is(Expected.to.equal("Test Entry")),
+
+        Enter.text(" Second Entry").into(textField),
+
+        See.ifThe(Value.of(textField))
+          .is(Expected.to.equal("Test Entry Second Entry")))
+
+
+      .getOrElseThrow(Function.identity());
   }
 }

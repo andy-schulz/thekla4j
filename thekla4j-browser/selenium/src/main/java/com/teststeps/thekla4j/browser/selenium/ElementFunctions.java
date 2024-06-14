@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
@@ -119,8 +120,13 @@ class ElementFunctions {
       .map(x -> null);
 
 
-  protected final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<Void>> enterTextIntoElement =
-    (driver, hlx, element, text) -> findElement(driver, hlx, element)
+  protected final static Function5<RemoteWebDriver, HighlightContext, Element, String, Boolean, Try<Void>> enterTextIntoElement =
+    (driver, hlx, element, text, clearField) -> findElement(driver, hlx, element)
+      .peek(webElement -> {
+        if (clearField) {
+          webElement.clear();
+        }
+      })
       .peek(webElement -> webElement.sendKeys(text))
       .onFailure(log::error)
       .map(x -> null);

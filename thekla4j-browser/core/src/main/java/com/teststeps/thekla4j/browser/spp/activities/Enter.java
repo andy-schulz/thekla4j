@@ -26,6 +26,8 @@ public class Enter extends BasicInteraction {
   @Called(name = "element")
   private Element element;
 
+  private Boolean clearField = false;
+
   @AttachOnError(name = "screenshot", type = LogAttachmentType.IMAGE_PNG)
   private File screenshot = null;
 
@@ -37,16 +39,20 @@ public class Enter extends BasicInteraction {
     }
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.enterTextInto(text, element))
+      .flatMap(b -> b.enterTextInto(text, element, clearField))
       .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 
   public static Enter text(String text) {
-    return new Enter(text, null, null);
+    return new Enter(text, null, false, null);
   }
 
   public Enter into(Element element) {
-    return new Enter(text, element, null);
+    return new Enter(text, element, false, null);
+  }
+
+  public Enter intoCleared(Element element) {
+    return new Enter(text, element, true, null);
   }
 }

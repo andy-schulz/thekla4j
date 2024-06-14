@@ -19,7 +19,7 @@ public interface Browser {
 
   Try<Void> doubleClickOn(Element element);
 
-  Try<Void> enterTextInto(String text, Element element);
+  Try<Void> enterTextInto(String text, Element element, Boolean clearField);
 
   Try<String> textOf(Element element);
 

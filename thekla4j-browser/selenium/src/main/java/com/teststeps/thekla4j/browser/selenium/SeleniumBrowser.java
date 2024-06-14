@@ -68,8 +68,8 @@ class SeleniumBrowser implements Browser {
   }
 
   @Override
-  public Try<Void> enterTextInto(String text, Element element) {
-    return enterTextIntoElement.apply(driver, highlightContext, element, text)
+  public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
+    return enterTextIntoElement.apply(driver, highlightContext, element, text, clearField)
       .map(applyExecutionSlowDown());
   }
 
