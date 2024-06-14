@@ -42,8 +42,8 @@ public class RetryTest {
     assertThat("check Waiter fails without until predicate",
         result.isLeft(), equalTo(true));
 
-    assertThat("check Waiter fails without until predicate",
-        result.getLeft().getMessage(), equalTo("Retrying task StaticStringTask timed out after 5 seconds with result:\n\t TestData \n\t message: until predicate not set 'Retry.task(TASK).until(PREDICATE)'"));
+    assertThat("check Waiter fails without until predicate has correct error message",
+        result.getLeft().getMessage(), equalTo("Retrying task StaticStringTask timed out after 5 seconds with result:\n\t TestData \n\t message: until predicate not set 'Retry.task(TASK).until(PREDICATE)'\n"));
 
   }
 
@@ -60,7 +60,7 @@ public class RetryTest {
     assertThat("check waiter fails with until predicate",
         result.isLeft(), equalTo(true));
 
-    assertThat("check Waiter fails without until predicate",
-        result.getLeft().getMessage(), equalTo("Retrying task StaticStringTask timed out after 5 seconds with result:\n\t WaiterTestData \n\t message: wait until predicate"));
+    assertThat("check Waiter fails without until predicate has correct error message",
+        result.getLeft().getMessage(), equalTo("Retrying task StaticStringTask timed out after 5 seconds with result:\n\t WaiterTestData \n\t message: wait until predicate\n"));
   }
 }

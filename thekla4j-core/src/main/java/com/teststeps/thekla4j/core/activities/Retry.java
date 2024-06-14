@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-@Workflow("retry executing task for as long as @{timeout} and retry every @{delay}")
+@Workflow("retry (@{reason}) executing task for as long as @{timeout} and retry every @{delay}")
 public class Retry<I, O> extends Task<I, O> {
 
 
@@ -33,6 +33,7 @@ public class Retry<I, O> extends Task<I, O> {
 
   private Predicate<O> untilFunction;
 
+  @Called(name = "reason")
   private String reason;
 
   private final Function6<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
@@ -75,7 +76,7 @@ public class Retry<I, O> extends Task<I, O> {
     Instant end = start.plusSeconds(forAsLongAs.getSeconds());
 
     return repeat.apply(end, forAsLongAs, pauseBetweenRetries,
-                        () -> activity.perform(actor, result),
+                        () -> actor.attemptsTo_(activity).apply(result),
                         Either.left(ActivityError.with(new Throwable("not evaluated"))),
                         activity.getClass()
                                 .getSimpleName());
