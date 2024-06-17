@@ -23,7 +23,7 @@ public class DeleteCookie extends BasicInteraction {
         .transform(ActivityError.toEither(String.format("Error while deleting cookie '%s' from browser", cookieName)));
   }
 
-  public static DeleteCookie fromBrowser(String cookieName) {
+  public static DeleteCookie named(String cookieName) {
     return new DeleteCookie(cookieName);
   }
 }

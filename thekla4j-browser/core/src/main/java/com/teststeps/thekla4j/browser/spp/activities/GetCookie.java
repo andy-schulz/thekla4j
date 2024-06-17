@@ -24,7 +24,7 @@ public class GetCookie extends Task<Void, Cookie> {
       .transform(ActivityError.toEither(String.format("Error while getting cookie '%s' from browser", cookieName)));
   }
 
-  public static GetCookie fromBrowser(String cookieName) {
+  public static GetCookie named(String cookieName) {
     return new GetCookie(cookieName);
   }
 }

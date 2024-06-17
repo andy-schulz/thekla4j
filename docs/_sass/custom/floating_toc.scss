@@ -1,4 +1,4 @@
-#top {
+#page_layout {
   display: flex;
   flex-direction: row-reverse;
 }
@@ -8,11 +8,18 @@
 }
 
 .page_toc {
-  width: 50%;
+  width: 25%;
 }
+
+
+ul {
+  list-style-type: none;
+}
+
 
 .content_toc {
   position: sticky;
   top: 2rem;
+  //counter-reset: step-counter;
   font-size: 14px !important;
 }
