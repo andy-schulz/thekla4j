@@ -1,7 +1,8 @@
 title: "Thekla4j"
 name: Andy Schulz, Test Automation Engineer
 #remote_theme: pmarsceill/just-the-docs
-theme: just-the-docs
+#theme: just-the-docs
+remote_theme: pmarsceill/just-the-docs
 search_enabled: true
 color_scheme: dark
 enable_copy_code_button: true
