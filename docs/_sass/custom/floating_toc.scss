@@ -1,0 +1,18 @@
+#top {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.main-content {
+  width: 75%;
+}
+
+.page_toc {
+  width: 50%;
+}
+
+.content_toc {
+  position: sticky;
+  top: 2rem;
+  font-size: 14px !important;
+}
