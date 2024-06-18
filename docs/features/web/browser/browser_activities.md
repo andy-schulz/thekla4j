@@ -39,7 +39,7 @@ Methods:
 
 |type   | name                                          | description                   |
 |-------|-----------------------------------------------|-------------------------------|
-|static | ``on( ``[``Element``](./browser_element#finding-elements)``)`` | Clicks on the given element.  |
+|static | ``on( ``[``Element``](./browser_concepts#finding-elements)``)`` | Clicks on the given element.  |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -56,7 +56,7 @@ ___
 
 Methods:
 
-- ``static`` ``on( ``[``Element``](./browser_element#finding-elements)``)``
+- ``static`` ``on( ``[``Element``](./browser_concepts#finding-elements)``)``
 
 Returns:
 
@@ -77,8 +77,8 @@ Methods:
 |type   | name                                                            | description                                                               |
 |-------|-----------------------------------------------------------------|---------------------------------------------------------------------------|
 |static | ``text( String )``                                              | Enters the given text.                                                    |
-|       | ``into( ``[``Element``](./browser_element#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
-|       | ``intoCleared( ``[``Element``](./browser_element#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
+|       | ``into( ``[``Element``](./browser_concepts#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
+|       | ``intoCleared( ``[``Element``](./browser_concepts#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -188,7 +188,7 @@ Methods:
 |type   | name                                                          | description                                          |
 |-------|---------------------------------------------------------------|------------------------------------------------------|
 |static | ``named( String )``                                           | Specify the name of the Attribute to get             |
-|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Spcify the element from which the attribute is read. |
+|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Spcify the element from which the attribute is read. |
 
 
 Returns:
@@ -222,7 +222,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the value of the given element. |
+|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the value of the given element. |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -240,7 +240,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the state of the given element. |
+|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the state of the given element. |
 
 Returns:
 - ``Either<ActivityError, State>``
@@ -282,7 +282,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the text of the given element.  |
+|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the text of the given element.  |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -416,7 +416,7 @@ Methods:
 |--------|----------------------------------------------|------------------------|
 | static | ``shape(``[``Canvas``](./CANVAS)``)``        | Draws one shape.       |
 | static | ``shapes(``List<[``Canvas``](./CANVAS)>``)`` | Draws multiple shapes. |
-|        | ``on(``[``Element``](./browser_element#finding-elements)``)``         | Draws on the element   |
+|        | ``on(``[``Element``](./browser_concepts#finding-elements)``)``         | Draws on the element   |
 
 
 Returns:
