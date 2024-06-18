@@ -1,9 +1,10 @@
 ---
 title: Cookies
-parent: Web Features
+parent: Http
+grand_parent: Web
 layout: default
 has_children: true
-nav_order: 100
+nav_order: 1510
 ---
 
 # Working with Cookies
@@ -12,18 +13,18 @@ and how to [set them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/
 
 ## Cookie record
 
-| parameter   | type          | description                                                                                                                               |
-|:------------|:--------------|:------------------------------------------------------------------------------------------------------------------------------------------|
-| name        | String        | name of the cookie                                                                                                                        |
-| value       | String        | value of the cookie                                                                                                                       |
-| domain      | String        | [Define where cookies are sent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies?retiredLocale=de#define_where_cookies_are_sent) |
-| path        | String        |                                                                                                                                           |
-| expires     | LocalDateTime |                                                                                                                                           |
-| sameSite    | String        | [Controlling third-party cookies with SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies?retiredLocale=de#controlling_third-party_cookies_with_samesite)                                                                                                                                      |
-| maxAge      | String        |                                                                                                                                           |
-| httpOnly    | boolean       |                                                                                                                                           |
-| secure      | boolean       |                                                                                                                                           |
-| partitioned | boolean       |                                                                                                                                           |
+| parameter   | type          | description                                                                                                                                                               |
+|:------------|:--------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| name        | String        | name of the cookie                                                                                                                                                        |
+| value       | String        | value of the cookie                                                                                                                                                       |
+| domain      | String        | [Define where cookies are sent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies?retiredLocale=de#define_where_cookies_are_sent)                                 |
+| path        | String        |                                                                                                                                                                           |
+| expires     | LocalDateTime |                                                                                                                                                                           |
+| sameSite    | String        | [Controlling third-party cookies with SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies?retiredLocale=de#controlling_third-party_cookies_with_samesite) |
+| maxAge      | String        |                                                                                                                                                                           |
+| httpOnly    | boolean       |                                                                                                                                                                           |
+| secure      | boolean       |                                                                                                                                                                           |
+| partitioned | boolean       |                                                                                                                                                                           |
 
 
 

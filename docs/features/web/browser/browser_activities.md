@@ -1,9 +1,10 @@
 ---
 title: Activities
-parent: Web Features
+parent: Browser
+grand_parent: Web
 layout: default
 has_children: true
-nav_order: 200
+nav_order: 1210
 ---
 
 # Activities
@@ -36,9 +37,9 @@ ___
 
 Methods:
 
-|type   | name                                  | description                   |
-|-------|---------------------------------------|-------------------------------|
-|static | ``on( ``[``Element``](./ELEMENT)``)`` | Clicks on the given element.  |
+|type   | name                                          | description                   |
+|-------|-----------------------------------------------|-------------------------------|
+|static | ``on( ``[``Element``](./browser_element#finding-elements)``)`` | Clicks on the given element.  |
 
 Returns:
 - ``Either<ActivityError, Void>``
