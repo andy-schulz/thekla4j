@@ -1,14 +1,31 @@
 ---
 ---
 
+#top {
+    max-width: 80rem;
+}
+
 #page_layout {
     display: flex;
     flex-direction: row-reverse;
-    color: red;
 }
 
 .main-content {
     width: 75%;
+}
+
+@media (max-width: 50rem) {
+    .page_toc {
+        display: none;
+    }
+
+    .main-content {
+        width: 100%;
+    }
+
+    .page_toc {
+        width: 0%;
+    }
 }
 
 .page_toc {
