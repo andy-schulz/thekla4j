@@ -4,6 +4,7 @@
 #page_layout {
     display: flex;
     flex-direction: row-reverse;
+    color: red;
 }
 
 .main-content {
@@ -23,6 +24,5 @@ ul {
 .content_toc {
     position: sticky;
     top: 2rem;
-//counter-reset: step-counter;
     font-size: 14px !important;
 }
