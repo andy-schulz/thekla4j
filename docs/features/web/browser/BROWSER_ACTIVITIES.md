@@ -73,11 +73,11 @@ ___
 
 Methods:
 
-|type   | name                                           | description                                              |
-|-------|------------------------------------------------|----------------------------------------------------------|
-|static | ``text( String )``                             | Enters the given text.                                   |
-|       | ``into( ``[``Element``](./ELEMENT)``)``        | Enters the text into the given element.                  |
-|       | ``intoCleared( ``[``Element``](./ELEMENT)``)`` | Enters the text into the given element after clearing it.|
+|type   | name                                                            | description                                                               |
+|-------|-----------------------------------------------------------------|---------------------------------------------------------------------------|
+|static | ``text( String )``                                              | Enters the given text.                                                    |
+|       | ``into( ``[``Element``](./ELEMENT.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
+|       | ``intoCleared( ``[``Element``](./ELEMENT#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -125,6 +125,7 @@ DoKey.pressAndHold(Key.CONTROL, Key.ALT)
 ```
 
 **Full Example:**
+
 ```java
 actor.attemptsTo(
   DoKey.pressAndHold(Key.CONTROL, Key.ALT),
