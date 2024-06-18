@@ -94,7 +94,47 @@ Enter.text(TEXT).intoCleared(<ELEMENT>)
 
 ___
 ___
-## Key Interectionsj
+## Key Interections
+
+___
+### DoKey
+
+Methods:
+
+| type   | name                                | description                                        |
+|--------|-------------------------------------|----------------------------------------------------|
+| static | ``press( Key... keys )``            | Presses the given key / key combination.           |
+| static | ``pressAndHold( Key... keys )``     | Presses and hold the given key / key combinations  |
+| static | ``release( Key... keys )``          | Releases the given key / key combination.          |
+|        | ``thenPressAndHold( Key... keys )`` | Presses and holds then given key / key combination |
+|        | ``thenRelease( Key... keys )``      | Releases the given key / key combination.          |
+|        | ``thenPress( Key... keys )``        | Presses the given key / key combination.           |
+
+Returns:
+- ``Either<ActivityError, Void>``
+
+**Code:**
+
+```java
+DoKey.press(Key.ENTER);
+```
+
+```java
+DoKey.pressAndHold(Key.CONTROL, Key.ALT)
+     .thenRelease(Key.ALT, Key.CONTROL);
+```
+
+**Full Example:**
+```java
+actor.attemptsTo(
+  DoKey.pressAndHold(Key.CONTROL, Key.ALT),
+  
+  // some other actions here, like mouse clicks etc.
+
+  DoKey.release(Key.CONTROL, Key.ALT));
+);
+
+```
 
 ___
 ___
