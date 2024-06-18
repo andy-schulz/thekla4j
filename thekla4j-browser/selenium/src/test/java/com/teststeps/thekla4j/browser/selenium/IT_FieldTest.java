@@ -27,7 +27,7 @@ public class IT_FieldTest {
   public void enterTextIntoFieldByActor() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element textField = Element.found(By.css("#first_name"));
 
@@ -48,7 +48,7 @@ public class IT_FieldTest {
   public void enterTextIntoClearedFieldByActor() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element textField = Element.found(By.css("#first_name"));
 
@@ -75,7 +75,7 @@ public class IT_FieldTest {
   public void enterTextTwiceIntoClearedFieldByActor() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element textField = Element.found(By.css("#first_name"));
 

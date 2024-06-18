@@ -46,7 +46,7 @@ public class IT_BrowserPropertiesTest {
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
     actor = Actor.named("test")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Instant start = Instant.now();
 

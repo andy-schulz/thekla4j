@@ -40,7 +40,7 @@ public class IT_KeyActionTest {
   public void testKeyPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     String url = "http://localhost:3000";
 
@@ -63,7 +63,7 @@ public class IT_KeyActionTest {
   public void testMultipleKeyPressActions() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     String url = "http://localhost:3000";
 

@@ -62,7 +62,7 @@ public class IT_DrawTest {
   public void writingLetterOnCanvas() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
@@ -87,7 +87,7 @@ public class IT_DrawTest {
   public void drawingMultipleShapes() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
@@ -115,7 +115,7 @@ public class IT_DrawTest {
   public void drawingMultipleShapesAtOnce() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");

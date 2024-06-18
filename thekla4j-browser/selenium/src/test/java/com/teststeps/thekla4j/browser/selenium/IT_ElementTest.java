@@ -38,7 +38,7 @@ public class IT_ElementTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
+        .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
@@ -58,7 +58,7 @@ public class IT_ElementTest {
   public void testChainedElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
+      .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
 
     Element chainedButton = Element
       .found(By.xpath("//*[@class='parentOne']"))
@@ -81,7 +81,7 @@ public class IT_ElementTest {
   public void waitForElementToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
@@ -102,7 +102,7 @@ public class IT_ElementTest {
   public void checkForElementNotToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"));
 
@@ -121,7 +121,7 @@ public class IT_ElementTest {
   public void checkElementIsNotPresent() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("div > #doesNotExist"));
 
@@ -143,7 +143,7 @@ public class IT_ElementTest {
   public void waitForElementToBeClickable() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isClickable().forAsLongAs(Duration.ofSeconds(10)));
@@ -166,7 +166,7 @@ public class IT_ElementTest {
   public void waitForElementToBeVisible() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("div > #visibilitySwitchingButton"))
         .wait(UntilElement.isVisible().forAsLongAs(Duration.ofSeconds(10)));
@@ -189,7 +189,7 @@ public class IT_ElementTest {
   public void testSelectionOfFocusedElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element focusedElement = Element.found(By.css(":focus"));
 

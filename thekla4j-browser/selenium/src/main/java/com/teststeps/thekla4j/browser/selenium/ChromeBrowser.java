@@ -17,7 +17,7 @@ class ChromeBrowser {
 
     return new SeleniumBrowser(new ChromeDriver(options));
   }
-  public static Browser with() {
+  public static Browser withoutOptions() {
     return new SeleniumBrowser(new ChromeDriver());
   }
 }

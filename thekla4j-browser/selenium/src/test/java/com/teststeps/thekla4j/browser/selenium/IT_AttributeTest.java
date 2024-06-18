@@ -29,7 +29,7 @@ public class IT_AttributeTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(FirefoxBrowser.with()));
+      .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
 

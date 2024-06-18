@@ -53,7 +53,7 @@ public class Selenium {
    *
    */
   private static final Function0<Try<Browser>> loadDefaultLocalChromeBrowser =
-    () -> Try.of(ChromeBrowser::with);
+    () -> Try.of(ChromeBrowser::withoutOptions);
 
   /**
    * Load the Browser details from configuration

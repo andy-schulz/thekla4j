@@ -11,7 +11,7 @@ public class FirefoxBrowser {
     return new SeleniumBrowser(new FirefoxDriver());
   }
 
-  public static Browser with() {
+  public static Browser withoutOptions() {
     return new SeleniumBrowser(new FirefoxDriver());
   }
 }

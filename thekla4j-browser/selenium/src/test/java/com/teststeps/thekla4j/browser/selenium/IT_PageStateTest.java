@@ -26,7 +26,7 @@ public class IT_PageStateTest {
   @Test
   public void getTitleFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     String url = "http://localhost:3000";
 
@@ -43,7 +43,7 @@ public class IT_PageStateTest {
   @Test
   public void getUrlFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     String url = "http://localhost:3000/elementStates";
 

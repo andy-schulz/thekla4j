@@ -29,7 +29,7 @@ public class IT_ElementStateTest {
   @Test
   public void testVisibilityStateTrue() throws ActivityError {
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("#ButtonWithId"));
 
@@ -50,7 +50,7 @@ public class IT_ElementStateTest {
   public void testVisibilityStateFalse() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
     Element clientButton = Element.found(By.css("#visibilitySwitchingButton"));
 

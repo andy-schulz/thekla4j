@@ -27,7 +27,7 @@ public class IT_CookieTest {
   public void testAddCookie() throws ActivityError {
 
     actor = Actor.named("TestUser")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
 
     Cookie c1 = Cookie.of("Cookie1", "CookieValue1")

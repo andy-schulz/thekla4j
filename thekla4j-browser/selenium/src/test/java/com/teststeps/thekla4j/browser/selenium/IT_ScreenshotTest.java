@@ -26,7 +26,7 @@ public class IT_ScreenshotTest {
   public void createScreenshot() {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.with()));
+        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
 
 
     actor.attemptsTo$(
