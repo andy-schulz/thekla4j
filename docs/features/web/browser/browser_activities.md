@@ -56,7 +56,7 @@ ___
 
 Methods:
 
-- ``static`` ``on( ``[``Element``](./ELEMENT)``)``
+- ``static`` ``on( ``[``Element``](./browser_element#finding-elements)``)``
 
 Returns:
 
@@ -77,8 +77,8 @@ Methods:
 |type   | name                                                            | description                                                               |
 |-------|-----------------------------------------------------------------|---------------------------------------------------------------------------|
 |static | ``text( String )``                                              | Enters the given text.                                                    |
-|       | ``into( ``[``Element``](./ELEMENT.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
-|       | ``intoCleared( ``[``Element``](./ELEMENT#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
+|       | ``into( ``[``Element``](./browser_element#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
+|       | ``intoCleared( ``[``Element``](./browser_element#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -185,8 +185,11 @@ Get the value of an attribute of an element.
 
 Methods:
 
-- ``static`` ``named( String )``
-- ``of(``[``Element``](./ELEMENT)``)``
+|type   | name                                                          | description                                          |
+|-------|---------------------------------------------------------------|------------------------------------------------------|
+|static | ``named( String )``                                           | Specify the name of the Attribute to get             |
+|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Spcify the element from which the attribute is read. |
+
 
 Returns:
 
@@ -195,9 +198,7 @@ Returns:
 **Code:**
 
 ```java
-Attribute.named("href").
-
-of(element);
+Attribute.named("href").of(element);
 ```
 
 **Full Example:**
@@ -210,7 +211,6 @@ Element element = Element.found(By.css("#elementId"))
 actor.attemptsTo(
   See.ifThe(Attribute.named("href").of(element))
   .is(Expected.to.equal("https://www.google.com"))
-
   );
 
 ```
@@ -222,7 +222,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./ELEMENT)``)`` | Gets the value of the given element. |
+|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the value of the given element. |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -240,7 +240,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./ELEMENT)``)`` | Gets the state of the given element. |
+|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the state of the given element. |
 
 Returns:
 - ``Either<ActivityError, State>``
@@ -282,7 +282,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./ELEMENT)``)`` | Gets the text of the given element.  |
+|static | ``of(``[``Element``](./browser_element#finding-elements)``)`` | Gets the text of the given element.  |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -319,10 +319,10 @@ Adds cookies to the browser.
 
 Methods:
 
-| type   | name                                             | description                            |
-|--------|--------------------------------------------------|----------------------------------------|
-| static | ``toBrowser(``[``Cookie``](../http/COOKIE)``)``  | Adds a single cookie to the browser.   |
-| static | ``list(List<``[``Cookie``](../http/COOKIE)``>)`` | Adds a list of cookies to the browser. |
+| type   | name                                              | description                            |
+|--------|---------------------------------------------------|----------------------------------------|
+| static | ``toBrowser(``[``Cookie``](../http/cookies)``)``  | Adds a single cookie to the browser.   |
+| static | ``list(List<``[``Cookie``](../http/cookies)``>)`` | Adds a list of cookies to the browser. |
 
 
 Returns:
@@ -416,7 +416,7 @@ Methods:
 |--------|----------------------------------------------|------------------------|
 | static | ``shape(``[``Canvas``](./CANVAS)``)``        | Draws one shape.       |
 | static | ``shapes(``List<[``Canvas``](./CANVAS)>``)`` | Draws multiple shapes. |
-|        | ``on(``[``Element``](./ELEMENT)``)``         | Draws on the element   |
+|        | ``on(``[``Element``](./browser_element#finding-elements)``)``         | Draws on the element   |
 
 
 Returns:
