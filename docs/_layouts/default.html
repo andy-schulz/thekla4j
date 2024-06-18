@@ -20,10 +20,16 @@ layout: table_wrappers
     {% include components/header.html %}
     <div class="main-content-wrap">
         {% include components/breadcrumbs.html %}
+
         <!--      CUSTOMIZATION FOR FLOATING TOC andy_schulz -->
         <!--      DONT AUTOFORMAT -->
-        <link rel="stylesheet" type="text/css" href="/thekla4j/css/styles.css">
-        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+        {% if jekyll.environment == "development" %}
+            <link rel="stylesheet" type="text/css" href="/css/styles.css">
+        {% else %}
+            <link rel="stylesheet" type="text/css" href="/thekla4j/css/styles.css">
+        {% endif %}
+
+
         <div id="page_layout">
             <div class="page_toc">
                 <div class="content_toc">
