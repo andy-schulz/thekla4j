@@ -4,10 +4,34 @@ parent: Browser
 grand_parent: Web
 layout: default
 has_children: true
-nav_order: 1210
+nav_order: 1220
 ---
 
 # Activities
+
+## Activity Overview
+
+The following activities are currently implemented to interact with a browser.
+
+| activity                              | activity description                                    |
+|---------------------------------------|---------------------------------------------------------|
+| [Navigate](#navigate)                 | Navigates to a given url                                |
+| [Click](#click)                       | Clicks on an element                                    |
+| [DoubleClick](#doubleclick)           | Double clicks on an element                             |
+| [Enter](#enter)                       | Enters text into a field / element                      |
+| [DoKey](#dokey)                       | Executes key actions                                    |
+| [Title](#title)                       | Returns the page title                                  |
+| [Url](#url)                           | Returns the page url                                    |
+| [Attribute](#attribute)               | Get the attribute value of an element                   |
+| [Value](#value)                       | Get the value of the "value"-attribute of an element    |
+| [ElementState](#elementstate)         | Get the state of an element (present, visible, enabled) |
+| [Text](#test)                         | Get the text of an element                              |
+| [Draw](#draw)                         | Draw a shape onto an element                            |
+| [AddCookie](#addcookie)               | Add a cookie or a list of cookies to the current domain |
+| [GetCookie](#getcookie)               | Get the named cookie                                    |
+| [GetAllCookies](#getallcookies)       | Get all cookies of the the current domain               |
+| [DeleteCookie](#deletecookie)         | Delete the named cookie.                                |
+| [DeleteAllCookies](#deleteallcookies) | Delete all cookies of the current domain.               |
 
 ___
 ___
@@ -25,6 +49,7 @@ Methods:
 
 Returns:
 - ``Either<ActivityError, Void>``
+- 
 
 **Example:**
 
@@ -37,9 +62,9 @@ ___
 
 Methods:
 
-|type   | name                                          | description                   |
-|-------|-----------------------------------------------|-------------------------------|
-|static | ``on( ``[``Element``](./browser_concepts#finding-elements)``)`` | Clicks on the given element.  |
+|type   | name                                                            | description                   |
+|-------|-----------------------------------------------------------------|-------------------------------|
+|static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Clicks on the given element.  |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -56,7 +81,9 @@ ___
 
 Methods:
 
-- ``static`` ``on( ``[``Element``](./browser_concepts#finding-elements)``)``
+|type   | name                                                            | description                   |
+|-------|-----------------------------------------------------------------|-------------------------------|
+|static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Double clicks on the element. |
 
 Returns:
 
@@ -77,8 +104,8 @@ Methods:
 |type   | name                                                            | description                                                               |
 |-------|-----------------------------------------------------------------|---------------------------------------------------------------------------|
 |static | ``text( String )``                                              | Enters the given text.                                                    |
-|       | ``into( ``[``Element``](./browser_concepts#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
-|       | ``intoCleared( ``[``Element``](./browser_concepts#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
+|       | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
+|       | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
 
 Returns:
 - ``Either<ActivityError, Void>``
@@ -188,7 +215,7 @@ Methods:
 |type   | name                                                          | description                                          |
 |-------|---------------------------------------------------------------|------------------------------------------------------|
 |static | ``named( String )``                                           | Specify the name of the Attribute to get             |
-|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Spcify the element from which the attribute is read. |
+|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Spcify the element from which the attribute is read. |
 
 
 Returns:
@@ -222,7 +249,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the value of the given element. |
+|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the value of the given element. |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -240,7 +267,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the state of the given element. |
+|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the state of the given element. |
 
 Returns:
 - ``Either<ActivityError, State>``
@@ -282,7 +309,7 @@ Methods:
 
 |type   | name                                 | description                          |
 |-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_concepts#finding-elements)``)`` | Gets the text of the given element.  |
+|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the text of the given element.  |
 
 Returns:
 - ``Either<ActivityError, String>``
@@ -416,7 +443,7 @@ Methods:
 |--------|----------------------------------------------|------------------------|
 | static | ``shape(``[``Canvas``](./CANVAS)``)``        | Draws one shape.       |
 | static | ``shapes(``List<[``Canvas``](./CANVAS)>``)`` | Draws multiple shapes. |
-|        | ``on(``[``Element``](./browser_concepts#finding-elements)``)``         | Draws on the element   |
+|        | ``on(``[``Element``](./browser_elements#finding-elements)``)``         | Draws on the element   |
 
 
 Returns:
