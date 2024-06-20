@@ -3,7 +3,7 @@ title: Activities
 parent: Browser
 grand_parent: Web
 layout: default
-has_children: true
+has_children: false
 nav_order: 1220
 ---
 
