@@ -1,0 +1,247 @@
+<style>
+ul, #ActivityLog {
+    list-style-type: none;
+    font-family: monospace;
+}
+
+#ActivityLog {
+    margin: 0;
+    padding: 0;
+}
+
+.task {
+    cursor: pointer;
+    -webkit-user-select: none; /* Safari 3.1+ */
+    -moz-user-select: none; /* Firefox 2+ */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none;
+}
+
+.task::before {
+    /*content: "\25B6"; */
+    content: "\25B6";
+    color: black;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.task.failed::before {
+    color: red;
+}
+
+.task.passed::before {
+    color: green;
+}
+
+.task.running::before {
+    color: black;
+}
+
+.task-open::before {
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Safari */'
+transform: rotate(90deg);
+}
+
+.nested {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+.longDescription {
+    display: none;
+}
+
+.descriptionActive {
+    display: block;
+}
+
+.longDescription .descHeader {
+    background: lightgray;
+    border-radius: 1em;
+    border: 1px solid #898989;
+    position: relative;
+    top: 0.7em;
+    width: max-content;
+    right: -1em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.longDescription .descMessage {
+    background: lightgray;
+    border-radius: 0.2em;
+    border: 1px solid #898989;
+    padding-left: 0.5em;
+}
+
+.inInfo {
+    display: none;
+    padding-left: 2em;
+}
+.outInfo {
+    display: none;
+    padding-left: 2em;
+}
+
+.attachmentInfo {
+    display: none;
+    padding-left: 2em;
+}
+
+.infoHeader {
+    background: lightgray;
+    border-radius: 1em;
+    border: 1px solid #898989;
+    position: relative;
+    top: 0.7em;
+    width: max-content;
+    right: -1em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.infoMessage {
+    background: lightgray;
+    border-radius: 0.2em;
+    border: 1px solid #898989;
+    padding-left: 0.5em;
+}
+
+.ioContent {
+    margin-bottom: 10px;
+}
+.outActive {
+    display: block;
+}
+
+.inActive {
+    display: block;
+}
+
+.attachmentActive {
+    display: block;
+}
+
+.ioInfo {
+    display: none;
+}
+
+.ioActive {
+    display: block;
+}
+
+.contentButton {
+    /*position: absolute;*/
+    cursor: help;
+    /*border: 1px solid white;*/
+    border-radius: 2px;
+    box-shadow: 1px 1px 1px #808080;
+    color: white;
+    font-weight: bold;
+    height: 11px;
+    padding: 2px 4px 2px 4px;
+    text-align: center;
+    min-width: 12px;
+    font-size: x-small;
+    display: inline-block;
+    margin-left: 1em;
+    background: #31708f;
+    /*background: radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    /*background: -moz-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    /*background: -ms-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    /*background: -o-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    /*background: -webkit-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+}
+
+.contentButton.active {
+    background: #73318f;
+}
+
+.interaction::before {
+    content: "\25B7";
+    color: black;
+    margin-right: 6px;
+}
+
+.interaction.failed::before {
+    color: red;
+}
+
+.interaction.passed::before {
+    color: green;
+}
+
+.interaction.running::before {
+    color: black;
+}
+
+.logMessage.fail {
+    color: red;
+}
+
+.logMessage .timestamp {
+    color: lightskyblue;
+}
+
+.activityName {
+    color: #ff0bb1;
+}
+
+pre {
+    white-space:pre-wrap;
+    overflow-wrap: break-word;
+    margin-right: 30px;
+}
+
+.attachmentContainer img {
+    width: 100%;
+}
+</style> 
+
+<ul id = "ActivityLog"><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[Step]</span> - <span class="activityDescription"> step description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskONE]</span> - <span class="activityDescription"> TaskONE description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li class="interaction passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskONE-Child]</span> - <span class="activityDescription"> TaskONE-Child description</span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div></li></ul></li><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskTWO]</span> - <span class="activityDescription"> TaskTWO description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li class="interaction passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskTWO-Child]</span> - <span class="activityDescription"> TaskTWO-Child description</span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div></li></ul></li></ul></li></ul> 
+
+<script>
+var toggler = document.querySelectorAll(".task");
+var inToggler = document.querySelectorAll(".label.inContentButton");
+var outToggler = document.querySelectorAll(".label.outContentButton");
+var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
+var descToggler = document.querySelectorAll(".ellipses");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("task-open");
+  });
+}
+
+for (i = 0; i < inToggler.length; i++) {
+    inToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
+        this.classList.toggle("active");
+    });
+}
+
+for (i = 0; i < outToggler.length; i++) {
+    outToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
+        this.classList.toggle("active");
+    });
+}
+for (i = 0; i < descToggler.length; i++) {
+    descToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
+        this.classList.toggle("active");
+    });
+}
+for (i = 0; i < attachmentToggler.length; i++) {
+    attachmentToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
+        this.classList.toggle("active");
+    });
+}
+</script>
