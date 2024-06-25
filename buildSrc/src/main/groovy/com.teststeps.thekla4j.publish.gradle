@@ -1,5 +1,4 @@
 plugins {
-//    id 'java-library'
     id 'signing'
     id 'maven-publish'
 }
@@ -23,8 +22,8 @@ publishing {
             url project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
             credentials {
-                username = project.findProperty('sonatypeUsername')
-                password = project.findProperty('sonatypePassword')
+                username = project.findProperty('ossrhToken')
+                password = project.findProperty('ossrhTokenPassword')
             }
         }
     }
@@ -69,9 +68,7 @@ publishing {
 
 signing {
     useGpgCmd()
-//    sign configurations.archives
     sign publishing.publications.pluginMaven
 }
-
 
 
