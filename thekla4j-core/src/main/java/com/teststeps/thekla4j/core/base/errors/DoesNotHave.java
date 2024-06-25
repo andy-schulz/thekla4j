@@ -12,7 +12,7 @@ public class DoesNotHave {
             String message =
                     "Actor " + actor.getName() + " does not have the ability " + this.abilityName + "\n" +
                             "try assigning an abiliy with:\n" +
-                            actor.getName() + ".can(" + this.abilityName + ".<<abilityConfigMethod()>>)";
+                            actor.getName() + ".whoCan(" + this.abilityName + ".<<abilityConfigMethod()>>)";
 
             return new DoesNotHaveTheAbility(message);
         }
@@ -25,7 +25,7 @@ public class DoesNotHave {
     public static class DoesNotHaveLogAnnotationHelper {
         private String annotationName = "";
 
-        public DoesNotHaveLogAnnotation in(Activity activity) {
+        public <I,O> DoesNotHaveLogAnnotation in(Activity<I,O> activity) {
             String message =
                     "Activity " + activity.getClass().getSimpleName() + " does not use the  " + this.annotationName + " annotation\n";
 

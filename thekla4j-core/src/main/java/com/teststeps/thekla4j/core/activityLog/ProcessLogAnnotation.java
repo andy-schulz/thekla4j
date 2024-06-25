@@ -91,7 +91,7 @@ public class ProcessLogAnnotation<P1, R1> {
                 flowAnT.value() :
                 interactionAnT.value(),
             clazz,
-            (Option<Object>) this.parameter
+            this.parameter
                                             ))
         .map(desc -> new ActivityLogData(desc, flowAnT != null ?
             ActivityLogEntryType.Task :
@@ -113,26 +113,21 @@ public class ProcessLogAnnotation<P1, R1> {
   /*accessibility update is needed to create the log */
   @SuppressWarnings("java:S3011")
   private final Function2<Activity<P1, R1>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getFieldValueAndAnnotations =
-      (actvty, clazz) -> {
-
-
-
-        return List.of(clazz.getFields())
-            .appendAll(List.of(clazz.getDeclaredFields()))
-            .map(field -> Tuple.of(field, field.getAnnotations()))
-            .map(t -> t.map2(List::of))
-            .map(t -> t.map2(filterAnnotations))
-            .filter(t -> !t._2.isEmpty())
-            .map(t -> t.map1(makePrivateFieldAccessible))
-            .map(t -> t.map1(getFieldValueOfActivity(actvty)))
-            .map(t -> t.map1(Option::of));
-      };
+      (actvty, clazz) -> List.of(clazz.getFields())
+          .appendAll(List.of(clazz.getDeclaredFields()))
+          .map(field -> Tuple.of(field, field.getAnnotations()))
+          .map(t -> t.map2(List::of))
+          .map(t -> t.map2(filterAnnotations))
+          .filter(t -> !t._2.isEmpty())
+          .map(t -> t.map1(makePrivateFieldAccessible))
+          .map(t -> t.map1(getFieldValueOfActivity(actvty)))
+          .map(t -> t.map1(Option::of));
 
 
   /**
    * construct a tuple with parameter value and parameter annotations
    */
-  private final Function2<Option<Object>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getAnnotationsOfParameters1 =
+  private final Function2<Option<P1>, Class<?>, List<Tuple2<Option<Object>, List<Annotation>>>> getAnnotationsOfParameters1 =
       (object, clazz) -> List.of(clazz.getDeclaredMethods())
           // the annotation is only valid for the performAs method
           // other methods cant be supported
@@ -143,10 +138,11 @@ public class ProcessLogAnnotation<P1, R1> {
           .map(t -> t.map2(annos -> annos.length > 1 ? annos[1] : new Annotation[]{}))
           .map(t -> t.map2(List::of))
           // only Called and CalledList annotations are of interest
-          .map(t -> t.map2(filterAnnotations));
+          .map(t -> t.map2(filterAnnotations))
+        .map(t -> t.map1(o -> o.map(r -> (Object) r)));
 
 
-  private final Function2<Class<? extends Object>, String, Try<Field>> getFieldByName =
+  private final Function2<Class<?>, String, Try<Field>> getFieldByName =
       (clazz, fieldName) -> Try.of(() -> clazz.getDeclaredField(fieldName))
           .map(makePrivateFieldAccessible);
 
@@ -159,7 +155,7 @@ public class ProcessLogAnnotation<P1, R1> {
           obj.map(Object::getClass)
               .flatMap(clz -> Try
                   // don't try to find a field for fieldName "" in the object, just return the object
-                  .of(() -> fieldName.equals("") ?
+                  .of(() -> fieldName.isEmpty() ?
                       obj.get() :
                       getFieldByName.apply(clz, fieldName)
                           .mapTry(f -> f.get(obj.get()))
@@ -223,7 +219,7 @@ public class ProcessLogAnnotation<P1, R1> {
           .foldLeft(descr, replaceSingleAttributeInString)
           .trim();
 
-  private String createLogDescription(String description, Class<?> clazz, Option<Object> param) {
+  private String createLogDescription(String description, Class<?> clazz, Option<P1> param) {
 
 
     return Option.of(description)
