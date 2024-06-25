@@ -5,6 +5,7 @@ nav_order: 1
 ---
 
 # Thekla4j
+[![Thekla4j](https://maven-badges.herokuapp.com/maven-central/com.test-steps.thekla4j/thekla4j-core/badge.svg)](https://mvnrepository.com/artifact/com.test-steps.thekla4j)
 
 ## The Screenplay Pattern
 
