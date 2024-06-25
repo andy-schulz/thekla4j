@@ -1,0 +1,28 @@
+name: Update Version
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Update version in Markdown
+        run: |
+          sed -i "s/<THEKLA4J_VERSION>/${{ steps.get_version.outputs.VERSION }}/g" docs/index.md
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Update version to ${{ steps.get_version.outputs.VERSION }}"
+          git push
