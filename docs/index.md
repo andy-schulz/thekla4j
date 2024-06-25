@@ -60,9 +60,9 @@ Add the following dependency to your `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation group: "com.test-steps.thekla4j", name: "thekla4j-core", version: <THEKLA4J_VERSION>
-    implementation group: "com.test-steps.thekla4j", name: "thekla4j-http", version: <THEKLA4J_VERSION>
-    implementation group: "com.test-steps.thekla4j", name: "thekla4j-browser-selenium", version: <THEKLA4J_VERSION>
+    implementation group: "com.test-steps.thekla4j", name: "thekla4j-core", version: {{THEKLA4J_VERSION}}
+    implementation group: "com.test-steps.thekla4j", name: "thekla4j-http", version: {{THEKLA4J_VERSION}}
+    implementation group: "com.test-steps.thekla4j", name: "thekla4j-browser-selenium", version: {{THEKLA4J_VERSION}}
 }
 ```
 
@@ -75,17 +75,17 @@ Add the following dependency to your `pom.xml` file:
     <dependency>
         <groupId>com.test-steps.thekla4j</groupId>
         <artifactId>thekla4j-core</artifactId>
-        <version>THEKLA4J_VERSION</version>
+        <version>{{THEKLA4J_VERSION}}</version>
     </dependency>
     <dependency>
         <groupId>com.test-steps.thekla4j</groupId>
         <artifactId>thekla4j-http</artifactId>
-        <version>THEKLA4J_VERSION</version>
+        <version>{{THEKLA4J_VERSION}}</version>
     </dependency>
     <dependency>
         <groupId>com.test-steps.thekla4j</groupId>
         <artifactId>thekla4j-browser-selenium</artifactId>
-        <version>THEKLA4J_VERSION</version>
+        <version>{{THEKLA4J_VERSION}}</version>
     </dependency>
 </dependencies>
 ```
