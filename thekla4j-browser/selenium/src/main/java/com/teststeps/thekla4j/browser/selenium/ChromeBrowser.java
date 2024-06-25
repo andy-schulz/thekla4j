@@ -6,7 +6,7 @@ import io.vavr.control.Option;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-class ChromeBrowser {
+public class ChromeBrowser {
   public static Browser with(BrowserConfig config) {
 
     ChromeOptions options = new ChromeOptions();
