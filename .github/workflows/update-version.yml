@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get the version
         id: get_version
@@ -22,7 +22,7 @@ jobs:
 
       - name: Commit and push
         run: |
-          git config --local user.email "action@github.com"
+          git config --local user.email "andy.schulz@test-steps.de"
           git config --local user.name "GitHub Action"
           git commit -am "Update version to ${{ steps.get_version.outputs.VERSION }}"
           git push
