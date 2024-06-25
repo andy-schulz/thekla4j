@@ -17,10 +17,10 @@ import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   private final HashMap<String, Ability> abilityMap = new HashMap<>();
@@ -47,8 +47,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
   public Actor whoCan(Ability... abilities) {
 
-    Stream.of(abilities)
-      .map(ability -> this.abilityMap.put(ability.getClass().getName(), ability));
+    Arrays.stream(abilities).forEach(ability -> this.abilityMap.put(ability.getClass().getName(), ability));
 
     return this;
   }
