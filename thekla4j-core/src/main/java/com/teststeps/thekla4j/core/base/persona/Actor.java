@@ -20,6 +20,7 @@ import io.vavr.control.Try;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   private final HashMap<String, Ability> abilityMap = new HashMap<>();
@@ -44,9 +45,10 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this;
   }
 
-  public Actor whoCan(Ability ability) {
+  public Actor whoCan(Ability... abilities) {
 
-    this.abilityMap.put(ability.getClass().getName(), ability);
+    Stream.of(abilities)
+      .map(ability -> this.abilityMap.put(ability.getClass().getName(), ability));
 
     return this;
   }
