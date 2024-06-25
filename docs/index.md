@@ -23,7 +23,12 @@ making it easier for non-technical stakeholders to understand.
 - Learning curve: The Screenplay Pattern is more complex than other patterns like the Page Object Model, so it can take time to learn and implement correctly.
 - Overhead: The pattern can be overkill for simple applications or small test suites.
 - Limited adoption: As it's a relatively new pattern, there are fewer resources and community support compared to more established patterns.
-- 
+
+The original Screenplay Pattern describes the concept of a question which is used to query the system under test to 
+verify its state. The current implementation does not include questions, as it can be easily replaced by activities.
+It makes the pattern more straightforward and easier to understand.
+
+
 ```mermaid
 stateDiagram
     Actor --> Activities: executes
@@ -53,9 +58,11 @@ To install Thekla4j, add the following dependencies to your project:
 Add the following dependency to your `build.gradle` file:
 
 ```gradle
+dependencies {
     implementation group: "com.test-steps.thekla4j", name: "thekla4j-core", version: <THEKLA4J_VERSION>
     implementation group: "com.test-steps.thekla4j", name: "thekla4j-http", version: <THEKLA4J_VERSION>
     implementation group: "com.test-steps.thekla4j", name: "thekla4j-browser-selenium", version: <THEKLA4J_VERSION>
+}
 ```
 
 ### Maven
@@ -91,8 +98,6 @@ For example, if you want the actor to interact with a web browser, you would giv
 Here is an example of how to create an actor with the `BrowseTheWeb` ability:
 
 ```java
-package com.teststeps.thekla4j.browser.selenium.examples;
-
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
