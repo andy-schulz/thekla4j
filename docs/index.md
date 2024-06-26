@@ -32,12 +32,18 @@ It makes the pattern more straightforward and easier to understand.
 
 ```mermaid
 stateDiagram
+    direction LR
+
+    classDef badBadEvent fill:gray,color:white,font-weight:bold,stroke-width:2px,stroke:black;
+    tool: Client or Tool
     Actor --> Activities: executes
-    Activities --> Application: invokes
-    Actor --> Ability: uses
-    Ability --> Client: uses
+    Actor --> Ability: has
+    Ability --> tool: uses
+    tool --> Application: interact with
     
     Activities --> Ability: uses
+
+    class Application badBadEvent
 ```
 
 ## Installation
@@ -48,9 +54,9 @@ with a web browser or sending HTTP requests.
 
 Currently, the following modules are available:
 
-- `thekla4j-core`: The [core module](./features/core/CORE.md) that provides the main functionality for the Screenplay Pattern.
-- `thekla4j-http`: A [module](./features/web/http/---HTTP---.md) that provides the ability to send HTTP requests.
-- `thekla4j-browser-selenium`: A [module](./features/web/browser/---BROWSER---.md) that provides the ability to interact with a web browser using Selenium.
+- `thekla4j-core`: The [core module](./features/core/CORE) that provides the main functionality for the Screenplay Pattern.
+- `thekla4j-http`: A [module](./features/web/http/---HTTP---) that provides the ability to send HTTP requests.
+- `thekla4j-browser-selenium`: A [module](./features/web/browser/---BROWSER---) that provides the ability to interact with a web browser using Selenium.
 
 To install Thekla4j, add the following dependencies to your project:
 
@@ -151,4 +157,4 @@ public class TestBasicBrowseTheWebExample {
 
 ## License
 
-Thekla4j is licensed under the MIT License. See the [LICENSE](./LICENSE.md) file for more information.
+Thekla4j is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more information.
