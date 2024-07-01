@@ -3,6 +3,8 @@ plugins {
     id "pl.allegro.tech.build.axion-release"
     id "io.freefair.lombok"
     id "com.teststeps.thekla4j.logging"
+    id 'jacoco'
+    id 'jacoco-report-aggregation'
 }
 
 group 'com.test-steps.thekla4j'
@@ -56,4 +58,8 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
 }
