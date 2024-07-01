@@ -9,6 +9,8 @@ import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -22,10 +24,13 @@ public class IT_BrowserPropertiesTest {
 
   private Actor actor = Actor.named("Test Actor");
 
+  @BeforeEach
+  public void setup() {
+    Thekla4jProperty.resetPropertyCache();
+  }
+
   @AfterEach
   public void tearDown() throws InterruptedException {
-    Thread.sleep(10);
-
     if (actor != null) {
       actor.cleansStage();
     }
@@ -38,6 +43,9 @@ public class IT_BrowserPropertiesTest {
 
   @Test
   public void checkSlowDownIsApplied() {
+
+    // reset property cache, to set the properties again for this test case
+    Thekla4jProperty.resetPropertyCache();
 
     System.setProperty(DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION.property().name(), "true");
     System.setProperty(DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME.property().name(), "5");
@@ -58,6 +66,7 @@ public class IT_BrowserPropertiesTest {
 
     assertThat("slow down property extends execution time",
         Duration.between(start, end).getSeconds(), greaterThan(9L));
+
 
   }
 }
