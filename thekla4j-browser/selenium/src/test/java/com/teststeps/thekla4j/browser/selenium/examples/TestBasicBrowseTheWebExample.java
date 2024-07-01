@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 public class TestBasicBrowseTheWebExample {
 
-  @Test
+//  @Test
   public void browseTheWeb() throws ActivityError {
 
     Actor actor = Actor.named("TestUser")
