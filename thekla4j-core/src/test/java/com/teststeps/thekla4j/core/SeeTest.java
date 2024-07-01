@@ -97,7 +97,7 @@ public class SeeTest {
   }
 
   @Test
-  public void testErrorValueList() throws ActivityError {
+  public void testErrorValueList() {
     Actor tester = Actor.named("Tester");
     Either<ActivityError, Void> val = tester.attemptsTo(
         See.ifValue(List.of(1,2,3))
