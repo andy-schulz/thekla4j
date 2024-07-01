@@ -28,7 +28,7 @@ It makes the pattern more straightforward and easier to understand.
 stateDiagram
     direction LR
 
-    classDef badBadEvent fill:gray,color:white,font-weight:bold,stroke-width:2px,stroke:black;
+    classDef nonSP fill:gray,color:white,font-weight:bold,stroke-width:2px,stroke:black;
     tool: Client or Tool
     Actor --> Activities: executes
     Actor --> Ability: has
@@ -37,7 +37,7 @@ stateDiagram
     
     Activities --> Ability: uses
 
-    class Application badBadEvent
+    class Application, tool nonSP
 ```
 
 ## Installation
