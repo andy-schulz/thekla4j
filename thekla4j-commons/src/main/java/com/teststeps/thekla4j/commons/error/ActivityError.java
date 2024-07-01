@@ -16,7 +16,7 @@ public class ActivityError extends Throwable {
   }
 
   public static ActivityError with(Throwable ex) {
-    return new ActivityError(ex.getMessage(), ex);
+    return new ActivityError(ex.getMessage());
   }
   public static ActivityError with(String message) {
     return new ActivityError(message);
