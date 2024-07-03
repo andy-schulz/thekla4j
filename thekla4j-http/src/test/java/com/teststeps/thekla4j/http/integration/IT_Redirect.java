@@ -38,7 +38,7 @@ public class IT_Redirect {
 
     Request request = Request.on("/redirect-to")
       .withOptions(baseOptions
-        .queryParameter("url", "https://httpbin.org/cookies"));
+        .queryParameter("url", "http://localhost:3001/cookies"));
 
     Either<ActivityError, HttpResult> res = tester
       .attemptsTo(
