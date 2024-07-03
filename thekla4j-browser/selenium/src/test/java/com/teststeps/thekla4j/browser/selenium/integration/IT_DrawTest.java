@@ -6,7 +6,6 @@ import com.teststeps.thekla4j.browser.core.drawing.Move;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Draw;
@@ -18,10 +17,10 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.CANVAS;
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
 
 public class IT_DrawTest {
 
@@ -83,7 +82,8 @@ public class IT_DrawTest {
         Draw.shape(letterT).on(canvas),
 
         See.ifThe(Text.of(header))
-          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 20 Y: 5")))
+          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 20 Y: 5"))
+          .forAsLongAs(Duration.ofSeconds(3)))
 
 
       .getOrElseThrow(Function.identity());
@@ -111,7 +111,8 @@ public class IT_DrawTest {
         Draw.shape(letterT2).on(canvas),
 
         See.ifThe(Text.of(header))
-          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5")))
+          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5"))
+          .forAsLongAs(Duration.ofSeconds(3)))
 
 
       .getOrElseThrow(Function.identity());
@@ -137,7 +138,8 @@ public class IT_DrawTest {
         .on(canvas),
 
       See.ifThe(Text.of(header))
-        .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5")))
+        .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5"))
+        .forAsLongAs(Duration.ofSeconds(3)))
 
       .getOrElseThrow(Function.identity());
   }
