@@ -1,17 +1,20 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
-import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.AddCookie;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
+
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
 
 public class IT_CookieTest {
 
@@ -27,7 +30,7 @@ public class IT_CookieTest {
   public void testAddCookie() throws ActivityError {
 
     actor = Actor.named("TestUser")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
 
     Cookie c1 = Cookie.of("Cookie1", "CookieValue1")
@@ -41,7 +44,7 @@ public class IT_CookieTest {
 
 
     actor.attemptsTo(
-            Navigate.to("http://localhost:3000/"),
+            Navigate.to(HOST),
 
             AddCookie.list(cookies))
 

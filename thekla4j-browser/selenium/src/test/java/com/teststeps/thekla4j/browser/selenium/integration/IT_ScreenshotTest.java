@@ -1,7 +1,9 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.activityLog.ActivityLogEntry;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.selenium.data.UiTest;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -26,7 +28,7 @@ public class IT_ScreenshotTest {
   public void createScreenshot() {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
 
     actor.attemptsTo$(

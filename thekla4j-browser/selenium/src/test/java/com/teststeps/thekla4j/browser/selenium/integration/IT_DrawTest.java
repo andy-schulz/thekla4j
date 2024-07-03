@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
@@ -6,6 +6,8 @@ import com.teststeps.thekla4j.browser.core.drawing.Move;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.core.locator.By;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Draw;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -18,7 +20,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.CANVAS;
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+
 public class IT_DrawTest {
+
   private Actor actor;
 
   Element header = Element.found(By.css(".headerElement"));
@@ -62,12 +68,12 @@ public class IT_DrawTest {
   public void writingLetterOnCanvas() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
 
-    String url = "http://localhost:3000/canvas";
+    String url = CANVAS;
 
 
     actor.attemptsTo(
@@ -87,12 +93,12 @@ public class IT_DrawTest {
   public void drawingMultipleShapes() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
 
-    String url = "http://localhost:3000/canvas";
+    String url = CANVAS;
 
 
     actor.attemptsTo(
@@ -115,12 +121,12 @@ public class IT_DrawTest {
   public void drawingMultipleShapesAtOnce() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
 
-    String url = "http://localhost:3000/canvas";
+    String url = CANVAS;
 
 
     actor.attemptsTo(

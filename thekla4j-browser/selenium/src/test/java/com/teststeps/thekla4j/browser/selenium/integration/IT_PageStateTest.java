@@ -1,6 +1,8 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.Title;
@@ -12,6 +14,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
+
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
 
 public class IT_PageStateTest {
 
@@ -26,9 +31,9 @@ public class IT_PageStateTest {
   @Test
   public void getTitleFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = "http://localhost:3000";
+    String url = HOST;
 
     actor.attemptsTo(
 
@@ -43,9 +48,9 @@ public class IT_PageStateTest {
   @Test
   public void getUrlFromPage() throws ActivityError {
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = "http://localhost:3000/elementStates";
+    String url = ELEMENT_STATES;
 
     actor.attemptsTo(
 

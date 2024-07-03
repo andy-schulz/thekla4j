@@ -1,8 +1,9 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Attribute;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -14,10 +15,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+
 public class IT_AttributeTest {
 
   Actor actor = Actor.named("Test Actor");
   Element header = Element.found(By.css(".headerElement"));
+
 
   @AfterEach
   public void tearDown() throws InterruptedException {
@@ -29,12 +33,12 @@ public class IT_AttributeTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
 
-    String url = "http://localhost:3000";
+    String url = HOST;
 
     actor.attemptsTo(
 

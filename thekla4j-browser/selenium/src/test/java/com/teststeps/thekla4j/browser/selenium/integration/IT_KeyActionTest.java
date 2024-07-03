@@ -1,8 +1,10 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -19,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Duration;
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_KeyActionTest {
@@ -40,9 +43,9 @@ public class IT_KeyActionTest {
   public void testKeyPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = "http://localhost:3000";
+    String url = HOST;
 
     Element clientButton = Element.found(By.css("#stateSwitchingButton"));
 
@@ -63,9 +66,9 @@ public class IT_KeyActionTest {
   public void testMultipleKeyPressActions() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = "http://localhost:3000";
+    String url = HOST;
 
     Element clientButton = Element.found(By.css("#stateSwitchingButton"));
 

@@ -1,8 +1,10 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_ElementStateTest {
@@ -29,11 +33,11 @@ public class IT_ElementStateTest {
   @Test
   public void testVisibilityStateTrue() throws ActivityError {
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("#ButtonWithId"));
 
-    String url = "http://localhost:3000";
+    String url = HOST;
 
     actor.attemptsTo(
 
@@ -50,11 +54,11 @@ public class IT_ElementStateTest {
   public void testVisibilityStateFalse() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("#visibilitySwitchingButton"));
 
-    String url = "http://localhost:3000/elementStates";
+    String url = ELEMENT_STATES;
 
     actor.attemptsTo(
 

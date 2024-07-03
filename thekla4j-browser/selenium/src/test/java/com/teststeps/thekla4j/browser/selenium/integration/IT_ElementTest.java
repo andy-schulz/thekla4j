@@ -1,9 +1,12 @@
-package com.teststeps.thekla4j.browser.selenium;
+package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
+import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.FirefoxBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
@@ -20,8 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.elementStates;
-import static com.teststeps.thekla4j.browser.selenium.Constants.url;
+import static com.teststeps.thekla4j.browser.selenium.Constants.*;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.*;
 
 public class IT_ElementTest {
@@ -38,13 +40,13 @@ public class IT_ElementTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
     actor.attemptsTo(
 
-            Navigate.to(url),
+            Navigate.to(HOST),
 
             Click.on(clientButton),
 
@@ -58,7 +60,7 @@ public class IT_ElementTest {
   public void testChainedElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(FirefoxBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element chainedButton = Element
       .found(By.xpath("//*[@class='parentOne']"))
@@ -67,7 +69,7 @@ public class IT_ElementTest {
 
     actor.attemptsTo(
 
-        Navigate.to(url),
+        Navigate.to(HOST),
 
         Click.on(chainedButton),
 
@@ -81,14 +83,14 @@ public class IT_ElementTest {
   public void waitForElementToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
 
     actor.attemptsTo(
 
-            Navigate.to(elementStates),
+            Navigate.to(ELEMENT_STATES),
 
             Click.on(clientButton),
 
@@ -102,13 +104,13 @@ public class IT_ElementTest {
   public void checkForElementNotToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"));
 
     actor.attemptsTo(
 
-        Navigate.to(elementStates),
+        Navigate.to(ELEMENT_STATES),
 
         See.ifThe(ElementState.of(clientButton))
           .is(Expected.not.to.be(enabled))
@@ -121,13 +123,13 @@ public class IT_ElementTest {
   public void checkElementIsNotPresent() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("div > #doesNotExist"));
 
     actor.attemptsTo(
 
-        Navigate.to(elementStates),
+        Navigate.to(ELEMENT_STATES),
 
         See.ifThe(ElementState.of(clientButton))
           .is(Expected.not.to.be(present))
@@ -143,7 +145,7 @@ public class IT_ElementTest {
   public void waitForElementToBeClickable() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("div > #stateSwitchingButton"))
         .wait(UntilElement.isClickable().forAsLongAs(Duration.ofSeconds(10)));
@@ -152,7 +154,7 @@ public class IT_ElementTest {
 
     actor.attemptsTo(
 
-            Navigate.to(elementStates),
+            Navigate.to(ELEMENT_STATES),
 
             Click.on(clientButton),
 
@@ -166,7 +168,7 @@ public class IT_ElementTest {
   public void waitForElementToBeVisible() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("div > #visibilitySwitchingButton"))
         .wait(UntilElement.isVisible().forAsLongAs(Duration.ofSeconds(10)));
@@ -175,7 +177,7 @@ public class IT_ElementTest {
 
     actor.attemptsTo(
 
-            Navigate.to(elementStates),
+            Navigate.to(ELEMENT_STATES),
 
             Click.on(clientButton),
 
@@ -189,13 +191,13 @@ public class IT_ElementTest {
   public void testSelectionOfFocusedElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element focusedElement = Element.found(By.css(":focus"));
 
     actor.attemptsTo(
 
-        Navigate.to(elementStates),
+        Navigate.to(ELEMENT_STATES),
 
         DoKey.press(Key.TAB, Key.TAB, Key.TAB),
 
