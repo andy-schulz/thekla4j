@@ -17,9 +17,18 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
+    services:
+      frameworktester:
+        image: andyschulz/frameworktester-nginx:latest
+        ports:
+          - 3000:80
+      httpbin:
+        image: kennethreitz/httpbin:latest
+        ports:
+          - 3001:80
 
     steps:
     - uses: actions/checkout@v4
@@ -38,6 +47,7 @@ jobs:
       run: ./gradlew build
 
     - name: Upload coverage to Codecov
+      if: success() || failure()
       uses: codecov/codecov-action@v4
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
