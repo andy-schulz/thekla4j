@@ -8,7 +8,7 @@ import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
+import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class Title extends Task<Void, String> {
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
     return BrowseTheWeb.as(actor)
       .flatMap(Browser::title)
-      .transform(LiftTry.toEither(ActivityError::with))
+      .transform(TransformTry.toEither(ActivityError::with))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

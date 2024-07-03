@@ -8,10 +8,7 @@ import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
-import io.vavr.Function1;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
+import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
@@ -29,7 +26,7 @@ public class ElementState extends Task<Void, State> {
 
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.getState(element))
-        .transform(LiftTry.toEither(x -> ActivityError.with(x.getMessage())));
+        .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage())));
   }
 
   public static ElementState of(Element element) {
