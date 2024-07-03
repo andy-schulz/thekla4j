@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id "pl.allegro.tech.build.axion-release"
     id "io.freefair.lombok"
-    id "com.teststeps.thekla4j.logging"
+    id "com.teststeps.thekla4j.sourceSets"
     id 'jacoco'
     id 'jacoco-report-aggregation'
 }
