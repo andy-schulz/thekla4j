@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class HttpOptionTest {
+public class TestHttpOption {
 
   /**
    * Test setting a query parameter as an option
