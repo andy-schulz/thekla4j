@@ -1,7 +1,7 @@
 package com.teststeps.thekla4j.assertions.lib;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
+import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.API;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -33,7 +33,7 @@ public class Assertion implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> "Assertion Result: " + r))
         .onFailure(log::error)
-        .transform(LiftTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::with));
   }
 
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
@@ -50,7 +50,7 @@ public class Assertion implements TheklaAssertion {
         .peek(r -> log.debug(() -> String.format("Predicate (%s) Result: %s", reason, r)))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate '%s' to pass on \n%s", reason, p), res)))
-        .transform(LiftTry.toEither(ActivityError::with)));
+        .transform(TransformTry.toEither(ActivityError::with)));
   }
 
   public <M4> SeeAssertion<M4> pass(Predicate<M4> expected) {
@@ -62,7 +62,7 @@ public class Assertion implements TheklaAssertion {
         .peek(r -> log.debug(() -> "unnamed Predicate Result: " + r))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect unnamed predicate to pass on \n%s", p), res)))
-        .transform(LiftTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::with));
   }
 
 }

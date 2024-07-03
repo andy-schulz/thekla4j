@@ -5,44 +5,29 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
-import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
 public class LiftTry {
 
+
   /**
-   * transforming a Try{R} into an Either{L,R}
+   * returns a function that lifts the Try from an Option
+   * <p>
+   * Option{Try{T}} -> Try{Option{T}}
    *
-   * @param toErrorFunction Either{L,R}
-   * @return Either{L,R}
+   * @return the function that lifts the Try from an Option
    */
-  public static <L, R> Function1<Try<R>, Either<L, R>> toEither(Function1<Throwable, L> toErrorFunction) {
-    return tryObj -> tryObj.isFailure() ? Either.left(toErrorFunction.apply(tryObj.getCause())) :
-        Either.right(tryObj.get());
+  public static <T> Function1<Option<Try<T>>, Try<Option<T>>> fromOption() {
+    return option -> option.isEmpty() ? Try.success(Option.none()) : option.get().map(Option::some);
   }
 
   /**
-   * transforming an Option{R} into an Either{L,R}
+   * returns a function that lifts the trys from a tuple
+   * <p>
+   * Tuple2{Try{T}, Try{U}} -> Try{Tuple{T,U}}
    *
-   * @param errorMessage in case the Option is empty create a failing Try with this error message
-   * @return Either{L,R}
-   */
-  public static <R> Function1<Option<R>, Try<R>> fromOption(String errorMessage) {
-    return option -> option.isEmpty() ? Try.failure(new Throwable(errorMessage)) :
-        Try.success(option.get());
-  }
-
-
-  /**
-   * returns a function that transforms a
-   * Tuple2{Try{T}, Try{U}}
-   * to
-   * Try{Tuple{T,U}}
-   *
-   * @param <T>
-   * @param <U>
-   * @return
+   * @return the function that transforms the tuple
    */
   public static <T, U> Function1<Tuple2<Try<T>, Try<U>>, Try<Tuple2<T, U>>> fromTuple2() {
     return tuple2 -> tuple2._1().map(t -> Tuple.of(t, tuple2._2))
@@ -50,6 +35,14 @@ public class LiftTry {
   }
 
 
+  /**
+   * returns a function that transforms two
+   * Try{U1} and Try{U2}
+   * to
+   * Try{Tuple{U1,U2}}
+   *
+   * @return the function that transforms into a tuple
+   */
   public static <U1, U2> Function2<Try<U1>, Try<U2>, Try<Tuple2<U1, U2>>> toTuple2() {
     return (t1, t2) -> t1.flatMap((u1) -> t2.map((u2) -> Tuple.of(u1, u2)));
   }
@@ -60,9 +53,7 @@ public class LiftTry {
    * to
    * Try{Tuple{T,U}}
    *
-   * @param <T>
-   * @param <U>
-   * @return
+   * @return the function that transforms the tuple
    */
   public static <T, U> Function1<Tuple2<Try<T>, U>, Try<Tuple2<T, U>>> fromTuple2$1() {
     return tuple2 -> tuple2._1().map(t -> Tuple.of(t, tuple2._2));

@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.websocket.stomp.spring;
 
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
+import com.teststeps.thekla4j.utils.vavr.TransformOption;
 import com.teststeps.thekla4j.websocket.stomp.core.Destination;
 import com.teststeps.thekla4j.websocket.stomp.core.Endpoint;
 import com.teststeps.thekla4j.websocket.stomp.core.StompClient;
@@ -90,7 +90,7 @@ public class SpringStompClient implements StompClient {
   private Try<SpringSockJsSession> sessionForEndpoint(Option<Endpoint> endpoint) {
 
     return
-        endpoint.transform(LiftTry.fromOption(
+        endpoint.transform(TransformOption.toTry(
                 "No endpoint found. Set a default endpoint when creating the ability or provide an endpoint for each destination"))
             .flatMap(ep -> sessions
                 .filter(s -> s.url().equals(ep.url()))

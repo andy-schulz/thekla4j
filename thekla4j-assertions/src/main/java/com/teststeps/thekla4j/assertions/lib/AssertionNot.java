@@ -1,7 +1,7 @@
 package com.teststeps.thekla4j.assertions.lib;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
+import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.API;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -31,7 +31,7 @@ public class AssertionNot implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> "Assertion Result: " + r))
         .onFailure(log::error)
-        .transform(LiftTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::with));
   }
 
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
@@ -47,7 +47,7 @@ public class AssertionNot implements TheklaAssertion {
     return Tuple.of(reason, p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate '%s' to fail on \n%s", reason, p), res)))
-        .transform(LiftTry.toEither(ActivityError::with)));
+        .transform(TransformTry.toEither(ActivityError::with)));
   }
 
   @Override
@@ -59,6 +59,6 @@ public class AssertionNot implements TheklaAssertion {
     return p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate to fail on \n%s", p), res)))
-        .transform(LiftTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::with));
   }
 }
