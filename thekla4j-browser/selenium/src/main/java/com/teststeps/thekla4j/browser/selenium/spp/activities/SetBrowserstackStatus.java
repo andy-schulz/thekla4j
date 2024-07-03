@@ -8,9 +8,9 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.json.JSON;
-import com.teststeps.thekla4j.utils.yaml.YAML;
 import io.vavr.Function1;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.With;
@@ -42,19 +42,20 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
 
-    Try<SeleniumConfig> config = loadSeleniumConfig.apply()
-      .flatMap(YAML.jParse(SeleniumConfig.class));
+    Try<Option<SeleniumConfig>> config = loadSeleniumConfig.apply();
 
-    if (config.isFailure()) {
+    if (config.isFailure() && config.get().isEmpty()) {
       log.debug("Could not load Selenium configuration, cannot set status on Browserstack");
       return Either.left(ActivityError.with(config.getCause()));
     }
 
-    if (Objects.isNull(config.get().bStack()) ||
-      Objects.isNull(config.get().bStack().userName()) ||
-      Objects.isNull(config.get().bStack().accessKey()) ||
-      config.get().bStack().userName().isEmpty() ||
-      config.get().bStack().accessKey().isEmpty()) {
+    SeleniumConfig conf = config.get().get();
+
+    if (Objects.isNull(conf.bStack()) ||
+      Objects.isNull(conf.bStack().userName()) ||
+      Objects.isNull(conf.bStack().accessKey()) ||
+      conf.bStack().userName().isEmpty() ||
+      conf.bStack().accessKey().isEmpty()) {
       log.debug("No username or access key found in selenium config, cannot set status on Browserstack");
       return Either.left(ActivityError.with(new RuntimeException("No username or access key found in selenium config, cannot set status on Browserstack")));
 
@@ -63,7 +64,7 @@ public class SetBrowserstackStatus extends Interaction<Void, String> {
     Either<ActivityError, String> out =
       BrowseTheWeb.as(actor)
       .flatMap(Browser::getSessionId)
-      .flatMap(sid -> config.flatMap(c -> sendStatus(sid, status, c.bStack().userName(), c.bStack().accessKey())))
+      .flatMap(sid -> sendStatus(sid, status, conf.bStack().userName(), conf.bStack().accessKey()))
       .transform(ActivityError.toEither("Could not set status on Browserstack"));
 
     return mapFailure && out.isLeft() ?

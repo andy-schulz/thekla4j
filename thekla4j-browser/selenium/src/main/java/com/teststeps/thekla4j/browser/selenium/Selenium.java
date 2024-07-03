@@ -4,12 +4,7 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
-import com.teststeps.thekla4j.utils.file.FileUtils;
-import com.teststeps.thekla4j.utils.yaml.YAML;
-import io.vavr.Function0;
-import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.Function3;
+import io.vavr.*;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
@@ -17,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static com.teststeps.thekla4j.browser.selenium.functions.ConfigFunctions.loadBrowserConfig;
 import static com.teststeps.thekla4j.browser.selenium.functions.ConfigFunctions.loadSeleniumConfig;
 import static io.vavr.API.*;
 
@@ -42,27 +38,22 @@ public class Selenium {
    * Load the Browser from the configuration
    */
   private static final Function1<Option<String>, Try<Browser>> loadBrowser =
-    testName -> loadSeleniumConfig.apply()
-      .map(Selenium.loadRemoteBrowser.apply(testName))
-      .onFailure(__ -> log.debug("No Selenium remote configuration found. Loading local browser."))
-      .recover(__ -> Selenium.loadLocalBrowser.apply())
-      .flatMap(Function.identity());
+    testName -> Selenium.loadConfigs.apply()
+      .flatMap(t -> Selenium.createBrowserWithConfig.apply(testName, t._1, t._2));
+
+  /**
+   * Load the Selenium and Browser Configurations from files
+   */
+  static final Function0<Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
+    () -> loadSeleniumConfig.apply()
+      .flatMap(sc -> loadBrowserConfig.apply()
+        .map(bc -> Tuple.of(sc, bc)));
 
   /**
    * Load default local Chrome Browser, no configuration was found
-   *
    */
   private static final Function0<Try<Browser>> loadDefaultLocalChromeBrowser =
     () -> Try.of(ChromeBrowser::withoutOptions);
-
-  /**
-   * Load the Browser details from configuration
-   *
-   */
-  private static final Function1<String, Try<Browser>> loadLocalBrowserWithConfig =
-    browserConfigString -> YAML.jParse(browserConfigString, BrowserConfig.class)
-      .onFailure(e -> log.debug("Error parsing BrowserConfig: " + e))
-      .flatMap(Selenium.loadBrowserByConfig);
 
   /**
    * Load specific local Browser
@@ -82,46 +73,60 @@ public class Selenium {
           "Running Browser on Local Machine: " + browserConfig.browserName() + ". Ignoring platform and version information in config. " + browserConfig));
 
 
+  /**
+   * Load local Chrome Browser
+   */
   private static final Function1<BrowserConfig, Function0<Try<Browser>>> loadLocalChromeBrowser =
     config -> () -> Try.of(() -> ChromeBrowser.with(config));
+
+  /**
+   * Load local Firefox Browser
+   */
   private static final Function1<BrowserConfig, Function0<Try<Browser>>> loadLocalFirefoxBrowser =
     config -> () -> Try.of(() -> FirefoxBrowser.with(config));
+
+  /**
+   * Load local Edge Browser
+   */
   private static final Function<BrowserConfig, Function0<Try<Browser>>> loadLocalEdgeBrowser =
     browserName -> () -> Try.of(() -> EdgeBrowser.with(browserName));
+
+  /**
+   * Load local Safari Browser
+   */
   private static final Function<BrowserConfig, Function0<Try<Browser>>> loadLocalSafariBrowser =
     browserName -> () -> Try.of(() -> SafariBrowser.with(browserName));
 
-  private static final Function0<Try<Browser>> loadLocalBrowser =
-    () -> Selenium.loadBrowserConfig.apply()
-      .onSuccess(__ -> log.debug("BrowserConfig found. Loading local browser."))
-      .map(loadLocalBrowserWithConfig)
-      .onFailure(__ -> log.debug("No BrowserConfig found. Loading default local Chrome browser."))
-      .recover(__ -> loadDefaultLocalChromeBrowser.apply())
-      .flatMap(Function.identity());
+  /**
+   * Create a Browser with the given configuration
+   */
+  private static final Function3<Option<String>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
+    (testName, seleniumConfig, browserConfig) -> {
 
+      if (seleniumConfig.isDefined() && browserConfig.isDefined()) {
+        log.info(() -> "Loading Remote Browser with config.");
+        return RemoteBrowser.with(testName, seleniumConfig.get(), browserConfig.get());
+      }
 
-  private static final Function1<Option<String>, Function1<String, Try<Browser>>> loadRemoteBrowser =
-    testName -> seleniumConfigString ->
-      YAML.jParse(seleniumConfigString, SeleniumConfig.class)
-        .onFailure(e -> log.error("Error parsing SeleniumConfig: " + e))
-        .flatMap(Selenium.loadRemoteBrowserByConfig.apply(testName));
+      if (seleniumConfig.isDefined() && browserConfig.isEmpty()) {
+        log.info(() -> "No BrowserConfig found. Loading default Chrome Remote Browser.");
+        return RemoteBrowser.defaultChromeBrowser(testName, seleniumConfig.get());
+      }
 
+      if (seleniumConfig.isEmpty() && browserConfig.isDefined()) {
+        log.info(() -> "No SeleniumConfig found. Loading local browser with config.");
+        return loadBrowserByConfig.apply(browserConfig.get());
+      }
 
-  private static final Function2<Option<String>, SeleniumConfig, Try<Browser>> loadRemoteBrowserByConfig =
+      if (seleniumConfig.isEmpty() && browserConfig.isEmpty()) {
+        log.info(() -> "No BrowserConfig and no SeleniumConfig found. Loading Local Chrome Browser.");
+        return loadDefaultLocalChromeBrowser.apply();
+      }
 
-    (testName, config) -> Selenium.loadBrowserConfig.apply()
-      .onSuccess(__ -> log.debug("BrowserConfig found. Creating remote capabilities."))
-      .map(Selenium.loadRemoteBrowserWithConfig.apply(testName, config))
-      .onFailure(__ -> log.warn("No BrowserConfig found. Creating default remote Chrome capabilities."))
-      .recover(__ -> RemoteBrowser.defaultChromeBrowser(testName, config))
-      .flatMap(Function.identity());
+      return Try.failure(new RuntimeException("Error starting browser."));
 
-  private static final Function3<Option<String>, SeleniumConfig, String, Try<Browser>> loadRemoteBrowserWithConfig =
-    (testName, seleniumConfig, browserConfigString) -> YAML.jParse(browserConfigString, BrowserConfig.class)
-      .flatMap(bc -> RemoteBrowser.with(testName, seleniumConfig, bc))
-;
-  private static final Function0<Try<String>> loadBrowserConfig =
-    () -> FileUtils.readStringFromResourceFile.apply("browserConfig.yaml");
+    };
+
 
 
 }
