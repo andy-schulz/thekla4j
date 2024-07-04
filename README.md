@@ -2,6 +2,8 @@
 ![Maven Central Version](https://img.shields.io/maven-central/v/com.test-steps.thekla4j/thekla4j-core)
 [![codecov](https://codecov.io/gh/andy-schulz/thekla4j/branch/master/graph/badge.svg?token=26OD6KWW7T)](https://codecov.io/gh/andy-schulz/thekla4j)
 
+Find the official library documentation at [GitHub Pages](https://andy-schulz.github.io/thekla4j/)
+
 ## Project Statistics
 [![Codecov](https://codecov.io/gh/andy-schulz/thekla4j/graphs/sunburst.svg?token=26OD6KWW7T)](https://codecov.io/gh/andy-schulz/thekla4j)
 ## The Screenplay Pattern
