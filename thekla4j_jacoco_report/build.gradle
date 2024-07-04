@@ -1,0 +1,35 @@
+plugins {
+    id 'base'
+    id 'jacoco-report-aggregation'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    jacocoAggregation project(':thekla4j-activityLog')
+    jacocoAggregation project(':thekla4j-assertions')
+    jacocoAggregation project(':thekla4j-browser')
+    jacocoAggregation project(':thekla4j-browser:core')
+    jacocoAggregation project(':thekla4j-browser:playwright')
+    jacocoAggregation project(':thekla4j-browser:selenium')
+    jacocoAggregation project(':thekla4j-commons')
+    jacocoAggregation project(':thekla4j-core')
+    jacocoAggregation project(':thekla4j-http')
+    jacocoAggregation project(':thekla4j-http-commons')
+    jacocoAggregation project(':thekla4j-utils')
+    jacocoAggregation project(':thekla4j-websocket')
+}
+
+reporting {
+    reports {
+        testCodeCoverageReport(JacocoCoverageReport) {
+            testType = TestSuiteType.UNIT_TEST
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+}

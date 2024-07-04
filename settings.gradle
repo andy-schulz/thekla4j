@@ -16,3 +16,6 @@ include(':thekla4j-http-commons')
 include(':thekla4j-utils')
 include(':thekla4j-websocket')
 
+
+include(':thekla4j_jacoco_report')
+
