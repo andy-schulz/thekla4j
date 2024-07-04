@@ -55,6 +55,11 @@ jobs:
     - name: Upload coverage to Codecov
       if: success() || failure()
       uses: codecov/codecov-action@v4
+      with:
+        files: ./thekla4j_jacoco_report/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml
+        flags: unittests
+        name: thekla4j codecov
+        verbose: true
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
