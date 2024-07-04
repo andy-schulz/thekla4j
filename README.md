@@ -150,7 +150,16 @@ public class TestBasicBrowseTheWebExample {
 
 ```
 
+## Credits
+Thanks to
 
+<a href="https://www.browserstack.com/"><img src="./docs/res/browserstack_white.svg" alt="drawing" width="200"/></a>
+
+and
+
+<a href="https://codecov.io/"><img src="./docs/res/codecov.svg" alt="drawing" width="200"/></a>
+
+for letting us use their services for free to test our software.
 
 ## License
 
