@@ -1,6 +1,5 @@
 package com.teststeps.thekla4j.commons.properties;
 
-import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.control.Option;
@@ -18,6 +17,11 @@ public class Thekla4jProperty {
 
   private static Function1<PropertyElement, String> of = TestPropertyHelper._withName.memoized();
 
+  /**
+   * get the value of the property
+   * <p>
+   * param: property element returns: property value
+   */
   public static String of(PropertyElement element) {
     return Thekla4jProperty.of.apply(element);
   }
@@ -27,9 +31,16 @@ public class Thekla4jProperty {
     TestPropertyHelper.resetPropertyFileCache();
   }
 
+  private Thekla4jProperty() {
+    // prevent instantiation of utility class
+  }
+
 
   static final class TestPropertyHelper {
 
+    private TestPropertyHelper() {
+      // prevent instantiation of utility class
+    }
     /**
      * load the property file
      */
@@ -44,6 +55,9 @@ public class Thekla4jProperty {
     private static Function1<String, Try<Properties>> loadPropertyFile = TestPropertyHelper._loadProperty.memoized();
 
 
+    /**
+     * reset the property file cache
+     */
     public static void resetPropertyFileCache() {
       TestPropertyHelper.loadPropertyFile = TestPropertyHelper._loadProperty.memoized();
     }
@@ -84,6 +98,9 @@ public class Thekla4jProperty {
             .flatMap(loadPropertyFile)
             .flatMap(getProperty.apply(propertyName));
 
+    /**
+     * get the property value
+     */
     static final Function1<PropertyElement, String> _withName = property -> {
       Try<String> system = TestPropertyHelper.loadSystemProperty.apply(property.name());
 

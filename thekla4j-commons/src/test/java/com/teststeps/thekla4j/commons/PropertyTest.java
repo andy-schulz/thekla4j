@@ -35,6 +35,43 @@ public class PropertyTest {
   }
 
   @Test
+  public void testThatSystemPropertyIsCachedUponFirstAccess() {
+
+    System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem");
+
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
+
+    String property = Thekla4jProperty.of(propertyElement);
+
+    System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem2");
+
+    String property2 = Thekla4jProperty.of(propertyElement);
+
+    assertThat("property is load from system", property, equalTo("propertyValueSetInSystem"));
+    assertThat("property is load from system", property2, equalTo("propertyValueSetInSystem"));
+
+  }
+
+  @Test
+  public void testThatSystemPropertyCacheIsResetAfterFirstAccess() {
+
+      System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem");
+
+      PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
+
+      String property = Thekla4jProperty.of(propertyElement);
+
+      Thekla4jProperty.resetPropertyCache();
+
+      System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem2");
+
+      String property2 = Thekla4jProperty.of(propertyElement);
+
+      assertThat("property is load from system", property, equalTo("propertyValueSetInSystem"));
+      assertThat("property is load from system", property2, equalTo("propertyValueSetInSystem2"));
+  }
+
+  @Test
   public void loadPropertyDefault() {
 
     PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyDefault", "defaultValue");
@@ -43,5 +80,25 @@ public class PropertyTest {
 
     assertThat("property is load from default", property, equalTo("defaultValue"));
 
+  }
+
+  @Test
+  public void testForNotExistingSystemProperty() {
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyNotExisting", "defaultValue");
+
+    String property = Thekla4jProperty.of(propertyElement);
+
+    assertThat("property is load from default", property, equalTo("defaultValue"));
+  }
+
+  @Test
+  public void testForEmptySystemProperty() {
+    System.setProperty("thekla4j.testPropertyEmpty", "");
+
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyEmpty", "defaultValue");
+
+    String property = Thekla4jProperty.of(propertyElement);
+
+    assertThat("property is load from system", property, equalTo("defaultValue"));
   }
 }
