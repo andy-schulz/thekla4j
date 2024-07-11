@@ -16,7 +16,7 @@ public class ActivityErrorTest {
     Either<ActivityError, Object> tryValue = Try.failure(new RuntimeException("RuntimeException"))
       .transform(ActivityError.toEither("Additional Error"));
 
-    String expectedError = "Additional Error\ncaused By:\nRuntimeException";
+    String expectedError = "Additional Error";
 
     assertThat("check final error message", tryValue.getLeft().getMessage(), equalTo(expectedError));
 
@@ -43,7 +43,7 @@ public class ActivityErrorTest {
   public void createActivityErrorWithUtilityMethodWithAndCause() {
 
     ActivityError error = ActivityError.with("Error Message", new RuntimeException("RuntimeException"));
-    assertThat("check error message", error.getMessage(), equalTo("Error Message\ncaused By:\nRuntimeException"));
+    assertThat("check error message", error.getMessage(), equalTo("Error Message"));
     assertThat("check error cause", error.getCause().getMessage(), equalTo("RuntimeException"));
   }
 
@@ -53,6 +53,18 @@ public class ActivityErrorTest {
     ActivityError error = ActivityError.with(new RuntimeException("RuntimeException"));
     assertThat("check error message", error.getMessage(), equalTo("RuntimeException"));
     assertThat("check error cause", error.getCause(), equalTo(null));
+  }
+
+  @Test
+  public void testActivityErrorMessageAggregation() {
+    ActivityError error3 = ActivityError.with("Error Message 3");
+    ActivityError error2 = ActivityError.with("Error Message 2", error3);
+    ActivityError error = ActivityError.with("Error Message 1", error2);
+
+    ActivityError aggregatedError = error.aggregateMessages();
+
+    assertThat("check aggregated error messages", aggregatedError.getMessage(), equalTo("Error Message 1\ncaused By:\nError Message 2\ncaused By:\nError Message 3"));
+    assertThat("check error cause", aggregatedError.getCause().getMessage(), equalTo("Error Message 1"));
   }
 
 }

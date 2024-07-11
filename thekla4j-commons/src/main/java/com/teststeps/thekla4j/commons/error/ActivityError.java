@@ -22,8 +22,7 @@ public class ActivityError extends Throwable {
    * @param cause   the cause of the error
    */
   public ActivityError(String message, Throwable cause) {
-
-    super(message + "\ncaused By:\n" + cause.getClass().getSimpleName(), cause);
+    super( message, cause);
   }
 
   /**
@@ -34,7 +33,7 @@ public class ActivityError extends Throwable {
    * @return the ActivityError
    */
   public static ActivityError with(Throwable ex) {
-    return new ActivityError(ex.getMessage());
+    return new ActivityError(ex.getMessage(), ex.getCause());
   }
 
   /**
@@ -69,6 +68,20 @@ public class ActivityError extends Throwable {
    */
   public static <R> Function1<Try<R>, Either<ActivityError, R>> toEither(String value) {
     return t -> t.isFailure() ? Either.left(ActivityError.with(value, t.getCause())) : Either.right(t.get());
+  }
+
+  public ActivityError aggregateMessages() {
+    return new ActivityError(aggregateMessages(this), this);
+  }
+
+  private String aggregateMessages(Throwable throwable) {
+    StringBuilder message = new StringBuilder(throwable.getMessage());
+    Throwable cause = throwable.getCause();
+    while (cause != null) {
+      message.append("\ncaused By:\n").append(cause.getMessage());
+      cause = cause.getCause();
+    }
+    return message.toString();
   }
 
 }
