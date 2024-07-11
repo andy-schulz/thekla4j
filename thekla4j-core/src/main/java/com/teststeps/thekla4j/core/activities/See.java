@@ -8,6 +8,7 @@ import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.error.ValidationError;
 import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.Function3;
@@ -57,16 +58,16 @@ public class See<P, M> extends Interaction<P, P> {
           Case($(), e -> e)
       );
 
-  private final Function1<String, Throwable> createExceptionWithCause =
+  private final Function1<String, ValidationError> createExceptionWithCause =
       errorMessage ->
           errorMessage.length() > 200 ?
               Try.of(() -> Pattern.compile(".*predicate '(.*)' to pass.*", Pattern.DOTALL))
                  .map(pattern -> pattern.matcher(errorMessage))
                  .map(matcher -> matcher.matches() ?
-                     new Throwable(matcher.group(1) + " failed", new Throwable(errorMessage)) :
-                     new Throwable(errorMessage))
-                 .getOrElse(new Throwable("error parsing the the error message: " + errorMessage)) :
-              new Throwable(errorMessage);
+                     new ValidationError(matcher.group(1) + " failed", new ValidationError(errorMessage)) :
+                     new ValidationError(errorMessage))
+                 .getOrElse(new ValidationError("error parsing the the error message: " + errorMessage)) :
+              new ValidationError(errorMessage);
 
   private See(Activity<P, M> question) {
     this.activity = question;
