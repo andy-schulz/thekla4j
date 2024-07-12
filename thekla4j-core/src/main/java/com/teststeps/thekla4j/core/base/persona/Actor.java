@@ -94,7 +94,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
             // in case of success set the activity status and add the result parameter to the log entry
             .peek(o -> setActivityStatus.apply(ActivityStatus.passed, logEntry, this.activityLog)
-                .accept(Option.of(o).map(Objects.isNull(o) ? x -> "null" : Objects::toString)))
+                .accept(Option.of(o).map(Objects::toString)))
 
             // in case of failure set the activity status
             .peekLeft(o -> setActivityStatus.apply(ActivityStatus.failed, logEntry, this.activityLog)
