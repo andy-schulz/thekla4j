@@ -4,14 +4,18 @@ import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Cast;
+import com.teststeps.thekla4j.core.data.SomeAbility;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class ActorAbilityTest {
+public class TestActorAbility {
 
 
   @Test
@@ -113,6 +117,19 @@ public class ActorAbilityTest {
 
     verify(testDestroyAbilities).destroy();
     verify(testDestroySecondAbilities).destroy();
+  }
+
+  @Test
+  @DisplayName("withAbilityTo method should throw DoesNotHaveTheAbility exception")
+  public void checkingForAbilityShouldThrowException() {
+
+    Actor actor = Actor.named("actor");
+
+    Throwable thrown = assertThrows(
+      DoesNotHaveTheAbility.class,
+      () -> actor.withAbilityTo(SomeAbility.class));
+
+    assertThat(thrown.getMessage(), startsWith("Actor actor does not have the ability SomeAbility"));
   }
 
 

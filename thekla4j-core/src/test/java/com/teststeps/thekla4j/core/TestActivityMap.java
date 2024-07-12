@@ -13,7 +13,7 @@ import static com.teststeps.thekla4j.core.activities.API.map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class TestMapTask {
+public class TestActivityMap {
 
 
   @Test

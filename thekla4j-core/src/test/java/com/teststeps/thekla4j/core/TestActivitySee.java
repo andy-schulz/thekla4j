@@ -14,14 +14,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.time.Duration;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 
-public class SeeTest {
+public class TestActivitySee {
 
   @Test
   public void simplePassingSeeActionWithReason() throws ActivityError, FileNotFoundException {
