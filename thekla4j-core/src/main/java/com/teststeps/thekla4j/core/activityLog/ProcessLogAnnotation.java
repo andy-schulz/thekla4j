@@ -1,13 +1,18 @@
 package com.teststeps.thekla4j.core.activityLog;
 
 import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
-import com.teststeps.thekla4j.activityLog.annotations.*;
+import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.activityLog.annotations.Called;
+import com.teststeps.thekla4j.activityLog.annotations.CalledList;
+import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
+import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.errors.DetectedNullObject;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function1;
 import io.vavr.Function2;
+import io.vavr.Function3;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
@@ -17,12 +22,12 @@ import lombok.extern.log4j.Log4j2;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Objects;
 
 import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
 import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 
 @Log4j2(topic = "ProcessLogAnnotation")
 public class ProcessLogAnnotation<P1, R1> {
@@ -150,8 +155,8 @@ public class ProcessLogAnnotation<P1, R1> {
   /*
    * get the value of fieldName from object (by reflection)
    */
-  private final Function2<Option<Object>, String, Option<Object>> getAttribute =
-      (obj, fieldName) ->
+  private final Function1<Class<?>, Function2<Option<Object>, String, Option<Object>>> getAttribute =
+      clazz -> (obj, fieldName) ->
           obj.map(Object::getClass)
               .flatMap(clz -> Try
                   // don't try to find a field for fieldName "" in the object, just return the object
@@ -160,7 +165,7 @@ public class ProcessLogAnnotation<P1, R1> {
                       getFieldByName.apply(clz, fieldName)
                           .mapTry(f -> f.get(obj.get()))
                           .get())
-                  .onFailure(ex -> log.error(ex + " in object of type " + clz.getSimpleName()))
+                  .onFailure(ex -> log.error("Error in {} -> {} in object of type {}", clazz.getSimpleName(),ex, clz.getSimpleName()))
                   // toOption is used so that I can use flatMap
                   .toOption());
 
@@ -184,9 +189,9 @@ public class ProcessLogAnnotation<P1, R1> {
    * <p>
    * then "MyObjectName" will be returned
    */
-  private final Function2<Option<Object>, String, String> extractMyAttribute =
-      (param, attributeString) -> List.of(attributeString.split("\\."))
-          .foldLeft(param, getAttribute)
+  private final Function3<Option<Object>, String, Class<?>, String> extractMyAttribute =
+      (param, attributeString, clazz) -> List.of(attributeString.split("\\."))
+          .foldLeft(param, getAttribute.apply(clazz))
           .map(Object::toString)
           .getOrElse("not found");
 
@@ -196,8 +201,8 @@ public class ProcessLogAnnotation<P1, R1> {
   /**
    * process the annotation list and replace the annotation value in the description string
    */
-  private final Function2<List<Tuple2<Option<Object>, List<Annotation>>>, String, String> processAnnotationsAndReplace =
-      (list, descr) -> list
+  private final Function3<List<Tuple2<Option<Object>, List<Annotation>>>, Class<?>, String, String> processAnnotationsAndReplace =
+      (list, clazz, descr) -> list
           // flatten the Annotation list
           // List<Tuple2<Option<Object>, List<Annotation>>> -> List<Tuple2<Option<Object>, Annotation>>
           .flatMap(t -> t.apply((t1, t2) -> t2.map(a -> Tuple.of(t1, a))))
@@ -212,7 +217,7 @@ public class ProcessLogAnnotation<P1, R1> {
           // get the replacements from parameter
           // if it's a nested object traverse it e.g.(Called(name = "myName", value = "nested1.nested2"))
           // if it's just a plain object just return it e.g.(Called(name = "myName"))
-          .map(t -> t.map(p -> extractMyAttribute.apply(p, t._2.value()), Called::name))
+          .map(t -> t.map(p -> extractMyAttribute.apply(p, t._2.value(), clazz), Called::name))
           // create the replacement string to search for in the description
           .map(t -> t.map2(s -> "@{" + s + "}"))
           // replace everything the description
@@ -224,13 +229,13 @@ public class ProcessLogAnnotation<P1, R1> {
 
     return Option.of(description)
         // process and replace the fields
-        .map(processAnnotationsAndReplace.apply(getFieldValueAndAnnotations.apply(this.activity, clazz)))
+        .map(processAnnotationsAndReplace.apply(getFieldValueAndAnnotations.apply(this.activity, clazz), clazz))
         // process and replace the parameter in the performAs method
-        .map(processAnnotationsAndReplace.apply(getAnnotationsOfParameters1.apply(param, clazz)))
+        .map(processAnnotationsAndReplace.apply(getAnnotationsOfParameters1.apply(param, clazz), clazz))
         .get();
   }
 
-  ProcessLogAnnotation(Activity<P1, R1> activity, Option<P1> param, Actor actor) {
+  private ProcessLogAnnotation(Activity<P1, R1> activity, Option<P1> param, Actor actor) {
     this.activity = activity;
     this.actor = actor;
     this.parameter = param;

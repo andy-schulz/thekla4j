@@ -10,8 +10,16 @@ import java.lang.reflect.Modifier;
 
 @Log4j2(topic = "Annotation Operations")
 public class AnnotationFunctions {
+
+  private AnnotationFunctions() {
+    // prevent instantiation of utility class
+  }
+
   public static final Function1<Field, Field> makePrivateFieldAccessible = field -> {
     if (Modifier.isPrivate(field.getModifiers())) {
+      field.setAccessible(true);
+    }
+    if(field.getModifiers() == 0) {
       field.setAccessible(true);
     }
     return field;

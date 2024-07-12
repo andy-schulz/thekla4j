@@ -18,6 +18,10 @@ import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePr
 
 public class ProcessAttachmentAnnotation {
 
+  private ProcessAttachmentAnnotation() {
+    // prevent instantiation of utility class
+  }
+
   public static <I, O> void setAttachment(ActivityLogEntry entry, Activity<I, O> activity) {
 
     List.of(activity.getClass().getFields())
