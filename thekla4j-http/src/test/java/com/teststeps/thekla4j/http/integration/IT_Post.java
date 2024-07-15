@@ -64,6 +64,6 @@ public class IT_Post {
   @Test
   public void setContentType() {
 
-    assertThat(ContentType.APPLICATION_X_WWW_FORM_URLENCODED.asString, equalTo("application/x-www-form-urlencoded"));
+    assertThat(ContentType.APPLICATION_X_WWW_FORM_URLENCODED.asString(), equalTo("application/x-www-form-urlencoded"));
   }
 }

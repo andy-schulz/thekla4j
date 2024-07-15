@@ -63,12 +63,12 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeBody = con -> Try.of(() -> {
 
-    if (Objects.isNull(opts.body) || opts.body.length() == 0) {
+    if (Objects.isNull(opts.body) || opts.body.isEmpty()) {
       this.connection.setFixedLengthStreamingMode(0);
       log.debug("setFixedLengthStreamingMode: {}", 0);
     }
 
-    if (this.opts.body != null && this.opts.body.length() > 0) {
+    if (this.opts.body != null && !this.opts.body.isEmpty()) {
       log.debug("Writing body: {}", this.opts.body);
       OutputStream os = con.getOutputStream();
       byte[] input = this.opts.body.getBytes(StandardCharsets.UTF_8);
@@ -174,7 +174,7 @@ public class HcHttpRequest implements HttpRequest {
     return
         Try.of(() -> {
           this.connection.setRequestMethod(method);
-          this.connection.setInstanceFollowRedirects(opts.followRedirects);
+          this.connection.setInstanceFollowRedirects(opts.getFollowRedirects());
           return this.connection;
         }).map(con -> {
           con.setDoOutput(true);
@@ -204,7 +204,7 @@ public class HcHttpRequest implements HttpRequest {
 
   @Override
   public Either<Throwable, HttpResult> postFile(File file, String fieldName) {
-    log.debug("Method: POST with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
+    log.debug("Method: POST of file with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     return this.executeRequest("POST")
         .flatMap(this.writeFile.apply(file, fieldName))
@@ -264,10 +264,10 @@ public class HcHttpRequest implements HttpRequest {
   }
 
   private String getUrl(String baseUrl, int port, String resource, Map<String, String> queryParameters, Map<String, String> pathParameters) {
-    String url = (baseUrl.length() > 0 ?
+    String url = (!baseUrl.isEmpty() ?
         baseUrl.concat(port > 0 ? ":" + port + resource : resource) :
         resource)
-        .concat(queryParameters != null && queryParameters.size() > 0 ? "?" : "")
+        .concat(queryParameters != null && !queryParameters.isEmpty() ? "?" : "")
         .concat(getParameterString(queryParameters));
 
     return pathParameters.entrySet().stream()
@@ -387,7 +387,7 @@ public class HcHttpRequest implements HttpRequest {
 
   public HcHttpRequest(final String resource, final String description, final HttpOptions opts) throws Exception {
 
-    if (opts.disableSSLCertificateValidation)
+    if (opts.getDisableSSLCertificateValidation())
       disableSSLCertificateValidation();
 
     this.resource = resource;
@@ -395,7 +395,7 @@ public class HcHttpRequest implements HttpRequest {
     this.connection = this.init(resource, opts)
         .getOrElseThrow(ex -> new Exception(ex.toString(), ex));
 //                .onSuccess(con -> this.connection = con);
-    this.connection.setReadTimeout(opts.responseTimeout);
+    this.connection.setReadTimeout(opts.getResponseTimeout());
     this.opts = opts;
   }
 }

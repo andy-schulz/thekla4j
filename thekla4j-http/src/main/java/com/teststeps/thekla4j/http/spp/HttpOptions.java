@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 
 public class HttpOptions {
 
+  public final int DEFAULT_TIMEOUT = 60000;
+  public final boolean DEFAULT_FOLLOW_REDIRECTS = true;
+  public final boolean DEFAULT_DISABLE_SSL_CERTIFICATE_VALIDATION = false;
+
   public Map<String, String> headers = new HashMap<>();
   public Map<String, String> queryParameters = new HashMap<>();
   public Map<String, String> pathParameters = new HashMap<>();
@@ -22,14 +26,38 @@ public class HttpOptions {
   public int port = 0;
   public String baseUrl = "";
   public String body = "";
-  public Boolean disableSSLCertificateValidation = false;
 
-  public Boolean followRedirects = true;
+  private Boolean disableSSLCertificateValidation = null;
+  private Boolean followRedirects = null;
 
   /**
    * Default timeout to receive a response from server. Overwrite this value for long running requests where needed, calling responseTimeout() setter
    */
-  public int responseTimeout = 60000;
+  private int responseTimeout = 0;
+
+  /**
+   * Getters
+   * @return int value of responseTimeout
+   */
+  public int getResponseTimeout() {
+    return responseTimeout <=0 ? DEFAULT_TIMEOUT: responseTimeout;
+  }
+
+  /**
+   * Getters
+   * @return boolean value of followRedirects
+   */
+  public boolean getFollowRedirects() {
+    return followRedirects == null ? DEFAULT_FOLLOW_REDIRECTS : followRedirects;
+  }
+
+  /**
+   * Getters
+   * @return boolean value of disableSSLCertificateValidation
+   */
+  public boolean getDisableSSLCertificateValidation() {
+    return disableSSLCertificateValidation == null ? DEFAULT_DISABLE_SSL_CERTIFICATE_VALIDATION : disableSSLCertificateValidation;
+  }
 
 
   public HttpOptions baseUrl(@NonNull String baseUrl) {
@@ -43,11 +71,10 @@ public class HttpOptions {
   }
 
   public HttpOptions body(String body) {
-    return getNewRestOptions()
-        .setBody(body);
+    return body(Option.of(body));
   }
 
-  public HttpOptions body(Option<String> body) {
+  public HttpOptions body(@NonNull Option<String> body) {
     return getNewRestOptions()
         .setBody(body.getOrElse(""));
   }
@@ -57,19 +84,19 @@ public class HttpOptions {
         .setHeaderValue(headerName, headerValue);
   }
 
-  public HttpOptions header(@NonNull HttpHeaderType headerType, @NonNull String headerValue) {
-    return header(headerType.asString, headerValue);
+  public HttpOptions header(@NonNull HttpHeaderType headerType, @NonNull HttpHeaderValue headerValue) {
+    return header(headerType.asString, headerValue.asString());
   }
 
   public <T> HttpOptions header(@NonNull String headerName, @NonNull Option<T> headerValue) {
     return headerValue
         .map(v -> getNewRestOptions()
-            .setHeaderValue(headerName, Objects.toString(v)))
+            .setHeaderValue(headerName, v instanceof HttpHeaderValue ? ((HttpHeaderValue) v).asString() : Objects.toString(v)))
         .getOrElse(this);
   }
 
   public HttpOptions cookies(List<Cookie> cookies) {
-    return header("Cookie", CookieFunctions.toCookieString.apply(cookies));
+    return header("Cookie", CookieFunctions.toCookieStringList.apply(cookies));
   }
 
   public <T> HttpOptions header(@NonNull HttpHeaderType headerType, @NonNull Option<T> headerValue) {
@@ -84,7 +111,7 @@ public class HttpOptions {
 
     map.foldLeft(opts, (o, tuple2) -> tuple2._2() != null ?
         o.setHeaderValue(tuple2._1(), tuple2._2()) :
-        o.setHeaderValue(tuple2._1(), null));
+        o);
 
     return opts;
   }
@@ -101,14 +128,6 @@ public class HttpOptions {
   public HttpOptions queryParameter(@NonNull String queryParameterName, @NonNull String queryParameterValue) {
     return getNewRestOptions()
         .setParameterValue(queryParameterName, queryParameterValue);
-  }
-
-  public <T> HttpOptions queryParameterArray(@NonNull String queryParameterName, @NonNull List<T> queryParameterValues) {
-    return getNewRestOptions()
-        .setParameterValue(
-            queryParameterName,
-            queryParameterValues.foldLeft("", (l, v) -> l + (l.length() > 0 ? "&" + queryParameterName + "=" : "") + v)
-        );
   }
 
   public HttpOptions pathParameter(@NonNull String pathParameterName, @NonNull String pathParameterValue) {
@@ -163,23 +182,28 @@ public class HttpOptions {
 
     HttpOptions clone = mergedOpts.clone();
 
-    if (this.baseUrl.length() > 0)
+    if (!this.baseUrl.isEmpty())
       clone.setBaseUrl(this.baseUrl);
 
-    if (this.body.length() > 0)
+    if (!this.body.isEmpty())
       clone.setBody(this.body);
 
     if (this.port > 0)
       clone.setPort(this.port);
 
-    if (this.disableSSLCertificateValidation)
+    if (!Objects.isNull(this.disableSSLCertificateValidation))
       clone.setDisableSSLCertificateValidation(this.disableSSLCertificateValidation);
 
-    if (!this.followRedirects)
+    if (!Objects.isNull(this.followRedirects)) {
       clone.followRedirects = this.followRedirects;
+    }
 
-    if (this.responseTimeout != mergedOpts.responseTimeout)
-      clone.setResponseTimeout(this.responseTimeout);
+
+    if (this.responseTimeout > 0) {
+        clone.setResponseTimeout(this.responseTimeout);
+    }
+
+
 
     this.headers.forEach(clone::setHeaderValue);
     clone.dropNullHeader();

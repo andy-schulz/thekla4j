@@ -14,7 +14,7 @@ public class TestRedirectOptions {
     HttpOptions options = HttpOptions.empty()
         .followRedirects(false);
 
-    assertThat(options.followRedirects, equalTo(false));
+    assertThat(options.getFollowRedirects(), equalTo(false));
 
   }
 
@@ -23,7 +23,7 @@ public class TestRedirectOptions {
 
     HttpOptions options = HttpOptions.empty();
 
-    assertThat(options.followRedirects, equalTo(true));
+    assertThat(options.getFollowRedirects(), equalTo(true));
 
   }
 
@@ -37,7 +37,7 @@ public class TestRedirectOptions {
 
     HttpOptions mergeTrueOnTopOfFalse = redirectOptsTrue.mergeOnTopOf(redirectOptsFalse);
 
-    assertThat(mergeTrueOnTopOfFalse.followRedirects, equalTo(false));
+    assertThat(mergeTrueOnTopOfFalse.getFollowRedirects(), equalTo(false));
 
 
   }
@@ -52,7 +52,7 @@ public class TestRedirectOptions {
 
     HttpOptions mergeTrueOnTopOfFalse = redirectOptsFalse.mergeOnTopOf(redirectOptsTrue);
 
-    assertThat(mergeTrueOnTopOfFalse.followRedirects, equalTo(false));
+    assertThat(mergeTrueOnTopOfFalse.getFollowRedirects(), equalTo(false));
   }
 
   @Test
@@ -64,7 +64,7 @@ public class TestRedirectOptions {
 
     HttpOptions mergeTrueOnTrue = redirectOptsTrue.mergeOnTopOf(redirectOptsTrue1);
 
-    assertThat(mergeTrueOnTrue.followRedirects, equalTo(true));
+    assertThat(mergeTrueOnTrue.getFollowRedirects(), equalTo(true));
   }
 
   @Test
@@ -76,7 +76,7 @@ public class TestRedirectOptions {
 
     HttpOptions mergeFalseOnFalse = redirectOptsFalse.mergeOnTopOf(redirectOptsFalse1);
 
-    assertThat(mergeFalseOnFalse.followRedirects, equalTo(false));
+    assertThat(mergeFalseOnFalse.getFollowRedirects(), equalTo(false));
   }
 
 

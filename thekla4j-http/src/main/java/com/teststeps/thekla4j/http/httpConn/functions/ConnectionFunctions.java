@@ -34,7 +34,7 @@ public class ConnectionFunctions {
   public static Function<HttpOptions, Try<Boolean>> isXWwwFormUrlencoded =
       opts -> {
         if (opts.headers.containsKey(CONTENT_TYPE.asString) && opts.headers.get(CONTENT_TYPE.asString)
-            .contains(APPLICATION_X_WWW_FORM_URLENCODED.asString)) {
+            .contains(APPLICATION_X_WWW_FORM_URLENCODED.asString())) {
           return opts.formParameters.isEmpty() ?
               Try.failure(new Throwable("Content-Type is set to 'x-www-form-urlencoded' but Form Parameters are missing")) :
               Try.success(true);

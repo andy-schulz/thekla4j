@@ -16,16 +16,25 @@ import static io.vavr.API.*;
 
 public class CookieFunctions {
 
+  private CookieFunctions() {
+    // prevent instantiation of utility class
+  }
   private static final String europeanDatePattern = "E, dd-LLL-yyyy HH:mm:ss O";
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(europeanDatePattern)
       .localizedBy(Locale.US);
 
-  public static final Function1<List<Cookie>, String> toCookieString =
+  /**
+   * Function to convert a list of cookies to a cookie string
+   */
+  public static final Function1<List<Cookie>, String> toCookieStringList =
       cookieList -> cookieList
           .filter(c -> Objects.isNull(c.expires()) || c.expires().isAfter(LocalDateTime.now()))
           .map(CookieFunctions.cookieToString)
           .collect(Collectors.joining(";"));
 
+  /**
+   * Function to convert a cookie string to a cookie
+   */
   public static final Function1<String, Cookie> toCookie =
       cookieString -> CookieFunctions.splitCookieString.apply(cookieString)
           .map(String::trim)
@@ -34,7 +43,7 @@ public class CookieFunctions {
 
 
   private static final Function1<String, List<String>> splitCookieString =
-      cookieString -> List.of(cookieString.split(";"));
+      cookieString -> Objects.isNull(cookieString) ? List.empty() : List.of(cookieString.split(";"));
 
   private static final Function1<String, Function1<Cookie, Cookie>> applyCookieValues =
       cookieValue -> cookie -> Match(List.of(cookieValue.split("="))).of(
