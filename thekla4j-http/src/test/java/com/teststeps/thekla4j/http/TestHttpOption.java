@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.http;
 
+import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.spp.ContentType;
 import com.teststeps.thekla4j.http.spp.HttpHeaderType;
 import com.teststeps.thekla4j.http.spp.HttpHeaderValue;
@@ -292,5 +293,28 @@ public class TestHttpOption {
     int expectedTimeout = 5000;
     HttpOptions options = HttpOptions.empty().responseTimeout(expectedTimeout);
     assertEquals(expectedTimeout, options.getResponseTimeout(), "responseTimeout should be set to 5000");
+  }
+
+  @Test
+  @DisplayName("set a single cookie")
+  void setSingleCookie() {
+
+    Cookie cookie = Cookie.of("cookieName", "cookieValue");
+
+    HttpOptions options = HttpOptions.empty().cookies(io.vavr.collection.List.of(cookie));
+
+    assertThat("cookie exists", options.headers.get("Cookie"), equalTo("cookieName=cookieValue"));
+  }
+
+  @Test
+  @DisplayName("set multiple cookies")
+  void setMultipleCookies() {
+
+    Cookie cookie1 = Cookie.of("cookieName1", "cookieValue1");
+    Cookie cookie2 = Cookie.of("cookieName2", "cookieValue2");
+
+    HttpOptions options = HttpOptions.empty().cookies(io.vavr.collection.List.of(cookie1, cookie2));
+
+    assertThat("cookie exists", options.headers.get("Cookie"), equalTo("cookieName1=cookieValue1;cookieName2=cookieValue2"));
   }
 }
