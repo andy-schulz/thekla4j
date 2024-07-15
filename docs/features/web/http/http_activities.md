@@ -26,8 +26,6 @@ ___
 
 ## HTTP Interactions
 
-___
-
 ### Get
 
 Sends a GET request to the specified URL.
@@ -53,6 +51,7 @@ actor.attemptsTo(
 
 println(response.body()));
 ```
+---
 
 ### Post
 
@@ -82,6 +81,7 @@ actor.attemptsTo(
       Post.to(Request.of("https://example.com/api/data")).options(options))
   .peek(response ->System.out.println(response));
 ```
+---
 
 ### PostFile
 
@@ -109,6 +109,7 @@ actor.attemptsTo(
     .peek(response ->System.out.println(response));
 
 ```
+---
 
 ### Put
 
@@ -138,6 +139,7 @@ actor.attemptsTo(
 
     .peek(response ->System.out.println(response));
 ```
+---
 
 ### Delete
 
