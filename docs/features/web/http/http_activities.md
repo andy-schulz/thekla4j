@@ -1,6 +1,6 @@
 ---
 title: HTTP Activities
-parent: HTTP
+parent: Http
 grand_parent: Web
 layout: default
 has_children: false
