@@ -72,7 +72,7 @@ Returns:
 **Code:**
 
 ```java
-Click.on(<ELEMENT>)
+Click.on(Element.found(By.css("#elementId")))
 ```
 
 ___
@@ -92,7 +92,7 @@ Returns:
 **Example:**
 
 ```java
-DoubleClick.on(<ELEMENT>)
+DoubleClick.on(Element.found(By.css("#elementId")))
 ```
 
 ___
@@ -101,9 +101,9 @@ ___
 
 Methods:
 
-|type   | name                                                            | description                                                               |
-|-------|-----------------------------------------------------------------|---------------------------------------------------------------------------|
-|static | ``text( String )``                                              | Enters the given text.                                                    |
+|type   | name                                                                                      | description                                                               |
+|-------|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+|static | ``text( String )``                                                                        | Enters the given text.                                                    |
 |       | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
 |       | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
 
@@ -113,11 +113,11 @@ Returns:
 **Examples:**
 
 ```java
-Enter.text(TEXT).into(<ELEMENT>)
+Enter.text("TEXT").into(Element.found(By.css("#elementId"))
 ```
 
 ```java
-Enter.text(TEXT).intoCleared(<ELEMENT>)
+Enter.text("TEXT").intoCleared(Element.found(By.css("#elementId")))
 ```
 
 ___
@@ -348,8 +348,8 @@ Methods:
 
 | type   | name                                              | description                            |
 |--------|---------------------------------------------------|----------------------------------------|
-| static | ``toBrowser(``[``Cookie``](../http/cookies)``)``  | Adds a single cookie to the browser.   |
-| static | ``list(List<``[``Cookie``](../http/cookies)``>)`` | Adds a list of cookies to the browser. |
+| static | ``toBrowser(``[``Cookie``](../http/http_cookies)``)``  | Adds a single cookie to the browser.   |
+| static | ``list(List<``[``Cookie``](../http/http_cookies)``>)`` | Adds a list of cookies to the browser. |
 
 
 Returns:

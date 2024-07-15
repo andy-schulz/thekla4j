@@ -1,10 +1,10 @@
 ---
-title: Cookies
+title: Http Cookies
 parent: Http
 grand_parent: Web
 layout: default
-has_children: true
-nav_order: 1510
+has_children: false
+nav_order: 1540
 ---
 
 # Working with Cookies
