@@ -13,26 +13,26 @@ nav_order: 1220
 
 The following activities are currently implemented to interact with a browser.
 
-| activity                              | activity description                                    |
-|---------------------------------------|---------------------------------------------------------|
-| [Navigate](#navigate)                 | Navigates to a given url                                |
-| [Click](#click)                       | Clicks on an element                                    |
-| [DoubleClick](#doubleclick)           | Double clicks on an element                             |
-| [Enter](#enter)                       | Enters text into a field / element                      |
-| [DoKey](#dokey)                       | Executes key actions                                    |
-| [Title](#title)                       | Returns the page title                                  |
-| [Url](#url)                           | Returns the page url                                    |
-| [Attribute](#attribute)               | Get the attribute value of an element                   |
-| [Value](#value)                       | Get the value of the "value"-attribute of an element    |
-| [ElementState](#elementstate)         | Get the state of an element (present, visible, enabled) |
-| [Text](#test)                         | Get the text of an element                              |
-| [Draw](#draw)                         | Draw a shape onto an element                            |
-| [AddCookie](#addcookie)               | Add a cookie or a list of cookies to the current domain |
-| [GetCookie](#getcookie)               | Get the named cookie                                    |
-| [GetAllCookies](#getallcookies)       | Get all cookies of the the current domain               |
-| [DeleteCookie](#deletecookie)         | Delete the named cookie.                                |
-| [DeleteAllCookies](#deleteallcookies) | Delete all cookies of the current domain.               |
-
+| activity                                | activity description                                    |
+|-----------------------------------------|---------------------------------------------------------|
+| [Navigate](#navigate)                   | Navigates to a given url                                |
+| [Click](#click)                         | Clicks on an element                                    |
+| [DoubleClick](#doubleclick)             | Double clicks on an element                             |
+| [Enter](#enter)                         | Enters text into a field / element                      |
+| [DoKey](#dokey)                         | Executes key actions                                    |
+| [Title](#title)                         | Returns the page title                                  |
+| [Url](#url)                             | Returns the page url                                    |
+| [Attribute](#attribute)                 | Get the attribute value of an element                   |
+| [Value](#value)                         | Get the value of the "value"-attribute of an element    |
+| [ElementState](#elementstate)           | Get the state of an element (present, visible, enabled) |
+| [Text](#test)                           | Get the text of an element                              |
+| [Draw](#draw)                           | Draw a shape onto an element                            |
+| [AddCookie](#addcookie)                 | Add a cookie or a list of cookies to the current domain |
+| [GetCookie](#getcookie)                 | Get the named cookie                                    |
+| [GetAllCookies](#getallcookies)         | Get all cookies of the the current domain               |
+| [DeleteCookie](#deletecookie)           | Delete the named cookie.                                |
+| [DeleteAllCookies](#deleteallcookies)   | Delete all cookies of the current domain.               |
+| [ExecuteJavaScript](#executejavascript) | Execute JavaScript code in the browser.               |
 ___
 ___
 ## Web Interactions
@@ -439,11 +439,11 @@ ___
 
 Methods:
 
-| type   | name                                         | description            |
-|--------|----------------------------------------------|------------------------|
-| static | ``shape(``[``Canvas``](./CANVAS)``)``        | Draws one shape.       |
-| static | ``shapes(``List<[``Canvas``](./CANVAS)>``)`` | Draws multiple shapes. |
-|        | ``on(``[``Element``](./browser_elements#finding-elements)``)``         | Draws on the element   |
+| type   | name                                                           | description             |
+|--------|----------------------------------------------------------------|-------------------------|
+| static | ``shape(``[``Canvas``](./CANVAS)``)``                          | Draws one shape.        |
+| static | ``shapes(``List<[``Canvas``](./CANVAS)>``)``                   | Draws multiple shapes.  |
+|        | ``on(``[``Element``](./browser_elements#finding-elements)``)`` | Draws on the element    |
 
 
 Returns:
@@ -452,11 +452,11 @@ Returns:
 **Code:**
 
 ```java
-Draw.shape(CANVAS).on(<ELEMENT>)
+Draw.shape(SHAPE).on(<ELEMENT>)
 ```
 
 ```java
-Draw.shapes(List<CANVAS>).on(<ELEMENT>);
+Draw.shapes(List<SHAPE>).on(<ELEMENT>);
 ```
 
 **Full Example:**
@@ -476,9 +476,40 @@ actor.attemptsTo(
 );
 
 ```
+---
 
+### ExecuteJavaScript
 
+Methods:
 
+| type   | name                                         | description                                        |
+|--------|----------------------------------------------|----------------------------------------------------|
+| static | ``onBrowser(String script)``                 | Executes the given JavaScript code.                |
+| static | ``onElement(String script, Element elment)`` | Executes the JavaScript code on the given element. |
+
+Returns:
+
+- ``Either<ActivityError, Void>``
+
+**Code:**
+
+```java
+ExecuteJavaScript.onBrowser("alert('Hello World!')");
+```
+
+```java
+ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';", <ELEMENT>);
+```
+**Full Example:**
+
+```java
+Element element = Element.found(By.css("#elementId"))
+  .withName("element");
+
+actor.attemptsTo(
+    ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';", element));
+    
+```
 
 
 
