@@ -161,4 +161,17 @@ class SeleniumBrowser implements Browser {
   public Try<KeyActions> executeKeyActions() {
     return Try.of(() -> new SeleniumKeyAction(new Actions(driver)));
   }
+
+
+  @Override
+  public Try<Void> executeJavaScript(String script, Element element) {
+    return executeJavaScriptOnElement.apply(driver, highlightContext, script, element)
+      .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Try<Void> executeJavaScript(String script) {
+    return executeJavaScript.apply(driver, script)
+      .map(applyExecutionSlowDown());
+  }
 }

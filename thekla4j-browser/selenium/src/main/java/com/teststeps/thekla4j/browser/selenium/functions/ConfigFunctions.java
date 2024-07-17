@@ -15,6 +15,11 @@ import lombok.extern.log4j.Log4j2;
 public class ConfigFunctions {
 
   private static final String SELENIUM_CONFIG_FILE = "seleniumConfig.yaml";
+  private static final String BROWSER_CONFIG_FILE = "browserConfig.yaml";
+
+  private ConfigFunctions() {
+    // prevent instantiation of utility class
+  }
 
   /**
    * Load the SeleniumConfig from the configuration file
@@ -45,7 +50,7 @@ public class ConfigFunctions {
    * in case the file cant be parsed the function fails with an error
    */
   public static final Function0<Try<Option<BrowserConfig>>> loadBrowserConfig =
-    () -> FileUtils.readStringFromResourceFile.apply("browserConfig.yaml")
+    () -> FileUtils.readStringFromResourceFile.apply(BROWSER_CONFIG_FILE)
       .map(Option::of)
       .recover(x -> Option.none())
       .flatMap(ConfigFunctions.parseBrowserConfig);

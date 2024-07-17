@@ -53,5 +53,9 @@ public interface Browser {
 
   Try<KeyActions> executeKeyActions();
 
+  Try<Void> executeJavaScript(String script, Element element);
+
+  Try<Void> executeJavaScript(String script);
+
 
 }

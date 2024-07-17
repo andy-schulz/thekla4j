@@ -7,7 +7,11 @@ import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
 import com.teststeps.thekla4j.browser.selenium.status.SeleniumElementStatus;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.http.commons.Cookie;
-import io.vavr.*;
+import io.vavr.Function1;
+import io.vavr.Function2;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Function5;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -22,13 +26,16 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
 
 @Log4j2(topic = "Element Operations")
 class ElementFunctions {
+
+  private ElementFunctions() {
+    // prevent instantiation of utility class
+  }
 
   static Try<WebElement> findElement(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
 
@@ -210,5 +217,12 @@ class ElementFunctions {
     (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
       .onFailure(log::error);
 
+  protected final static Function2<RemoteWebDriver, String, Try<Void>> executeJavaScript =
+    (driver, script) -> Try.run(() -> driver.executeScript(script))
+      .onFailure(log::error);
 
+  protected final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Void>> executeJavaScriptOnElement =
+    (driver, hlx, script, element) -> findElement(driver, hlx, element)
+      .flatMap(webElement -> Try.run(() -> driver.executeScript(script, webElement)))
+      .onFailure(log::error);
 }

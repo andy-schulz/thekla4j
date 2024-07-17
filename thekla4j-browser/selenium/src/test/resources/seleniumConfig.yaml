@@ -1,5 +1,3 @@
-#remoteUrl: "https://andyschulz1:LjqXVR5RiXSgmVH93Q1V@hub-cloud.browserstack.com/wd/hub"
-#remoteUrl: "https://andyschulz_fgAHOW:GzeSxKMajRQbevy1tzeL@hub-cloud.browserstack.com/wd/hub"
 remoteUrl: "http://localhost:4444/wd/hub"
 bStack:
   projectName: "LC_UI_TEST_DEV"
