@@ -49,7 +49,6 @@ Methods:
 
 Returns:
 - ``Either<ActivityError, Void>``
-- 
 
 **Example:**
 
