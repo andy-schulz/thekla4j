@@ -53,12 +53,16 @@ public class LogFormatter {
    * @param node - the node which will be converted to the html list
    * @return the html representation of the node content
    */
-  private static String formatShortLogContentToHtml(ActivityLogNode node) {
-    return "<span class=\"logMessage\"><span class = \"timestamp\">" + node.startedAt + " - </span>" +
-      "<span class=\"activityName\">" + "[" + node.name + "]</span> - " +
-      "<span class=\"activityDescription\"> " + (node.description.length() > 100 ? node.description.substring(0, 90) :
-      node.description) + "</span>" +
-      "</span>";
+  protected static String formatShortLogContentToHtml(ActivityLogNode node) {
+    return """
+      <span class=\"logMessage\">
+        <span class = \"timestamp\">{NODE_STARTED_AT} - </span>
+        <span><span class=\"activityName\">[{NODE_NAME}]</span> - </span>
+        <span class=\"activityDescription\">{NODE_DESCRIPTION}</span>
+      </span>"""
+      .replace("{NODE_STARTED_AT}", node.startedAt)
+      .replace("{NODE_NAME}", node.name)
+      .replace("{NODE_DESCRIPTION}", (node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
   }
 
   /**
@@ -73,51 +77,48 @@ public class LogFormatter {
 
     if (logNode.logType.equals(ActivityLogEntryType.Task) || logNode.logType.equals(ActivityLogEntryType.Group)) {
 
-      String formattedText = "<li><span class=\"task %s\">%s</span>" +
-        // ... in case the message is to long
-        (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
-        (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-          "<span class=\"label contentButton inContentButton\">In</span>") +
-        (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-          "<span class=\"label contentButton outContentButton\">Out</span>") +
-        (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-          "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
-        "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
-        .length() <= 100 ? "" : logNode.description) + "</pre></div></div>" +
-        // IO Element
-        "%s" +
-        "<ul class=\"nested\">%s</ul>" +
-        "</li>";
-
-      return String.format(formattedText,
-        logNode.status,
-        formatShortLogContentToHtml(logNode),
-        formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)),
-        logNode.activityNodes.stream().reduce(
-          "",
-          (acc, logEntry) -> acc + formatNodeToHtml(logEntry),
-          (s1, s2) -> null));
+      return """
+            <li><span class="task {$$_TASK_STATUS}">{$$_LOG_SHORT_CONTENT}</span>
+            {$$_EXPAND_DESCRIPTION_BUTTON}
+            {$$_IN_BUTTON}
+            {$$_OUT_BUTTON}
+            {$$_ATTACHMENT_BUTTON}
+            <div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre>{$$_DESCRIPTION}</pre></div></div>
+            {$$_IO_CONTENT}
+            <ul class="nested">{$$_SUBNOTES}</ul>
+            </li>
+            """
+        .replace("{$$_TASK_STATUS}", logNode.status.toString())
+        .replace("{$$_LOG_SHORT_CONTENT}", formatShortLogContentToHtml(logNode))
+        .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "")
+        .replace("{$$_IN_BUTTON}", Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" : "<span class=\"label contentButton inContentButton\">In</span>")
+        .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" : "<span class=\"label contentButton outContentButton\">Out</span>")
+        .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" : "<span class=\"label contentButton attachmentContentButton\">Attachment</span>")
+        .replace("{$$_DESCRIPTION}", descr.getOrElse("").length() <= 100 ? "" : logNode.description)
+        .replace("{$$_IO_CONTENT}", formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)))
+        .replace("{$$_SUBNOTES}", logNode.activityNodes.stream().reduce("", (acc, logEntry) -> acc + formatNodeToHtml(logEntry), (s1, s2) -> null));
 
     } else if (logNode.logType == ActivityLogEntryType.Interaction) {
 
-      String formattedText = "<li class=\"interaction %s\">%s" +
-        (descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "") +
-        (Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-          "<span class=\"label contentButton inContentButton\">In</span>") +
-        (Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-          "<span class=\"label contentButton outContentButton\">Out</span>") +
-        (Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-          "<span class=\"label contentButton attachmentContentButton\">Attachment</span>") +
-        "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div><div class=\"infoMessage\"><pre>" + (descr.getOrElse("")
-        .length() <= 100 ? "" : logNode.description.replace("%", "%%")) + "</pre></div></div>" +
-        // IO Element
-        "%s" +
-        "</li>";
+      return """
+          <li class="interaction {$$_TASK_STATUS}">{$$_LOG_SHORT_CONTENT}
+            {$$_EXPAND_DESCRIPTION_BUTTON}
+            {$$_IN_BUTTON}
+            {$$_OUT_BUTTON}
+            {$$_ATTACHMENT_BUTTON}
+          <div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre>{$$_DESCRIPTION}</pre></div></div>
+          {$$_IO_CONTENT}
+          </li>
+          """
+        .replace("{$$_TASK_STATUS}", logNode.status.toString())
+        .replace("{$$_LOG_SHORT_CONTENT}", formatShortLogContentToHtml(logNode))
+        .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "")
+        .replace("{$$_IN_BUTTON}", Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" : "<span class=\"label contentButton inContentButton\">In</span>")
+        .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" : "<span class=\"label contentButton outContentButton\">Out</span>")
+        .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" : "<span class=\"label contentButton attachmentContentButton\">Attachment</span>")
+        .replace("{$$_DESCRIPTION}", descr.getOrElse("").length() <= 100 ? "" : logNode.description.replace("%", "%%"))
+        .replace("{$$_IO_CONTENT}", formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)));
 
-      return String.format(formattedText,
-        logNode.status,
-        formatShortLogContentToHtml(logNode),
-        formatIOElement(logNode.input, logNode.output, Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments)));
     } else {
       throw new Error("Unknown Node Type ${logNode.logType}");
     }
@@ -200,24 +201,28 @@ public class LogFormatter {
   private static String formatIOElement(String input, String output, List<NodeAttachment> attachments) {
 
     return (Objects.isNull(input) || Objects.equals(input, "")) &&
-      (Objects.isNull(output) || Objects.equals(output, "")) ? "" : String.format(
-      "<span class=\"with options\">\n" +
-        "                <div class=\"inInfo\">\n" +
-        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Input</div>" +
-        "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
-        "                    </div>\n" +
-        "                </div>" +
-        "                <div class=\"outInfo\">\n" +
-        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Output</div>" +
-        "                        <div class=\"infoMessage\"><pre>%s</pre></div>\n" +
-        "                    </div>\n" +
-        "                </div>" +
-        "                <div class=\"attachmentInfo\">\n" +
-        "                    <div class=\"ioContent\"><div class=\"infoHeader\">Attachment</div>" +
-        "                        <div class=\"infoMessage attachmentContainer\">%s</div>\n" +
-        "                    </div>\n" +
-        "                </div>" +
-        "</span>", input, output, formatAttachments(attachments));
+      (Objects.isNull(output) || Objects.equals(output, "")) ? "" : """
+          <span class="with options">
+            <div class="inInfo">
+              <div class="ioContent"><div class="infoHeader">Input</div>
+                <div class="infoMessage"><pre>{$$_INPUT}</pre></div>
+              </div>
+            </div>
+            <div class="outInfo">
+              <div class="ioContent"><div class="infoHeader">Output</div>
+                <div class="infoMessage"><pre>{$$_OUTPUT}</pre></div>
+              </div>
+            </div>
+            <div class="attachmentInfo">
+              <div class="ioContent"><div class="infoHeader">Attachment</div>
+                <div class="infoMessage attachmentContainer">{$$_ATTACHMENT}</div>
+              </div>
+            </div>
+          </span>
+          """
+      .replace("{$$_INPUT}", input)
+      .replace("{$$_OUTPUT}", output)
+      .replace("{$$_ATTACHMENT}", formatAttachments(attachments));
   }
 
   /**
@@ -276,6 +281,7 @@ public class LogFormatter {
   private static String fileToBase64String(NodeAttachment attachment) {
 
     return Try.of(() -> new File(attachment.content()))
+      .peek(t -> System.out.println(t))
       .map(File::toPath)
       .mapTry(Files::readAllBytes)
       .map(Base64.getEncoder()::encodeToString)
