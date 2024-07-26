@@ -55,14 +55,14 @@ public class LogFormatter {
    */
   protected static String formatShortLogContentToHtml(ActivityLogNode node) {
     return """
-      <span class=\"logMessage\">
-        <span class = \"timestamp\">{NODE_STARTED_AT} - </span>
-        <span><span class=\"activityName\">[{NODE_NAME}]</span> - </span>
-        <span class=\"activityDescription\">{NODE_DESCRIPTION}</span>
+      <span class="logMessage">
+        <span class = "timestamp">{$$_NODE_STARTED_AT} - </span>
+        <span><span class="activityName">[{$$_NODE_NAME}]</span> - </span>
+        <span class="activityDescription">{$$_NODE_DESCRIPTION}</span>
       </span>"""
-      .replace("{NODE_STARTED_AT}", node.startedAt)
-      .replace("{NODE_NAME}", node.name)
-      .replace("{NODE_DESCRIPTION}", (node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
+      .replace("{$$_NODE_STARTED_AT}", node.startedAt)
+      .replace("{$$_NODE_NAME}", node.name)
+      .replace("{$$_NODE_DESCRIPTION}", (node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
   }
 
   /**
@@ -146,22 +146,24 @@ public class LogFormatter {
    * @return the html representation of the node
    */
   public static String formatLogAsHtmlTree(ActivityLogNode logNode) {
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    String formattedText = "<style>\n%s\n</style> " +
-      "\n\n%s " +
-      "\n\n%s";
+    String formattedText = """
+        <style>
+        {$$_STYLE}
+        </style>
+        
+        {$$_HTML_TAGS}
+        
+        {$$_SCRIPT}
+        """;
     String returnText = "";
     try {
-      returnText = String.format(formattedText,
-        LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
-        formatLogWithHtmlTags(logNode),
-        functionScript);
-
-    } catch (IOException e) {
-      e.printStackTrace();
+      returnText = formattedText
+        .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
+        .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNode))
+        .replace("{$$_SCRIPT}", functionScript);
+    } catch (Exception e) {
+      log.error(e);
     }
-
     return returnText;
   }
 
@@ -172,22 +174,24 @@ public class LogFormatter {
    * @return the html representation of the node list
    */
   public static String formatLogAsHtmlTree(List<ActivityLogNode> logNodes) {
+    String formattedText = """
+        <style>
+        {$$_STYLE}
+        </style>
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    String formattedText = "<style>\n%s\n</style> " +
-      "\n\n%s " +
-      "\n\n%s";
+        {$$_HTML_TAGS}
+
+        {$$_SCRIPT}
+        """;
     String returnText = "";
     try {
-      returnText = String.format(formattedText,
-        LogFormatter.getResourceFileAsString("style/ActivityLog.css"),
-        formatLogWithHtmlTags(logNodes),
-        functionScript);
-
-    } catch (IOException e) {
-      e.printStackTrace();
+      returnText = formattedText
+        .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
+        .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNodes))
+        .replace("{$$_SCRIPT}", functionScript);
+    } catch (Exception e) {
+      log.error(e);
     }
-
     return returnText;
   }
 
@@ -232,7 +236,9 @@ public class LogFormatter {
    * @return the html representation of the attachments
    */
   private static String formatAttachments(List<NodeAttachment> attachments) {
-    return String.format("<div class=\"attachments\">%s</div>", attachments.map(LogFormatter::formatAttachment)
+    return """
+        <div class="attachments">{$$_ATTACHMENTS}</div>
+        """.replace("{$$_ATTACHMENTS}", attachments.map(LogFormatter::formatAttachment)
       .collect(Collectors.joining("<br>")));
   }
 
@@ -259,7 +265,11 @@ public class LogFormatter {
    * @return the html representation of the attachment
    */
   private static String formatTextAttachment(String attachment) {
-    return "<div class=\"attachment\"><pre>" + attachment + "</pre></div>";
+    return """
+        <div class="attachment">
+            <pre>{$$_ATTACHMENT}</pre>
+        </div>
+        """.replace("{$$_ATTACHMENT}", attachment);
   }
 
   /**
@@ -269,7 +279,12 @@ public class LogFormatter {
    * @return the html representation of the attachment
    */
   private static String formatPngBase64FileAttachment(String base64Attachment) {
-    return "<div class=\"attachment\"><img src=\"data:image/png;base64," + base64Attachment + "\"/></div>";
+    return """
+        <div class="attachment">
+            <img src="data:image/png;base64,{$$_BASE64_ATTACHMENT}
+            "/>
+        </div>
+        """.replace("{$$_BASE64_ATTACHMENT}", base64Attachment);
   }
 
   /**
@@ -281,7 +296,6 @@ public class LogFormatter {
   private static String fileToBase64String(NodeAttachment attachment) {
 
     return Try.of(() -> new File(attachment.content()))
-      .peek(t -> System.out.println(t))
       .map(File::toPath)
       .mapTry(Files::readAllBytes)
       .map(Base64.getEncoder()::encodeToString)
@@ -335,60 +349,52 @@ public class LogFormatter {
   }
 
   /**
-   * The style which is applied to the HTML tree
-   */
-  private static final String STYLE = "";
-
-  /**
-   * The style which is added to the HTML tree a css file is read from the file system
-   */
-  private static String htmlStyle = String.format("<style>${activityLogStyle.toString()}</style>", LogFormatter.STYLE);
-
-  /**
    * the function script which is added to the HTML tree
    */
-  private static String functionScript =
-    "<script>\n" +
-      "var toggler = document.querySelectorAll(\".task\");\n" +
-      "var inToggler = document.querySelectorAll(\".label.inContentButton\");\n" +
-      "var outToggler = document.querySelectorAll(\".label.outContentButton\");\n" +
-      "var attachmentToggler = document.querySelectorAll(\".label.attachmentContentButton\");\n" +
-      "var descToggler = document.querySelectorAll(\".ellipses\");\n" +
-      "var i;\n" +
-      "\n" +
-      "for (i = 0; i < toggler.length; i++) {\n" +
-      "  toggler[i].addEventListener(\"click\", function() {\n" +
-      "    this.parentElement.querySelector(\".nested\").classList.toggle(\"active\");\n" +
-      "    this.classList.toggle(\"task-open\");\n" +
-      "  });\n" +
-      "}\n" +
-      "\n" +
-      "for (i = 0; i < inToggler.length; i++) {\n" +
-      "    inToggler[i].addEventListener(\"click\", function() {\n" +
-      "        this.parentElement.querySelector(\".inInfo\").classList.toggle(\"inActive\");\n" +
-      "        this.classList.toggle(\"active\");\n" +
-      "    });\n" +
-      "}\n" +
-      "\n" +
-      "for (i = 0; i < outToggler.length; i++) {\n" +
-      "    outToggler[i].addEventListener(\"click\", function() {\n" +
-      "        this.parentElement.querySelector(\".outInfo\").classList.toggle(\"outActive\");\n" +
-      "        this.classList.toggle(\"active\");\n" +
-      "    });\n" +
-      "}\n" +
-      "for (i = 0; i < descToggler.length; i++) {\n" +
-      "    descToggler[i].addEventListener(\"click\", function() {\n" +
-      "        this.parentElement.querySelector(\".longDescription\").classList.toggle(\"descriptionActive\");\n" +
-      "        this.classList.toggle(\"active\");\n" +
-      "    });\n" +
-      "}\n" +
-      "for (i = 0; i < attachmentToggler.length; i++) {\n" +
-      "    attachmentToggler[i].addEventListener(\"click\", function() {\n" +
-      "        this.parentElement.querySelector(\".attachmentInfo\").classList.toggle(\"attachmentActive\");\n" +
-      "        this.classList.toggle(\"active\");\n" +
-      "    });\n" +
-      "}\n" +
-      "</script>";
+  private static final String functionScript =
+    """
+      <script>
+      var toggler = document.querySelectorAll(".task");
+      var inToggler = document.querySelectorAll(".label.inContentButton");
+      var outToggler = document.querySelectorAll(".label.outContentButton");
+      var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
+      var descToggler = document.querySelectorAll(".ellipses");
+      var i;
+      
+      for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".nested").classList.toggle("active");
+          this.classList.toggle("task-open");
+        });
+      }
+      
+      for (i = 0; i < inToggler.length; i++) {
+          inToggler[i].addEventListener("click", function() {
+              this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
+              this.classList.toggle("active");
+          });
+      }
+      
+      for (i = 0; i < outToggler.length; i++) {
+          outToggler[i].addEventListener("click", function() {
+              this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
+              this.classList.toggle("active");
+          });
+      }
+      for (i = 0; i < descToggler.length; i++) {
+          descToggler[i].addEventListener("click", function() {
+              this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
+              this.classList.toggle("active");
+          });
+      }
+      for (i = 0; i < attachmentToggler.length; i++) {
+          attachmentToggler[i].addEventListener("click", function() {
+              this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
+              this.classList.toggle("active");
+          });
+      }
+      </script>
+""";
 
   private LogFormatter() {
   }
