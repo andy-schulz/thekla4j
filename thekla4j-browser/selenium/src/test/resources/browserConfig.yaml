@@ -1,1 +1,4 @@
 browserName: "Chrome"
+chromeOptions:
+  args:
+    - "disable-search-engine-choice-screen"

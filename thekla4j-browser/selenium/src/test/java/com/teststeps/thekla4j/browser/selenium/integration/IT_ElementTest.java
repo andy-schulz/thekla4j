@@ -4,8 +4,6 @@ import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
-import com.teststeps.thekla4j.browser.selenium.FirefoxBrowser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
@@ -23,8 +21,11 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.*;
-import static com.teststeps.thekla4j.browser.spp.activities.ElementState.*;
+import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
+import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.enabled;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.present;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_ElementTest {
 

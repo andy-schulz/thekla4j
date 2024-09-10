@@ -1,5 +1,5 @@
 remoteUrl: "http://localhost:4444/wd/hub"
 bStack:
-  projectName: "LC_UI_TEST_DEV"
+  projectName: "THEKLA_UI_TEST_DEV"
   buildName: "Build_201"
   sessionName: "master1"

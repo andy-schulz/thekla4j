@@ -15,8 +15,10 @@ public class ChromeBrowser {
     ChromeOptions options = new ChromeOptions();
 
     Option.of(config.chromeOptions())
-      .map(opts -> Option.of(opts.debuggerAddress())
-        .peek(debAddr -> options.setExperimentalOption("debuggerAddress", debAddr)));
+      .peek(opts -> Option.of(opts.debuggerAddress())
+        .peek(debAddr -> options.setExperimentalOption("debuggerAddress", debAddr)))
+      .peek(opts -> Option.of(opts.args())
+        .peek(args -> args.forEach(options::addArguments)));
 
     return new SeleniumBrowser(new ChromeDriver(options));
   }
