@@ -28,7 +28,7 @@ public class Send extends Interaction<Void, Receipt> {
   protected Either<ActivityError, Receipt> performAs(Actor actor, Void result) {
 
     return destination
-        .transform(LiftEither.fromOption(() -> ActivityError.with("cant send payload to empty destination")))
+        .transform(LiftEither.fromOption(() -> ActivityError.of("cant send payload to empty destination")))
         .flatMap(dest -> UseWebsocketWithStomp.as(actor).flatMap(ab -> ab.atDestination(dest)))
         .flatMap(dest -> dest.send(headers, payload));
   }

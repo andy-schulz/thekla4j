@@ -15,7 +15,7 @@ public class UseWebsocketWithStomp implements Ability {
 
   public static Either<ActivityError, UseWebsocketWithStomp> as(UsesAbilities actor) {
     return Try.of(() -> (UseWebsocketWithStomp) actor.withAbilityTo(UseWebsocketWithStomp.class))
-        .transform(TransformTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 
   public static UseWebsocketWithStomp with(StompClient httpClient) {
@@ -24,12 +24,12 @@ public class UseWebsocketWithStomp implements Ability {
 
   public Either<ActivityError, StompDestination> atDestination(Destination spe) {
     return this.stompClient.getDestination(spe)
-        .transform(TransformTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 
   public Either<ActivityError, StompHeaders> connectTo(Endpoint endpoint) {
     return this.stompClient.connectTo(endpoint)
-        .transform(TransformTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 
   private UseWebsocketWithStomp(StompClient stompClient) {

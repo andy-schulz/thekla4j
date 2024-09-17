@@ -31,7 +31,7 @@ public class SpringStompDestination implements StompDestination {
   @Override
   public Either<ActivityError, Subscription> subscribe(StompHeaders headers) {
 
-    return destination.transform(LiftEither.fromOption(() -> ActivityError.with("no Destination to subscribe")))
+    return destination.transform(LiftEither.fromOption(() -> ActivityError.of("no Destination to subscribe")))
         .map(dest -> {
 
           StompSession.Subscription subscr =
@@ -51,7 +51,7 @@ public class SpringStompDestination implements StompDestination {
   @Override
   public Either<ActivityError, Receipt> send(StompHeaders headers, Object payload) {
 
-    return destination.transform(LiftEither.fromOption(() -> ActivityError.with("no Destination to send a message to found")))
+    return destination.transform(LiftEither.fromOption(() -> ActivityError.of("no Destination to send a message to found")))
         .map(dest -> {
 
           StompSession.Receiptable receiptable =
@@ -72,7 +72,7 @@ public class SpringStompDestination implements StompDestination {
 
 
   private final Function1<SpringStompSessionHandler, Either<ActivityError, SpringStompSessionHandler>> failOnExistingErrors =
-      handl -> !handl.errors().isEmpty() ? Either.left(ActivityError.with(handl.errors().toString())) :
+      handl -> !handl.errors().isEmpty() ? Either.left(ActivityError.of(handl.errors().toString())) :
           Either.right(handl);
 
   public Either<ActivityError, List<StompFrame<Object>>> messages() {
