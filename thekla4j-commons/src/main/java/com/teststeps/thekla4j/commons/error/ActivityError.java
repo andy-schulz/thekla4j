@@ -78,7 +78,7 @@ public class ActivityError extends Throwable {
    * if the Try is a failure, the function returns an Either.left with an ActivityError
    * if the Try is a success, the function returns an Either.right with the value of the Try
    *
-   * @param value the value to be used in the ActivityError
+   * @param errorMessage the value to be used in the ActivityError
    * @param <R> the type of the Try
    * @return the function
    */
