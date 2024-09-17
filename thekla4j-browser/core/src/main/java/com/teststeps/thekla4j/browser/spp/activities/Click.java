@@ -34,7 +34,7 @@ public class Click extends BasicInteraction {
     return BrowseTheWeb.as(actor)
       .flatMap(b -> b.clickOn(element))
       .onSuccess(__ -> log.info("Clicked on element: {}", element))
-      .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage())))
+      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

@@ -25,7 +25,7 @@ public class FailingTaskWithTwoAttachOnError extends Task<Void, String> {
 
     this.secondAttachOnError = "secondAttachOnError applied in performAs";
 
-    return Either.left(ActivityError.with("Failing task with content: " + content));
+    return Either.left(ActivityError.of("Failing task with content: " + content));
   }
 
   public static FailingTaskWithTwoAttachOnError setString(String content) {

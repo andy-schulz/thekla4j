@@ -1,7 +1,6 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
 
 public class IT_PageStateTest {
@@ -33,7 +32,7 @@ public class IT_PageStateTest {
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = HOST;
+    String url = FRAMEWORKTESTER;
 
     actor.attemptsTo(
 

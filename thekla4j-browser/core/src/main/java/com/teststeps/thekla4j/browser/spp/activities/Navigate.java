@@ -34,7 +34,7 @@ public class Navigate extends BasicInteraction {
     return BrowseTheWeb.as(actor)
       .peek(browser -> log.info("Navigating to {}", url))
       .flatMap(browser -> browser.navigateTo(url))
-      .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage() + " while navigating to " + url)))
+      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage() + " while navigating to " + url)))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

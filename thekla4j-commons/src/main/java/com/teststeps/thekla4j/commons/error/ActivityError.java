@@ -32,6 +32,11 @@ public class ActivityError extends Throwable {
    * @param ex the cause of the error
    * @return the ActivityError
    */
+  public static ActivityError of(Throwable ex) {
+    return new ActivityError(ex.getMessage(), ex.getCause());
+  }
+
+  @Deprecated
   public static ActivityError with(Throwable ex) {
     return new ActivityError(ex.getMessage(), ex.getCause());
   }
@@ -42,9 +47,15 @@ public class ActivityError extends Throwable {
    * @param message the error message
    * @return the ActivityError
    */
+  public static ActivityError of(String message) {
+    return new ActivityError(message);
+  }
+
+  @Deprecated
   public static ActivityError with(String message) {
     return new ActivityError(message);
   }
+
 
   /**
    * Create an ActivityError with the given error message and cause
@@ -53,6 +64,11 @@ public class ActivityError extends Throwable {
    * @param cause   the cause of the error
    * @return the ActivityError
    */
+  public static ActivityError of(String message, Throwable cause) {
+    return new ActivityError(message, cause);
+  }
+
+  @Deprecated
   public static ActivityError with(String message, Throwable cause) {
     return new ActivityError(message, cause);
   }
@@ -67,7 +83,7 @@ public class ActivityError extends Throwable {
    * @return the function
    */
   public static <R> Function1<Try<R>, Either<ActivityError, R>> toEither(String value) {
-    return t -> t.isFailure() ? Either.left(ActivityError.with(value, t.getCause())) : Either.right(t.get());
+    return t -> t.isFailure() ? Either.left(ActivityError.of(value, t.getCause())) : Either.right(t.get());
   }
 
   public ActivityError aggregateMessages() {

@@ -22,7 +22,6 @@ import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static io.vavr.API.*;
@@ -52,7 +51,7 @@ public class See<P, M> extends Interaction<P, P> {
                // Wait before trying to ask the question again
                () -> Try.run(() -> Thread.sleep(next.toMillis()))
                         .toEither()
-                        .mapLeft(ActivityError::with)
+                        .mapLeft(ActivityError::of)
                         .flatMap(x -> this.retryExecutingTaskIfFails.apply(endTry, next, askQuestion))),
 
           Case($(), e -> e)
@@ -89,7 +88,7 @@ public class See<P, M> extends Interaction<P, P> {
                    .map(v -> v.mapError(createExceptionWithCause))
                    .map(v -> v.map(l -> true))
                    .map(Validation::toEither)
-                   .flatMap(either -> either.mapLeft(ActivityError::with));
+                   .flatMap(either -> either.mapLeft(ActivityError::of));
 
 
     return retryExecutingTaskIfFails.apply(Instant.now()

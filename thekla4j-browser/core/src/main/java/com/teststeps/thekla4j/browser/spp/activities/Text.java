@@ -21,7 +21,7 @@ public class Text extends Task<Void, String> {
 
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.textOf(element))
-        .toEither(ActivityError.with("could not get text from element " + element));
+        .toEither(ActivityError.of("could not get text from element " + element));
   }
 
   public static Text of(Element element) {

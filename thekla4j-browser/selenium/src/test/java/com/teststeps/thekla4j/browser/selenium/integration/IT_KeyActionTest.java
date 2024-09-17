@@ -3,7 +3,6 @@ package com.teststeps.thekla4j.browser.selenium.integration;
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
@@ -21,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Duration;
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_KeyActionTest {
@@ -45,7 +44,7 @@ public class IT_KeyActionTest {
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = HOST;
+    String url = FRAMEWORKTESTER;
 
     Element clientButton = Element.found(By.css("#stateSwitchingButton"));
 
@@ -68,7 +67,7 @@ public class IT_KeyActionTest {
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    String url = HOST;
+    String url = FRAMEWORKTESTER;
 
     Element clientButton = Element.found(By.css("#stateSwitchingButton"));
 

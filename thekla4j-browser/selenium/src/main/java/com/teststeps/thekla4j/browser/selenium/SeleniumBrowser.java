@@ -136,8 +136,33 @@ class SeleniumBrowser implements Browser {
     return takeScreenShot.apply(driver);
   }
 
-  public Try<Void> drawShapes(List<Shape> shapes,  Element element, Boolean releaseAndHold, Option<Duration> pause) {
+  public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes);
+  }
+
+  @Override
+  public Try<Void> switchToNewBrowserTab() {
+    return switchToNewBrowserTab.apply(driver);
+  }
+
+  @Override
+  public Try<Void> switchToNewBrowserWindow() {
+    return switchToNewBrowserWindow.apply(driver);
+  }
+
+  @Override
+  public Try<Void> switchToBrowserByTitle(String browserTitle) {
+    return switchToBrowserByTitle.apply(driver, browserTitle);
+  }
+
+  @Override
+  public Try<Void> switchToBrowserByIndex(int index) {
+    return switchToBrowserByIndex.apply(driver, index);
+  }
+
+  @Override
+  public Try<Integer> numberOfOpenTabsAndWindows() {
+    return numberOfOpenTabsAndWindows.apply(driver);
   }
 
   @Override

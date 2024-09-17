@@ -40,13 +40,13 @@ public class ExecuteJavaScript extends BasicInteraction {
       return BrowseTheWeb.as(actor)
         .flatMap(b -> b.executeJavaScript(script))
         .onSuccess(__ -> log.info("JS script executed: {}", script))
-        .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage())))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())))
         .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
     else
       return BrowseTheWeb.as(actor)
         .flatMap(b -> b.executeJavaScript(script, element.get()))
         .onSuccess(__ -> log.info("JS script executed: {} on element {}", script, element.get()))
-        .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage())))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())))
         .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

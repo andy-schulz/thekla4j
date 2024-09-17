@@ -10,7 +10,7 @@ import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 
 @Workflow("Ui Test Task")
 public class UiTest extends Task<Void, Void> {
@@ -22,7 +22,7 @@ public class UiTest extends Task<Void, Void> {
 
 
     return actor.attemptsTo(
-      Navigate.to(HOST),
+      Navigate.to(FRAMEWORKTESTER),
 
       Click.on(element));
   }

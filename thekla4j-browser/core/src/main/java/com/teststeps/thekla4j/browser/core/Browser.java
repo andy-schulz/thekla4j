@@ -47,6 +47,16 @@ public interface Browser {
 
   Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
 
+  Try<Void> switchToNewBrowserTab();
+
+  Try<Void> switchToNewBrowserWindow();
+
+  Try<Void> switchToBrowserByTitle(String browserTitle);
+
+  Try<Void> switchToBrowserByIndex(int index);
+
+  Try<Integer> numberOfOpenTabsAndWindows();
+
   Try<Void> quit();
 
   Try<String> getSessionId();

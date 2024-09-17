@@ -44,11 +44,11 @@ public class Retry<I, O> extends Task<I, O> {
 
         if (ends.compareTo(Instant.now()) < 0)
           return intermediateResult
-              .mapLeft(x -> ActivityTimeOutError.with(
+              .mapLeft(x -> ActivityTimeOutError.of(
                   String.format("Retrying task %s timed out after %s seconds with Error: \n\t %s",
                                 taskName, timeWaiting.getSeconds(), x.getMessage())))
               .flatMap(r -> Either.left(
-                  ActivityTimeOutError.with(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s\n", taskName, timeWaiting.getSeconds(), r, reason))));
+                  ActivityTimeOutError.of(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s\n", taskName, timeWaiting.getSeconds(), r, reason))));
 
 
         Either<ActivityError, O> res = func.apply();
@@ -56,13 +56,13 @@ public class Retry<I, O> extends Task<I, O> {
         return res.isLeft() ?
             Try.run(() -> Thread.sleep(pauseBetweenRetries.toMillis()))
                .toEither()
-               .mapLeft(ActivityError::with)
+               .mapLeft(ActivityError::of)
                .flatMap(f.apply(res)) :
 
             !untilFunction.test(res.get()) ?
                 Try.run(() -> Thread.sleep(pauseBetweenRetries.toMillis()))
                    .toEither()
-                   .mapLeft(ActivityError::with)
+                   .mapLeft(ActivityError::of)
                    .flatMap(f.apply(res)) :
 
                 res;
@@ -77,7 +77,7 @@ public class Retry<I, O> extends Task<I, O> {
 
     return repeat.apply(end, forAsLongAs, pauseBetweenRetries,
                         () -> actor.attemptsTo_(activity).apply(result),
-                        Either.left(ActivityError.with(new Throwable("not evaluated"))),
+                        Either.left(ActivityError.of(new Throwable("not evaluated"))),
                         activity.getClass()
                                 .getSimpleName());
   }

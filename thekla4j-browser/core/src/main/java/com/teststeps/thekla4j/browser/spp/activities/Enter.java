@@ -9,7 +9,6 @@ import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
@@ -35,7 +34,7 @@ public class Enter extends BasicInteraction {
 
   protected Either<ActivityError, Void> performAs(Actor actor) {
     if (element == null) {
-      return Either.left(ActivityError.with("No element to enter text into. Did you set the element with Enter.text(\"1234\").into(ELEMENT)? "));
+      return Either.left(ActivityError.of("No element to enter text into. Did you set the element with Enter.text(\"1234\").into(ELEMENT)? "));
     }
 
     return BrowseTheWeb.as(actor)

@@ -3,8 +3,6 @@ package com.teststeps.thekla4j.browser.selenium.integration;
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
-import com.teststeps.thekla4j.browser.selenium.Constants;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.*;
@@ -16,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 
 public class IT_FieldTest {
 
@@ -38,7 +36,7 @@ public class IT_FieldTest {
 
     actor.attemptsTo(
 
-            Navigate.to(HOST),
+            Navigate.to(FRAMEWORKTESTER),
 
             Enter.text("Test Entry").into(textField),
 
@@ -59,7 +57,7 @@ public class IT_FieldTest {
 
     actor.attemptsTo(
 
-        Navigate.to(HOST),
+        Navigate.to(FRAMEWORKTESTER),
 
         Enter.text("Test Entry").into(textField),
 
@@ -86,7 +84,7 @@ public class IT_FieldTest {
 
     actor.attemptsTo(
 
-        Navigate.to(HOST),
+        Navigate.to(FRAMEWORKTESTER),
 
         Enter.text("Test Entry").into(textField),
 

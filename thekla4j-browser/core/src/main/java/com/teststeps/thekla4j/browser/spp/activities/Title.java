@@ -25,7 +25,7 @@ public class Title extends Task<Void, String> {
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
     return BrowseTheWeb.as(actor)
       .flatMap(Browser::title)
-      .transform(TransformTry.toEither(ActivityError::with))
+      .transform(TransformTry.toEither(ActivityError::of))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

@@ -22,7 +22,7 @@ public class Map<T, R> extends Interaction<T, R> {
   protected Either<ActivityError, R> performAs(Actor actor, T result) {
     return mapper.apply(result)
                  .toEither()
-                 .mapLeft(ActivityError::with);
+                 .mapLeft(ActivityError::of);
   }
 
   protected Map(Function1<T, Try<R>> mapper) {

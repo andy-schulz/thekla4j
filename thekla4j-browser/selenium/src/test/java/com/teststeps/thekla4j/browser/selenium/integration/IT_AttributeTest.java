@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 
 public class IT_AttributeTest {
 
@@ -38,7 +38,7 @@ public class IT_AttributeTest {
     Element clientButton = Element.found(By.id("ButtonWithId"));
 
 
-    String url = HOST;
+    String url = FRAMEWORKTESTER;
 
     actor.attemptsTo(
 

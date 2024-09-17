@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 
 public class IT_CookieTest {
 
@@ -44,7 +44,7 @@ public class IT_CookieTest {
 
 
     actor.attemptsTo(
-            Navigate.to(HOST),
+            Navigate.to(FRAMEWORKTESTER),
 
             AddCookie.list(cookies))
 

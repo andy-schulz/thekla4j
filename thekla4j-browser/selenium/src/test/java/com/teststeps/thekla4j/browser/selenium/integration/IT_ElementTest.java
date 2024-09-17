@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.enabled;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.present;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
@@ -47,7 +47,7 @@ public class IT_ElementTest {
 
     actor.attemptsTo(
 
-            Navigate.to(HOST),
+            Navigate.to(FRAMEWORKTESTER),
 
             Click.on(clientButton),
 
@@ -70,7 +70,7 @@ public class IT_ElementTest {
 
     actor.attemptsTo(
 
-        Navigate.to(HOST),
+        Navigate.to(FRAMEWORKTESTER),
 
         Click.on(chainedButton),
 

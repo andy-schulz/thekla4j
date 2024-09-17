@@ -13,41 +13,47 @@ nav_order: 1220
 
 The following activities are currently implemented to interact with a browser.
 
-| activity                                | activity description                                     |
-|-----------------------------------------|----------------------------------------------------------|
-| [Navigate](#navigate)                   | Navigates to a given url                                 |
-| [Click](#click)                         | Clicks on an element                                     |
-| [DoubleClick](#doubleclick)             | Double clicks on an element                              |
-| [Enter](#enter)                         | Enters text into a field / element                       |
-| [DoKey](#dokey)                         | Executes key actions                                     |
-| [Title](#title)                         | Returns the page title                                   |
-| [Url](#url)                             | Returns the page url                                     |
-| [Attribute](#attribute)                 | Get the attribute value of an element                    |
-| [Value](#value)                         | Get the value of the "value"-attribute of an element     |
-| [ElementState](#elementstate)           | Get the state of an element (present, visible, enabled)  |
-| [Text](#test)                           | Get the text of an element                               |
-| [Draw](#draw)                           | Draw a shape onto an element                             |
-| [AddCookie](#addcookie)                 | Add a cookie or a list of cookies to the current domain  |
-| [GetCookie](#getcookie)                 | Get the named cookie                                     |
-| [GetAllCookies](#getallcookies)         | Get all cookies of the the current domain                |
-| [DeleteCookie](#deletecookie)           | Delete the named cookie.                                 |
-| [DeleteAllCookies](#deleteallcookies)   | Delete all cookies of the current domain.                |
-| [ExecuteJavaScript](#executejavascript) | Execute JavaScript code in the browser.                  |
+| activity                                   | activity description                                    |
+|--------------------------------------------|---------------------------------------------------------|
+| [Navigate](#navigate)                      | Navigates to a given url                                |
+| [Click](#click)                            | Clicks on an element                                    |
+| [DoubleClick](#doubleclick)                | Double clicks on an element                             |
+| [Enter](#enter)                            | Enters text into a field / element                      |
+| [DoKey](#dokey)                            | Executes key actions                                    |
+| [Title](#title)                            | Returns the page title                                  |
+| [Url](#url)                                | Returns the page url                                    |
+| [Attribute](#attribute)                    | Get the attribute value of an element                   |
+| [Value](#value)                            | Get the value of the "value"-attribute of an element    |
+| [ElementState](#elementstate)              | Get the state of an element (present, visible, enabled) |
+| [Text](#test)                              | Get the text of an element                              |
+| [Draw](#draw)                              | Draw a shape onto an element                            |
+| [AddCookie](#addcookie)                    | Add a cookie or a list of cookies to the current domain |
+| [GetCookie](#getcookie)                    | Get the named cookie                                    |
+| [GetAllCookies](#getallcookies)            | Get all cookies of the the current domain               |
+| [DeleteCookie](#deletecookie)              | Delete the named cookie.                                |
+| [DeleteAllCookies](#deleteallcookies)      | Delete all cookies of the current domain.               |
+| [ExecuteJavaScript](#executejavascript)    | Execute JavaScript code in the browser.                 |
+| [NumberOfBrowsers](#numberofbrowsers)      | Get the number of open browsers.                        |
+| [SwitchToBrowser](#switchtobrowser)        | Switch to a different browser tab or window.            |
+| [SwitchToNewBorowser](#switchtonewbrowser) | Switch to a new browser tab or window.                  |
+
 ___
 ___
+
 ## Web Interactions
 
 ___
+
 ### Navigate
 
 Methods:
 
-|type   | name              | description                   |
-|-------|-------------------|-------------------------------|
-|static | ``to( String )``  | Navigates to the given URL.   |
-
+| type   | name             | description                 |
+|--------|------------------|-----------------------------|
+| static | ``to( String )`` | Navigates to the given URL. |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Example:**
@@ -57,15 +63,17 @@ Navigate.to(URL)
 ```
 
 ___
+
 ### Click
 
 Methods:
 
-|type   | name                                                            | description                   |
-|-------|-----------------------------------------------------------------|-------------------------------|
-|static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Clicks on the given element.  |
+| type   | name                                                            | description                  |
+|--------|-----------------------------------------------------------------|------------------------------|
+| static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Clicks on the given element. |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Code:**
@@ -80,9 +88,9 @@ ___
 
 Methods:
 
-|type   | name                                                            | description                   |
-|-------|-----------------------------------------------------------------|-------------------------------|
-|static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Double clicks on the element. |
+| type   | name                                                            | description                   |
+|--------|-----------------------------------------------------------------|-------------------------------|
+| static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Double clicks on the element. |
 
 Returns:
 
@@ -100,13 +108,14 @@ ___
 
 Methods:
 
-|type   | name                                                                                      | description                                                               |
-|-------|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-|static | ``text( String )``                                                                        | Enters the given text.                                                    |
-|       | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                                   |
-|       | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it.                 |
+| type   | name                                                                                      | description                                               |
+|--------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| static | ``text( String )``                                                                        | Enters the given text.                                    |
+|        | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                   |
+|        | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it. |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Examples:**
@@ -121,9 +130,11 @@ Enter.text("TEXT").intoCleared(Element.found(By.css("#elementId")))
 
 ___
 ___
+
 ## Key Interections
 
 ___
+
 ### DoKey
 
 Methods:
@@ -138,6 +149,7 @@ Methods:
 |        | ``thenPress( Key... keys )``        | Presses the given key / key combination.           |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Code:**
@@ -156,28 +168,30 @@ DoKey.pressAndHold(Key.CONTROL, Key.ALT)
 ```java
 actor.attemptsTo(
   DoKey.pressAndHold(Key.CONTROL, Key.ALT),
-  
-  // some other actions here, like mouse clicks etc.
+
+// some other actions here, like mouse clicks etc.
 
   DoKey.release(Key.CONTROL, Key.ALT));
-);
 
 ```
 
 ___
 ___
+
 ## Web Properties
 
 ___
+
 ### Title
 
 Methods:
 
-|type   | name          | description                         |
-|-------|---------------|-------------------------------------|
-|static | ``ofPage()`` | Gets the title of the current page. |
+| type   | name         | description                         |
+|--------|--------------|-------------------------------------|
+| static | ``ofPage()`` | Gets the title of the current page. |
 
 Returns:
+
 - ``Either<ActivityError, String>``
 
 **Example:**
@@ -185,17 +199,19 @@ Returns:
 ```java 
 Title.ofPage()
 ```
+
 ___
+
 ### Url
 
 Methods:
 
-|type   | name          | description                         |
-|-------|---------------|-------------------------------------|
-|static | ``ofPage()``  | Gets the URL of the current page.   |
-
+| type   | name         | description                       |
+|--------|--------------|-----------------------------------|
+| static | ``ofPage()`` | Gets the URL of the current page. |
 
 Returns:
+
 - ``Either<ActivityError, String>``
 
 **Example:**
@@ -205,17 +221,17 @@ Url.ofPage()
 ```
 
 ___
+
 ### Attribute
 
 Get the value of an attribute of an element.
 
 Methods:
 
-|type   | name                                                          | description                                          |
-|-------|---------------------------------------------------------------|------------------------------------------------------|
-|static | ``named( String )``                                           | Specify the name of the Attribute to get             |
-|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Spcify the element from which the attribute is read. |
-
+| type   | name                                                           | description                                          |
+|--------|----------------------------------------------------------------|------------------------------------------------------|
+| static | ``named( String )``                                            | Specify the name of the Attribute to get             |
+| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Spcify the element from which the attribute is read. |
 
 Returns:
 
@@ -224,7 +240,9 @@ Returns:
 **Code:**
 
 ```java
-Attribute.named("href").of(element);
+Attribute.named("href").
+
+of(element);
 ```
 
 **Full Example:**
@@ -234,23 +252,26 @@ Element element = Element.found(By.css("#elementId"))
   .withName("element");
 
 // Checking the attribute value with See
-actor.attemptsTo(
+actor.
+
+attemptsTo(
   See.ifThe(Attribute.named("href").of(element))
-  .is(Expected.to.equal("https://www.google.com"))
-  );
+  .is(Expected.to.equal("https://www.google.com")));
 
 ```
 
 ___
+
 ### Value
 
 Methods:
 
-|type   | name                                 | description                          |
-|-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the value of the given element. |
+| type   | name                                                           | description                          |
+|--------|----------------------------------------------------------------|--------------------------------------|
+| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the value of the given element. |
 
 Returns:
+
 - ``Either<ActivityError, String>``
 
 **Example:**
@@ -260,15 +281,17 @@ Value.of(<ELEMENT>)
 ```
 
 ___
+
 ### ElementState
 
 Methods:
 
-|type   | name                                 | description                          |
-|-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the state of the given element. |
+| type   | name                                                           | description                          |
+|--------|----------------------------------------------------------------|--------------------------------------|
+| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the state of the given element. |
 
 Returns:
+
 - ``Either<ActivityError, State>``
 
 **Example:**
@@ -284,12 +307,14 @@ Element element = Element.found(By.css("#elementId"))
   .withName("element");
 
 // Checking the state of the element with See
-actor.attemptsTo(
-        See.ifThe(ElementState.of(element))
-        .is(Expected.to.be(ElementState.present))
-        .is(Expected.to.be(ElementState.visible))
-        .is(Expected.not.to.be(ElementState.enabled)));
-    
+actor.
+
+attemptsTo(
+  See.ifThe(ElementState.of(element))
+  .is(Expected.to.be(ElementState.present))
+  .is(Expected.to.be(ElementState.visible))
+  .is(Expected.not.to.be(ElementState.enabled)));
+
 ```
 
 The State object is a record with the following properties:
@@ -301,16 +326,18 @@ The State object is a record with the following properties:
 | isVisible | boolean | is the element present and visible                                  |
 | isEnabled | boolean | is the element present, visible and enabled (ready for interaction) |
 
-
 ___
+
 ### Text
+
 Methods:
 
-|type   | name                                 | description                          |
-|-------|--------------------------------------|--------------------------------------|
-|static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the text of the given element.  |
+| type   | name                                                           | description                         |
+|--------|----------------------------------------------------------------|-------------------------------------|
+| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the text of the given element. |
 
 Returns:
+
 - ``Either<ActivityError, String>``
 
 **Example:**
@@ -326,32 +353,40 @@ Element element = Element.found(By.css("#elementId"))
   .withName("element");
 
 // Checking the text of the element with See
-actor.attemptsTo(
-        See.ifThe(Text.of(element))
-        .is(Expected.to.equal("Hello World!")));
-    
+actor.
+
+attemptsTo(
+  See.ifThe(Text.of(element
+          ))
+  .
+
+is(Expected.to.equal("Hello World!")));
+
 ```
+
 ___
 ___
+
 ## Cookies
 
 Cookies can be added, retrieved, and deleted from the browser.
 To Do so, you have to load the page first.
 
 ___
+
 ### AddCookie
 
 Adds cookies to the browser.
 
 Methods:
 
-| type   | name                                              | description                            |
-|--------|---------------------------------------------------|----------------------------------------|
+| type   | name                                                   | description                            |
+|--------|--------------------------------------------------------|----------------------------------------|
 | static | ``toBrowser(``[``Cookie``](../http/http_cookies)``)``  | Adds a single cookie to the browser.   |
 | static | ``list(List<``[``Cookie``](../http/http_cookies)``>)`` | Adds a list of cookies to the browser. |
 
-
 Returns:
+
 - ``Either<ActivityError, Cookie>``
 
 **Code:**
@@ -369,15 +404,17 @@ AddCookie.list(List<COOKIE>);
 ```
 
 ___
+
 ### GetCookie
+
 Methods:
 
-| type   | name                                             | description                            |
-|--------|--------------------------------------------------|----------------------------------------|
-| static | ``named(String)``                                | Gets the value of the given cookie.    |
-
+| type   | name              | description                         |
+|--------|-------------------|-------------------------------------|
+| static | ``named(String)`` | Gets the value of the given cookie. |
 
 Returns:
+
 - ``Either<ActivityError, ``[``Cookie``](../http/COOKIE)``>``
 
 **Code:**
@@ -387,16 +424,17 @@ GetCookie.named("cookieName");
 ```
 
 ___
+
 ### GetAllCookies
 
 Methods:
 
-| type   | name                                             | description                            |
-|--------|--------------------------------------------------|----------------------------------------|
-| static | ``fromBrowser()``                                | Gets all cookies from the browser.     |
-
+| type   | name              | description                        |
+|--------|-------------------|------------------------------------|
+| static | ``fromBrowser()`` | Gets all cookies from the browser. |
 
 Returns:
+
 - ``Either<ActivityError, List<``[``Cookie``](../http/COOKIE)``>>``
 
 **Code:**
@@ -406,14 +444,17 @@ GetAllCookies.fromBrowser();
 ```
 
 ___
+
 ### DeleteCookie
+
 Methods:
 
-| type   | name                                             | description                            |
-|--------|--------------------------------------------------|----------------------------------------|
-| static | ``named(String)``                                | Deletes the given cookie.              |
+| type   | name              | description               |
+|--------|-------------------|---------------------------|
+| static | ``named(String)`` | Deletes the given cookie. |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Code:**
@@ -423,39 +464,46 @@ DeleteCookie.named("cookieName");
 ```
 
 ### DeleteAllCookies
+
 Methods:
 
-| type   | name                                             | description                            |
-|--------|--------------------------------------------------|----------------------------------------|
-| static | ``fromBrowser()``                                | Deletes all cookies from the browser.  |
+| type   | name              | description                           |
+|--------|-------------------|---------------------------------------|
+| static | ``fromBrowser()`` | Deletes all cookies from the browser. |
 
 ___
 ___
+
 ## Drawing on a Canvas
 
 ___
+
 ### Draw
 
 Methods:
 
-| type   | name                                                           | description             |
-|--------|----------------------------------------------------------------|-------------------------|
-| static | ``shape(``[``Canvas``](./CANVAS)``)``                          | Draws one shape.        |
-| static | ``shapes(``List<[``Canvas``](./CANVAS)>``)``                   | Draws multiple shapes.  |
-|        | ``on(``[``Element``](./browser_elements#finding-elements)``)`` | Draws on the element    |
-
+| type   | name                                                           | description            |
+|--------|----------------------------------------------------------------|------------------------|
+| static | ``shape(``[``Canvas``](./CANVAS)``)``                          | Draws one shape.       |
+| static | ``shapes(``List<[``Canvas``](./CANVAS)>``)``                   | Draws multiple shapes. |
+|        | ``on(``[``Element``](./browser_elements#finding-elements)``)`` | Draws on the element   |
 
 Returns:
+
 - ``Either<ActivityError, Void>``
 
 **Code:**
 
 ```java
-Draw.shape(SHAPE).on(<ELEMENT>)
+Draw.shape(SHAPE).
+
+on(<ELEMENT>)
 ```
 
 ```java
-Draw.shapes(List<SHAPE>).on(<ELEMENT>);
+Draw.shapes(List<SHAPE>).
+
+on(<ELEMENT>);
 ```
 
 **Full Example:**
@@ -466,15 +514,21 @@ Element canvas = Element.found(By.css("#theCanvas"))
 
 // Shape is relative to the elements top left corner
 Shape letterT = Shape.startingAt(StartPoint.on(5, 5))
-    .moveTo(Move.right(30))
-    .moveTo(Move.left(15))
-    .moveTo(Move.down(40));
+  .moveTo(Move.right(30))
+  .moveTo(Move.left(15))
+  .moveTo(Move.down(40));
 
-actor.attemptsTo(
-  Draw.shape(letterT).on(canvas)
+actor.
+
+attemptsTo(
+  Draw.shape(letterT
+          ).
+
+on(canvas)
 );
 
 ```
+
 ---
 
 ### ExecuteJavaScript
@@ -497,18 +551,91 @@ ExecuteJavaScript.onBrowser("alert('Hello World!')");
 ```
 
 ```java
-ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';", <ELEMENT>);
+ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';",<ELEMENT>);
 ```
+
 **Full Example:**
 
 ```java
 Element element = Element.found(By.css("#elementId"))
   .withName("element");
 
-actor.attemptsTo(
-    ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';", element));
-    
+actor.
+
+attemptsTo(
+  ExecuteJavaScript.onElement("arguments[0].style.backgroundColor = 'red';", element
+  ));
+
 ```
 
+### NumberOfBrowsers
+
+Methods:
+
+| type   | name                 | description                       |
+|--------|----------------------|-----------------------------------|
+| static | ``tabsAndWindows()`` | Gets the number of open browsers. |
+
+Returns:
+
+- ``Either<ActivityError, Integer>``
+
+**Code:**
+
+```java
+NumberOfBrowser.tabsAndWindows()
+```
+
+### SwitchToBrowser
+
+Methods:
+
+| type   | name                                 | description                                                       |
+|--------|--------------------------------------|-------------------------------------------------------------------|
+| static | ``havingTitle(String browserTitle)`` | Switch to browser tab or window having the title ``browserTitel`` |
+| static | ``byIndex(int index)``               | Switch to browser tab or window by index ``index``                |
+
+Returns:
+
+- ``Either<ActivityError, Void>``
+
+**Code:**
+
+```java
+
+SwitchToBrowser.havingTitle("Google");
+
+```
+
+```java
+
+SwitchToBrowser.byIndex(1);
+
+```
+
+### SwitchToNewBrowser
+
+Methods:
+
+| type   | name         | description                                  |
+|--------|--------------|----------------------------------------------|
+| static | ``tab()``    | Create a new browser tab and switch to it    |
+| static | ``window()`` | Create a new browser window and switch to it |
 
 
+
+Returns:
+
+- ``Either<ActivityError, Void>``
+
+**Code:**
+
+```java
+SwitchToNewBrowser.tab();
+
+```
+
+```java
+SwitchToNewBrowser.window();
+
+```

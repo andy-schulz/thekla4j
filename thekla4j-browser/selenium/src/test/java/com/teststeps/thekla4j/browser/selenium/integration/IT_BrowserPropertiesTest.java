@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
@@ -60,7 +60,7 @@ public class IT_BrowserPropertiesTest {
     Instant start = Instant.now();
 
     actor.attemptsTo(
-        Navigate.to(HOST),
+        Navigate.to(FRAMEWORKTESTER),
         Click.on(clientButton));
 
     Instant end = Instant.now();

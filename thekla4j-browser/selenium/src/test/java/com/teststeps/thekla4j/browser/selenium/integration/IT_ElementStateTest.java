@@ -3,7 +3,6 @@ package com.teststeps.thekla4j.browser.selenium.integration;
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
@@ -17,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
-import static com.teststeps.thekla4j.browser.selenium.Constants.HOST;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_ElementStateTest {
@@ -37,7 +36,7 @@ public class IT_ElementStateTest {
 
     Element clientButton = Element.found(By.css("#ButtonWithId"));
 
-    String url = HOST;
+    String url = FRAMEWORKTESTER;
 
     actor.attemptsTo(
 

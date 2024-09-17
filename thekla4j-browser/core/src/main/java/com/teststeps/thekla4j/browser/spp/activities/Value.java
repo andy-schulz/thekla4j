@@ -20,7 +20,7 @@ public class Value extends Task<Void, String> {
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.valueOf(element))
-        .toEither(ActivityError.with("could not get value from element " + element));
+        .toEither(ActivityError.of("could not get value from element " + element));
   }
 
   public static Value of(Element element) {

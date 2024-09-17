@@ -31,7 +31,7 @@ public class AssertionNot implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> "Assertion Result: " + r))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
@@ -47,7 +47,7 @@ public class AssertionNot implements TheklaAssertion {
     return Tuple.of(reason, p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate '%s' to fail on \n%s", reason, p), res)))
-        .transform(TransformTry.toEither(ActivityError::with)));
+        .transform(TransformTry.toEither(ActivityError::of)));
   }
 
   @Override
@@ -59,6 +59,6 @@ public class AssertionNot implements TheklaAssertion {
     return p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate to fail on \n%s", p), res)))
-        .transform(TransformTry.toEither(ActivityError::with));
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 }

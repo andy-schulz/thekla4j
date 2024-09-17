@@ -225,4 +225,51 @@ class ElementFunctions {
     (driver, hlx, script, element) -> findElement(driver, hlx, element)
       .flatMap(webElement -> Try.run(() -> driver.executeScript(script, webElement)))
       .onFailure(log::error);
+
+  /**
+   * Switch to a browser tab by index
+   */
+  protected final static Function2<RemoteWebDriver, Integer, Try<Void>> switchToBrowserByIndex =
+    (driver, index) ->
+      Try.of(() -> driver.getWindowHandles().toArray(new String[0]))
+
+        .flatMap(handles -> handles.length > index ?
+          Try.of(() -> handles[index]) :
+          Try.failure(new IndexOutOfBoundsException("No browser with index " + index + " found")))
+
+        .map(handle -> driver.switchTo().window(handle))
+        .onFailure(log::error)
+        .map(__ -> null);
+
+  /**
+   * Switch to a browser tab by title
+   */
+  protected final static Function2<RemoteWebDriver, String, Try<Void>> switchToBrowserByTitle =
+    (driver, title) ->
+      Try.of(() -> driver.getWindowHandles()
+        .stream()
+        .filter(handle -> driver.switchTo().window(handle).getTitle().equals(title))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("No browser with title " + title + " found")))
+        .map(handle -> driver.switchTo().window(handle))
+        .onFailure(log::error)
+        .map(__ -> null);
+
+  /**
+   * Switch to a new browser tab
+   */
+  protected final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserTab =
+    (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.TAB))
+      .onFailure(log::error);
+
+  /**
+   * Switch to a new browser window
+   */
+  protected final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserWindow =
+    (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.WINDOW))
+      .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<Integer>> numberOfOpenTabsAndWindows =
+    (driver) -> Try.of(() -> driver.getWindowHandles().size())
+      .onFailure(log::error);
 }

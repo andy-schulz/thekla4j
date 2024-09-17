@@ -17,7 +17,7 @@ public class StaticStringTask extends Task<Void, String> {
     this.attempts = this.attempts + 1;
 
     if (passingAfterFiveAttempts && this.attempts < 5) {
-      return Either.left(ActivityError.with("Failed to pass the test string with attempts: " + this.attempts + " out of 5."));
+      return Either.left(ActivityError.of("Failed to pass the test string with attempts: " + this.attempts + " out of 5."));
     }
     return Either.right(this.testString);
   }

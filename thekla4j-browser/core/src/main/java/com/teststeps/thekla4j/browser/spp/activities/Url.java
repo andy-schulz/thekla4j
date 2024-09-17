@@ -24,7 +24,7 @@ public class Url extends Task<Void, String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
     return BrowseTheWeb.as(actor).flatMap(Browser::url)
-      .transform(TransformTry.toEither(ActivityError::with))
+      .transform(TransformTry.toEither(ActivityError::of))
       .peekLeft(e -> takeScreenshot(actor).map(file -> this.screenshot = file));
   }
 

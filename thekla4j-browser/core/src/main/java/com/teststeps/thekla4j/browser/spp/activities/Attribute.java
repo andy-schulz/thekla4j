@@ -22,7 +22,7 @@ public class Attribute extends Task<Void, String> {
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.attributeValueOf(attributeName, element))
-        .toEither(ActivityError.with(String.format("could not get value of attribute '%s' from %s", attributeName, element)));
+        .toEither(ActivityError.of(String.format("could not get value of attribute '%s' from %s", attributeName, element)));
   }
 
   public static AttributeNamed named(String name) {

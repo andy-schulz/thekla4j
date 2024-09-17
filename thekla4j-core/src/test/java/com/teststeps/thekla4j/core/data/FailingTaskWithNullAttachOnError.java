@@ -21,7 +21,7 @@ public class FailingTaskWithNullAttachOnError extends Task<Void, String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
 
-    return Either.left(ActivityError.with("Failing task with content: " + content));
+    return Either.left(ActivityError.of("Failing task with content: " + content));
   }
 
   public static FailingTaskWithNullAttachOnError setString(String content) {

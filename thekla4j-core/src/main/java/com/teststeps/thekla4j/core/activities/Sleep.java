@@ -5,7 +5,6 @@ import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.Function0;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
@@ -39,7 +38,7 @@ public class Sleep<T> extends Interaction<T, T> {
           return null;
         })
         .toEither()
-        .mapLeft(ActivityError::with)
+        .mapLeft(ActivityError::of)
         .map(x -> result);
   }
 

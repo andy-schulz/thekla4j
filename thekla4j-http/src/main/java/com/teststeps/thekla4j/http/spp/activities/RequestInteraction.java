@@ -38,7 +38,7 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
         .map(eReq -> eReq.flatMap(this.requestMethod))
         .toEither()
         .flatMap(Function.identity())
-        .mapLeft(ActivityError::with);
+        .mapLeft(ActivityError::of);
 
   }
 

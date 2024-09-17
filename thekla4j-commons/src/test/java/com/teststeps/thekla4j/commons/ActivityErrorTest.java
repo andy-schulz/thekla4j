@@ -35,14 +35,14 @@ public class ActivityErrorTest {
   @Test
   public void createActivityErrorWithUtilityMethodWith() {
 
-    ActivityError error = ActivityError.with("Error Message");
+    ActivityError error = ActivityError.of("Error Message");
     assertThat("check error message", error.getMessage(), equalTo("Error Message"));
   }
 
   @Test
   public void createActivityErrorWithUtilityMethodWithAndCause() {
 
-    ActivityError error = ActivityError.with("Error Message", new RuntimeException("RuntimeException"));
+    ActivityError error = ActivityError.of("Error Message", new RuntimeException("RuntimeException"));
     assertThat("check error message", error.getMessage(), equalTo("Error Message"));
     assertThat("check error cause", error.getCause().getMessage(), equalTo("RuntimeException"));
   }
@@ -50,16 +50,16 @@ public class ActivityErrorTest {
   @Test
   public void createActivityErrorWithUtilityMethodWithAndCauseAndAdditionalMessage() {
 
-    ActivityError error = ActivityError.with(new RuntimeException("RuntimeException"));
+    ActivityError error = ActivityError.of(new RuntimeException("RuntimeException"));
     assertThat("check error message", error.getMessage(), equalTo("RuntimeException"));
     assertThat("check error cause", error.getCause(), equalTo(null));
   }
 
   @Test
   public void testActivityErrorMessageAggregation() {
-    ActivityError error3 = ActivityError.with("Error Message 3");
-    ActivityError error2 = ActivityError.with("Error Message 2", error3);
-    ActivityError error = ActivityError.with("Error Message 1", error2);
+    ActivityError error3 = ActivityError.of("Error Message 3");
+    ActivityError error2 = ActivityError.of("Error Message 2", error3);
+    ActivityError error = ActivityError.of("Error Message 1", error2);
 
     ActivityError aggregatedError = error.aggregateMessages();
 

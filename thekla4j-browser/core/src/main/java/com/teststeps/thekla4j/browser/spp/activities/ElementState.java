@@ -26,7 +26,7 @@ public class ElementState extends Task<Void, State> {
 
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.getState(element))
-        .transform(TransformTry.toEither(x -> ActivityError.with(x.getMessage())));
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
   public static ElementState of(Element element) {
@@ -41,7 +41,7 @@ public class ElementState extends Task<Void, State> {
       if (state.isVisible() == checkForTrue) {
         return Either.right(null);
       } else {
-        return Either.left(ActivityError.with(String.format("%s should %sbe visible, but it is %svisible" , state.element(),  expectedMessage, actualMessage)));
+        return Either.left(ActivityError.of(String.format("%s should %sbe visible, but it is %svisible" , state.element(),  expectedMessage, actualMessage)));
       }
     };
 
@@ -54,7 +54,7 @@ public class ElementState extends Task<Void, State> {
       if (state.isEnabled() == checkForTrue) {
         return Either.right(null);
       } else {
-        return Either.left(ActivityError.with(String.format("%s should %sbe enabled, but it is %senabled" , state.element(),  expectedMessage, actualMessage)));
+        return Either.left(ActivityError.of(String.format("%s should %sbe enabled, but it is %senabled" , state.element(),  expectedMessage, actualMessage)));
       }
     };
 
@@ -66,7 +66,7 @@ public class ElementState extends Task<Void, State> {
       if (state.isEnabled() == checkForTrue) {
         return Either.right(null);
       } else {
-        return Either.left(ActivityError.with(String.format("%s should %sbe present in DOM, but it is %spresent" , state.element(),  expectedMessage, actualMessage)));
+        return Either.left(ActivityError.of(String.format("%s should %sbe present in DOM, but it is %spresent" , state.element(),  expectedMessage, actualMessage)));
       }
     };
 }
