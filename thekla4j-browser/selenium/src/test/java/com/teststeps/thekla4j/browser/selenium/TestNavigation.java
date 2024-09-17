@@ -2,12 +2,19 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.RefreshCurrentBrowser;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -16,7 +23,9 @@ import java.util.function.Function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TestNavigation {
 
@@ -78,7 +87,7 @@ public class TestNavigation {
   }
 
   @Test
-  public void testKeyDown() throws ActivityError {
+  public void testNavigateTo() throws ActivityError {
 
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(chromeMock));
@@ -96,5 +105,52 @@ public class TestNavigation {
 
     String urlValue = urlCaptor.getValue();
     assertThat(urlValue, equalTo(url));
+  }
+
+  @Test
+  public void testNavigateBack() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(chromeMock));
+
+    actor.attemptsTo(
+        Navigate.back())
+      .getOrElseThrow(Function.identity());
+
+    verify(chromeMock).navigateBack();
+    verify(driverMock, times(1)).navigate();
+    verify(navigationMock, times(1)).back();
+  }
+
+  @Test
+  public void testNavigateForward() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(chromeMock));
+
+    actor.attemptsTo(
+        Navigate.forward())
+      .getOrElseThrow(Function.identity());
+
+    verify(chromeMock).navigateForward();
+    verify(driverMock, times(1)).navigate();
+    verify(navigationMock, times(1)).forward();
+  }
+
+  @Test
+  public void testRefresh() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(chromeMock));
+
+    actor.attemptsTo(
+
+        RefreshCurrentBrowser.page())
+
+      .getOrElseThrow(Function.identity());
+
+    verify(chromeMock).refresh();
+    verify(driverMock, times(1)).navigate();
+    verify(navigationMock, times(1)).refresh();
   }
 }

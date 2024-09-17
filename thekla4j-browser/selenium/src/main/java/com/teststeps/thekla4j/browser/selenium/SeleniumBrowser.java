@@ -199,4 +199,22 @@ class SeleniumBrowser implements Browser {
     return executeJavaScript.apply(driver, script)
       .map(applyExecutionSlowDown());
   }
+
+  @Override
+  public Try<Void> refresh() {
+    return refresh.apply(driver)
+      .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Try<Void> navigateBack() {
+    return navigateBack.apply(driver)
+      .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Try<Void> navigateForward() {
+    return navigateForward.apply(driver)
+      .map(applyExecutionSlowDown());
+  }
 }

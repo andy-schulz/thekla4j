@@ -82,8 +82,8 @@ public class ActivityError extends Throwable {
    * @param <R> the type of the Try
    * @return the function
    */
-  public static <R> Function1<Try<R>, Either<ActivityError, R>> toEither(String value) {
-    return t -> t.isFailure() ? Either.left(ActivityError.of(value, t.getCause())) : Either.right(t.get());
+  public static <R> Function1<Try<R>, Either<ActivityError, R>> toEither(String errorMessage) {
+    return t -> t.isFailure() ? Either.left(ActivityError.of(errorMessage, t.getCause())) : Either.right(t.get());
   }
 
   public ActivityError aggregateMessages() {

@@ -272,4 +272,16 @@ class ElementFunctions {
   protected final static Function1<RemoteWebDriver, Try<Integer>> numberOfOpenTabsAndWindows =
     (driver) -> Try.of(() -> driver.getWindowHandles().size())
       .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<Void>> refresh =
+    (driver) -> Try.run(() -> driver.navigate().refresh())
+      .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<Void>> navigateBack =
+    (driver) -> Try.run(() -> driver.navigate().back())
+      .onFailure(log::error);
+
+  protected final static Function1<RemoteWebDriver, Try<Void>> navigateForward =
+    (driver) -> Try.run(() -> driver.navigate().forward())
+      .onFailure(log::error);
 }

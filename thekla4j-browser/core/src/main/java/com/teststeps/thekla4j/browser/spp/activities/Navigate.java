@@ -3,7 +3,9 @@ package com.teststeps.thekla4j.browser.spp.activities;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.AttachOnError;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
+import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
+import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
@@ -40,5 +42,35 @@ public class Navigate extends BasicInteraction {
 
   public static Navigate to(String url) {
     return new Navigate(url, null);
+  }
+
+  public static BasicInteraction back() {
+    return new NavigateBack();
+  }
+
+  public static BasicInteraction forward() {
+    return new NavigateForward();
+  }
+
+  @Workflow("navigate back")
+  private static class NavigateBack extends BasicInteraction {
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor) {
+      return BrowseTheWeb.as(actor)
+        .peek(browser -> log.info("Navigating back"))
+        .flatMap(Browser::navigateBack)
+        .transform(ActivityError.toEither("Error while navigating back"));
+    }
+  }
+
+  @Workflow("navigate forward")
+  private static class NavigateForward extends BasicInteraction {
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor) {
+      return BrowseTheWeb.as(actor)
+        .peek(browser -> log.info("Navigating forward"))
+        .flatMap(Browser::navigateForward)
+        .transform(ActivityError.toEither("Error while navigating forward"));
+    }
   }
 }

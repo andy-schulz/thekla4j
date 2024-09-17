@@ -47,6 +47,11 @@ public interface Browser {
 
   Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
 
+
+  Try<Void> refresh();
+  Try<Void> navigateBack();
+  Try<Void> navigateForward();
+
   Try<Void> switchToNewBrowserTab();
 
   Try<Void> switchToNewBrowserWindow();
