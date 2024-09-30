@@ -15,6 +15,7 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
@@ -28,10 +29,16 @@ class SeleniumBrowser implements Browser {
 
   private final RemoteWebDriver driver;
   private final HighlightContext highlightContext = new HighlightContext();
+  private LocalFileDetector localFileDetector;
 
   SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
     this.driver.manage().window().maximize();
+  }
+
+  public void enableLocalFileDetector() {
+    this.localFileDetector = new LocalFileDetector();
+    this.driver.setFileDetector(localFileDetector);
   }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
@@ -143,7 +150,14 @@ class SeleniumBrowser implements Browser {
 
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
-    return setUploadFilesTo.apply(driver, filePaths, targetFileUploadInput)
+
+    List<String> filePathsAsString = filePaths.map(Path::toString);
+
+    if(localFileDetector != null) {
+      filePathsAsString = filePathsAsString.map(f -> localFileDetector.getLocalFile(f).getAbsolutePath());
+    }
+
+    return setUploadFilesTo.apply(driver, filePathsAsString, targetFileUploadInput)
       .map(applyExecutionSlowDown());
   }
 
