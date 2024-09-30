@@ -156,6 +156,8 @@ class SeleniumBrowser implements Browser {
       .map(Path::toUri)
       .map(URI::toString);
 
+    log.info("trying to load files {}", filePathsAsString);
+
     if(localFileDetector != null) {
       filePathsAsString = filePathsAsString
         .map(f -> {
