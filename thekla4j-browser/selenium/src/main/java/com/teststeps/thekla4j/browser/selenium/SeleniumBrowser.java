@@ -154,7 +154,12 @@ class SeleniumBrowser implements Browser {
     List<String> filePathsAsString = filePaths.map(Path::toString);
 
     if(localFileDetector != null) {
-      filePathsAsString = filePathsAsString.map(f -> localFileDetector.getLocalFile(f).getAbsolutePath());
+      filePathsAsString = filePathsAsString
+        .map(f -> {
+          File localFile = localFileDetector.getLocalFile(f);
+          log.info("trying to load local file {} from path {}", localFile, f);
+          return localFile.getAbsolutePath();
+        });
     }
 
     return setUploadFilesTo.apply(driver, filePathsAsString, targetFileUploadInput)
