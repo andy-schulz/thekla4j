@@ -21,6 +21,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -46,6 +47,17 @@ class ElementFunctions {
         Instant.now(),
         Duration.ofMillis(0))
       .map(highlightElement.apply(driver, highlightContext))
+      .flatMap(scrollIntoView.apply(driver));
+  }
+
+  static Try<WebElement> findElement(RemoteWebDriver driver, Element element) {
+
+    return retryUntil.apply(
+        ElementFunctions.locateElement.apply(driver),
+        locateElement.apply(driver).apply(element),
+        element,
+        Instant.now(),
+        Duration.ofMillis(0))
       .flatMap(scrollIntoView.apply(driver));
   }
 
@@ -284,4 +296,11 @@ class ElementFunctions {
   protected final static Function1<RemoteWebDriver, Try<Void>> navigateForward =
     (driver) -> Try.run(() -> driver.navigate().forward())
       .onFailure(log::error);
+
+  protected final static Function3<RemoteWebDriver, List<Path>, Element, Try<Void>> setUploadFilesTo =
+    (driver, filePaths, element) -> findElement(driver, element)
+      .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.map(Path::toString).mkString(",")))
+        .onFailure(log::error))
+      .map(x -> null);
+
 }

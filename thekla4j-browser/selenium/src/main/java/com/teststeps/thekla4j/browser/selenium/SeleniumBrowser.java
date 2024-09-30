@@ -18,6 +18,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Duration;
 
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
@@ -138,6 +139,12 @@ class SeleniumBrowser implements Browser {
 
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes);
+  }
+
+  @Override
+  public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
+    return setUploadFilesTo.apply(driver, filePaths, targetFileUploadInput)
+      .map(applyExecutionSlowDown());
   }
 
   @Override

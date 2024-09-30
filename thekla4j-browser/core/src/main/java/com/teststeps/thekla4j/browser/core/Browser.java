@@ -9,6 +9,7 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Duration;
 
 public interface Browser {
@@ -47,6 +48,7 @@ public interface Browser {
 
   Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
 
+  Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput);
 
   Try<Void> refresh();
   Try<Void> navigateBack();
