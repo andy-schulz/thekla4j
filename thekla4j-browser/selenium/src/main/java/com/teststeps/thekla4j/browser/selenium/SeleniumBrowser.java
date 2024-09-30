@@ -19,6 +19,7 @@ import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 
@@ -151,7 +152,9 @@ class SeleniumBrowser implements Browser {
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
 
-    List<String> filePathsAsString = filePaths.map(Path::toString);
+    List<String> filePathsAsString = filePaths
+      .map(Path::toUri)
+      .map(URI::toString);
 
     if(localFileDetector != null) {
       filePathsAsString = filePathsAsString
