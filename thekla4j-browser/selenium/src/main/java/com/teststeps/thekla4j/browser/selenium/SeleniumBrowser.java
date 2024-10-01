@@ -19,7 +19,6 @@ import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 
@@ -35,11 +34,6 @@ class SeleniumBrowser implements Browser {
   SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
     this.driver.manage().window().maximize();
-    enableLocalFileDetector();
-  }
-
-  public void enableLocalFileDetector() {
-    this.localFileDetector = this.driver.getFileDetector();
   }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
@@ -152,23 +146,11 @@ class SeleniumBrowser implements Browser {
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
 
-    List<String> filePathsAsString = filePaths
-      .map(Path::toUri)
-      .map(URI::toString);
+    List<String> files = filePaths.map(Path::toString);
 
-    log.info("trying to load files {}", filePathsAsString);
-
-    if(localFileDetector != null) {
-      filePathsAsString = filePathsAsString
-        .map(f -> {
-          File localFile = localFileDetector.getLocalFile(f);
-          log.info("trying to load local file {} from path {}", localFile, f);
-          return localFile.getAbsolutePath();
-        });
-    }
-
-    return setUploadFilesTo.apply(driver, filePathsAsString, targetFileUploadInput)
+    return setUploadFilesTo.apply(driver, files, targetFileUploadInput)
       .map(applyExecutionSlowDown());
+
   }
 
   @Override

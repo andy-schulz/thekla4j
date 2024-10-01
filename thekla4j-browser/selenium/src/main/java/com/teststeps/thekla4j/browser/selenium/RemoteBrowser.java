@@ -28,8 +28,8 @@ class RemoteBrowser {
         return caps;
       })
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
-      .peek(driver -> log.debug("Connecting to: {}",seleniumConfig.remoteUrl()))
-      .peek(driver -> log.debug("SessionID: {}",driver.getSessionId()))
+      .peek(driver -> log.debug("Connecting to: {}", seleniumConfig.remoteUrl()))
+      .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
       .map(SeleniumBrowser::new);
@@ -51,12 +51,14 @@ class RemoteBrowser {
   }
 
   private static final Function2<SeleniumConfig, RemoteWebDriver, RemoteWebDriver> applySeleniumConfig =
-    (seleniumConfig, remoteBrowser) -> {
+    (seleniumConfig, driver) -> {
 
-      if (!Objects.isNull(seleniumConfig.setLocalFileDetector()) && seleniumConfig.setLocalFileDetector())
-        remoteBrowser.setFileDetector(new LocalFileDetector());
+      log.debug("Applying Selenium Configurations setLocalFileDetector: {}", seleniumConfig.setLocalFileDetector());
+      if (!Objects.isNull(seleniumConfig.setLocalFileDetector()) && seleniumConfig.setLocalFileDetector()) {
+        driver.setFileDetector(new LocalFileDetector());
+      }
 
-      return remoteBrowser;
+      return driver;
     };
 
   private static final Function3<Option<String>, SeleniumConfig, BrowserConfig, HashMap<String, String>> createBrowserStackCapabilities =
@@ -76,7 +78,7 @@ class RemoteBrowser {
         .flatMap(bst -> Option.of(bst.buildName()))
         .map(buildName -> capabilities.put("buildName", buildName));
 
-      if(testName.isEmpty()) {
+      if (testName.isEmpty()) {
         Option.of(seleniumConf.bStack())
           .flatMap(bst -> Option.of(bst.sessionName()))
           .map(sessName -> capabilities.put("sessionName", sessName));
