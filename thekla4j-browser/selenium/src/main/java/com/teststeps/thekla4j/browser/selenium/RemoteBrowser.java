@@ -20,6 +20,14 @@ import java.util.Objects;
 
 @Log4j2(topic = "Selenium Remote Browser")
 class RemoteBrowser {
+
+  /**
+   * Load the Browser from the configuration
+   * @param testName the name of the test
+   * @param seleniumConfig the Selenium Configuration
+   * @param browserConfig the Browser Configuration
+   * @return a Try of the Browser
+   */
   static Try<Browser> with(Option<String> testName, SeleniumConfig seleniumConfig, BrowserConfig browserConfig) {
 
     return createCapabilities.apply(browserConfig)
@@ -27,6 +35,7 @@ class RemoteBrowser {
         caps.setCapability("bstack:options", createBrowserStackCapabilities.apply(testName, seleniumConfig, browserConfig));
         return caps;
       })
+      .map(createSeleniumCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .peek(driver -> log.debug("Connecting to: {}", seleniumConfig.remoteUrl()))
       .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
@@ -35,6 +44,13 @@ class RemoteBrowser {
       .map(SeleniumBrowser::new);
   }
 
+  /**
+   * Load default local Chrome Browser, no configuration was found
+   *
+   * @param testName the name of the test
+   * @param seleniumConfig the Selenium Configuration
+   * @return a Try of the Browser
+   */
   static Try<Browser> defaultChromeBrowser(Option<String> testName, SeleniumConfig seleniumConfig) {
 
     DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -50,6 +66,9 @@ class RemoteBrowser {
       .map(SeleniumBrowser::new);
   }
 
+  /**
+   * Apply the Selenium Configurations
+   */
   private static final Function2<SeleniumConfig, RemoteWebDriver, RemoteWebDriver> applySeleniumConfig =
     (seleniumConfig, driver) -> {
 
@@ -61,6 +80,22 @@ class RemoteBrowser {
       return driver;
     };
 
+  /**
+   * Create the Selenium Capabilities
+   */
+  private static final Function1<SeleniumConfig, Function1<DesiredCapabilities, DesiredCapabilities>> createSeleniumCapabilities =
+    seleniumConfig -> caps -> {
+
+      Option.of(seleniumConfig.seOptions())
+        .flatMap(bc -> Option.of(bc.recordVideo()))
+        .peek(recordVideo -> caps.setCapability("se:recordVideo", recordVideo));
+
+      return caps;
+    };
+
+  /**
+   * Create the BrowserStack Capabilities
+   */
   private static final Function3<Option<String>, SeleniumConfig, BrowserConfig, HashMap<String, String>> createBrowserStackCapabilities =
     (testName, seleniumConf, browserConf) -> {
 
@@ -95,7 +130,9 @@ class RemoteBrowser {
       return capabilities;
     };
 
-
+  /**
+   * Create the Desired Capabilities
+   */
   private static final Function1<BrowserConfig, Try<DesiredCapabilities>> createCapabilities =
     browserConfig ->
       Try.of(DesiredCapabilities::new)
