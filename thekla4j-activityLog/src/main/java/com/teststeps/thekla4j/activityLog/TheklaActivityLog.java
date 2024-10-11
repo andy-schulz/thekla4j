@@ -99,6 +99,14 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
   }
 
   /**
+   * append video attachment to root node
+   * @param videoAttachment - the video attachment
+   */
+  public void appendVideoAttachmentToRootNode(NodeAttachment videoAttachment) {
+    this.rootActivityLogEntry.appendVideoAttachment(videoAttachment);
+  }
+
+  /**
    * resets the current Activity to the parent activity
    * The current activity reached its end and is "closed" now
    *

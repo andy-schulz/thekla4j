@@ -155,8 +155,23 @@ public class ActivityLogEntry implements Serializable {
         return this;
     }
 
+    /**
+     * add an attachment to the activity
+     * @param attachment the attachment to be added
+     * @return the current activity log entry
+     */
     public ActivityLogEntry appendAttachment(NodeAttachment attachment) {
         this.attachments = this.attachments.append(attachment);
+        return this;
+    }
+
+    /**
+     * add a video attachment to the activity
+     * @param attachment the video attachment to be added
+     * @return the current activity log entry
+     */
+    public ActivityLogEntry appendVideoAttachment(NodeAttachment attachment) {
+        this.videoAttachments = this.videoAttachments.append(attachment);
         return this;
     }
 
