@@ -29,17 +29,17 @@ class SeleniumBrowser implements Browser {
 
   private final RemoteWebDriver driver;
   private final HighlightContext highlightContext = new HighlightContext();
-  private final SeleniumOptions options;
+  private final Option<SeleniumOptions> options;
 
   SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options) {
     this.driver = driver;
-    this.options = options;
+    this.options = Option.of(options);
     this.driver.manage().window().maximize();
   }
 
   SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
-    this.options = SeleniumOptions.empty();
+    this.options = Option.of(SeleniumOptions.empty());
     this.driver.manage().window().maximize();
   }
 
@@ -204,7 +204,7 @@ class SeleniumBrowser implements Browser {
 
   @Override
   public Boolean isVideoRecordingActive() {
-    return options.recordVideo();
+    return options.map(SeleniumOptions::recordVideo).getOrElse(false);
   }
 
   @Override

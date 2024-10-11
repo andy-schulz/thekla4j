@@ -33,11 +33,8 @@ class RemoteBrowser {
   static Try<Browser> with(Option<String> testName, SeleniumConfig seleniumConfig, BrowserConfig browserConfig) {
 
     return createCapabilities.apply(browserConfig)
-      .map(caps -> {
-        caps.setCapability("bstack:options", createBrowserStackCapabilities.apply(testName, seleniumConfig, browserConfig));
-        return caps;
-      })
-      .map(createSeleniumCapabilities.apply(seleniumConfig))
+      .map(addBrowserStackOptions.apply(seleniumConfig, browserConfig, testName))
+      .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .peek(driver -> log.debug("Connecting to: {}", seleniumConfig.remoteUrl()))
       .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
@@ -59,10 +56,9 @@ class RemoteBrowser {
     capabilities.setBrowserName("chrome");
 
     return Try.of(() -> capabilities)
-      .map(caps -> {
-        caps.setCapability("bstack:options", createBrowserStackCapabilities.apply(testName, seleniumConfig, null));
-        return caps;
-      })
+      .map(addBrowserStackOptions.apply(seleniumConfig, null, testName))
+
+      .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .map(applySeleniumConfig.apply(seleniumConfig))
       .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()));
@@ -85,7 +81,7 @@ class RemoteBrowser {
   /**
    * Create the Selenium Capabilities
    */
-  private static final Function1<SeleniumConfig, Function1<DesiredCapabilities, DesiredCapabilities>> createSeleniumCapabilities =
+  private static final Function1<SeleniumConfig, Function1<DesiredCapabilities, DesiredCapabilities>> addSeleniumOptionsToCapabilities =
     seleniumConfig -> caps -> {
 
       Option.of(seleniumConfig.seOptions())
@@ -99,7 +95,7 @@ class RemoteBrowser {
    * Create the BrowserStack Capabilities
    */
   private static final Function3<Option<String>, SeleniumConfig, BrowserConfig, HashMap<String, String>> createBrowserStackCapabilities =
-    (testName, seleniumConf, browserConf) -> {
+    (testName, seleniumConfig, browserConf) -> {
 
       HashMap<String, String> capabilities = new HashMap<>();
 
@@ -107,29 +103,35 @@ class RemoteBrowser {
         .flatMap(bc -> Option.of(bc.osVersion()))
         .map(osVers -> capabilities.put("os_version", osVers));
 
-      Option.of(seleniumConf.bStack())
+      Option.of(seleniumConfig.bStack())
         .flatMap(bst -> Option.of(bst.projectName()))
         .map(projName -> capabilities.put("projectName", projName));
 
-      Option.of(seleniumConf.bStack())
+      Option.of(seleniumConfig.bStack())
         .flatMap(bst -> Option.of(bst.buildName()))
         .map(buildName -> capabilities.put("buildName", buildName));
 
       if (testName.isEmpty()) {
-        Option.of(seleniumConf.bStack())
+        Option.of(seleniumConfig.bStack())
           .flatMap(bst -> Option.of(bst.sessionName()))
           .map(sessName -> capabilities.put("sessionName", sessName));
       } else {
         testName.map(tn -> capabilities.put("sessionName", tn));
       }
 
-      Option.of(seleniumConf.bStack())
+      Option.of(seleniumConfig.bStack())
         .flatMap(bst -> Option.of(bst.geoLocation()))
         .map(sessName -> capabilities.put("geoLocation", sessName));
 
 
       log.debug("BrowserStack Capabilities created: " + capabilities);
       return capabilities;
+    };
+
+  private static final Function3<SeleniumConfig, BrowserConfig, Option<String>, Function1<DesiredCapabilities, DesiredCapabilities>> addBrowserStackOptions =
+    (seleniumConfig, browserConfig, testName) -> caps -> {
+      caps.setCapability("bstack:options", createBrowserStackCapabilities.apply(testName, seleniumConfig, browserConfig));
+      return caps;
     };
 
   /**
