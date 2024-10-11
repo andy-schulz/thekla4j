@@ -18,6 +18,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.RECORD_VIDEO;
+
 @Log4j2(topic = "Selenium Remote Browser")
 class RemoteBrowser {
 
@@ -41,7 +43,7 @@ class RemoteBrowser {
       .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(SeleniumBrowser::new);
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()));
   }
 
   /**
@@ -63,7 +65,7 @@ class RemoteBrowser {
       })
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(SeleniumBrowser::new);
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()));
   }
 
   /**
@@ -88,7 +90,7 @@ class RemoteBrowser {
 
       Option.of(seleniumConfig.seOptions())
         .flatMap(bc -> Option.of(bc.recordVideo()))
-        .peek(recordVideo -> caps.setCapability("se:recordVideo", recordVideo));
+        .peek(recordVideo -> caps.setCapability(RECORD_VIDEO, recordVideo));
 
       return caps;
     };

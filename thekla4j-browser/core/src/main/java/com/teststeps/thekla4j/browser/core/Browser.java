@@ -68,11 +68,11 @@ public interface Browser {
 
   Try<String> getSessionId();
 
+  Boolean isVideoRecordingActive();
+
   Try<KeyActions> executeKeyActions();
 
   Try<Void> executeJavaScript(String script, Element element);
 
   Try<Void> executeJavaScript(String script);
-
-
 }

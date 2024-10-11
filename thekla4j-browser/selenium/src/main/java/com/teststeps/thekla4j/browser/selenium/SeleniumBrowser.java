@@ -4,6 +4,7 @@ import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
+import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
@@ -15,7 +16,6 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
@@ -29,10 +29,17 @@ class SeleniumBrowser implements Browser {
 
   private final RemoteWebDriver driver;
   private final HighlightContext highlightContext = new HighlightContext();
-  private FileDetector localFileDetector;
+  private final SeleniumOptions options;
+
+  SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options) {
+    this.driver = driver;
+    this.options = options;
+    this.driver.manage().window().maximize();
+  }
 
   SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
+    this.options = SeleniumOptions.empty();
     this.driver.manage().window().maximize();
   }
 
@@ -193,6 +200,11 @@ class SeleniumBrowser implements Browser {
   @Override
   public Try<String> getSessionId() {
     return Try.of(() -> driver.getSessionId().toString());
+  }
+
+  @Override
+  public Boolean isVideoRecordingActive() {
+    return options.recordVideo();
   }
 
   @Override
