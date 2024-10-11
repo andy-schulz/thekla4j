@@ -9,12 +9,8 @@ import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -54,6 +50,11 @@ public class ActivityLogEntry implements Serializable {
      * the attachments of the activity
      */
     private List<NodeAttachment> attachments = List.empty();
+
+    /**
+     * the video attachments of the activity
+     */
+    private List<NodeAttachment> videoAttachments = List.empty();
 
     /**
      * the type of the activity
@@ -216,6 +217,7 @@ public class ActivityLogEntry implements Serializable {
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.input,
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.output,
             Objects.isNull(this.attachments) ? null : this.attachments.toJavaList(),
+            Objects.isNull(this.videoAttachments) ? null : this.videoAttachments.toJavaList(),
             this.activityType,
             this.activityStatus,
             this.subEntries.map(ActivityLogEntry::getLogTree)

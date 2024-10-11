@@ -91,6 +91,11 @@ transform: rotate(90deg);
     padding-left: 2em;
 }
 
+.videoInfo {
+    display: none;
+    padding-left: 2em;
+}
+
 .infoHeader {
     background: lightgray;
     border-radius: 1em;
@@ -125,6 +130,10 @@ transform: rotate(90deg);
     display: block;
 }
 
+.videoActive {
+    display: block;
+}
+
 .ioInfo {
     display: none;
 }
@@ -154,6 +163,24 @@ transform: rotate(90deg);
     /*background: -ms-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
     /*background: -o-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
     /*background: -webkit-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+}
+
+.video {
+    display: block;
+    padding: 8px 4px 8px 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.videoButton {
+    padding: 2px 2px 5px 2px;
+    font-size:12px;
+    color:white;
+}
+
+.iconButton {
+    padding-right: 4px;
+    color:white;
 }
 
 .contentButton.active {

@@ -7,7 +7,6 @@ import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import io.vavr.collection.List;
 
 import java.io.FileNotFoundException;
-import java.net.URL;
 
 import static com.teststeps.thekla4j.activityLog.TestFunctions.writeContentToIndexFile;
 import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromResourceFile;
@@ -21,12 +20,13 @@ public class HtmlAttachmentTest {
       "Click",
       "click on @{element}",
       "2024-02-19 11:32:16",
-      "",
+      "Input",
       "com.teststeps.thekla4j.commons.error.ActivityError: Could not find Element.found(By(css=doesNotExist))",
       List.of(
-              (NodeAttachment) new LogAttachment("screenshot", loadRedDot().toString(), LogAttachmentType.IMAGE_PNG),
-              (NodeAttachment) new LogAttachment("screenshot", loadRedDot().toString(), LogAttachmentType.IMAGE_PNG))
+              (NodeAttachment) new LogAttachment("screenshot", loadRedDot(), LogAttachmentType.IMAGE_PNG),
+              (NodeAttachment) new LogAttachment("screenshot", loadRedDot(), LogAttachmentType.IMAGE_PNG))
           .toJavaList(),
+      null,
       ActivityLogEntryType.Interaction,
       ActivityStatus.failed,
       List.<ActivityLogNode>empty().toJavaList());
@@ -39,14 +39,18 @@ public class HtmlAttachmentTest {
       "",
       "",
       null,
+      List.of((NodeAttachment) new LogAttachment(
+        "Video Recording",
+        "https://file-examples.com/storage/fea570b16e6703ef79e65b4/2017/04/file_example_MP4_480_1_5MG.mp4",
+        LogAttachmentType.VIDEO_MP4)).toJavaList(),
       ActivityLogEntryType.Task,
       ActivityStatus.failed,
       List.of(child).toJavaList()
   );
 
 
-  public URL loadRedDot() {
-    return HtmlAttachmentTest.class.getClassLoader().getResource("reddot.png");
+  public String loadRedDot() {
+    return HtmlAttachmentTest.class.getClassLoader().getResource("reddot.png").getPath();
   }
 
 

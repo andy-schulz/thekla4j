@@ -48,6 +48,9 @@ public class ActivityLogNode implements Serializable {
   @Expose
   public List<NodeAttachment> attachments;
 
+  @Expose
+  public List<NodeAttachment> videoAttachments;
+
   /**
    * The type of the activity (Task, Interaction, Group)
    */
@@ -83,6 +86,7 @@ public class ActivityLogNode implements Serializable {
       final String input,
       final String output,
       final List<NodeAttachment> attachments,
+      final List<NodeAttachment> videoAttachments,
       final ActivityLogEntryType logType,
       final ActivityStatus status,
       final List<ActivityLogNode> activityNodes) {
@@ -92,6 +96,7 @@ public class ActivityLogNode implements Serializable {
     this.input = input;
     this.output = output;
     this.attachments = attachments;
+    this.videoAttachments = videoAttachments;
     this.logType = logType;
     this.status = status;
     this.activityNodes = activityNodes;
