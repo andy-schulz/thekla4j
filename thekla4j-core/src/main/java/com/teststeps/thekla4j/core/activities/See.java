@@ -8,23 +8,22 @@ import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.core.error.ValidationError;
 import io.vavr.Function0;
-import io.vavr.Function1;
 import io.vavr.Function3;
 import io.vavr.Tuple2;
-import io.vavr.collection.List;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import io.vavr.control.Validation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.regex.Pattern;
 
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Workflow("ask if @{activity} is matching the validations (retry for @{retries} time(s))")
 @Log4j2
@@ -33,15 +32,15 @@ public class See<P, M> extends Interaction<P, P> {
   @Called(name = "activity")
   private final Activity<P, M> activity;
 
-  private List<ValidateResult<M>> matchers = List.empty();
+  private LinkedHashMap<String, SeeAssertion<M>> matchers2 = LinkedHashMap.empty();
 
 
   @Called(name = "retries")
-  private Duration duration = Duration.ofSeconds(0);
+  private Duration duration = Duration.of(0, SECONDS);
 
-  private Duration nextTryIn = Duration.ofSeconds(1);
+  private Duration nextTryIn = Duration.of(1, SECONDS);
 
-  private final Function3<Instant, Duration, Function0<Either<ActivityError, Boolean>>, Either<ActivityError, Boolean>> retryExecutingTaskIfFails =
+  private final Function3<Instant, Duration, Function0<Either<ActivityError, String>>, Either<ActivityError, String>> retryExecutingTaskIfFails =
       (endTry, next, askQuestion) -> Match(askQuestion.apply()).of(
 
           Case($(e -> e.isLeft() &&
@@ -57,17 +56,6 @@ public class See<P, M> extends Interaction<P, P> {
           Case($(), e -> e)
       );
 
-  private final Function1<String, ValidationError> createExceptionWithCause =
-      errorMessage ->
-          errorMessage.length() > 200 ?
-              Try.of(() -> Pattern.compile(".*predicate '(.*)' to pass.*", Pattern.DOTALL))
-                 .map(pattern -> pattern.matcher(errorMessage))
-                 .map(matcher -> matcher.matches() ?
-                     new ValidationError(matcher.group(1) + " failed", new ValidationError(errorMessage)) :
-                     new ValidationError(errorMessage))
-                 .getOrElse(new ValidationError("error parsing the the error message: " + errorMessage)) :
-              new ValidationError(errorMessage);
-
   private See(Activity<P, M> question) {
     this.activity = question;
   }
@@ -75,21 +63,10 @@ public class See<P, M> extends Interaction<P, P> {
   @Override
   protected Either<ActivityError, P> performAs(Actor actor, P passedResult) {
 
-    Function0<Either<ActivityError, Boolean>> executeActivity =
-        () -> actor.attemptsTo_(this.activity)
-                   .apply(passedResult)
-                   .map(res -> this.matchers
-                       .map(actor::attemptsTo_)
-                       .map(validation -> validation.apply(res))
-                       .map(e -> e.mapLeft(x -> List.of(x.getMessage())))
-                       .map(Either::toValidation))
-                   .map(Validation::sequence)
-                   .map(v -> v.mapError(l -> l.foldLeft("", (a, e) -> a + "\n" + e + "\n")))
-                   .map(v -> v.mapError(createExceptionWithCause))
-                   .map(v -> v.map(l -> true))
-                   .map(Validation::toEither)
-                   .flatMap(either -> either.mapLeft(ActivityError::of));
-
+    Function0<Either<ActivityError, String>> executeActivity =
+        () -> actor.attemptsTo_(this.activity
+                               , ValidateResult.with(this.matchers2))
+                   .apply(passedResult);
 
     return retryExecutingTaskIfFails.apply(Instant.now()
                                                   .plusMillis(duration.toMillis()), nextTryIn, executeActivity)
@@ -110,12 +87,13 @@ public class See<P, M> extends Interaction<P, P> {
   }
 
   public See<P, M> is(SeeAssertion<M> matcher) {
-    this.matchers = this.matchers.append(ValidateResult.with(matcher, "expected to match validation"));
+    this.matchers2 = this.matchers2.put("expected to match validation", matcher);
+
     return this;
   }
 
   public See<P, M> is(Tuple2<String, SeeAssertion<M>> matcher) {
-    this.matchers = this.matchers.append(ValidateResult.with(matcher._2, matcher._1));
+    this.matchers2 = this.matchers2.put(matcher);
     return this;
   }
 

@@ -6,28 +6,40 @@ import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.control.Either;
 
-@Action("expected to pass on predicate: @{reason}")
-class ValidateResult<M> extends Interaction<M, Void> {
+import java.util.stream.Collectors;
+
+@Action("verify all assertion on See activity")
+class ValidateResult<M> extends Interaction<M, String> {
 
   @Called(name = "reason")
-  private final String reason;
-  private final SeeAssertion<M> matcher;
+  private final LinkedHashMap<String, SeeAssertion<M>> matcher;
 
   @Override
-  protected Either<ActivityError, Void> performAs(Actor actor, M result) {
+  protected Either<ActivityError, String> performAs(Actor actor, M result) {
 
-    return matcher.affirm(result);
+    String error = matcher
+      .map(t -> t.map2(m -> m.affirm(result)))
+      .filter(t -> t._2.isLeft())
+      .map(t -> t._2.getLeft().getMessage())
+      .collect(Collectors.joining("\n"));
+
+    if (error.isEmpty()) {
+      String success = matcher.keySet().foldLeft("", (acc, key) -> acc + key + ": true \n");
+      return Either.right(success);
+    } else {
+      return Either.left(ActivityError.of("\n" + error + "\n"));
+    }
   }
 
-  public static <M2> ValidateResult<M2> with(SeeAssertion<M2> matcher, String reason) {
-    return new ValidateResult<>(matcher, reason);
+  public static <M2> ValidateResult<M2> with(LinkedHashMap<String, SeeAssertion<M2>> matcher) {
+    return new ValidateResult<>(matcher);
   }
 
-  private ValidateResult(SeeAssertion<M> matcher, String reason) {
+  private ValidateResult(LinkedHashMap<String, SeeAssertion<M>> matcher) {
     this.matcher = matcher;
-    this.reason = reason;
   }
 
 

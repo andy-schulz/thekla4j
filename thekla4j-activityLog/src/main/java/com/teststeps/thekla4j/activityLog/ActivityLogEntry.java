@@ -185,9 +185,8 @@ public class ActivityLogEntry implements Serializable {
                 acc.equals(ActivityStatus.running) || stat.equals(ActivityStatus.running) ? ActivityStatus.running :
                     acc;
 
-        // Dont change the status when its already failed e.g.
-        // The See activity may be failed but all sub tasks are passed
-        if (this.activityStatus != ActivityStatus.failed)
+        // Calculate the status of the group node as it is not actively set
+        if (this.activityType.equals(ActivityLogEntryType.Group))
             Try.of(() -> getSubTreeStatusList().reduce(testStatus))
                 .onSuccess(this::status)
                 .onFailure(ex -> status(this.activityStatus));

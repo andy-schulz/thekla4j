@@ -8,7 +8,7 @@ import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-@Workflow("get result of activity")
+@Workflow("passed result of activity")
 public class PassedActivityResult<A> extends Task<A, A> {
 
   public static <A1> PassedActivityResult<A1> ofLastActivity() {
