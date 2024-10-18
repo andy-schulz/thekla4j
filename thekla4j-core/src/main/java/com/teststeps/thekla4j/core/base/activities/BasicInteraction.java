@@ -24,5 +24,10 @@ public abstract class BasicInteraction implements Activity<Void, Void> {
     return evaluationResult.getOrElseThrow(() -> TaskIsNotEvaluated.called(this));
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
+
   protected abstract Either<ActivityError, Void> performAs(Actor actor);
 }

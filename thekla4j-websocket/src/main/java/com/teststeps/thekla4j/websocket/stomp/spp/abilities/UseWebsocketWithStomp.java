@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.websocket.stomp.spp.abilities;
 
+import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import com.teststeps.thekla4j.websocket.stomp.core.*;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 
@@ -40,5 +42,10 @@ public class UseWebsocketWithStomp implements Ability {
   @Override
   public void destroy() {
     stompClient.destroy();
+  }
+
+  @Override
+  public List<NodeAttachment> abilityLogDump() {
+    return List.empty();
   }
 }

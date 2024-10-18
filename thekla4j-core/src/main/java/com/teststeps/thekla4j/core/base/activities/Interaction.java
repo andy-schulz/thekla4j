@@ -23,5 +23,10 @@ public abstract class Interaction<PT, RT> implements Activity<PT, RT> {
         Either<ActivityError, RT> res = performAs(actor, result);
         evaluationResult = Option.of(res);
         return res;
-    };
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

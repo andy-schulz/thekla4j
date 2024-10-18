@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.core;
 
+import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Cast;
 import com.teststeps.thekla4j.core.data.SomeAbility;
+import io.vavr.collection.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -140,6 +142,11 @@ public class TestActorAbility {
     public void destroy() {
 
     }
+
+    @Override
+    public List<NodeAttachment> abilityLogDump() {
+      return List.empty();
+    }
   }
 
   static class SecondAbility implements Ability {
@@ -147,6 +154,11 @@ public class TestActorAbility {
     @Override
     public void destroy() {
 
+    }
+
+    @Override
+    public List<NodeAttachment> abilityLogDump() {
+      return List.empty();
     }
   }
 }
