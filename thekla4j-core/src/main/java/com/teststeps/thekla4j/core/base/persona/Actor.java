@@ -13,6 +13,7 @@ import com.teststeps.thekla4j.core.base.errors.DoesNotHaveLogAnnotation;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;
 import io.vavr.Function1;
 import io.vavr.Function3;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -37,14 +38,11 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this.name;
   }
 
-  public TheklaActivityLog activityLog() {
+  public void attachAbilityDumpToLog() {
 
-//    if (this.activityLog)
-//      List.ofAll(abilityMap.values())
-//        .flatMap(Ability::abilityLogDump)
-//        .forEach(this.activityLog::appendAttachmentsToRootNode);
-
-    return this.activityLog;
+    List.ofAll(this.abilityMap.values())
+      .flatMap(Ability::abilityLogDump)
+      .forEach(this.activityLog::appendAttachmentsToRootNode);
   }
 
   @Override
