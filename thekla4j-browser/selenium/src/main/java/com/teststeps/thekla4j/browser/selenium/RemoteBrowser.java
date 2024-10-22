@@ -40,7 +40,8 @@ class RemoteBrowser {
       .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()));
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()))
+      .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
   }
 
   /**
@@ -61,7 +62,8 @@ class RemoteBrowser {
       .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()));
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()))
+      .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
   }
 
   /**

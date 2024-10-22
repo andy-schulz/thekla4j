@@ -1,8 +1,6 @@
-package com.teststeps.thekla4j.browser.selenium.integration;
+package com.teststeps.thekla4j.browser.browserstack.integration;
 
-import com.teststeps.thekla4j.browser.selenium.Selenium;
-import com.teststeps.thekla4j.browser.selenium.spp.activities.SetBrowserstackStatus;
-import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
+import com.teststeps.thekla4j.browser.browserstack.tasks.SetBrowserstackStatus;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -17,8 +15,8 @@ public class IT_BrowserStackStatus {
 
   @BeforeEach
   public void setUp() {
-    actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+    actor = Actor.named("Test Actor");
+//      .whoCan(BrowseTheWeb.with(Selenium.browser()));
   }
 
   @AfterEach

@@ -1,9 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.core.Browser;
+import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
+import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
@@ -25,11 +27,12 @@ import java.time.Duration;
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 
 @Log4j2(topic = "Browser")
-class SeleniumBrowser implements Browser {
+class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   private final RemoteWebDriver driver;
   private final HighlightContext highlightContext = new HighlightContext();
   private final Option<SeleniumOptions> options;
+  private Option<BrowsersStackOptions> bsOptions = Option.none();
 
   SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options) {
     this.driver = driver;
@@ -41,6 +44,11 @@ class SeleniumBrowser implements Browser {
     this.driver = driver;
     this.options = Option.of(SeleniumOptions.empty());
     this.driver.manage().window().maximize();
+  }
+
+  protected SeleniumBrowser withBrowserStackOptions(BrowsersStackOptions bsOptions) {
+    this.bsOptions = Option.of(bsOptions);
+    return this;
   }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
@@ -241,5 +249,10 @@ class SeleniumBrowser implements Browser {
   public Try<Void> navigateForward() {
     return navigateForward.apply(driver)
       .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Boolean executesOnBrowserStack() {
+    return bsOptions.isDefined();
   }
 }

@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.browser.selenium.spp.activities;
+package com.teststeps.thekla4j.browser.browserstack.tasks;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.browser.spp.activities.ExecuteJavaScript;
