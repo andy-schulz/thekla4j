@@ -1,6 +1,8 @@
 package com.teststeps.thekla4j.browser.browserstack.tasks;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
+import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ExecuteJavaScript;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
@@ -27,6 +29,13 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
 
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor, Void result) {
+
+
+    BrowserStackExecutor executor = (BrowserStackExecutor) BrowseTheWeb.as(actor);
+
+    if (!executor.executesOnBrowserStack())
+      return Either.right(null);
+
     String sessionScript = "browserstack_executor: " + JSON.jStringify(session);
     String statusScript = "browserstack_executor: " + JSON.jStringify(status);
 
