@@ -95,13 +95,14 @@ public class LogFormatter {
         .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "")
 
         .replace("{$$_IN_BUTTON}",
-          Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" : "<span class=\"label contentButton inContentButton\">In</span>")
+          Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
+            "<span class=\"label contentButton inContentButton\"><i class=\"fa fa-hand-o-right iconButton\"></i>In</span>")
 
         .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-          "<span class=\"label contentButton outContentButton\">Out</span>")
+          "<span class=\"label contentButton outContentButton\"><i class=\"fa fa-hand-o-left iconButton\"></i>Out</span>")
 
         .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-          "<span class=\"label contentButton attachmentContentButton\">Attachment</span>")
+          "<span class=\"label contentButton attachmentContentButton\"><i class=\"fa fa-file-photo-o iconButton\"></i>Attachment</span>")
 
         .replace("{$$_VIDEO_ATTACHMENT_BUTTON}", Objects.isNull(logNode.videoAttachments) || logNode.videoAttachments.isEmpty() ? "" :
           "<span class=\"label videoContentButton contentButton videoButton\" ><i class=\"fa fa-video-camera videoButton\"></i></span>")
