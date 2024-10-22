@@ -6,12 +6,11 @@ import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
-import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.function.Function;
+import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.takeScreenshot;
 
 @Log4j2
 public class BrowseTheWeb implements Ability {
@@ -36,14 +35,11 @@ public class BrowseTheWeb implements Ability {
   @Override
   public List<NodeAttachment> abilityLogDump() {
 
-    return List.of(browser)
-      .map(Browser::takeScreenShot)
-      .map(t -> t.map(screenshot ->
-        new LogAttachment("screenshot", screenshot.getAbsolutePath(), LogAttachmentType.IMAGE_PNG)))
-      .transform(LiftTry.fromList())
-      .onFailure(x -> log.error("Could not take screenshot", x))
-      .getOrElse(List.empty())
-      .map(Function.identity());
+    return takeScreenshot(browser)
+      .map(screenshot ->
+        new LogAttachment("screenshot", screenshot.getAbsolutePath(), LogAttachmentType.IMAGE_PNG))
+      .map(List::<NodeAttachment>of)
+      .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   private BrowseTheWeb(Browser browser) {
