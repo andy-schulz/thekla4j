@@ -38,11 +38,13 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this.name;
   }
 
-  public void attachAbilityDumpToLog() {
+  public Actor attachAbilityDumpToLog() {
 
     List.ofAll(this.abilityMap.values())
       .flatMap(Ability::abilityLogDump)
       .forEach(this.activityLog::appendAttachmentsToRootNode);
+
+    return this;
   }
 
   @Override

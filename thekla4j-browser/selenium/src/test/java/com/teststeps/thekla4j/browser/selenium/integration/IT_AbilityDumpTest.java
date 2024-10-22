@@ -39,10 +39,10 @@ public class IT_AbilityDumpTest {
 
       "Step", "Click on element");
 
-    actor.attachAbilityDumpToLog();
+    Actor act = actor.attachAbilityDumpToLog();
 
     ActivityLogNode log = actor.activityLog.getLogTree();
-
+    assertThat("Actor is the same", actor.equals(act));
     assertThat("has at least one attachment", log.attachments.size() == 1);
     assertThat("contains image with session Id", log.attachments.get(0).content(), containsString(sessionId + ".png"));
 
