@@ -228,6 +228,11 @@ class ElementFunctions {
     (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
       .onFailure(log::error);
 
+  protected final static Function2<RemoteWebDriver, Element, Try<File>> takeScreenShotOfElement =
+    (driver, element) -> findElement(driver, element)
+        .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
+        .onFailure(log::error);
+
   protected final static Function2<RemoteWebDriver, String, Try<Void>> executeJavaScript =
     (driver, script) -> Try.run(() -> driver.executeScript(script))
       .onFailure(log::error);
@@ -258,10 +263,10 @@ class ElementFunctions {
   protected final static Function2<RemoteWebDriver, String, Try<Void>> switchToBrowserByTitle =
     (driver, title) ->
       Try.of(() -> driver.getWindowHandles()
-        .stream()
-        .filter(handle -> driver.switchTo().window(handle).getTitle().equals(title))
-        .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("No browser with title " + title + " found")))
+          .stream()
+          .filter(handle -> driver.switchTo().window(handle).getTitle().equals(title))
+          .findFirst()
+          .orElseThrow(() -> new IllegalArgumentException("No browser with title " + title + " found")))
         .map(handle -> driver.switchTo().window(handle))
         .onFailure(log::error)
         .map(__ -> null);

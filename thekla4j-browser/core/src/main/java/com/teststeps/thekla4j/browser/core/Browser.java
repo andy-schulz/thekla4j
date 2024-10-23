@@ -46,6 +46,8 @@ public interface Browser {
 
   Try<File> takeScreenShot();
 
+  Try<File> takeScreenShotOfElement(Element element);
+
   Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause);
 
   Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput);

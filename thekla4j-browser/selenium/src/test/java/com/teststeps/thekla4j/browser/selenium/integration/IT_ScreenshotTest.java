@@ -1,16 +1,25 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
-import com.teststeps.thekla4j.activityLog.ActivityLogEntry;
-import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.core.Element;
+import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
-import com.teststeps.thekla4j.browser.selenium.data.UiTest;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
+import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.TakeScreenshot;
+import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.utils.json.JSON;
-import io.vavr.control.Option;
+import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class IT_ScreenshotTest {
 
@@ -25,24 +34,54 @@ public class IT_ScreenshotTest {
   }
 
   @Test
-  public void createScreenshot() {
+  public void createScreenshot() throws IOException {
 
     actor = Actor.named("Test Actor")
         .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
 
-    actor.attemptsTo$(
-
-      UiTest.failOnNotExistingElement(),
+    Either<ActivityError, File> file = actor.attemptsTo$(
+      Navigate.to("https://www.google.com"),
+      TakeScreenshot.ofPage(),
 
       "Step", "Click on element");
 
-    ActivityLogNode log = actor.activityLog.getLogTree();
+    assertThat("taking screenshot is a success", file.isRight());
+    assertThat("file exists", file.get().exists());
+    assertThat ("file is a file and not a directory", file.get().isFile());
+    assertThat ("size of file is bigger than 1024 byte", file.get().length() > 1024);
 
-    Option<ActivityLogEntry> failedActivity = actor.activityLog.getFailedActivity();
+    System.out.println(file.get().length());
 
-    System.out.println(JSON.jStringify(log));
-    System.out.println(JSON.jStringify(failedActivity));
+    Path p = Paths.get("").toAbsolutePath();
+    Files.move(file.get().toPath(), Paths.get(p.toString(), "page.png"), REPLACE_EXISTING);
+
+  }
+
+  @Test
+  public void createScreenshotOfElement() throws IOException {
+
+    Element button = Element.found(By.xpath("//*[text()='Alle akzeptieren']"));
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+
+    Either<ActivityError, File> file = actor.attemptsTo$(
+      Navigate.to("https://www.google.com"),
+      TakeScreenshot.ofElement(button),
+
+      "Step", "Click on element");
+
+    assertThat("taking screenshot is a success", file.isRight());
+    assertThat("file exists", file.get().exists());
+    assertThat ("file is a file and not a directory", file.get().isFile());
+    assertThat ("size of file is bigger than 1024 byte", file.get().length() > 1024);
+    assertThat ("size of file is smaller than 5000 byte", file.get().length() < 5000);
+
+    Path p = Paths.get("").toAbsolutePath();
+    Files.move(file.get().toPath(), Paths.get(p.toString(), "button.png"), REPLACE_EXISTING);
+
 
   }
 }

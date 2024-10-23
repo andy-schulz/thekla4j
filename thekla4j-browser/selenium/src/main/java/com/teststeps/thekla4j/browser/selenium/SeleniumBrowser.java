@@ -154,6 +154,12 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     return takeScreenShot.apply(driver);
   }
 
+  @Override
+  public Try<File> takeScreenShotOfElement(Element element) {
+    return takeScreenShotOfElement.apply(driver, element);
+  }
+
+  @Override
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes);
   }
