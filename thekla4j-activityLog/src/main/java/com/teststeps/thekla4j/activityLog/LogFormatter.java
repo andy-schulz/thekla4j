@@ -419,7 +419,6 @@ public class LogFormatter {
       .mapTry(Files::readAllBytes)
       .map(Base64.getEncoder()::encodeToString)
       .map(LogFormatter::formatPngBase64FileAttachment)
-      .onSuccess(log::info)
       .onFailure(log::error)
       .getOrElse("");
   }
