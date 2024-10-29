@@ -1,14 +1,18 @@
 package com.teststeps.thekla4j.utils.file;
 
 import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
 
-import java.net.URL;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+@Log4j2
 public class FileUtils {
 
   public static Function1<String, Try<String>> readStringFromResourceFile =
@@ -21,6 +25,15 @@ public class FileUtils {
     java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
     return s.hasNext() ? s.next() : "";
   }
+
+  public static Function2<Path, File, Try<File>> moveFile =
+    (targetFolder, sourceFile) ->
+      (Files.exists(targetFolder) ? Try.success(targetFolder) : Try.of(() -> Files.createDirectories(targetFolder)))
+
+        .mapTry(folder -> Files.move(sourceFile.toPath(), folder.resolve(sourceFile.getName()), REPLACE_EXISTING))
+        .map(Path::toString)
+        .map(File::new)
+        .onFailure(log::error);
 
 
   public static Function1<String, Try<String>> readStringFromLocation =
