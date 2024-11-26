@@ -16,6 +16,8 @@ dependencies {
     jacocoAggregation project(':thekla4j-browser:selenium')
     jacocoAggregation project(':thekla4j-commons')
     jacocoAggregation project(':thekla4j-core')
+    jacocoAggregation project(':thekla4j-cucumber')
+    jacocoAggregation project(':thekla4j-cucumber:data_generator')
     jacocoAggregation project(':thekla4j-http')
     jacocoAggregation project(':thekla4j-http-commons')
     jacocoAggregation project(':thekla4j-utils')
