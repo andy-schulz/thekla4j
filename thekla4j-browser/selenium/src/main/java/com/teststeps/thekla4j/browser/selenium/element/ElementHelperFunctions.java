@@ -47,7 +47,7 @@ public class ElementHelperFunctions {
   public static Function1<RemoteWebDriver, Function1<WebElement, Try<WebElement>>> scrollIntoView =
     driver -> element ->
       Try.of(() -> (JavascriptExecutor) driver)
-        .map(d -> d.executeScript("arguments[0].scrollIntoView({block: 'center',inline: 'center', behavior: 'smooth'});", element))
+        .mapTry(d -> d.executeScript("arguments[0].scrollIntoView({block: 'start',inline: 'center', behavior: 'smooth'});", element))
         .map(__ -> element);
 
 
