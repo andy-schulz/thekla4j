@@ -37,8 +37,8 @@ public class LogFormatter {
 
     return String.format(formattedText,
       indents,
-//      logNode.status == ActivityStatus.failed ? "✗" : "✓",
-      logNode.status == ActivityStatus.failed ? "x" : "OK",
+      logNode.status == ActivityStatus.failed ? "✗" : "✓",
+//      logNode.status == ActivityStatus.failed ? "x" : "OK",
       logNode.name,
       logNode.description.replace("\n", "\n" + new String(new char[indents.length() + 7 + logNode.name.length()]).replace("\0", " ")),
       logNode.activityNodes.stream().reduce(
