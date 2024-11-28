@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.core.activities;
 
+import com.teststeps.thekla4j.core.base.activities.Activity;
 import io.vavr.Function1;
 import io.vavr.control.Try;
 
@@ -57,6 +58,18 @@ public class API {
    */
   public static <T, R> Map<T, R> mapTry(Function1<T, Try<R>> mapper, String reason) {
     return new Map<>(mapper, reason);
+  }
+
+  /**
+   * create a runnable task that creates n new activity
+   *
+   * @param runner the function that creates the new activity
+   * @return the run task
+   * @param <T> the input type
+   * @param <R> the output type
+   */
+  public static <T,R> Activity<T,R> run(Function1<T, Activity<Void,R>> runner) {
+    return new Run<>(runner);
   }
 
   private API() {
