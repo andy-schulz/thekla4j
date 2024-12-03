@@ -98,7 +98,7 @@ class ElementFunctions {
           ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration));
     };
 
-  private static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
+  protected static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
     (driver, locators) ->
       locators.length() == 1 ?
 

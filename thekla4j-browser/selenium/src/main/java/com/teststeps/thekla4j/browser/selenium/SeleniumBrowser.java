@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.browser.selenium;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
+import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
@@ -25,6 +26,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
+import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
 @Log4j2(topic = "Browser")
 class SeleniumBrowser implements Browser, BrowserStackExecutor {
@@ -33,6 +35,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   private final HighlightContext highlightContext = new HighlightContext();
   private final Option<SeleniumOptions> options;
   private Option<BrowsersStackOptions> bsOptions = Option.none();
+  private Option<Frame> currentFrame = Option.none();
 
   SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options) {
     this.driver = driver;
@@ -67,6 +70,40 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     };
   }
 
+  protected Try<Void> switchFrame (Option<Frame> frame) {
+
+    if((currentFrame.isEmpty() && frame.isEmpty())) {
+      return Try.success(null);
+    }
+
+    if(currentFrame.isDefined() && frame.isEmpty()) {
+      currentFrame = Option.none();
+      switchToDefaultContent();
+      return Try.success(null);
+    }
+
+
+    if(currentFrame.isDefined() && frame.isDefined() && currentFrame.get().equals(frame.get())) {
+      return Try.success(null);
+    }
+
+    // current frame is empty and incoming frame is defined
+    // both frames are defined and they are not equal
+    this.currentFrame = frame;
+    return switchToFrame(frame.get());
+
+  }
+
+  protected void switchToDefaultContent() {
+    driver.switchTo().defaultContent();
+  }
+
+  protected Try<Void> switchToFrame(Frame frame) {
+    return switchToFrame.apply(driver, frame);
+  }
+
+
+
   @Override
   public Try<Void> navigateTo(String url) {
     return navigateTo.apply(driver, url)
@@ -75,43 +112,51 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   @Override
   public Try<Void> clickOn(Element element) {
-    return clickOnElement.apply(driver, highlightContext, element)
+    return switchFrame(element.frame())
+      .flatMap(x -> clickOnElement.apply(driver, highlightContext, element))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<Void> doubleClickOn(Element element) {
-    return doubleClickOnElement.apply(driver, highlightContext, element)
+    return switchFrame(element.frame())
+      .flatMap(x -> doubleClickOnElement.apply(driver, highlightContext, element))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
-    return enterTextIntoElement.apply(driver, highlightContext, element, text, clearField)
+    return switchFrame(element.frame())
+      .flatMap(x -> enterTextIntoElement.apply(driver, highlightContext, element, text, clearField))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<String> textOf(Element element) {
-    return getTextFromElement.apply(driver, highlightContext, element)
+
+    return switchFrame(element.frame())
+      .flatMap(x -> getTextFromElement.apply(driver, highlightContext, element))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<String> valueOf(Element element) {
-    return getValueOfElement.apply(driver, highlightContext, element)
+    return switchFrame(element.frame())
+      .flatMap(x -> getValueOfElement.apply(driver, highlightContext, element))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
-    return getAttributeFromElement.apply(driver, highlightContext, element, attribute)
+    return switchFrame(element.frame())
+      .flatMap(x -> getAttributeFromElement.apply(driver, highlightContext, element, attribute))
       .map(applyExecutionSlowDown());
   }
 
   @Override
   public Try<State> getState(Element element) {
-    return getElementState.apply(driver, highlightContext, element);
+    return switchFrame(element.frame())
+      .flatMap(x -> getElementState.apply(driver, highlightContext, element));
   }
 
   @Override
@@ -156,12 +201,14 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   @Override
   public Try<File> takeScreenShotOfElement(Element element) {
-    return takeScreenShotOfElement.apply(driver, element);
+    return switchFrame(element.frame())
+      .flatMap(x -> takeScreenShotOfElement.apply(driver, element));
   }
 
   @Override
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
-    return DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes);
+    return switchFrame(element.frame())
+      .flatMap(x -> DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes));
   }
 
   @Override
@@ -169,7 +216,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
     List<String> files = filePaths.map(Path::toString);
 
-    return setUploadFilesTo.apply(driver, files, targetFileUploadInput)
+    return switchFrame(targetFileUploadInput.frame())
+      .flatMap(x -> setUploadFilesTo.apply(driver, files, targetFileUploadInput))
       .map(applyExecutionSlowDown());
 
   }
@@ -229,7 +277,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   @Override
   public Try<Void> executeJavaScript(String script, Element element) {
-    return executeJavaScriptOnElement.apply(driver, highlightContext, script, element)
+    return switchFrame(element.frame())
+      .flatMap(x -> executeJavaScriptOnElement.apply(driver, highlightContext, script, element))
       .map(applyExecutionSlowDown());
   }
 

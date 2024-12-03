@@ -5,5 +5,5 @@ public enum LocatorType {
   ID,
   TEXT,
   CSS,
-  XPATH,
+  XPATH
 }
