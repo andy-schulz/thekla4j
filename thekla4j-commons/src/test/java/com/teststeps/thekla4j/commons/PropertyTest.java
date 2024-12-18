@@ -13,7 +13,7 @@ public class PropertyTest {
   @Test
   public void loadPropertyFromFiles() {
 
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyFile", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyFile", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
@@ -26,7 +26,7 @@ public class PropertyTest {
 
     System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem");
 
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
@@ -39,7 +39,7 @@ public class PropertyTest {
 
     System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem");
 
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
@@ -57,7 +57,7 @@ public class PropertyTest {
 
       System.setProperty("thekla4j.testPropertySystem", "propertyValueSetInSystem");
 
-      PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue");
+      PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertySystem", "defaultValue", "helpText");
 
       String property = Thekla4jProperty.of(propertyElement);
 
@@ -74,7 +74,7 @@ public class PropertyTest {
   @Test
   public void loadPropertyDefault() {
 
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyDefault", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyDefault", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
@@ -84,7 +84,7 @@ public class PropertyTest {
 
   @Test
   public void testForNotExistingSystemProperty() {
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyNotExisting", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyNotExisting", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
@@ -95,7 +95,7 @@ public class PropertyTest {
   public void testForEmptySystemProperty() {
     System.setProperty("thekla4j.testPropertyEmpty", "");
 
-    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyEmpty", "defaultValue");
+    PropertyElement propertyElement = PropertyElement.of("thekla4j.testPropertyEmpty", "defaultValue", "helpText");
 
     String property = Thekla4jProperty.of(propertyElement);
 
