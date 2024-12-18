@@ -3,8 +3,10 @@ package com.teststeps.thekla4j.core;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Retry;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.tasks.CountingTask;
 import com.teststeps.thekla4j.core.tasks.StaticStringTask;
 import com.teststeps.thekla4j.core.tasks.T_V2V_Failing;
+import com.teststeps.thekla4j.core.tasks.WaitUntil;
 import io.vavr.control.Either;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -123,5 +125,58 @@ public class TestActivityRetry {
     assertThat("check retry succeeds", result.isRight(), equalTo(true));
     assertThat("check retry waits for a maximum 1 second", (int) difference, Matchers.lessThan(1000));
     assertThat("check retry waits for at least 400 milli seconds", (int) difference , Matchers.greaterThanOrEqualTo(400));
+  }
+
+  @Test void retryWaitForTaskToSucceed() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Integer> result = tester.attemptsTo(
+      Retry.task(CountingTask.startWith(0))
+        .untilTask(WaitUntil.counterIs(2), "wait until predicate")
+        .forAsLongAs(Duration.ofSeconds(6))
+        .every(Duration.ofMillis(100)));
+
+    assertThat("check retry succeeds", result.isRight(), equalTo(true));
+    assertThat("check retry succeeds with correct result", result.get(), equalTo(1));
+  }
+
+  @Test void retryWaitForTaskWith2Executions() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Integer> result = tester.attemptsTo(
+      Retry.task(CountingTask.startWith(0))
+        .untilTask(WaitUntil.counterIs(3), "wait until predicate")
+        .forAsLongAs(Duration.ofSeconds(6))
+        .every(Duration.ofMillis(100)));
+
+    assertThat("check retry succeeds", result.isRight(), equalTo(true));
+    assertThat("check retry succeeds with correct result", result.get(), equalTo(2));
+  }
+
+  @Test void retryUntilWaiterDoesNotFail() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Integer> result = tester.attemptsTo(
+      Retry.task(CountingTask.startWith(0))
+        .untilTask(WaitUntil.doesNotFailWhenReaching(5), "wait until predicate")
+        .forAsLongAs(Duration.ofSeconds(6))
+        .every(Duration.ofMillis(100)));
+
+    assertThat("check retry succeeds", result.isRight(), equalTo(true));
+    assertThat("check retry succeeds with correct result", result.get(), equalTo(3));
+  }
+
+  @Test void retryButWaiterContinuesToFail() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Integer> result = tester.attemptsTo(
+      Retry.task(CountingTask.startWith(0))
+        .untilTask(WaitUntil.doesNotFailWhenReaching(100), "wait until called for 100 times")
+        .forAsLongAs(Duration.ofSeconds(1))
+        .every(Duration.ofMillis(300)));
+
+    assertThat("check retry fails", result.isLeft(), equalTo(true));
+    assertThat("check retry succeeds with correct result", result.getLeft().getMessage(),
+      equalTo("Retrying task CountingTask timed out after 1 seconds with result:\n\t 4 \n\t message: wait until called for 100 times\n"));
   }
 }
