@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.With;
 import lombok.extern.log4j.Log4j2;
 
+import static com.teststeps.thekla4j.core.activities.API.map;
+
 /**
  * Set the status of the current Browserstack session to failed
  */
@@ -36,15 +38,20 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
     if (!failsOnError) {
       return actor.attemptsTo(
           ExecuteJavaScript.onBrowser(sessionScript),
+            map(__ -> null),
           ExecuteJavaScript.onBrowser(statusScript))
         .recover(x -> {
           log.error("Failed to set Browserstack status: {}", x.getMessage());
           return null;
-        });
+        })
+        .map(__ -> null);
     } else {
       return actor.attemptsTo(
         ExecuteJavaScript.onBrowser(sessionScript),
-        ExecuteJavaScript.onBrowser(statusScript));
+        map(__ -> null),
+
+        ExecuteJavaScript.onBrowser(statusScript),
+        map(__ -> null));
     }
   }
 
