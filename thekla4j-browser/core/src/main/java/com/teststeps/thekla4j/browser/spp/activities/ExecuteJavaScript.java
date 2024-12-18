@@ -5,7 +5,7 @@ import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
+import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
@@ -17,7 +17,7 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Log4j2(topic = "Browser-ExecuteJavaScript")
 @Workflow("execute the JavaScript @{script}")
-public class ExecuteJavaScript extends BasicInteraction {
+public class ExecuteJavaScript extends Task<Void, Object> {
 
   @Called(name = "script")
   private final String script;
@@ -25,7 +25,7 @@ public class ExecuteJavaScript extends BasicInteraction {
   private final Option<Element> element;
 
   @Override
-  protected Either<ActivityError, Void> performAs(Actor actor) {
+  protected Either<ActivityError, Object> performAs(Actor actor, Void unused) {
 
     if (element.isEmpty())
       return BrowseTheWeb.as(actor)

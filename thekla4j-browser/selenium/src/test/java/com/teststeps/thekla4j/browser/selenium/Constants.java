@@ -7,4 +7,5 @@ public class Constants {
   public static String ELEMENT_STATES = FRAMEWORKTESTER + "/elementStates/";
   public static String FRAMES = FRAMEWORKTESTER + "/frames/";
   public static String CANVAS = FRAMEWORKTESTER + "/canvas/";
+  public static String TABLE = FRAMEWORKTESTER + "/table/";
 }

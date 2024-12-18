@@ -45,7 +45,7 @@ class ElementFunctions {
         element,
         Instant.now(),
         Duration.ofMillis(0))
-      .map(highlightElement.apply(driver, highlightContext))
+      .map(highlightElement.apply(driver, highlightContext, element.highlight()))
       .flatMap(scrollIntoView.apply(driver));
   }
 
@@ -58,6 +58,16 @@ class ElementFunctions {
         Instant.now(),
         Duration.ofMillis(0))
       .flatMap(scrollIntoView.apply(driver));
+  }
+
+  static Try<WebElement> findElementWithoutScrolling(RemoteWebDriver driver, Element element) {
+
+    return retryUntil.apply(
+        ElementFunctions.locateElement.apply(driver),
+        locateElement.apply(driver).apply(element),
+        element,
+        Instant.now(),
+        Duration.ofMillis(0));
   }
 
   private static final Function1<RemoteWebDriver, Function1<Element, Try<WebElement>>> locateElement =
@@ -233,13 +243,13 @@ class ElementFunctions {
         .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
         .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, String, Try<Void>> executeJavaScript =
-    (driver, script) -> Try.run(() -> driver.executeScript(script))
+  protected final static Function2<RemoteWebDriver, String, Try<Object>> executeJavaScript =
+    (driver, script) -> Try.of(() -> driver.executeScript(script))
       .onFailure(log::error);
 
-  protected final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Void>> executeJavaScriptOnElement =
-    (driver, hlx, script, element) -> findElement(driver, hlx, element)
-      .flatMap(webElement -> Try.run(() -> driver.executeScript(script, webElement)))
+  protected final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Object>> executeJavaScriptOnElement =
+    (driver, hlx, script, element) -> findElementWithoutScrolling(driver, element)
+      .flatMap(webElement -> Try.of(() -> driver.executeScript(script, webElement)))
       .onFailure(log::error);
 
   /**

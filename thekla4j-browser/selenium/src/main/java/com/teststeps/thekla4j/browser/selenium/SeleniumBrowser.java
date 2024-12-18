@@ -276,14 +276,14 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
 
   @Override
-  public Try<Void> executeJavaScript(String script, Element element) {
+  public Try<Object> executeJavaScript(String script, Element element) {
     return switchFrame(element.frame())
       .flatMap(x -> executeJavaScriptOnElement.apply(driver, highlightContext, script, element))
       .map(applyExecutionSlowDown());
   }
 
   @Override
-  public Try<Void> executeJavaScript(String script) {
+  public Try<Object> executeJavaScript(String script) {
     return executeJavaScript.apply(driver, script)
       .map(applyExecutionSlowDown());
   }

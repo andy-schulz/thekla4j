@@ -74,7 +74,7 @@ public interface Browser {
 
   Try<KeyActions> executeKeyActions();
 
-  Try<Void> executeJavaScript(String script, Element element);
+  Try<Object> executeJavaScript(String script, Element element);
 
-  Try<Void> executeJavaScript(String script);
+  Try<Object> executeJavaScript(String script);
 }

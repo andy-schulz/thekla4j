@@ -11,7 +11,7 @@ dependencies {
     implementation project(":thekla4j-utils")
 
 
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.17.0'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.27.0'
 
 }
 

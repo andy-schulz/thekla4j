@@ -15,12 +15,14 @@ public record Element(
     List<Locator> locators,
     Option<Frame> frame,
     String name,
+    Boolean highlight,
     UntilElement waiter) {
   public static Element found(Locator locator) {
     return new Element(
         List.of(locator),
         Option.none(),
         "unnamed",
+        true,
         defaultWaiter());
   }
 
@@ -29,6 +31,7 @@ public record Element(
         List.of(locator),
         Option.of(frame),
         "unnamed",
+        true,
         defaultWaiter());
   }
 
@@ -39,14 +42,18 @@ public record Element(
   }
 
   public Element called(String name) {
-    return new Element(locators, frame, name, waiter);
+    return new Element(locators, frame, name, highlight, waiter);
   }
 
   public Element andThenFound(Locator locator) {
-    return new Element(locators.append(locator), frame, name, waiter);
+    return new Element(locators.append(locator), frame, name, highlight, waiter);
+  }
+
+  public Element dontHighlight() {
+    return new Element(locators, frame, name, false, waiter);
   }
 
   public Element wait(UntilElement waiter) {
-    return new Element(locators, frame, name, waiter);
+    return new Element(locators, frame, name, highlight, waiter);
   }
 }

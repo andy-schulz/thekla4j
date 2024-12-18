@@ -1,9 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium.element;
 
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
-import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
+import io.vavr.Function0;
 import io.vavr.Function1;
-import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +11,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.util.Objects;
+
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_VERTICAL;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.HIGHLIGHT_ELEMENTS;
 
 @Log4j2(topic = "Element Helper Operations")
 public class ElementHelperFunctions {
@@ -22,11 +24,25 @@ public class ElementHelperFunctions {
     "var style = arguments[0].getAttribute('style')\n" +
       "arguments[0].setAttribute('style', style ? style + '%s' : '%s')";
 
+  private static final String SCROLL_INTO_VIEW_SCRIPT =
+    """
+      arguments[0].scrollIntoView({block: '%s',inline: 'center', behavior: 'instant'});
+    """;
+
+  private final String SCROLL_INTO_VIEW_SCRIPT2 =
+    """
+      var element = arguments[0];
+      var rect = element.getBoundingClientRect();
+      if(!(rect.top >= 0 && rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth))) {
+      element.scrollIntoView({block: 'center',inline: 'center', behavior: 'instant'});
+      }""";
+
   private static final Function3<RemoteWebDriver, WebElement, String, Object> setBorder =
     (driver, element, style) ->
       ((JavascriptExecutor) driver).executeScript(
         String.format(SCRIPT, style, style),
-//              String.format("arguments[0].setAttribute('style', '%s');", style),
         element);
 
 
@@ -44,20 +60,34 @@ public class ElementHelperFunctions {
       return null;
     };
 
+  private static final Function0<String> getVerticalScrolling =
+    () -> switch (AUTO_SCROLL_VERTICAL.value()) {
+      case "top" -> "start";
+      case "bottom" -> "end";
+      default -> "center";
+    };
+
+
   public static Function1<RemoteWebDriver, Function1<WebElement, Try<WebElement>>> scrollIntoView =
     driver -> element ->
-      Try.of(() -> (JavascriptExecutor) driver)
-        .mapTry(d -> d.executeScript("arguments[0].scrollIntoView({block: 'start',inline: 'center', behavior: 'smooth'});", element))
-        .map(__ -> element);
+      DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED.value().equals("true") ?
+
+        Try.of(() -> (JavascriptExecutor) driver)
+          .mapTry(d -> d.executeScript("arguments[0].scrollIntoView({block: '%s',inline: 'center', behavior: 'instant'});"
+            .formatted(getVerticalScrolling.apply()), element))
+          .map(__ -> element) :
+
+        Try.success(element);
 
 
-  public static Function2<RemoteWebDriver, HighlightContext, Function1<WebElement, WebElement>> highlightElement =
-    (driver, hlx) -> element -> {
+  public static Function3<RemoteWebDriver, HighlightContext, Boolean, Function1<WebElement, WebElement>> highlightElement =
+    (driver, hlx, elementHighlight) -> element -> {
 
-      Boolean highlightElements = Boolean.parseBoolean(
-        Thekla4jProperty.of(DefaultThekla4jBrowserProperties.HIGHLIGHT_ELEMENTS.property()));
+      if (!elementHighlight) {
+        return element;
+      }
 
-      if (!highlightElements) {
+      if (!Boolean.parseBoolean(HIGHLIGHT_ELEMENTS.value())) {
         return element;
       }
 

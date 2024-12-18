@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.core.activities.API.map;
 
 public class IT_ExecuteJavaScript {
 
@@ -45,6 +46,8 @@ public class IT_ExecuteJavaScript {
 
         ExecuteJavaScript.onBrowser(script),
 
+        map(__ -> null),
+
         See.ifThe(Text.of(header))
           .is(Expected.to.equal("Clicked on Button: Button with id")))
 
@@ -67,6 +70,8 @@ public class IT_ExecuteJavaScript {
         Navigate.to(FRAMEWORKTESTER),
 
         ExecuteJavaScript.onElement(script, element),
+
+        map(__ -> null),
 
         See.ifThe(Text.of(header))
           .is(Expected.to.equal("Clicked on Button: Button with id")))
