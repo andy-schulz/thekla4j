@@ -127,8 +127,11 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
     entry.calculateStatus();
 
-    if (entry.parent != null)
+    if (entry.parent != null) {
+      entry.parent.setEndTime(LocalDateTime.now());
       this._currentActivity = entry.parent;
+    }
+
   }
 
   /**
