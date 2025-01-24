@@ -18,6 +18,7 @@ import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -80,6 +81,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     (status, activityLogEntry, actLog) -> output -> {
       activityLogEntry
         .setOutput(output.getOrElse(""))
+        .setEndTime(LocalDateTime.now())
         .status(status);
       actLog.reset(activityLogEntry);
     };

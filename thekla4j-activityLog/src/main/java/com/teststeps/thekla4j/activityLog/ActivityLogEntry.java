@@ -9,6 +9,7 @@ import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -28,7 +29,12 @@ public class ActivityLogEntry implements Serializable {
     /**
      * the start time of the activity
      */
-    private final LocalDateTime startedAt;
+    private final LocalDateTime start;
+
+    /**
+     * the end time of the activity
+     */
+    private LocalDateTime end;
     /**
      * the name of the activity
      */
@@ -96,7 +102,7 @@ public class ActivityLogEntry implements Serializable {
         this.activityType = activityType;
         this.activityStatus = activityStatus;
         this.activityLogType = activityLogType;
-        this.startedAt = LocalDateTime.now();
+        this.start = LocalDateTime.now();
         this.parent = parent;
 
         if (parent != null)
@@ -133,6 +139,11 @@ public class ActivityLogEntry implements Serializable {
      */
     public ActivityStatus status() {
         return this.activityStatus;
+    }
+
+    public ActivityLogEntry setEndTime(LocalDateTime end) {
+        this.end = end;
+        return this;
     }
 
     /**
@@ -227,7 +238,9 @@ public class ActivityLogEntry implements Serializable {
         return new ActivityLogNode(
             this.activityName,
             this.activityDescription,
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").format(this.startedAt),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").format(this.start),
+            Objects.isNull(this.end) ? "not finished" : DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").format(this.end),
+            Objects.isNull(this.end) ? Duration.ofSeconds(0) : Duration.between(this.start, this.end),
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.input,
             this.activityLogType.equals(TASK_LOG.NO_INPUT_OUTPUT) ? "" : this.output,
             Objects.isNull(this.attachments) ? null : this.attachments.toJavaList(),

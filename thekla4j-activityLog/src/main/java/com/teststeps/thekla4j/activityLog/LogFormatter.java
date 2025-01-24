@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -48,6 +49,12 @@ public class LogFormatter {
                         );
   }
 
+  private static String formatDuration(Duration duration) {
+    return String.format("%s.%02d",
+                         duration.toSeconds(),
+                         duration.toMillisPart());
+  }
+
   /**
    * format the content of the node as html it is the inner content of the ul/li html list
    *
@@ -57,11 +64,14 @@ public class LogFormatter {
   protected static String formatShortLogContentToHtml(ActivityLogNode node) {
     return """
       <span class="logMessage">
-        <span class = "timestamp">{$$_NODE_STARTED_AT} - </span>
+        <span class="timestamp">{$$_NODE_STARTED_AT} - {$$_NODE_ENDED_AT}</span>
+        <span class="duration">{$$_NODE_DURATION} sec - </span>
         <span><span class="activityName">[{$$_NODE_NAME}]</span> - </span>
         <span class="activityDescription">{$$_NODE_DESCRIPTION}</span>
       </span>"""
       .replace("{$$_NODE_STARTED_AT}", node.startedAt)
+      .replace("{$$_NODE_ENDED_AT}", node.endedAt)
+      .replace("{$$_NODE_DURATION}", formatDuration(node.duration))
       .replace("{$$_NODE_NAME}", node.name)
       .replace("{$$_NODE_DESCRIPTION}", (node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
   }
@@ -175,6 +185,13 @@ public class LogFormatter {
       .collect(Collectors.joining("<br>"));
   }
 
+  private static String legend = """
+      <div class="legend">
+          <input type="checkbox" id="toggleTimeSpan">
+          <span id="timespanToggleDescription">switch visibility of timespan on or off</span>
+      </div>
+    """;
+
   /**
    * format the node to an html tree and add the style and JS function to the html representation
    *
@@ -187,15 +204,18 @@ public class LogFormatter {
       {$$_STYLE}
       </style>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-      {$$_HTML_TAGS}
       
+      {$$_LEGEND}
+      
+      {$$_HTML_TAGS}
+     
       {$$_SCRIPT}
       """;
     String returnText = "";
     try {
       returnText = formattedText
         .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
+        .replace("{$$_LEGEND}", legend)
         .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNode))
         .replace("{$$_SCRIPT}", functionScript);
     } catch (Exception e) {
@@ -218,6 +238,8 @@ public class LogFormatter {
       
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+      {$$_LEGEND}
+
       {$$_HTML_TAGS}
 
       {$$_SCRIPT}
@@ -226,6 +248,7 @@ public class LogFormatter {
     try {
       returnText = formattedText
         .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
+        .replace("{$$_LEGEND}", legend)
         .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNodes))
         .replace("{$$_SCRIPT}", functionScript);
     } catch (Exception e) {
@@ -478,7 +501,7 @@ public class LogFormatter {
       var outToggler = document.querySelectorAll(".label.outContentButton");
       var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
       var videoToggler = document.querySelectorAll(".label.videoContentButton");
-
+    
       var descToggler = document.querySelectorAll(".ellipses");
       var i;
   
@@ -520,6 +543,18 @@ public class LogFormatter {
               this.classList.toggle("active");
           });
       }
+    
+      var toggleButton = document.getElementById("toggleTimeSpan");
+        toggleButton.addEventListener("change", function() {
+            var timestamps = document.querySelectorAll(".timestamp");
+            timestamps.forEach(function(timestamp) {
+                if (toggleButton.checked) {
+                    timestamp.style.display = "inline-block";
+                } else {
+                    timestamp.style.display = "none";
+                }
+            });
+        });
       </script>
     """;
 

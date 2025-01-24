@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
 import com.teststeps.thekla4j.activityLog.ActivityStatus;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -31,6 +32,19 @@ public class ActivityLogNode implements Serializable {
    */
   @Expose
   public String startedAt;
+
+  /**
+   * The time the activity was ended
+   */
+  @Expose
+  public String endedAt;
+
+  /**
+   * The duration of the activity
+   */
+  @Expose
+  public Duration duration;
+
   /**
    * The input to the activity
    */
@@ -72,6 +86,8 @@ public class ActivityLogNode implements Serializable {
    * @param name - The name of the activity
    * @param description - The description of the activity
    * @param startedAt - The time the activity was started
+   * @param endedAt - The time the activity was ended
+   * @param duration - The duration of the activity
    * @param input - The input to the activity
    * @param output - The output of the activity (result or error message)
    * @param attachments - The attachments of the activity (PNG, PDF, etc.)
@@ -83,6 +99,8 @@ public class ActivityLogNode implements Serializable {
       final String name,
       final String description,
       final String startedAt,
+      final String endedAt,
+      final Duration duration,
       final String input,
       final String output,
       final List<NodeAttachment> attachments,
@@ -93,6 +111,8 @@ public class ActivityLogNode implements Serializable {
     this.name = name;
     this.description = description;
     this.startedAt = startedAt;
+    this.endedAt = endedAt;
+    this.duration = duration;
     this.input = input;
     this.output = output;
     this.attachments = attachments;

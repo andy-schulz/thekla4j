@@ -7,6 +7,7 @@ import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import io.vavr.collection.List;
 
 import java.io.FileNotFoundException;
+import java.time.Duration;
 
 import static com.teststeps.thekla4j.activityLog.TestFunctions.writeContentToIndexFile;
 import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromResourceFile;
@@ -20,6 +21,8 @@ public class HtmlAttachmentTest {
       "Click",
       "click on @{element}",
       "2024-02-19 11:32:16",
+      "2024-02-19 11:32:16",
+      Duration.ofSeconds(2, 456789000),
       "Input",
       "com.teststeps.thekla4j.commons.error.ActivityError: Could not find Element.found(By(css=doesNotExist))",
       List.of(
@@ -31,11 +34,30 @@ public class HtmlAttachmentTest {
       ActivityStatus.failed,
       List.<ActivityLogNode>empty().toJavaList());
 
+  ActivityLogNode child2 = new ActivityLogNode(
+    "Click",
+    "description one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty one twenty two twenty three twenty four twenty five twenty six twenty seven twenty eight twenty nine thirty",
+    "2024-02-19 11:32:16",
+    "2024-02-19 11:32:16",
+    Duration.ofSeconds(2, 456789000),
+    "Input",
+    "com.teststeps.thekla4j.commons.error.ActivityError: Could not find Element.found(By(css=doesNotExist))",
+    List.of(
+        (NodeAttachment) new LogAttachment("screenshot", loadRedDot(), LogAttachmentType.IMAGE_PNG),
+        (NodeAttachment) new LogAttachment("screenshot", loadRedDot(), LogAttachmentType.IMAGE_PNG))
+      .toJavaList(),
+    null,
+    ActivityLogEntryType.Interaction,
+    ActivityStatus.failed,
+    List.<ActivityLogNode>empty().toJavaList());
+
 
   ActivityLogNode rootLoc = new ActivityLogNode(
       "START",
       "Test Actor attempts to",
       "2020-01-01T00:00:00.000Z",
+      "2020-01-01T01:00:00.000Z",
+      Duration.ofSeconds(123, 456789000),
       "",
       "",
       null,
@@ -45,7 +67,7 @@ public class HtmlAttachmentTest {
         LogAttachmentType.VIDEO_MP4)).toJavaList(),
       ActivityLogEntryType.Task,
       ActivityStatus.failed,
-      List.of(child).toJavaList()
+      List.of(child, child2).toJavaList()
   );
 
 

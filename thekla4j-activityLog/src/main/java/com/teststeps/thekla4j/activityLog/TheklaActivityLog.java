@@ -8,6 +8,7 @@ import io.vavr.collection.List;
 import io.vavr.control.Option;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -118,6 +119,8 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    */
   @Override
   public void reset(ActivityLogEntry entry) {
+
+    entry.setEndTime(LocalDateTime.now());
 
     if(entry.status() == ActivityStatus.failed && this._failedActivity.isEmpty())
       this._failedActivity = Option.of(entry);
