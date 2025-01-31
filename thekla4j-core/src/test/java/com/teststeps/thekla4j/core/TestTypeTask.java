@@ -2,7 +2,6 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
-import com.teststeps.thekla4j.core.base.errors.TaskIsNotEvaluated;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.tasks.AddNumber;
 import io.vavr.control.Either;
@@ -18,51 +17,26 @@ public class TestTypeTask {
 
   @Test
   @DisplayName("calling perform on a task with null actor should throw exception")
-  public void testUsingANullActor() {
+  public void testUsingRunAsMethod() {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> AddNumber.of(1).perform(null, 1));
+      () -> AddNumber.of(1).runAs(null, 1));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }
 
   @Test
-  public void testEvaluationResult() {
+  public void testResultForRunAsMethod() throws ActivityError {
 
     Actor actor = Actor.named("TheActor");
 
     AddNumber task = AddNumber.of(1);
 
-    actor.attemptsTo_(task).apply(2);
+    Integer result =  task.runAs(actor, 2);
 
-    Either<ActivityError, Integer> value = task.value();
+    assertThat("output is as expected", result, equalTo(3));
 
-    assertThat("task execution is successful", value.isRight());
-    assertThat("output is as expected", value.get(), equalTo(3));
-
-  }
-
-  @Test
-  @DisplayName("value method should throw TaskIsNotEvaluated exception")
-  public void checkingForAbilityShouldThrowException() {
-
-    AddNumber task = AddNumber.of(1);
-
-    Throwable thrown = assertThrows(
-      TaskIsNotEvaluated.class,
-      task::value);
-
-    assertThat("error message is correct", thrown.getMessage(),
-      startsWith("""
-
-      Task AddNumber is not evaluated yet.
-      try using it with an actor:
-
-          actor.attemptsTo(
-              AddNumber.someMethod()
-          )"""
-                ));
   }
 
   @Test

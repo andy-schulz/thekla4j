@@ -2,7 +2,6 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
-import com.teststeps.thekla4j.core.base.errors.TaskIsNotEvaluated;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +24,13 @@ public class TestTypeBasicInteraction {
   }
 
   @Test
+  public void testBasicInteractionWithRunMethod() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    BasicInteractionTask.start().runAs(actor);
+  }
+
+  @Test
   @DisplayName("calling perform on a BasicInteraction with null actor should throw exception")
   public void testUsingANullActor() {
 
@@ -42,35 +48,12 @@ public class TestTypeBasicInteraction {
     BasicInteractionTask task = BasicInteractionTask.start();
 
     Either<ActivityError, Void> result = actor.attemptsTo(task);
-    Either<ActivityError, Void> value = task.value();
 
 
     assertThat("task execution is successful", result.isRight());
-    assertThat("task is evaluated", value.get(), equalTo(null));
-    assertThat("result and value are the same", result, equalTo(value));
+    assertThat("task is evaluated", result.get(), equalTo(null));
   }
 
-  @Test
-  @DisplayName("value method should throw TaskIsNotEvaluated exception")
-  public void checkingForAbilityShouldThrowException() {
-
-    BasicInteractionTask task = BasicInteractionTask.start();
-
-    Throwable thrown = assertThrows(
-      TaskIsNotEvaluated.class,
-      task::value);
-
-    assertThat("error message is correct", thrown.getMessage(),
-      startsWith("""
-
-      Task BasicInteractionTask is not evaluated yet.
-      try using it with an actor:
-
-          actor.attemptsTo(
-              BasicInteractionTask.someMethod()
-          )"""
-                ));
-  }
 
   static class BasicInteractionTask extends BasicInteraction {
 

@@ -3,7 +3,7 @@ package com.teststeps.thekla4j.core.activities;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.error.ActivityTimeOutError;

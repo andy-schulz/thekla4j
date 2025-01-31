@@ -5,7 +5,7 @@ import com.teststeps.thekla4j.activityLog.annotations.AttachOnError;
 import com.teststeps.thekla4j.activityLog.data.LogAttachment;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Option;

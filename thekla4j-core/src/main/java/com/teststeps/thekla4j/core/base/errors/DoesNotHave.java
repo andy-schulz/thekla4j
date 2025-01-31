@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.core.base.errors;
 
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 
 public class DoesNotHave {

@@ -8,10 +8,11 @@ import lombok.NonNull;
 
 import java.util.function.Function;
 
-public abstract class BasicInteraction extends Activity<Void, Void> {
+public abstract class SupplierTask<RT> extends Activity<Void, RT> {
+
 
   @Override
-  final public Either<ActivityError, Void> perform(@NonNull Actor actor, Void unused){
+  final public Either<ActivityError, RT> perform(@NonNull Actor actor, Void result){
     return performAs(actor);
   }
 
@@ -20,9 +21,9 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
     return this.getClass().getSimpleName();
   }
 
-  protected abstract Either<ActivityError, Void> performAs(Actor actor);
+  protected abstract Either<ActivityError, RT> performAs(Actor actor);
 
-  final public void runAs(Actor actor) throws ActivityError {
-    perform(actor, null).getOrElseThrow(Function.identity());
+  final public RT runAs(Actor actor) throws ActivityError {
+    return perform(actor, null).getOrElseThrow(Function.identity());
   }
 }

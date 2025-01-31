@@ -6,7 +6,7 @@ import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.CalledList;
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.errors.DetectedNullObject;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
 import com.teststeps.thekla4j.core.base.persona.Actor;

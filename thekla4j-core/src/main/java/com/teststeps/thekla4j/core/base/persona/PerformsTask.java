@@ -1,7 +1,6 @@
 package com.teststeps.thekla4j.core.base.persona;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Activity;
 import io.vavr.Function1;
 import io.vavr.control.Either;
 

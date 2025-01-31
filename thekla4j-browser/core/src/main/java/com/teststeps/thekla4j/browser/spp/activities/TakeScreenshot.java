@@ -6,7 +6,7 @@ import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function1;
@@ -22,21 +22,16 @@ import static com.teststeps.thekla4j.utils.file.FileUtils.moveFile;
 @Log4j2(topic = "TakeScreenshot")
 public class TakeScreenshot {
 
-  public static TakeScreenshotActivity ofPage() {
+  public static TakePageScreenshot ofPage() {
     return new TakePageScreenshot();
   }
 
-  public static TakeScreenshotActivity ofElement(Element element) {
+  public static TakeElementScreenshot ofElement(Element element) {
     return new TakeElementScreenshot(element);
   }
 
-  public interface TakeScreenshotActivity extends Activity<Void, File> {
-    Activity<Void, File> saveTo(Path path);
-  }
-
-
   @Workflow("take a screenshot of the page")
-  private static class TakePageScreenshot extends Task<Void, File> implements TakeScreenshotActivity {
+  public static class TakePageScreenshot extends Task<Void, File> {
 
     private Function1<File, Try<File>> saveTo = Try::success;
 
@@ -50,7 +45,6 @@ public class TakeScreenshot {
         .toEither(ActivityError.of("could not get screen shot of page"));
     }
 
-    @Override
     public Activity<Void, File> saveTo(Path path) {
       this.saveTo = moveFile.apply(path);
       return this;
@@ -58,7 +52,7 @@ public class TakeScreenshot {
   }
 
   @Workflow("take a screenshot of element @{element}")
-  private static class TakeElementScreenshot extends Task<Void, File> implements TakeScreenshotActivity {
+  public static class TakeElementScreenshot extends Task<Void, File> {
 
     @Called(name = "element")
     private final Element element;
@@ -78,7 +72,6 @@ public class TakeScreenshot {
       this.element = element;
     }
 
-    @Override
     public Activity<Void, File> saveTo(Path path) {
      this.saveTo = moveFile.apply(path);
       return this;

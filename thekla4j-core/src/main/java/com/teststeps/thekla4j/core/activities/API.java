@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.core.activities;
 
-import com.teststeps.thekla4j.core.base.activities.Activity;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import io.vavr.Function1;
 import io.vavr.control.Try;
 

@@ -7,7 +7,6 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activityLog.ProcessAttachmentAnnotation;
 import com.teststeps.thekla4j.core.activityLog.ProcessLogAnnotation;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
-import com.teststeps.thekla4j.core.base.activities.Activity;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveLogAnnotation;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;

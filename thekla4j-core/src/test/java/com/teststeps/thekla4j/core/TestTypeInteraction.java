@@ -2,7 +2,6 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
-import com.teststeps.thekla4j.core.base.errors.TaskIsNotEvaluated;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
@@ -43,34 +42,10 @@ public class TestTypeInteraction {
     InteractionTask task = InteractionTask.start();
 
     Either<ActivityError, Integer> result = actor.attemptsTo_(task).apply(3);
-    Either<ActivityError, Integer> value = task.value();
 
 
     assertThat("task execution is successful", result.isRight());
-    assertThat("task is evaluated", value.get(), equalTo(3));
-    assertThat("result and value are the same", result, equalTo(value));
-  }
-
-  @Test
-  @DisplayName("value method should throw TaskIsNotEvaluated exception")
-  public void checkingForAbilityShouldThrowException() {
-
-    InteractionTask task = InteractionTask.start();
-
-    Throwable thrown = assertThrows(
-      TaskIsNotEvaluated.class,
-      task::value);
-
-    assertThat("error message is correct", thrown.getMessage(),
-      startsWith("""
-
-      Task InteractionTask is not evaluated yet.
-      try using it with an actor:
-
-          actor.attemptsTo(
-              InteractionTask.someMethod()
-          )"""
-                ));
+    assertThat("task is evaluated", result.get(), equalTo(3));
   }
 
   static class InteractionTask extends Interaction<Integer, Integer> {
