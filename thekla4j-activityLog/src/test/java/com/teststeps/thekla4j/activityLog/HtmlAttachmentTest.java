@@ -5,8 +5,9 @@ import com.teststeps.thekla4j.activityLog.data.LogAttachment;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import io.vavr.collection.List;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.time.Duration;
 
 import static com.teststeps.thekla4j.activityLog.TestFunctions.writeContentToIndexFile;
@@ -14,6 +15,7 @@ import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromResource
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+@Disabled
 public class HtmlAttachmentTest {
 
 
@@ -76,13 +78,18 @@ public class HtmlAttachmentTest {
   }
 
 
-//  @Test
-  public void loadRedDotTest() throws FileNotFoundException {
+  @Test
+  public void loadRedDotTest() {
     writeContentToIndexFile.apply(LogFormatter.formatLogAsHtmlTree(rootLoc));
   }
 
-//  @Test
-  public void loadRedDotTest2() throws FileNotFoundException {
+  @Test
+  public void loadRedDotTestList() {
+    writeContentToIndexFile.apply(LogFormatter.formatLogAsHtmlTree(List.of(rootLoc, rootLoc)));
+  }
+
+  @Test
+  public void loadRedDotTest2() {
 
     String index = readStringFromResourceFile.apply("redDotExample.html")
       .getOrElseThrow(x -> new RuntimeException("Error loading redDotExample.png file", x));
