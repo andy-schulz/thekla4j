@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation group: "io.freefair.gradle", name: "lombok-plugin", version: "8.1.0"
     implementation group: "io.freefair.gradle", name: "lombok-plugin", version: "8.1.0"
-    implementation group: "pl.allegro.tech.build", name:"axion-release-plugin", version: "1.15.5"
+    implementation group: "pl.allegro.tech.build", name:"axion-release-plugin", version: "1.18.16"
 }
 
 repositories {
