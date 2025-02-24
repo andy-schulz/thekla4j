@@ -6,10 +6,15 @@ import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
-import io.vavr.*;
+import io.vavr.Function1;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Function5;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -17,9 +22,24 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.time.Duration;
 
+/**
+ * Functions for drawing shapes on a web page
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2(topic = "DrawingFunctions")
 class DrawingFunctions {
 
+  /**
+   * Draw a shape on a web page
+   *
+   * @param driver         - the web driver
+   * @param hlx            - the highlight context
+   * @param element        - the element to draw the shape on
+   * @param releaseAndHold - whether to release and hold the mouse
+   * @param pause          - the pause between drawing actions
+   * @param shape          - the shape to draw
+   * @return - a Try of void
+   */
   protected static Try<Void> drawShape(RemoteWebDriver driver, HighlightContext hlx, Element element, Boolean releaseAndHold, Option<Duration> pause, List<Shape> shape) {
 
     return ElementFunctions.findElement(driver, hlx, element)
@@ -68,6 +88,7 @@ class DrawingFunctions {
       pause.map(d -> actions.pause(d.toMillis()));
       return null;
     };
+
   private static final Function4<List<PointerMove>, Boolean, Option<Duration>, Actions, Actions> addDrawingActions =
     (directions, releaseAndHold, pause, actions) -> {
       directions.forEach(move -> {

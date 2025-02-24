@@ -4,7 +4,11 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
-import io.vavr.*;
+import io.vavr.Function0;
+import io.vavr.Function1;
+import io.vavr.Function3;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
@@ -12,10 +16,17 @@ import lombok.extern.log4j.Log4j2;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static com.teststeps.thekla4j.browser.selenium.functions.ConfigFunctions.loadBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.functions.ConfigFunctions.loadSeleniumConfig;
-import static io.vavr.API.*;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 
+/**
+ * Load the Browser from the configuration
+ */
 @Log4j2(topic = "Selenium Browser Load")
 public class Selenium {
 
@@ -29,6 +40,12 @@ public class Selenium {
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
+  /**
+   * Load the Browser from the configuration
+   *
+   * @param testName - the name of the test
+   * @return a Try of the Browser
+   */
   public static Browser browser(String testName) {
     return loadBrowser.apply(Option.of(testName))
       .getOrElseThrow((e) -> new RuntimeException(e));
@@ -46,7 +63,9 @@ public class Selenium {
    */
   static final Function0<Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
     () -> loadSeleniumConfig.apply()
-      .flatMap(sc -> loadBrowserConfig.apply()
+      .map(loadDefaultSeleniumConfig)
+      .flatMap(sc -> loadBrowserConfigList.apply()
+        .map(loadDefaultBrowserConfig)
         .map(bc -> Tuple.of(sc, bc)));
 
   /**
@@ -70,7 +89,7 @@ public class Selenium {
 
       .onSuccess(
         x -> log.warn(
-          "Running Browser on Local Machine: " + browserConfig.browserName() + ". Ignoring platform and version information in config. " + browserConfig));
+          "Running Browser on Local Machine: " + browserConfig.browserName() + ". Ignoring platform and version information in com.teststeps.thekla4j.browser.appium.config. " + browserConfig));
 
 
   /**
@@ -104,17 +123,17 @@ public class Selenium {
     (testName, seleniumConfig, browserConfig) -> {
 
       if (seleniumConfig.isDefined() && browserConfig.isDefined()) {
-        log.info(() -> "Loading Remote Browser with config.");
-        return RemoteBrowser.with(testName, seleniumConfig.get(), browserConfig.get());
+        log.info(() -> "Loading Remote Browser with com.teststeps.thekla4j.browser.appium.config.");
+        return SeleniumBrowserBuilder.with(testName, seleniumConfig.get(), browserConfig.get());
       }
 
       if (seleniumConfig.isDefined() && browserConfig.isEmpty()) {
         log.info(() -> "No BrowserConfig found. Loading default Chrome Remote Browser.");
-        return RemoteBrowser.defaultChromeBrowser(testName, seleniumConfig.get());
+        return SeleniumBrowserBuilder.defaultChromeBrowser(testName, seleniumConfig.get());
       }
 
       if (seleniumConfig.isEmpty() && browserConfig.isDefined()) {
-        log.info(() -> "No SeleniumConfig found. Loading local browser with config.");
+        log.info(() -> "No SeleniumConfig found. Loading local browser with com.teststeps.thekla4j.browser.appium.config.");
         return loadBrowserByConfig.apply(browserConfig.get());
       }
 

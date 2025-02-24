@@ -17,7 +17,7 @@ import java.time.Instant;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
 
 @Log4j2
-public class FrameFunctions {
+class FrameFunctions {
 
   static Try<WebElement> findFrame(RemoteWebDriver driver, Frame frame) {
 

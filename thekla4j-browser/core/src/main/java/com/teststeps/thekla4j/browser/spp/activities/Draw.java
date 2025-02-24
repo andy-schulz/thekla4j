@@ -11,11 +11,15 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 import java.time.Duration;
 
-@AllArgsConstructor
+/**
+ * Interaction to draw a shape to an element
+ */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("draw shape @{shape} to @{element}")
 public class Draw extends BasicInteraction {
 
@@ -33,26 +37,58 @@ public class Draw extends BasicInteraction {
       .transform(ActivityError.toEither("Could not draw shape to element!"));
   }
 
+  /**
+   * Factory method to create a new Draw activity
+   *
+   * @param shape the shape to draw
+   * @return a new Draw instance
+   */
   public static Draw shape(Shape shape) {
     return new Draw(List.of(shape), null, false, Option.none());
   }
 
+  /**
+   * Factory method to create a new Draw activity
+   *
+   * @param shapes the shapes to draw
+   * @return a new Draw instance
+   */
   public static Draw shapes(Shape... shapes) {
     return new Draw(List.of(shapes), null, false, Option.none());
   }
 
+  /**
+   * Factory method to specify the element to draw the shape to
+   *
+   * @param element the element to draw the shape to
+   * @return the Draw instance
+   */
   public Draw on(Element element) {
     this.element = element;
     return this;
   }
 
+  /**
+   * set whether to release and hold between strokes (of single shapes)
+   *
+   * @param releaseAndHold true to release and hold, false to not
+   * @return the Draw instance
+   */
   public Draw releaseAndHoldAfterStroke(Boolean releaseAndHold) {
     this.releaseAndHold = releaseAndHold;
     return this;
   }
 
+  /**
+   * set the pause after each stroke
+   *
+   * @param pause the pause duration
+   * @return the Draw instance
+   */
   public Draw pauseAfterStroke(Duration pause) {
     this.pause = Option.of(pause);
     return this;
   }
+
+
 }

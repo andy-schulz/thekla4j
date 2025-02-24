@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.teststeps.thekla4j.utils.json.exception.JsonParseException;
 import com.teststeps.thekla4j.utils.json.exception.JsonStringifyException;
 import com.teststeps.thekla4j.utils.json.serialization.LocalDateTimeDeserializer;
 import com.teststeps.thekla4j.utils.json.serialization.LocalDateTimeSerializer;
 import io.vavr.Function1;
 import io.vavr.control.Try;
+import io.vavr.jackson.datatype.VavrModule;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +22,7 @@ public class YAML {
       .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
       .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+      .registerModule(new VavrModule())
       .registerModule(new JavaTimeModule())
       .registerModule(new SimpleModule().addSerializer(LocalDateTime.class, new LocalDateTimeSerializer()))
       .registerModule(new SimpleModule().addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()));

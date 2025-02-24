@@ -1,4 +1,7 @@
-os: "Windows"
-osVersion: "10"
-browserName: "Chrome"
-browserVersion: "120.0"
+defaultConfig: win
+
+win:
+  os: "Windows"
+  osVersion: "10"
+  browserName: "Chrome"
+  browserVersion: "120.0"

@@ -43,7 +43,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     this.driver.manage().window().maximize();
   }
 
-  SeleniumBrowser(RemoteWebDriver driver) {
+  protected SeleniumBrowser(RemoteWebDriver driver) {
     this.driver = driver;
     this.options = Option.of(SeleniumOptions.empty());
     this.driver.manage().window().maximize();
@@ -102,14 +102,18 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     return switchToFrame.apply(driver, frame);
   }
 
-
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateTo(String url) {
     return navigateTo.apply(driver, url)
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clickOn(Element element) {
     return switchFrame(element.frame())
@@ -117,6 +121,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> doubleClickOn(Element element) {
     return switchFrame(element.frame())
@@ -124,6 +131,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return switchFrame(element.frame())
@@ -131,6 +141,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> textOf(Element element) {
 
@@ -139,6 +152,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> valueOf(Element element) {
     return switchFrame(element.frame())
@@ -146,6 +162,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
     return switchFrame(element.frame())
@@ -153,64 +172,100 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<State> getState(Element element) {
     return switchFrame(element.frame())
       .flatMap(x -> getElementState.apply(driver, highlightContext, element));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> title() {
     return getTitle.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> url() {
     return getUrl.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Cookie> getCookie(String name) {
     return getCookie.apply(driver, name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<List<Cookie>> getAllCookies() {
     return getAllCookies.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> addCookie(Cookie cookie) {
     return addCookie.apply(driver, cookie);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> deleteCookie(String name) {
     return deleteCookie.apply(driver, name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> deleteAllCookies() {
     return deleteAllCookies.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> takeScreenShot() {
     return takeScreenShot.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> takeScreenShotOfElement(Element element) {
     return switchFrame(element.frame())
       .flatMap(x -> takeScreenShotOfElement.apply(driver, element));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return switchFrame(element.frame())
       .flatMap(x -> DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
 
@@ -222,31 +277,49 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToNewBrowserTab() {
     return switchToNewBrowserTab.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToNewBrowserWindow() {
     return switchToNewBrowserWindow.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToBrowserByTitle(String browserTitle) {
     return switchToBrowserByTitle.apply(driver, browserTitle);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToBrowserByIndex(int index) {
     return switchToBrowserByIndex.apply(driver, index);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Integer> numberOfOpenTabsAndWindows() {
     return numberOfOpenTabsAndWindows.apply(driver);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> quit() {
     Option.of(driver)
@@ -259,22 +332,33 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     return Try.success(null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> getSessionId() {
     return Try.of(() -> driver.getSessionId().toString());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Boolean isVideoRecordingActive() {
     return options.map(SeleniumOptions::recordVideo).getOrElse(false);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<KeyActions> executeKeyActions() {
     return Try.of(() -> new SeleniumKeyAction(new Actions(driver)));
   }
 
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Object> executeJavaScript(String script, Element element) {
     return switchFrame(element.frame())
@@ -282,30 +366,45 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Object> executeJavaScript(String script) {
     return executeJavaScript.apply(driver, script)
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> refresh() {
     return refresh.apply(driver)
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateBack() {
     return navigateBack.apply(driver)
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateForward() {
     return navigateForward.apply(driver)
       .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Boolean executesOnBrowserStack() {
     return bsOptions.isDefined();

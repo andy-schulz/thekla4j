@@ -30,6 +30,9 @@ import java.util.function.BiFunction;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
 
+/**
+ * Functions to interact with elements
+ */
 @Log4j2(topic = "Element Operations")
 class ElementFunctions {
 
@@ -108,7 +111,7 @@ class ElementFunctions {
           ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration));
     };
 
-  protected static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
+  static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
     (driver, locators) ->
       locators.length() == 1 ?
 
@@ -129,17 +132,17 @@ class ElementFunctions {
     (driver, locator) -> List.ofAll(driver.findElements(LocatorResolver.resolve(locator)));
 
 
-  protected final static Function2<RemoteWebDriver, String, Try<Void>> navigateTo =
+  final static Function2<RemoteWebDriver, String, Try<Void>> navigateTo =
     (driver, url) -> Try.run(() -> driver.navigate().to(url));
 
-  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clickOnElement =
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clickOnElement =
     (driver, hlx, element) -> findElement(driver, hlx, element)
       .flatMapTry(elem -> Try.run(elem::click))
       .onFailure(log::error)
       .map(x -> null);
 
 
-  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> doubleClickOnElement =
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> doubleClickOnElement =
     (driver, hlx, element) -> findElement(driver, hlx, element)
       .flatMap(elem -> Try.of(() -> new Actions(driver))
         .map(actions -> actions.doubleClick(elem))
@@ -148,7 +151,7 @@ class ElementFunctions {
       .map(x -> null);
 
 
-  protected final static Function5<RemoteWebDriver, HighlightContext, Element, String, Boolean, Try<Void>> enterTextIntoElement =
+  final static Function5<RemoteWebDriver, HighlightContext, Element, String, Boolean, Try<Void>> enterTextIntoElement =
     (driver, hlx, element, text, clearField) -> findElement(driver, hlx, element)
       .peek(webElement -> {
         if (clearField) {
@@ -159,27 +162,27 @@ class ElementFunctions {
       .onFailure(log::error)
       .map(x -> null);
 
-  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getTextFromElement =
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getTextFromElement =
     (driver, hlx, element) ->
       findElement(driver, hlx, element)
         .map(WebElement::getText)
         .onFailure(log::error);
 
-  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getValueOfElement =
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getValueOfElement =
     (driver, hlx, element) ->
       findElement(driver, hlx, element)
         .map(webElement -> webElement.getAttribute("value"))
         .onFailure(log::error);
 
 
-  protected final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getAttributeFromElement =
+  final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getAttributeFromElement =
     (driver, hlx, element, attribute) ->
       findElement(driver, hlx, element)
         .map(webElement -> webElement.getAttribute(attribute))
         .onFailure(log::error);
 
 
-  protected final static Function3<RemoteWebDriver, HighlightContext, Element, Try<State>> getElementState =
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<State>> getElementState =
     (driver, hlx, element) ->
       findElement(driver, hlx, element)
         .map(webElement ->
@@ -190,26 +193,26 @@ class ElementFunctions {
         .onFailure(log::error)
         .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
-  protected final static Function1<RemoteWebDriver, Try<String>> getTitle =
+  final static Function1<RemoteWebDriver, Try<String>> getTitle =
     driver -> Try.of(driver::getTitle)
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<String>> getUrl =
+  final static Function1<RemoteWebDriver, Try<String>> getUrl =
     driver -> Try.of(driver::getCurrentUrl)
       .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
+  final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
     (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))
       .map(c -> Cookie.of(c.getName(), c.getValue()))
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<List<Cookie>>> getAllCookies =
+  final static Function1<RemoteWebDriver, Try<List<Cookie>>> getAllCookies =
     (driver) -> Try.of(() -> driver.manage().getCookies())
       .map(List::ofAll)
       .map(c -> c.map(c1 -> Cookie.of(c1.getName(), c1.getValue())))
       .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, Cookie, Try<Void>> addCookie =
+  final static Function2<RemoteWebDriver, Cookie, Try<Void>> addCookie =
     (driver, cookie) -> Try.run(() -> driver.manage().addCookie(
         new org.openqa.selenium.Cookie
           .Builder(cookie.name(), cookie.value())
@@ -225,29 +228,29 @@ class ElementFunctions {
           .build()))
       .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, String, Try<Void>> deleteCookie =
+  final static Function2<RemoteWebDriver, String, Try<Void>> deleteCookie =
     (driver, name) -> Try.run(() -> driver.manage().deleteCookieNamed(name))
       .onFailure(log::error);
 
   // deleteAllCookies
-  protected final static Function1<RemoteWebDriver, Try<Void>> deleteAllCookies =
+  final static Function1<RemoteWebDriver, Try<Void>> deleteAllCookies =
     (driver) -> Try.run(() -> driver.manage().deleteAllCookies())
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<File>> takeScreenShot =
+  final static Function1<RemoteWebDriver, Try<File>> takeScreenShot =
     (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
       .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, Element, Try<File>> takeScreenShotOfElement =
+  final static Function2<RemoteWebDriver, Element, Try<File>> takeScreenShotOfElement =
     (driver, element) -> findElement(driver, element)
         .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
         .onFailure(log::error);
 
-  protected final static Function2<RemoteWebDriver, String, Try<Object>> executeJavaScript =
+  final static Function2<RemoteWebDriver, String, Try<Object>> executeJavaScript =
     (driver, script) -> Try.of(() -> driver.executeScript(script))
       .onFailure(log::error);
 
-  protected final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Object>> executeJavaScriptOnElement =
+  final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Object>> executeJavaScriptOnElement =
     (driver, hlx, script, element) -> findElementWithoutScrolling(driver, element)
       .flatMap(webElement -> Try.of(() -> driver.executeScript(script, webElement)))
       .onFailure(log::error);
@@ -255,7 +258,7 @@ class ElementFunctions {
   /**
    * Switch to a browser tab by index
    */
-  protected final static Function2<RemoteWebDriver, Integer, Try<Void>> switchToBrowserByIndex =
+  final static Function2<RemoteWebDriver, Integer, Try<Void>> switchToBrowserByIndex =
     (driver, index) ->
       Try.of(() -> driver.getWindowHandles().toArray(new String[0]))
 
@@ -270,7 +273,7 @@ class ElementFunctions {
   /**
    * Switch to a browser tab by title
    */
-  protected final static Function2<RemoteWebDriver, String, Try<Void>> switchToBrowserByTitle =
+  final static Function2<RemoteWebDriver, String, Try<Void>> switchToBrowserByTitle =
     (driver, title) ->
       Try.of(() -> driver.getWindowHandles()
           .stream()
@@ -284,34 +287,34 @@ class ElementFunctions {
   /**
    * Switch to a new browser tab
    */
-  protected final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserTab =
+  final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserTab =
     (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.TAB))
       .onFailure(log::error);
 
   /**
    * Switch to a new browser window
    */
-  protected final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserWindow =
+  final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserWindow =
     (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.WINDOW))
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<Integer>> numberOfOpenTabsAndWindows =
+  final static Function1<RemoteWebDriver, Try<Integer>> numberOfOpenTabsAndWindows =
     (driver) -> Try.of(() -> driver.getWindowHandles().size())
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<Void>> refresh =
+  final static Function1<RemoteWebDriver, Try<Void>> refresh =
     (driver) -> Try.run(() -> driver.navigate().refresh())
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<Void>> navigateBack =
+  final static Function1<RemoteWebDriver, Try<Void>> navigateBack =
     (driver) -> Try.run(() -> driver.navigate().back())
       .onFailure(log::error);
 
-  protected final static Function1<RemoteWebDriver, Try<Void>> navigateForward =
+  final static Function1<RemoteWebDriver, Try<Void>> navigateForward =
     (driver) -> Try.run(() -> driver.navigate().forward())
       .onFailure(log::error);
 
-  protected final static Function3<RemoteWebDriver, List<String>, Element, Try<Void>> setUploadFilesTo =
+  final static Function3<RemoteWebDriver, List<String>, Element, Try<Void>> setUploadFilesTo =
     (driver, filePaths, element) -> findElement(driver, element)
       .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString(",")))
         .onFailure(log::error))

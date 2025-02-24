@@ -6,6 +6,11 @@ plugins {
 tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
 tasks.withType(PublishToMavenLocal).configureEach { it.enabled = false }
 
+project.ext {
+    seleniumVersion = '4.27.0'
+    appiumVersion = '9.4.0'
+}
+
 dependencies {
     implementation project(":thekla4j-commons")
 }

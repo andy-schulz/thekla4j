@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
@@ -14,9 +15,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Helper functions for taking screenshots
+ */
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Log4j2(topic = "Screenshot Operations")
 public class ScreenshotFunctions {
 
+  /**
+   * Get the path to save the screenshot
+   *
+   * @return - the path to save the screenshot
+   */
   protected static String getScreenshotPath() {
 
     return Option.of(Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_RELATIVE_PATH.property()))
@@ -31,6 +41,12 @@ public class ScreenshotFunctions {
   }
 
 
+  /**
+   * Take a screenshot of the browser
+   *
+   * @param browser - the browser to take the screenshot of
+   * @return - a Try containing the file of the screenshot
+   */
   public static Either<ActivityError, File> takeScreenshot(Browser browser) {
 
     // new formatted data

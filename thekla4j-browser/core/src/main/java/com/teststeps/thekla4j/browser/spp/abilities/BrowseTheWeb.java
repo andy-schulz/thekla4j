@@ -12,26 +12,49 @@ import lombok.extern.log4j.Log4j2;
 
 import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.takeScreenshot;
 
+/**
+ * BrowseTheWeb Ability
+ */
 @Log4j2
 public class BrowseTheWeb implements Ability {
 
   private final Browser browser;
 
 
+  /**
+   * Get the browser instance from the actors ability
+   *
+   * @param actor - the actor
+   * @return - the browser
+   */
   public static Try<Browser> as(UsesAbilities actor) {
     return Try.of(() -> ((BrowseTheWeb) actor.withAbilityTo(BrowseTheWeb.class)).browser);
   }
 
+  /**
+   * Create a new BrowseTheWeb ability
+   *
+   * @param browser - the browser to use
+   * @return - the new BrowseTheWeb ability
+   */
   public static BrowseTheWeb with(Browser browser) {
     return new BrowseTheWeb(browser);
   }
 
+  /**
+   * Destroy the browser
+   */
   @Override
   public void destroy() {
     browser.quit()
-        .getOrElseThrow((e) -> new RuntimeException(e));
+      .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
+  /**
+   * Dump the ability log
+   *
+   * @return - the ability log
+   */
   @Override
   public List<NodeAttachment> abilityLogDump() {
 

@@ -6,28 +6,43 @@ import io.vavr.control.Try;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
 
+/**
+ * A key action for Selenium
+ */
 class SeleniumKeyAction implements KeyActions {
 
   private Try<Actions> selAction;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyActions keyDown(Key key) {
     this.selAction = selAction.map(a -> a.keyDown(Keys.valueOf(key.name())));
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyActions keyUp(Key key) {
     this.selAction = selAction.map(a -> a.keyUp(Keys.valueOf(key.name())));
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyActions keyPress(Key key) {
     this.selAction = selAction.map(a -> a.sendKeys(Keys.valueOf(key.name())));
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> perform() {
     return selAction.map(a -> {
@@ -36,7 +51,7 @@ class SeleniumKeyAction implements KeyActions {
     });
   }
 
-  public SeleniumKeyAction(Actions actions) {
+  SeleniumKeyAction(Actions actions) {
     this.selAction = Try.success(actions);
   }
 }

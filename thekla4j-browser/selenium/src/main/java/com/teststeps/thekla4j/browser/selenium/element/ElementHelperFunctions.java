@@ -15,6 +15,9 @@ import java.util.Objects;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_VERTICAL;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.HIGHLIGHT_ELEMENTS;
 
+/**
+ * Helper functions for element operations
+ */
 @Log4j2(topic = "Element Helper Operations")
 public class ElementHelperFunctions {
 
@@ -67,7 +70,9 @@ public class ElementHelperFunctions {
       default -> "center";
     };
 
-
+  /**
+   * Scroll the element into view, used before interacting with the element
+   */
   public static Function1<RemoteWebDriver, Function1<WebElement, Try<WebElement>>> scrollIntoView =
     driver -> element ->
       DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED.value().equals("true") ?
@@ -80,10 +85,14 @@ public class ElementHelperFunctions {
         Try.success(element);
 
 
+  /**
+   * Highlight the element, the highlight is applied before interacting with the element
+   * and removed before the next element is highlighted
+   */
   public static Function3<RemoteWebDriver, HighlightContext, Boolean, Function1<WebElement, WebElement>> highlightElement =
     (driver, hlx, elementHighlight) -> element -> {
 
-      if (!elementHighlight) {
+      if (!elementHighlight || Objects.isNull(hlx)) {
         return element;
       }
 

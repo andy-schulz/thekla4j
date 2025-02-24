@@ -1,0 +1,30 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+}
+
+dependencies {
+    api project(":thekla4j-core")
+    api project(":thekla4j-commons")
+    api project(":thekla4j-browser:core")
+    api project(":thekla4j-browser:selenium")
+    implementation project(":thekla4j-utils")
+
+
+    implementation group: 'io.appium', name: 'java-client', version: project.appiumVersion
+
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-api', version: project.seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-remote-driver', version: project.seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-support', version: project.seleniumVersion)
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: project.seleniumVersion
+
+}
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            artifactId = 'thekla4j-browser-appium'
+            description = 'thekla4j screenplay browser implementation using appium for mobile devices'
+        }
+    }
+}

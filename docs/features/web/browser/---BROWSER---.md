@@ -43,7 +43,7 @@ create a Selenium browser:
 
 | class and method call                | description                                                                   |
 |--------------------------------------|-------------------------------------------------------------------------------|
-| `Selenium.browser()`                 | creates a new Selenium browser which is loading its options from config files |
+| `Selenium.browser()`                 | creates a new Selenium browser which is loading its options from com.teststeps.thekla4j.browser.selenium.config files |
 | `FirefoxBrowser.with(BrowserConfig)` | creates a new Firefox browser with the given configuration                    |
 | `FirefoxBrowser.withoutOptions()`    | creates a new Firefox browser without any configuration                       |
 | `ChromeBrowser.with(BrowserConfig)`  | creates a new Chrome browser with the given configuration                     |

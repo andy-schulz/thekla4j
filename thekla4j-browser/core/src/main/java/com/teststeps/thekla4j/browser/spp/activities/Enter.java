@@ -8,9 +8,13 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
+/**
+ * Enter text into an element
+ */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("Enter text '@{text}' into @{element}")
 public class Enter extends BasicInteraction {
 
@@ -33,14 +37,32 @@ public class Enter extends BasicInteraction {
       .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
   }
 
+  /**
+   * Create a new Enter activity
+   *
+   * @param text - the text to enter
+   * @return - a new Enter activity
+   */
   public static Enter text(String text) {
     return new Enter(text, null, false);
   }
 
+  /**
+   * Create a new Enter activity
+   *
+   * @param element - the element to enter the text into
+   * @return - a new Enter activity
+   */
   public Enter into(Element element) {
     return new Enter(text, element, false);
   }
 
+  /**
+   * Create a new Enter activity which is clearing the field before entering the text
+   *
+   * @param element - the element to enter the text into
+   * @return - a new Enter activity
+   */
   public Enter intoCleared(Element element) {
     return new Enter(text, element, true);
   }

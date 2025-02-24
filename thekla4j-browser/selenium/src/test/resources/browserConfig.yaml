@@ -1,4 +1,7 @@
-browserName: "Chrome"
-chromeOptions:
-  args:
-    - "disable-search-engine-choice-screen"
+defaultConfig: localChrome
+
+localChrome:
+  browserName: "Chrome"
+  chromeOptions:
+    args:
+      - "disable-search-engine-choice-screen"

@@ -20,8 +20,11 @@ import java.util.Objects;
 
 import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.RECORD_VIDEO;
 
+/**
+ * Functions to build a Selenium Browser
+ */
 @Log4j2(topic = "Selenium Remote Browser")
-class RemoteBrowser {
+class SeleniumBrowserBuilder {
 
   /**
    * Load the Browser from the configuration
@@ -145,7 +148,7 @@ class RemoteBrowser {
         .map(capabilities -> {
           Option.of(browserConfig.browserName()).forEach(bn -> capabilities.setBrowserName(bn.getName().toLowerCase()));
           Option.of(browserConfig.browserVersion()).forEach(capabilities::setVersion);
-          Option.of(browserConfig.os()).forEach(os -> capabilities.setPlatform(Platform.fromString(os.getName())));
+          Option.of(browserConfig.platformName()).forEach(pName -> capabilities.setPlatform(Platform.fromString(pName.getName())));
           return capabilities;
         })
         .onSuccess(capa -> log.debug("Capabilities created: " + capa));

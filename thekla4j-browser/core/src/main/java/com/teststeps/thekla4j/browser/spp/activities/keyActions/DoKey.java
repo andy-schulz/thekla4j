@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.spp.activities.keyActions;
 
-import com.teststeps.thekla4j.activityLog.annotations.Workflow;
+import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -9,10 +10,14 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 
-@Workflow("perform key actions")
+/**
+ * Perform key actions
+ */
+@Action("perform key actions @{actions}")
 public class DoKey extends BasicInteraction {
 
 
+  @Called(name = "actions")
   private List<KeyAction> actions;
 
   @Override
@@ -27,6 +32,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Presses the given keys
+   *
    * @param keys the keys to press
    * @return the DoKeys task
    */
@@ -36,6 +42,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Presses and holds the given keys
+   *
    * @param keys the keys to press and hold
    * @return the DoKeys task
    */
@@ -46,6 +53,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Presses and holds the given keys
+   *
    * @param keys the keys to press and hold
    * @return the DoKeys task
    */
@@ -56,6 +64,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Presses the given keys (and holds them down)
+   *
    * @param keys the keys to press
    * @return the DoKeys task
    */
@@ -66,6 +75,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Presses the given keys (and releases them)
+   *
    * @param keys the keys to press
    * @return the DoKeys task
    */
@@ -76,6 +86,7 @@ public class DoKey extends BasicInteraction {
 
   /**
    * Releases the given keys
+   *
    * @param keys the keys to release
    * @return the DoKeys task
    */

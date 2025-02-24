@@ -10,11 +10,14 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 
-
-@AllArgsConstructor
+/**
+ * Add cookies to the browser
+ */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("add cookies '@{cookie}' to browser")
 public class AddCookie extends BasicInteraction {
 
@@ -24,16 +27,28 @@ public class AddCookie extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-        .map(b -> cookies.map(b::addCookie))
-        .flatMap(LiftTry.fromList())
-        .map(List::getOrNull)
-        .transform(ActivityError.toEither("Error while adding cookies to browser"));
+      .map(b -> cookies.map(b::addCookie))
+      .flatMap(LiftTry.fromList())
+      .map(List::getOrNull)
+      .transform(ActivityError.toEither("Error while adding cookies to browser"));
   }
 
+  /**
+   * Create a new AddCookie activity
+   *
+   * @param cookie - the cookies to add to the browser
+   * @return - a new AddCookie activity
+   */
   public static AddCookie toBrowser(Cookie cookie) {
     return new AddCookie(List.of(cookie));
   }
 
+  /**
+   * Create a new AddCookie activity
+   *
+   * @param cookieList - the cookies to add to the browser
+   * @return - a new AddCookie activity
+   */
   public static AddCookie list(List<Cookie> cookieList) {
     return new AddCookie(cookieList);
   }

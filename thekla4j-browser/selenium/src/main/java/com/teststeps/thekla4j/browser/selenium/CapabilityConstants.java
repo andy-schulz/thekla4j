@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+/**
+ * selenium capability constants
+ */
 class CapabilityConstants {
   protected static String RECORD_VIDEO = "se:recordVideo";
 }

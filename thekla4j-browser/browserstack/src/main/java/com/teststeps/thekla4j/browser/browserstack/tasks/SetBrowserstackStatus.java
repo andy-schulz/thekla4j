@@ -7,6 +7,7 @@ import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.With;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +18,7 @@ import static com.teststeps.thekla4j.core.activities.API.map;
  * Set the status of the current Browserstack session to failed
  */
 @Log4j2(topic = "Set Browserstack Status")
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("set the status of the current Browserstack session to failed")
 public class SetBrowserstackStatus extends Interaction<Void, Void> {
 
@@ -58,6 +59,9 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
   /**
    * Set the status to failed
    *
+   * @param sessionName - the name of the session
+   * @param reason - the reason for the failure
+   *
    * @return the activity
    */
   public static SetBrowserstackStatus ofTestCaseToFailed(String sessionName, String reason) {
@@ -67,6 +71,12 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
       false);
   }
 
+  /**
+   * Set the status to passed
+   *
+   * @param sessionName - the name of the session
+   * @return the activity
+   */
   public static SetBrowserstackStatus ofTestCaseToPassed(String sessionName) {
     return new SetBrowserstackStatus(
       Executor.setSessionStatus(Arguments.passed()),
@@ -74,12 +84,17 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
       false);
   }
 
+  /**
+   * activate that the task is failing on error
+   *
+   * @return the activity
+   */
   public SetBrowserstackStatus failsOnError() {
     this.failsOnError = true;
     return this;
   }
 
-  @AllArgsConstructor
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   @With
   private static class Executor {
     public String action;
@@ -94,7 +109,7 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
     }
   }
 
-  @AllArgsConstructor
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   @With
   private static class Arguments {
     public String status;

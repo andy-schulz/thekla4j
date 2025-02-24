@@ -11,6 +11,9 @@ import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Click on an element
+ */
 @Log4j2(topic = "Browser-Click")
 @Action("click on @{element}")
 public class Click extends BasicInteraction {
@@ -27,6 +30,12 @@ public class Click extends BasicInteraction {
       .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
+  /**
+   * Create a new Click activity
+   *
+   * @param element - the element to click on
+   * @return - a new Click activity
+   */
   public static Click on(Element element) {
     return new Click(element);
   }
