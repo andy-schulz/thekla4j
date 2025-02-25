@@ -24,7 +24,7 @@ public class WorldTest {
     actor
         .attemptsTo_(
             Sleep.<User>forA(Duration.ofSeconds(1)))
-        .apply(User.empty().withUserName("MyUser"))
+        .using(User.empty().withUserName("MyUser"))
         .peek(user -> world.of(actor).setUser(user));
 
     assertThat(world.of(actor).user.userName, equalTo("MyUser"));

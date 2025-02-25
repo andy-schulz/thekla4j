@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
 public class TestTypeTask {
 
   @Test
@@ -46,7 +47,7 @@ public class TestTypeTask {
 
     Task<Integer, Integer> task = AddNumber.of(1);
 
-    Either<ActivityError, Integer> result = actor.attemptsTo_(task).apply(2);
+    Either<ActivityError, Integer> result = actor.attemptsTo_(task).using(2);
 
     String str = task.toString();
 

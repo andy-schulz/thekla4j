@@ -8,21 +8,43 @@ import lombok.NonNull;
 
 import java.util.function.Function;
 
+/**
+ * A task that returns a result
+ *
+ * @param <RT> the type of the result
+ */
 public abstract class SupplierTask<RT> extends Activity<Void, RT> {
 
 
   @Override
-  final public Either<ActivityError, RT> perform(@NonNull Actor actor, Void result){
+  final protected Either<ActivityError, RT> perform(@NonNull Actor actor, Void result){
     return performAs(actor);
   }
 
+  /**
+   * return the name of the task
+   * @return the name of the task
+   */
   @Override
   public String toString() {
     return this.getClass().getSimpleName();
   }
 
+  /**
+   * perform the task as the given actor
+   *
+   * @param actor the actor to perform the task as
+   * @return the result of the task
+   */
   protected abstract Either<ActivityError, RT> performAs(Actor actor);
 
+  /**
+   * run the task as the given actor
+   *
+   * @param actor the actor to run the task as
+   * @return the result of the task
+   * @throws ActivityError if the task fails
+   */
   final public RT runAs(Actor actor) throws ActivityError {
     return perform(actor, null).getOrElseThrow(Function.identity());
   }

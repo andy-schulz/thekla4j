@@ -37,7 +37,7 @@ public class TestAnnotationLog {
   void testDoubleInputLogAnnotation() {
     Actor actor = Actor.named("TestActor");
 
-    Either<ActivityError, Integer> result = actor.attemptsTo_(DoubleInputLogAnnotation.start()).apply(2);
+    Either<ActivityError, Integer> result = actor.attemptsTo_(DoubleInputLogAnnotation.start()).using(2);
 
     assertThat("task execution is successful", result.isRight());
     assertThat("output is as expected", result.get(), equalTo(3));
@@ -54,7 +54,7 @@ public class TestAnnotationLog {
     Either<ActivityError, Integer> result =
       actor.attemptsTo_(
         MissingLogAnnotationParameter.start())
-        .apply(2);
+        .using(2);
 
     // task is successful even when the value does not exist
     assertThat("task execution is successful", result.isRight());

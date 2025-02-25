@@ -29,9 +29,18 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 
+/**
+ * This class is used to process the annotations of an activity and create a log description
+ */
 @Log4j2(topic = "ProcessLogAnnotation")
 public class ProcessLogAnnotation<P1, R1> {
 
+  /**
+   * Helper class to process the annotations of an activity
+   *
+   * @param <P2> - the type of the parameter of the activity
+   * @param <R2> - the type of the result of the activity
+   */
   public static class ProcessAnnotationHelper<P2, R2> {
     private final Activity<P2, R2> activity;
     private Option<P2> parameter = Option.none();
@@ -40,21 +49,54 @@ public class ProcessLogAnnotation<P1, R1> {
       this.activity = activity;
     }
 
+    /**
+     * set the actor for the activity
+     *
+     * @param actor - the actor
+     * @return a Try of the ActivityLogData
+     */
     public Try<ActivityLogData> andActor(Actor actor) {
       return new ProcessLogAnnotation<P2, R2>(this.activity, parameter, actor).process();
     }
 
+    /**
+     * set the parameter for the activity
+     *
+     * @param parameter - the parameter
+     * @return the ProcessAnnotationHelper
+     */
     public ProcessAnnotationHelper<P2, R2> withParameter(P2 parameter) {
       this.parameter = Option.of(parameter);
       return this;
     }
   }
 
+  /**
+   * Data class for the ActivityLogData
+   */
   public static class ActivityLogData {
+    /**
+     * the activity log description
+     */
     public final String description;
+
+    /**
+     * the activity log entry type
+     */
     public final ActivityLogEntryType activityType;
+
+    /**
+     * the actlog type
+     */
     public final TASK_LOG logType;
 
+    /**
+     * Create a new ActivityLogData
+     *
+     * @param description  - the description
+     * @param activityType - the activity type
+     * @param logType      - the log type
+     */
     public ActivityLogData(String description, ActivityLogEntryType activityType, TASK_LOG logType) {
       this.description = description;
       this.activityType = activityType;
@@ -66,6 +108,14 @@ public class ProcessLogAnnotation<P1, R1> {
   private final Actor actor;
   private final Option<P1> parameter;
 
+  /**
+   * Create a new ProcessLogAnnotation
+   *
+   * @param activity - the activity
+   * @param <P3>     - the type of the parameter
+   * @param <R3>     - the type of the result
+   * @return a Try of the ActivityLogData
+   */
   public static <P3, R3> ProcessAnnotationHelper<P3, R3> forActivity(Activity<P3, R3> activity) {
     return new ProcessAnnotationHelper<>(activity);
   }

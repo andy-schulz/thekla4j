@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 
 import java.util.function.Predicate;
 
+/**
+ * A task that performs a predicate on a given input
+ * @param <P> the input type
+ */
 @AllArgsConstructor
 class PredicateTask <P> extends Interaction<P, Boolean> {
 
@@ -18,6 +22,12 @@ class PredicateTask <P> extends Interaction<P, Boolean> {
     return Either.right(predicate.test(result));
   }
 
+  /**
+   * Creates a new PredicateTask with the given predicate
+   * @param predicate the predicate to use
+   * @param <I> the input type
+   * @return a new PredicateTask
+   */
   public static <I> PredicateTask<I> of(Predicate<I> predicate) {
     return new PredicateTask<>(predicate);
   }

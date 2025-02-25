@@ -12,21 +12,21 @@ import org.junit.jupiter.api.Test;
 import static com.teststeps.thekla4j.core.activities.API.map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestActivityMap {
 
 
   @Test
-  void testMapFunction() {
+  void testMapFunction() throws ActivityError {
     String input = "test";
     String expectedOutput = "TEST";
 
     Map<String, String> mapTask = map(String::toUpperCase);
 
-    Either<ActivityError, String> result = mapTask.perform(Actor.named("TestUser"), input);
+    String result = mapTask.runAs(Actor.named("TestUser"), input);
 
-    assertThat("task execution is successful", result.isRight(), equalTo(true));
-    assertThat("output is as expected", result.get(), equalTo(expectedOutput));
+    assertThat("output is as expected", result, equalTo(expectedOutput));
   }
 
   @Test
@@ -40,7 +40,7 @@ public class TestActivityMap {
     Either<ActivityError, String> result =
       actor.attemptsTo_(
         API.<String, String>map(String::toUpperCase, reason))
-        .apply(input);
+        .using(input);
 
     assertThat("task execution is successful", result.isRight(), equalTo(true));
     assertThat("output is as expected", result.get(), equalTo(expectedOutput));
@@ -48,7 +48,7 @@ public class TestActivityMap {
   }
 
   @Test
-  void testMapFunctionWithTry() {
+  void testMapFunctionWithTry() throws ActivityError {
     String input = "test";
     String expectedOutput = "TEST";
 
@@ -56,14 +56,13 @@ public class TestActivityMap {
 
     Map<String, String> mapTask = API.mapTry(mapper);
 
-    Either<ActivityError, String> result = mapTask.perform(Actor.named("TestUser"), input);
+    String result = mapTask.runAs(Actor.named("TestUser"), input);
 
-    assertThat("task execution is successful", result.isRight(), equalTo(true));
-    assertThat("output is as expected", result.get(), equalTo(expectedOutput));
+    assertThat("output is as expected", result, equalTo(expectedOutput));
   }
 
   @Test
-  void testFailingMapFunctionWithTry() {
+  void testFailingMapFunctionWithTry() throws ActivityError {
     String input = "test";
 
     Function1<String, Try<String>> mapper = s -> Try.of(() -> {
@@ -72,10 +71,10 @@ public class TestActivityMap {
 
     Map<String, String> mapTask = API.mapTry(mapper);
 
-    Either<ActivityError, String> result = mapTask.perform(Actor.named("TestUser"), input);
+    ActivityError result = assertThrows(ActivityError.class,
+      () -> mapTask.runAs(Actor.named("TestUser"), input));
 
-    assertThat("task execution is not successful", result.isLeft(), equalTo(true));
-    assertThat("error message is as expected", result.getLeft().getMessage(), equalTo("Test exception"));
+    assertThat("error message is as expected", result.getMessage(), equalTo("Test exception"));
   }
 
   @Test
@@ -91,7 +90,7 @@ public class TestActivityMap {
     Either<ActivityError, String> result =
       actor.attemptsTo_(
         API.mapTry(mapper, reason))
-        .apply(input);
+        .using(input);
 
     assertThat("task execution is successful", result.isRight(), equalTo(true));
     assertThat("output is as expected", result.get(), equalTo(expectedOutput));
@@ -112,7 +111,7 @@ public class TestActivityMap {
     Either<ActivityError, String> result =
       actor.attemptsTo_(
         API.mapTry(mapper, reason))
-        .apply(input);
+        .using(input);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
     assertThat("error message is as expected", result.getLeft().getMessage(), equalTo("Test exception"));

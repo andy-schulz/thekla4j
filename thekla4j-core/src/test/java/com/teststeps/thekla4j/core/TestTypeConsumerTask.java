@@ -2,7 +2,7 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.core.tasks.SupplyString;
+import com.teststeps.thekla4j.core.tasks.ConsumeString;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TestSupplierTask {
+public class TestTypeConsumerTask {
 
   private Actor tester;
 
@@ -27,30 +27,38 @@ public class TestSupplierTask {
   }
 
   @Test
-  public void runBasicSupplierTask() {
-    Either<ActivityError, String> result = tester.attemptsTo(
-        SupplyString.shallThrow(false));
+  public void runBasicConsumerTask() {
+    Either<ActivityError, Void> result = tester.attemptsTo_(
+        ConsumeString.print())
+      .using("test");
 
     assertThat("execution of consumer task is successful", result.isRight(), equalTo(true));
-    assertThat("result is correct", result.get(), equalTo("Hello World"));
-
   }
 
   @Test
-  public void runBasicSupplierTaskWithRunMethod() throws ActivityError {
+  public void runBasicConsumerTaskFailing() {
 
-    String result = SupplyString.shallThrow(false).runAs(tester);
+    ConsumeString print = ConsumeString.print();
 
-    assertThat("result is correct", result, equalTo("Hello World"));
+    assertThat("toString is task name", print.toString(), equalTo("ConsumeString"));
 
+    Either<ActivityError, Void> result = tester.attemptsTo_(
+        print)
+      .using("throw");
+
+    assertThat("execution of consumer task fails", result.isLeft(), equalTo(true));
   }
 
   @Test
   public void runBasicConsumerTaskWithException() throws ActivityError {
 
+    ConsumeString.print().runAs(tester, "test");
+
     assertThrows(
       ActivityError.class,
-      () -> SupplyString.shallThrow(true).runAs(tester));
+      () -> ConsumeString.print().runAs(tester, "throw"));
+
 
   }
 }
+

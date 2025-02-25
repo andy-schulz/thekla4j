@@ -11,6 +11,11 @@ import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 
+/**
+ * Pause all activities for a given duration
+ *
+ * @param <T> the type of the result
+ */
 @Log4j2(topic = "Activity Sleep")
 @Action("pause all activities for @{duration} @{reason}")
 public class Sleep<T> extends Interaction<T, T> {

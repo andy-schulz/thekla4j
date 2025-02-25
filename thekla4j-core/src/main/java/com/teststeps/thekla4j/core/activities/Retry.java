@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.error.ActivityTimeOutError;
 import io.vavr.Function0;
 import io.vavr.Function1;
@@ -19,6 +20,12 @@ import java.time.Instant;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Retry the task for as long as the timeout and retry every delay
+ *
+ * @param <I> - the input type
+ * @param <O> - the output type
+ */
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Workflow("retry (@{reason}) executing task for as long as @{timeout} and retry every @{delay}")
 public class Retry<I, O> extends Task<I, O> {
@@ -39,7 +46,7 @@ public class Retry<I, O> extends Task<I, O> {
 
   private final Function7<Instant, Duration, Duration,
         Function0<Either<ActivityError, O>>,
-        Function1<O, Either<ActivityError, Boolean>>,
+        AttemptsWith<O, Either<ActivityError, Boolean>>,
         Either<ActivityError, O>, String,
         Either<ActivityError, O>> repeat =
       (ends, timeWaiting, pause, activityFunction, untilFunc, intermediateResult, taskName) -> {
@@ -58,7 +65,7 @@ public class Retry<I, O> extends Task<I, O> {
 
 
         if(intermediateResult.isRight()) {
-          Either<ActivityError, Boolean> untilBefore = untilFunc.apply(intermediateResult.get());
+          Either<ActivityError, Boolean> untilBefore = untilFunc.using(intermediateResult.get());
 
           if (untilBefore.isRight() && untilBefore.get()) {
             return intermediateResult;
@@ -75,7 +82,7 @@ public class Retry<I, O> extends Task<I, O> {
 
         }
 
-        Either<ActivityError, Boolean> untilResult = untilFunc.apply(actRes.get());
+        Either<ActivityError, Boolean> untilResult = untilFunc.using(actRes.get());
 
         if(untilResult.isRight() && untilResult.get()) {
           return actRes;
@@ -95,13 +102,21 @@ public class Retry<I, O> extends Task<I, O> {
     Instant end = start.plusSeconds(forAsLongAs.getSeconds());
 
     return repeat.apply(end, forAsLongAs, pauseBetweenRetries,
-                        () -> actor.attemptsTo_(activity).apply(result),
+                        () -> actor.attemptsTo_(activity).using(result),
                         actor.attemptsTo_(untilActivity),
                         Either.left(ActivityError.of(new Throwable("not evaluated"))),
                         activity.getClass().getSimpleName());
   }
 
 
+  /**
+   * Create a retry task
+   *
+   * @param task - the task to retry
+   * @param <K> - the input type
+   * @param <P> - the output type
+   * @return - the retry task
+   */
   public static <K, P> Retry<K, P> task(Activity<K, P> task) {
     return new Retry<>(task,
         Duration.ofSeconds(5),
@@ -109,23 +124,47 @@ public class Retry<I, O> extends Task<I, O> {
         PredicateTask.of(o -> false), "until predicate not set 'Retry.task(TASK).until(PREDICATE)'");
   }
 
+  /**
+   * add the predicate to check if the task should be retried
+   * @param until - the predicate to check if the task should be retried
+   * @param reason - description of the retry task, will be added to the log
+   * @return - the retry task
+   *
+   */
   public Retry<I, O> until(Predicate<O> until, String reason) {
     this.untilActivity = PredicateTask.of(until);
     this.reason = reason;
     return this;
   }
 
+  /**
+   * add a task which is executed to check if the task should be retried
+   * @param untilTask - the task to check if the task should be retried
+   * @param reason - description of the retry task, will be added to the log
+   * @return - the retry task
+   *
+   */
   public Retry<I, O> untilTask(Activity<O, Boolean> untilTask, String reason) {
     this.untilActivity = untilTask;
     this.reason = reason;
     return this;
   }
 
+  /**
+   * set the duration for how long the task should be retried
+   * @param forAsLongAs - the duration for how long the task should be retried
+   * @return - the retry task
+   */
   public Retry<I, O> forAsLongAs(Duration forAsLongAs) {
     this.forAsLongAs = forAsLongAs;
     return this;
   }
 
+  /**
+   * set the duration between retries
+   * @param retry - the duration between retries
+   * @return - the retry task
+   */
   public Retry<I, O> every(Duration retry) {
     this.pauseBetweenRetries = retry;
     return this;

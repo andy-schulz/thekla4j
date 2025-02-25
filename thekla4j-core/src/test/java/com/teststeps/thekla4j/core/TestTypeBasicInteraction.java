@@ -18,9 +18,33 @@ public class TestTypeBasicInteraction {
   public void testBasicInteraction() {
     Actor actor = Actor.named("TestActor");
 
-    Either<ActivityError, Void> result = BasicInteractionTask.start().performAs(actor);
+    BasicInteractionTask task = BasicInteractionTask.start();
+
+    assertThat("get name of task", task.toString(), equalTo("BasicInteractionTask"));
+
+    Either<ActivityError, Void> result = task.performAs(actor);
 
     assertThat("task execution is successful", result.isRight());
+  }
+
+  @Test
+  public void failingBasicInteractionTask() {
+    Actor actor = Actor.named("TestActor");
+
+    Either<ActivityError, Void> result = FailingBasicInteractionTask.start().performAs(actor);
+
+    assertThat("task execution is not successful", result.isLeft(), equalTo(true));
+  }
+
+
+  @Test
+  public void failingBasicInteractionTaskThrowing() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    ActivityError error = assertThrows(ActivityError.class,
+      () -> FailingBasicInteractionTask.start().runAs(actor));
+
+    assertThat("task execution is not successful", error.getMessage(), equalTo("test"));
   }
 
   @Test
@@ -36,7 +60,7 @@ public class TestTypeBasicInteraction {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> BasicInteractionTask.start().perform(null, null));
+      () -> BasicInteractionTask.start().runAs(null));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }
@@ -55,15 +79,30 @@ public class TestTypeBasicInteraction {
   }
 
 
-  static class BasicInteractionTask extends BasicInteraction {
 
-    @Override
-    protected Either<ActivityError, Void> performAs(Actor actor) {
-      return Either.right(null);
-    }
+}
 
-    public static BasicInteractionTask start() {
-      return new BasicInteractionTask();
-    }
+class BasicInteractionTask extends BasicInteraction {
+
+  @Override
+  protected Either<ActivityError, Void> performAs(Actor actor) {
+    return Either.right(null);
+  }
+
+  public static BasicInteractionTask start() {
+    return new BasicInteractionTask();
+  }
+}
+
+
+class FailingBasicInteractionTask extends BasicInteraction {
+
+  @Override
+  protected Either<ActivityError, Void> performAs(Actor actor) {
+    return Either.left(ActivityError.of("test"));
+  }
+
+  public static FailingBasicInteractionTask start() {
+    return new FailingBasicInteractionTask();
   }
 }

@@ -11,6 +11,9 @@ import io.vavr.control.Either;
 
 import java.util.stream.Collectors;
 
+/**
+ * Validate the result of a See activity
+ */
 @Action("verify all assertion on See activity")
 class ValidateResult<M> extends Interaction<M, String> {
 
@@ -34,6 +37,13 @@ class ValidateResult<M> extends Interaction<M, String> {
     }
   }
 
+  /**
+   * create a new ValidateResult with the given matcher
+   *
+   * @param matcher the matcher to use
+   * @param <M2> the type of the result
+   * @return the new ValidateResult
+   */
   public static <M2> ValidateResult<M2> with(LinkedHashMap<String, SeeAssertion<M2>> matcher) {
     return new ValidateResult<>(matcher);
   }
@@ -41,6 +51,4 @@ class ValidateResult<M> extends Interaction<M, String> {
   private ValidateResult(LinkedHashMap<String, SeeAssertion<M>> matcher) {
     this.matcher = matcher;
   }
-
-
 }

@@ -10,12 +10,12 @@ import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveLogAnnotation;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;
-import io.vavr.Function1;
 import io.vavr.Function3;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -23,21 +23,40 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * The actor is the person who performs the tasks
+ */
 public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   private final HashMap<String, Ability> abilityMap = new HashMap<>();
+
+  /**
+   * the name of the actor
+   * @return the name of the actor
+   */
+  @Getter
   private final String name;
+
+  /**
+   * the actors activity log
+   */
   public final TheklaActivityLog activityLog;
 
   private ActorsWorld world;
 
+  /**
+   * Create a new actor with the given name
+   *
+   * @param name the name of the actor
+   * @return the actor
+   */
   public static Actor named(String name) {
     return new Actor(name);
   }
 
-  public String getName() {
-    return this.name;
-  }
-
+  /**
+   * create and attach the ability dump of all abilities to the log
+   * @return the actor
+   */
   public Actor attachAbilityDumpToLog() {
 
     List.ofAll(this.abilityMap.values())
@@ -47,6 +66,9 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UsesAbilities cleansStage() {
 
@@ -55,6 +77,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this;
   }
 
+  /**
+   * assign new abilities to the actor
+   *
+   * @param abilities list of abilities
+   * @return the actor
+   */
   public Actor whoCan(Ability... abilities) {
 
     Arrays.stream(abilities).forEach(ability -> this.abilityMap.put(ability.getClass().getName(), ability));
@@ -62,11 +90,17 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean can(Class<? extends Ability> abilityClass) {
     return this.abilityMap.containsKey(abilityClass.getName());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T extends Ability> Ability withAbilityTo(Class<T> abilityClass) throws DoesNotHaveTheAbility {
     if (!this.abilityMap.containsKey(abilityClass.getName())) {
@@ -120,83 +154,107 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .get();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1> Either<ActivityError, R1> attemptsTo(Activity<P, R1> a1) {
+  public <R1> Either<ActivityError, R1> attemptsTo(Activity<Void, R1> a1) {
     return perform(a1, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2> Either<ActivityError, R2> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2> Either<ActivityError, R2> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2
-                                                         ) {
+                                                      ) {
     return this.attemptsTo(a1)
       .flatMap(r -> perform(a2, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3> Either<ActivityError, R3> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3> Either<ActivityError, R3> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3
-                                                             ) {
+                                                          ) {
     return this.attemptsTo(a1, a2)
       .flatMap(r -> perform(a3, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4> Either<ActivityError, R4> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4> Either<ActivityError, R4> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4
-                                                                 ) {
+                                                              ) {
     return this.attemptsTo(a1, a2, a3)
       .flatMap(r -> perform(a4, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5> Either<ActivityError, R5> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5> Either<ActivityError, R5> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5
-                                                                     ) {
+                                                                  ) {
     return this.attemptsTo(a1, a2, a3, a4)
       .flatMap(r -> perform(a5, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6> Either<ActivityError, R6> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6> Either<ActivityError, R6> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5,
     Activity<R5, R6> a6
-                                                                         ) {
+                                                                      ) {
     return this.attemptsTo(a1, a2, a3, a4, a5)
       .flatMap(r -> perform(a6, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7> Either<ActivityError, R7> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7> Either<ActivityError, R7> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5,
     Activity<R5, R6> a6,
     Activity<R6, R7> a7
-                                                                             ) {
+                                                                          ) {
     return this.attemptsTo(a1, a2, a3, a4, a5, a6)
       .flatMap(r -> perform(a7, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8> Either<ActivityError, R8> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8> Either<ActivityError, R8> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -204,14 +262,17 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R5, R6> a6,
     Activity<R6, R7> a7,
     Activity<R7, R8> a8
-                                                                                 ) {
+                                                                              ) {
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7)
       .flatMap(r -> perform(a8, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> Either<ActivityError, R9> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8, R9> Either<ActivityError, R9> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -220,16 +281,19 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R6, R7> a7,
     Activity<R7, R8> a8,
     Activity<R8, R9> a9
-                                                                                     ) {
+                                                                                  ) {
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8)
       .flatMap(r -> perform(a9, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("java:S119")
   // R10 does not conform to naming convention [A-Z][0-9], its OK here
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Either<ActivityError, R10> attemptsTo(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Either<ActivityError, R10> attemptsTo(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -239,75 +303,96 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R7, R8> a8,
     Activity<R8, R9> a9,
     Activity<R9, R10> a10
-                                                                                           ) {
+                                                                                        ) {
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9)
       .flatMap(r -> perform(a10, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1> Function1<P, Either<ActivityError, R1>> attemptsTo_(
+  public <P, R1> AttemptsWith<P, Either<ActivityError, R1>> attemptsTo_(
     Activity<P, R1> a1
-                                                                    ) {
+                                                                       ) {
     return param -> perform(a1, param);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2> Function1<P, Either<ActivityError, R2>> attemptsTo_(
+  public <P, R1, R2> AttemptsWith<P, Either<ActivityError, R2>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2
-                                                                        ) {
-    return param -> this.attemptsTo_(a1).apply(param)
+                                                                           ) {
+    return param -> this.attemptsTo_(a1).using(param)
       .flatMap(r -> perform(a2, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3> Function1<P, Either<ActivityError, R3>> attemptsTo_(
+  public <P, R1, R2, R3> AttemptsWith<P, Either<ActivityError, R3>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3
-                                                                            ) {
-    return param -> this.attemptsTo_(a1, a2).apply(param)
+                                                                               ) {
+    return param -> this.attemptsTo_(a1, a2).using(param)
       .flatMap(r -> perform(a3, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4> Function1<P, Either<ActivityError, R4>> attemptsTo_(
+  public <P, R1, R2, R3, R4> AttemptsWith<P, Either<ActivityError, R4>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4
-                                                                                ) {
-    return param -> this.attemptsTo_(a1, a2, a3).apply(param)
+                                                                                   ) {
+    return param -> this.attemptsTo_(a1, a2, a3).using(param)
       .flatMap(r -> perform(a4, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5> Function1<P, Either<ActivityError, R5>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5> AttemptsWith<P, Either<ActivityError, R5>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5
-                                                                                    ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4).apply(param)
+                                                                                       ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4).using(param)
       .flatMap(r -> perform(a5, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6> Function1<P, Either<ActivityError, R6>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5, R6> AttemptsWith<P, Either<ActivityError, R6>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5,
     Activity<R5, R6> a6
-                                                                                        ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4, a5).apply(param)
+                                                                                           ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4, a5).using(param)
       .flatMap(r -> perform(a6, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7> Function1<P, Either<ActivityError, R7>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5, R6, R7> AttemptsWith<P, Either<ActivityError, R7>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -315,13 +400,16 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R4, R5> a5,
     Activity<R5, R6> a6,
     Activity<R6, R7> a7
-                                                                                            ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6).apply(param)
+                                                                                               ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6).using(param)
       .flatMap(r -> perform(a7, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8> Function1<P, Either<ActivityError, R8>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8> AttemptsWith<P, Either<ActivityError, R8>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -330,13 +418,16 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R5, R6> a6,
     Activity<R6, R7> a7,
     Activity<R7, R8> a8
-                                                                                                ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).apply(param)
+                                                                                                   ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).using(param)
       .flatMap(r -> perform(a8, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> Function1<P, Either<ActivityError, R9>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> AttemptsWith<P, Either<ActivityError, R9>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -346,15 +437,18 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R6, R7> a7,
     Activity<R7, R8> a8,
     Activity<R8, R9> a9
-                                                                                                    ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).apply(param)
+                                                                                                       ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).using(param)
       .flatMap(r -> perform(a9, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("java:S119")
   // R10 does not conform to naming convention [A-Z][0-9], its OK here
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Function1<P, Either<ActivityError, R10>> attemptsTo_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> AttemptsWith<P, Either<ActivityError, R10>> attemptsTo_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -365,17 +459,20 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R7, R8> a8,
     Activity<R8, R9> a9,
     Activity<R9, R10> a10
-                                                                                                          ) {
-    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).apply(param)
+                                                                                                             ) {
+    return param -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).using(param)
       .flatMap(r -> perform(a10, r));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1> Function1<P, Either<ActivityError, R1>> attemptsTo$_(
+  public <P, R1> AttemptsWith<P, Either<ActivityError, R1>> attemptsTo$_(
     Activity<P, R1> a1,
     String group,
     String groupName
-                                                                     ) {
+                                                                        ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
@@ -386,62 +483,74 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2> Function1<P, Either<ActivityError, R2>> attemptsTo$_(
+  public <P, R1, R2> AttemptsWith<P, Either<ActivityError, R2>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     String group,
     String groupName
-                                                                         ) {
+                                                                            ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1).apply(param)
+      return this.attemptsTo_(a1).using(param)
         .flatMap(r -> perform(a2, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3> Function1<P, Either<ActivityError, R3>> attemptsTo$_(
+  public <P, R1, R2, R3> AttemptsWith<P, Either<ActivityError, R3>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     String group,
     String groupName
-                                                                             ) {
+                                                                                ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2).apply(param)
+      return this.attemptsTo_(a1, a2).using(param)
         .flatMap(r -> perform(a3, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4> Function1<P, Either<ActivityError, R4>> attemptsTo$_(
+  public <P, R1, R2, R3, R4> AttemptsWith<P, Either<ActivityError, R4>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     String group,
     String groupName
-                                                                                 ) {
+                                                                                    ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3).apply(param)
+      return this.attemptsTo_(a1, a2, a3).using(param)
         .flatMap(r -> perform(a4, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5> Function1<P, Either<ActivityError, R5>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5> AttemptsWith<P, Either<ActivityError, R5>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -449,19 +558,22 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R4, R5> a5,
     String group,
     String groupName
-                                                                                     ) {
+                                                                                        ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4).using(param)
         .flatMap(r -> perform(a5, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6> Function1<P, Either<ActivityError, R6>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5, R6> AttemptsWith<P, Either<ActivityError, R6>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -470,19 +582,22 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R5, R6> a6,
     String group,
     String groupName
-                                                                                         ) {
+                                                                                            ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4, a5).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4, a5).using(param)
         .flatMap(r -> perform(a6, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7> Function1<P, Either<ActivityError, R7>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5, R6, R7> AttemptsWith<P, Either<ActivityError, R7>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -492,19 +607,22 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R6, R7> a7,
     String group,
     String groupName
-                                                                                             ) {
+                                                                                                ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4, a5, a6).using(param)
         .flatMap(r -> perform(a7, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8> Function1<P, Either<ActivityError, R8>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8> AttemptsWith<P, Either<ActivityError, R8>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -515,19 +633,22 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R7, R8> a8,
     String group,
     String groupName
-                                                                                                 ) {
+                                                                                                    ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).using(param)
         .flatMap(r -> perform(a8, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> Function1<P, Either<ActivityError, R9>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> AttemptsWith<P, Either<ActivityError, R9>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -539,21 +660,24 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R8, R9> a9,
     String group,
     String groupName
-                                                                                                     ) {
+                                                                                                        ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).using(param)
         .flatMap(r -> perform(a9, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("java:S119")
   // R10 does not conform to naming convention [A-Z][0-9], its OK here
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Function1<P, Either<ActivityError, R10>> attemptsTo$_(
+  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> AttemptsWith<P, Either<ActivityError, R10>> attemptsTo$_(
     Activity<P, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
@@ -566,23 +690,26 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R9, R10> a10,
     String group,
     String groupName
-                                                                                                           ) {
+                                                                                                              ) {
     return (param) -> {
 
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).apply(param)
+      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).using(param)
         .flatMap(r -> perform(a10, r))
         .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1> Either<ActivityError, R1> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1> Either<ActivityError, R1> attemptsTo$(
+    Activity<Void, R1> a1,
     String group,
     String groupName
-                                                      ) {
+                                                   ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return perform(a1, null)
@@ -590,13 +717,16 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2> Either<ActivityError, R2> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2> Either<ActivityError, R2> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     String group,
     String groupName
-                                                          ) {
+                                                       ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1)
@@ -604,14 +734,17 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3> Either<ActivityError, R3> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3> Either<ActivityError, R3> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     String group,
     String groupName
-                                                              ) {
+                                                           ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2)
@@ -619,15 +752,18 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4> Either<ActivityError, R4> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4> Either<ActivityError, R4> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     String group,
     String groupName
-                                                                  ) {
+                                                               ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3)
@@ -635,16 +771,19 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5> Either<ActivityError, R5> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5> Either<ActivityError, R5> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
     Activity<R4, R5> a5,
     String group,
     String groupName
-                                                                      ) {
+                                                                   ) {
 
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
@@ -653,9 +792,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6> Either<ActivityError, R6> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6> Either<ActivityError, R6> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -663,7 +805,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R5, R6> a6,
     String group,
     String groupName
-                                                                          ) {
+                                                                       ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3, a4, a5)
@@ -671,9 +813,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7> Either<ActivityError, R7> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7> Either<ActivityError, R7> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -682,7 +827,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R6, R7> a7,
     String group,
     String groupName
-                                                                              ) {
+                                                                           ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6)
@@ -690,9 +835,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8> Either<ActivityError, R8> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8> Either<ActivityError, R8> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -702,7 +850,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R7, R8> a8,
     String group,
     String groupName
-                                                                                  ) {
+                                                                               ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7)
@@ -710,9 +858,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> Either<ActivityError, R9> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8, R9> Either<ActivityError, R9> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -723,7 +874,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R8, R9> a9,
     String group,
     String groupName
-                                                                                      ) {
+                                                                                   ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8)
@@ -731,11 +882,14 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("java:S119")
   // R10 does not conform to naming convention [A-Z][0-9], its OK here
-  public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Either<ActivityError, R10> attemptsTo$(
-    Activity<P, R1> a1,
+  public <R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Either<ActivityError, R10> attemptsTo$(
+    Activity<Void, R1> a1,
     Activity<R1, R2> a2,
     Activity<R2, R3> a3,
     Activity<R3, R4> a4,
@@ -747,7 +901,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     Activity<R9, R10> a10,
     String group,
     String groupName
-                                                                                            ) {
+                                                                                         ) {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9)

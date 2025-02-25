@@ -30,7 +30,7 @@ public class TestTypeInteraction {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> InteractionTask.start().perform(null, null));
+      () -> InteractionTask.start().runAs(null, null));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }
@@ -41,7 +41,7 @@ public class TestTypeInteraction {
 
     InteractionTask task = InteractionTask.start();
 
-    Either<ActivityError, Integer> result = actor.attemptsTo_(task).apply(3);
+    Either<ActivityError, Integer> result = actor.attemptsTo_(task).using(3);
 
 
     assertThat("task execution is successful", result.isRight());

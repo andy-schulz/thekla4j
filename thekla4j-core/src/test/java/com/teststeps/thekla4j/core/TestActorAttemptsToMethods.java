@@ -38,7 +38,7 @@ public class TestActorAttemptsToMethods {
 
     Throwable thrown = assertThrows(
       DetectedNullObject.class,
-      () -> actor.attemptsTo_(null).apply(1));
+      () -> actor.attemptsTo_(null).using(1));
 
     assertThat(thrown.getMessage(), startsWith("Property  ProcessLogAnnotation::activity is null, but should not."));
   }
@@ -64,7 +64,7 @@ public class TestActorAttemptsToMethods {
 
     Throwable thrown = assertThrows(
       DetectedNullObject.class,
-      () -> actor.attemptsTo$_(null, "Group", "Group description").apply(1));
+      () -> actor.attemptsTo$_(null, "Group", "Group description").using(1));
 
     assertThat(thrown.getMessage(), startsWith("Property  ProcessLogAnnotation::activity is null, but should not."));
   }
@@ -75,7 +75,7 @@ public class TestActorAttemptsToMethods {
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
         AddNumber.of(1))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -88,7 +88,7 @@ public class TestActorAttemptsToMethods {
     Either<ActivityError, Integer> number = actor.attemptsTo_(
         AddNumber.of(1),
         AddNumber.of(2))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -102,7 +102,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(1),
         AddNumber.of(2),
         AddNumber.of(3))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -117,7 +117,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(2),
         AddNumber.of(3),
         AddNumber.of(4))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -133,7 +133,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(3),
         AddNumber.of(4),
         AddNumber.of(5))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));
@@ -150,7 +150,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(4),
         AddNumber.of(5),
         AddNumber.of(6))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(22));
@@ -168,7 +168,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(5),
         AddNumber.of(6),
         AddNumber.of(7))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(29));
@@ -187,7 +187,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(6),
         AddNumber.of(7),
         AddNumber.of(8))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(37));
@@ -207,7 +207,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(7),
         AddNumber.of(8),
         AddNumber.of(9))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(46));
@@ -228,7 +228,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(8),
         AddNumber.of(9),
         AddNumber.of(10))
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(56));
@@ -396,7 +396,7 @@ public class TestActorAttemptsToMethods {
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
         AddNumber.of(1),
       "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -420,7 +420,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(1),
         AddNumber.of(2),
       "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -449,7 +449,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(2),
         AddNumber.of(3),
       "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -483,7 +483,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(3),
         AddNumber.of(4),
       "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -523,7 +523,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(4),
         AddNumber.of(5),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));
@@ -568,7 +568,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(5),
         AddNumber.of(6),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(22));
@@ -618,7 +618,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(6),
         AddNumber.of(7),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(29));
@@ -673,7 +673,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(7),
         AddNumber.of(8),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(37));
@@ -733,7 +733,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(8),
         AddNumber.of(9),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(46));
@@ -798,7 +798,7 @@ public class TestActorAttemptsToMethods {
         AddNumber.of(9),
         AddNumber.of(10),
         "Group", "group description")
-      .apply(1);
+      .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(56));

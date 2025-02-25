@@ -333,7 +333,7 @@ public class TestActorActivityLog {
     Either<ActivityError, Void> result = actor.attemptsTo$_(
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -351,7 +351,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -370,7 +370,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -390,7 +390,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -411,7 +411,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -433,7 +433,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -456,7 +456,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -480,7 +480,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -505,7 +505,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -531,7 +531,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .apply(null);
+      .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 

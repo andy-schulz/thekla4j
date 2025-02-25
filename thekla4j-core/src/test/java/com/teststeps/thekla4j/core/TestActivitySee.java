@@ -204,7 +204,7 @@ public class TestActivitySee {
         See.<List<String>>ifResult()
             .is(Expected.to.pass(x -> x.length() > 1, "predicate one"))
             .is(Expected.to.pass(x -> x.head().equals("test"), "predicate two"))
-    ).apply(List.of("test"));
+    ).using(List.of("test"));
 
     ActivityLogNode log = tester.activityLog.getLogTree();
 

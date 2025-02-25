@@ -4,6 +4,9 @@ import com.teststeps.thekla4j.core.base.persona.Activity;
 import io.vavr.Function1;
 import io.vavr.control.Try;
 
+/**
+ * Utility class to create MAP and RUN tasks
+ */
 public class API {
 
   /**

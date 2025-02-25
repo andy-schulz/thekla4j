@@ -16,12 +16,23 @@ import java.util.Objects;
 import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
 import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
 
+/**
+ * utility class to process the attachment annotations of an activity
+ */
 public class ProcessAttachmentAnnotation {
 
   private ProcessAttachmentAnnotation() {
     // prevent instantiation of utility class
   }
 
+  /**
+   * set the attachments of an activity to the activity log entry
+   *
+   * @param entry    the activity log entry
+   * @param activity the activity
+   * @param <I>      the input type of the activity
+   * @param <O>      the output type of the activity
+   */
   public static <I, O> void setAttachment(ActivityLogEntry entry, Activity<I, O> activity) {
 
     List.of(activity.getClass().getFields())
@@ -32,6 +43,14 @@ public class ProcessAttachmentAnnotation {
         .map(entry::appendAttachment);
   }
 
+  /**
+   * create an attachment for a field of an activity
+   *
+   * @param activity the activity
+   * @param <I>      the input type of the activity
+   * @param <O>      the output type of the activity
+   * @return a function that creates an attachment for a field
+   */
   private static <I, O> Function1<Field, NodeAttachment> createAttachmentForActivity(Activity<I, O> activity) {
 
     return field ->
@@ -44,6 +63,9 @@ public class ProcessAttachmentAnnotation {
 
   }
 
+  /**
+   * create an attachment for a field of an activity
+   */
   public static Function1<AttachOnError, Function1<String, LogAttachment>> nodeAttachment =
       annotation -> content -> new LogAttachment(annotation.name(), content, annotation.type());
 }

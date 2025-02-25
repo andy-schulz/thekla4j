@@ -8,14 +8,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 
+/**
+ * Utility class to create MAP and RUN tasks
+ */
 @Log4j2(topic = "Annotation Operations")
-public class AnnotationFunctions {
+class AnnotationFunctions {
 
   private AnnotationFunctions() {
     // prevent instantiation of utility class
   }
 
-  public static final Function1<Field, Field> makePrivateFieldAccessible = field -> {
+  static final Function1<Field, Field> makePrivateFieldAccessible = field -> {
     if (Modifier.isPrivate(field.getModifiers())) {
       field.setAccessible(true);
     }
@@ -29,7 +32,7 @@ public class AnnotationFunctions {
   /*
 get field value, if the field is a function execute it and take the result
  */
-  public static <I, O> Function1<Field , Object> getFieldValueOfActivity(Activity<I, O> activity) {
+  static <I, O> Function1<Field , Object> getFieldValueOfActivity(Activity<I, O> activity) {
 
    return field -> {
      try {
