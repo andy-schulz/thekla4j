@@ -3,7 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-
 java {
     withJavadocJar()
     withSourcesJar()
@@ -13,13 +12,26 @@ tasks.named('sourcesJar') {
     duplicatesStrategy = 'include'
 }
 
+// ATTENTION: always set scmVersion properties before assigning the version to the version property
+scmVersion {
+    versionCreator { version, position ->
+        'v' + version
+    }
+    versionIncrementer("incrementMinor")
+    monorepo {
+        include(rootProject.subprojects.collect({p -> p.name}))
+    }
+}
+
+version = scmVersion.version
+
 publishing {
 
     repositories {
         maven {
             def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            url project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
             credentials {
                 username = project.findProperty('ossrhToken')
@@ -35,14 +47,14 @@ publishing {
             from components.java
 
             groupId = 'com.test-steps.thekla4j'
-            archivesBaseName = "test-steps-thekla4j"
+//            archivesName = "test-steps-thekla4j"
             version = project.version
 
             pom {
                 name = 'thekla4j'
                 description = 'a screenplay pattern implementation in java'
                 url = 'https://github.com/andy-schulz/thekla4j'
-                packaging 'jar'
+                packaging = 'jar'
 
                 licenses {
                     license {
