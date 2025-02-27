@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.addCapabilities;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
 import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.parseSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -130,6 +132,35 @@ public class TestSeleniumConfig {
     Try<DesiredCapabilities> caps = addCapabilities.apply(seleniumConfig, new DesiredCapabilities());
 
     assertThat("capabilities are empty", caps.get().asMap().isEmpty());
+
+  }
+
+  @Test
+  public void loadSeleniumConfigSetBySystemEnvironment() {
+
+    SELENIUM_CONFIG.property().name();
+
+    System.setProperty("thekla4j.browser.selenium.config", "setBySystem");
+
+    String config = """
+        defaultConfig: local
+      
+        setBySystem:
+          remoteUrl: "http://localhost:4444/wd/hub"
+          setLocalFileDetector: false
+      """;
+
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error parsing SeleniumConfigList", e));
+
+
+    Try<Option<SeleniumConfig>> seleniumConfig = configList.map(loadDefaultSeleniumConfig)
+      .onFailure(e -> log.error("Error loading SeleniumConfig", e));
+
+    assertThat("retrieving seleniumConfig is success", seleniumConfig.isSuccess());
+    assertThat("seleniumConfig is defined", seleniumConfig.get().isDefined());
+
+    assertThat("remote url is set", seleniumConfig.get().get().remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
 
   }
 }

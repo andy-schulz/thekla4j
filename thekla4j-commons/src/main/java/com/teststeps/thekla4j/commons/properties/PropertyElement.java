@@ -1,9 +1,11 @@
 package com.teststeps.thekla4j.commons.properties;
 
+import io.vavr.control.Option;
+
 public class PropertyElement {
 
   private final String name;
-  private final String defaultValue;
+  private final Option<String> defaultValue;
   private final String helpText;
 
   /**
@@ -18,7 +20,7 @@ public class PropertyElement {
    * get the default value of the property
    * @return the default value of the property
    */
-  public String defaultValue() {
+  public Option<String> defaultValue() {
     return defaultValue;
   }
 
@@ -36,11 +38,11 @@ public class PropertyElement {
    * @param defaultValue the default value of the property
    * @return the new PropertyElement
    */
-  public static PropertyElement of(String name, String defaultValue, String helpText) {
+  public static PropertyElement of(String name, Option<String> defaultValue, String helpText) {
     return new PropertyElement(name, defaultValue, helpText);
   }
 
-  private PropertyElement(String name, String value, String helpText) {
+  private PropertyElement(String name, Option<String> value, String helpText) {
     this.name = name;
     this.defaultValue = value;
     this.helpText = helpText;

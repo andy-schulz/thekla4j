@@ -5,13 +5,11 @@ import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
-import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
-import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
 import io.vavr.collection.List;
@@ -25,6 +23,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
@@ -56,11 +56,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
 
-    boolean slowDownExecution = Boolean.parseBoolean(
-      Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION.property()));
+    boolean slowDownExecution = Boolean.parseBoolean(SLOW_DOWN_EXECUTION.value() );
 
-    Duration slowDownTime = Duration.ofSeconds(
-      Long.parseLong(Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME.property())));
+    Duration slowDownTime = Duration.ofSeconds(Long.parseLong(SLOW_DOWN_TIME.value()));
 
     return any -> {
       if (slowDownExecution)

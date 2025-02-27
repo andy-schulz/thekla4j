@@ -16,6 +16,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.util.Objects;
 
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+
 /**
  * Functions to work with SeleniumConfig
  */
@@ -29,9 +31,8 @@ public class SeleniumConfigFunctions {
   }
 
   /**
-   * Load the SeleniumConfig from the configuration file
-   * in case the file cant be loaded an empty SeleniumConfig is returned
-   * in case the file cant be parsed the function fails with an error
+   * Load the SeleniumConfig from the configuration file in case the file cant be loaded an empty SeleniumConfig is returned in case the file cant be
+   * parsed the function fails with an error
    */
   public static final Function0<Try<Option<SeleniumConfigList>>> loadSeleniumConfig =
     () -> FileUtils.readStringFromResourceFile.apply(SELENIUM_CONFIG_FILE)
@@ -42,7 +43,6 @@ public class SeleniumConfigFunctions {
 
   /**
    * Parse the SeleniumConfig from a string
-   *
    */
   static final Function1<Option<String>, Try<Option<SeleniumConfigList>>> parseSeleniumConfig =
     seleniumConfigString ->
@@ -54,24 +54,24 @@ public class SeleniumConfigFunctions {
    * Load the default SeleniumConfig from the configuration object
    */
   public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig = seleniumConfigList ->
-    seleniumConfigList.map(scl -> scl.seleniumConfigs().get(scl.defaultConfig())
+
+    seleniumConfigList.map(scl -> scl.seleniumConfigs().get(SELENIUM_CONFIG.optionValue().getOrElse(scl.defaultConfig()))
       .getOrElseThrow(() -> new IllegalArgumentException(
         """
-            Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
+          Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
           
-            $$CONFIG_FILE$$
+          $$CONFIG_FILE$$
           
-            Please specify a default selenium config in the seleniumConfig.yaml file like:
+          Please specify a default selenium config in the seleniumConfig.yaml file like:
           
-            defaultConfig: mySeleniumConfig
+          defaultConfig: mySeleniumConfig
           
-            mySeleniumConfig:
-              remoteUrl: http://localhost:4444/wd/hub
-            ...
-          """
-          .replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
-          .replace("$$CONFIG_FILE$$", seleniumConfigList.map(YAML::jStringify).getOrElse("No Config found")))));
-
+          mySeleniumConfig:
+            remoteUrl: http://localhost:4444/wd/hub
+          ...
+          """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
+          .replace("$$CONFIG_FILE$$", seleniumConfigList
+            .map(YAML::jStringify).getOrElse("No Config found")))));
 
 
   /**
@@ -79,11 +79,11 @@ public class SeleniumConfigFunctions {
    */
   public static final Function1<Map<String, Map<String, String>>, Map<String, String>> createCapabilityMapWithPrefix =
     capabilityMap ->
-    Objects.isNull(capabilityMap) ? HashMap.empty() :
-      capabilityMap.map((prefix, valueMap) ->
-          Objects.isNull(valueMap) ? Tuple.of(prefix, HashMap.<String, String>empty()) :
-        Tuple.of(prefix,valueMap.map((key, value) -> Tuple.of(prefix + ":" + key, value))))
-      .foldLeft(HashMap.empty(), (acc, tuple) -> acc.merge(tuple._2, (v1, v2) -> v2));
+      Objects.isNull(capabilityMap) ? HashMap.empty() :
+        capabilityMap.map((prefix, valueMap) ->
+            Objects.isNull(valueMap) ? Tuple.of(prefix, HashMap.<String, String>empty()) :
+              Tuple.of(prefix, valueMap.map((key, value) -> Tuple.of(prefix + ":" + key, value))))
+          .foldLeft(HashMap.empty(), (acc, tuple) -> acc.merge(tuple._2, (v1, v2) -> v2));
 
 
   /**

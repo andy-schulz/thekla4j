@@ -16,7 +16,7 @@ public class ActivityErrorTest {
     Either<ActivityError, Object> tryValue = Try.failure(new RuntimeException("RuntimeException"))
       .transform(ActivityError.toEither("Additional Error"));
 
-    String expectedError = "Additional Error";
+    String expectedError = "Additional Error\nRuntimeException";
 
     assertThat("check final error message", tryValue.getLeft().getMessage(), equalTo(expectedError));
 

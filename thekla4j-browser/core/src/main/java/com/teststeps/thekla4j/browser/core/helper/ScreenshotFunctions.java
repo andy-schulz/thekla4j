@@ -5,7 +5,6 @@ import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProp
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -29,9 +28,9 @@ public class ScreenshotFunctions {
    */
   protected static String getScreenshotPath() {
 
-    return Option.of(Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_RELATIVE_PATH.property()))
+    return Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_RELATIVE_PATH.property())
       .map(s -> s.isEmpty() ?
-        Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_ABSOLUTE_PATH.property()) :
+        Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_ABSOLUTE_PATH.property()).get() :
         System.getProperty("user.dir") + File.separator + s)
       .map(s -> s.isEmpty() ? System.getProperty("user.dir") : s)
       .peek(s -> log.info("Screenshot directory: {}", s))

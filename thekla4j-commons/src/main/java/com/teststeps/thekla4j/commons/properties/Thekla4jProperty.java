@@ -15,14 +15,14 @@ public class Thekla4jProperty {
 
   private final static String PROPERTY_FILE = "thekla4j.properties";
 
-  private static Function1<PropertyElement, String> of = TestPropertyHelper._withName.memoized();
+  private static Function1<PropertyElement, Option<String>> of = TestPropertyHelper._withName.memoized();
 
   /**
    * get the value of the property
    * <p>
    * param: property element returns: property value
    */
-  public static String of(PropertyElement element) {
+  public static Option<String> of(PropertyElement element) {
     return Thekla4jProperty.of.apply(element);
   }
 
@@ -101,20 +101,20 @@ public class Thekla4jProperty {
     /**
      * get the property value
      */
-    static final Function1<PropertyElement, String> _withName = property -> {
+    static final Function1<PropertyElement, Option<String>> _withName = property -> {
       Try<String> system = TestPropertyHelper.loadSystemProperty.apply(property.name());
 
       if (system.isSuccess())
-        return system.get();
+        return Option.of(system.get());
 
-      system.onFailure(x -> log.debug(x.getMessage() + " - trying to load from property file"));
+      system.onFailure(x -> log.debug("{} - trying to load from property file", x.getMessage()));
 
       Try<String> envProperty = TestPropertyHelper.loadFileProperty.apply(property.name());
 
       if (envProperty.isSuccess())
-        return envProperty.get();
+        return Option.of(envProperty.get());
 
-      envProperty.onFailure(x -> log.debug(x.getMessage() + " - loading default value now"));
+      envProperty.onFailure(x -> log.debug("{} - loading default value now", x.getMessage()));
 
       return property.defaultValue();
     };

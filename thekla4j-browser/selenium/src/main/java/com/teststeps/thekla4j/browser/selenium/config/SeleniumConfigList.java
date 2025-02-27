@@ -2,7 +2,8 @@ package com.teststeps.thekla4j.browser.selenium.config;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 
@@ -10,19 +11,19 @@ import io.vavr.collection.Map;
  * A list of Selenium configurations
  */
 public class SeleniumConfigList {
-  @JsonProperty("defaultConfig")
   private String defaultConfig;
 
   /**
    * the Selenium configurations
    */
-  public Map<String, SeleniumConfig> seleniumConfigs = HashMap.empty();
+  private Map<String, SeleniumConfig> seleniumConfigs = HashMap.empty();
 
   /**
    * Get the default configuration
    *
    * @return - the default configuration
    */
+  @JsonGetter("defaultConfig")
   public String defaultConfig() {
     return defaultConfig;
   }
@@ -32,6 +33,7 @@ public class SeleniumConfigList {
    *
    * @param defaultConfig - the default configuration
    */
+  @JsonSetter("defaultConfig")
   public void defaultConfig(String defaultConfig) {
     this.defaultConfig = defaultConfig;
   }

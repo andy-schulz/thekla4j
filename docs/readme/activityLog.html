@@ -92,6 +92,11 @@ transform: rotate(90deg);
     padding-left: 2em;
 }
 
+.videoInfo {
+    display: none;
+    padding-left: 2em;
+}
+
 .infoHeader {
     background: lightgray;
     border-radius: 1em;
@@ -126,6 +131,10 @@ transform: rotate(90deg);
     display: block;
 }
 
+.videoActive {
+    display: block;
+}
+
 .ioInfo {
     display: none;
 }
@@ -157,6 +166,24 @@ transform: rotate(90deg);
     /*background: -webkit-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
 }
 
+.video {
+    display: block;
+    padding: 8px 4px 8px 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.videoButton {
+    padding: 2px 2px 5px 2px;
+    font-size:12px;
+    color:white;
+}
+
+.iconButton {
+    padding-right: 4px;
+    color:white;
+}
+
 .contentButton.active {
     background: #73318f;
 }
@@ -185,6 +212,11 @@ transform: rotate(90deg);
 
 .logMessage .timestamp {
     color: lightskyblue;
+    display: none;
+}
+
+.logMessage .duration {
+    color: #e50a78;
 }
 
 .activityName {
@@ -200,48 +232,194 @@ pre {
 .attachmentContainer img {
     width: 100%;
 }
-</style> 
 
-<ul id = "ActivityLog"><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[Step]</span> - <span class="activityDescription"> step description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskONE]</span> - <span class="activityDescription"> TaskONE description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li class="interaction passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskONE-Child]</span> - <span class="activityDescription"> TaskONE-Child description</span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div></li></ul></li><li><span class="task passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskTWO]</span> - <span class="activityDescription"> TaskTWO description</span></span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div><ul class="nested"><li class="interaction passed"><span class="logMessage"><span class = "timestamp">2024-06-25 05:40:14.959776 - </span><span class="activityName">[TaskTWO-Child]</span> - <span class="activityDescription"> TaskTWO-Child description</span></span><div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div></li></ul></li></ul></li></ul> 
-
-<script>
-var toggler = document.querySelectorAll(".task");
-var inToggler = document.querySelectorAll(".label.inContentButton");
-var outToggler = document.querySelectorAll(".label.outContentButton");
-var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
-var descToggler = document.querySelectorAll(".ellipses");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("task-open");
-  });
+.legend {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
 }
 
-for (i = 0; i < inToggler.length; i++) {
-    inToggler[i].addEventListener("click", function() {
-        this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
-        this.classList.toggle("active");
+.legend #toggleTimeSpan {
+    margin-right: 10px;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <div class="legend">
+      <input type="checkbox" id="toggleTimeSpan">
+      <span id="timespanToggleDescription">switch visibility of timespan on or off</span>
+  </div>
+
+
+<ul id = "ActivityLog"><li><span class="task passed"><span class="logMessage">
+  <span class="timestamp">2025-02-27 13:17:03.608874 - not finished</span>
+  <span class="duration">0.00 sec - </span>
+  <span><span class="activityName">[Step]</span> - </span>
+  <span class="activityDescription">step description</span>
+</span></span>
+
+
+
+
+
+<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
+<span class="with options">
+  
+  
+  
+  
+</span>
+
+<ul class="nested"><li><span class="task passed"><span class="logMessage">
+  <span class="timestamp">2025-02-27 13:17:03.608874 - not finished</span>
+  <span class="duration">0.00 sec - </span>
+  <span><span class="activityName">[TaskONE]</span> - </span>
+  <span class="activityDescription">TaskONE description</span>
+</span></span>
+
+
+
+
+
+<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
+<span class="with options">
+  
+  
+  
+  
+</span>
+
+<ul class="nested"><li class="interaction passed"><span class="logMessage">
+  <span class="timestamp">2025-02-27 13:17:03.609873 - not finished</span>
+  <span class="duration">0.00 sec - </span>
+  <span><span class="activityName">[TaskONE-Child]</span> - </span>
+  <span class="activityDescription">TaskONE-Child description</span>
+</span>
+  
+  
+  
+  
+  
+<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
+<span class="with options">
+  
+  
+  
+  
+</span>
+
+</li>
+</ul>
+</li>
+<li><span class="task passed"><span class="logMessage">
+  <span class="timestamp">2025-02-27 13:17:03.608874 - not finished</span>
+  <span class="duration">0.00 sec - </span>
+  <span><span class="activityName">[TaskTWO]</span> - </span>
+  <span class="activityDescription">TaskTWO description</span>
+</span></span>
+
+
+
+
+
+<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
+<span class="with options">
+  
+  
+  
+  
+</span>
+
+<ul class="nested"><li class="interaction passed"><span class="logMessage">
+  <span class="timestamp">2025-02-27 13:17:03.609873 - not finished</span>
+  <span class="duration">0.00 sec - </span>
+  <span><span class="activityName">[TaskTWO-Child]</span> - </span>
+  <span class="activityDescription">TaskTWO-Child description</span>
+</span>
+  
+  
+  
+  
+  
+<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
+<span class="with options">
+  
+  
+  
+  
+</span>
+
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <script>
+  var toggler = document.querySelectorAll(".task");
+  var inToggler = document.querySelectorAll(".label.inContentButton");
+  var outToggler = document.querySelectorAll(".label.outContentButton");
+  var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
+  var videoToggler = document.querySelectorAll(".label.videoContentButton");
+
+  var descToggler = document.querySelectorAll(".ellipses");
+  var i;
+
+  for (i = 0; i < toggler.length; i++) {
+    toggler[i].addEventListener("click", function() {
+      this.parentElement.querySelector(".nested").classList.toggle("active");
+      this.classList.toggle("task-open");
     });
-}
+  }
 
-for (i = 0; i < outToggler.length; i++) {
-    outToggler[i].addEventListener("click", function() {
-        this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
-        this.classList.toggle("active");
+  for (i = 0; i < inToggler.length; i++) {
+      inToggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
+          this.classList.toggle("active");
+      });
+  }
+
+  for (i = 0; i < outToggler.length; i++) {
+      outToggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
+          this.classList.toggle("active");
+      });
+  }
+  for (i = 0; i < descToggler.length; i++) {
+      descToggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
+          this.classList.toggle("active");
+      });
+  }
+  for (i = 0; i < attachmentToggler.length; i++) {
+      attachmentToggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
+          this.classList.toggle("active");
+      });
+  }
+  for (i = 0; i < videoToggler.length; i++) {
+      videoToggler[i].addEventListener("click", function() {
+          this.parentElement.querySelector(".videoInfo").classList.toggle("videoActive");
+          this.classList.toggle("active");
+      });
+  }
+
+  var toggleButton = document.getElementById("toggleTimeSpan");
+    toggleButton.addEventListener("change", function() {
+        var timestamps = document.querySelectorAll(".timestamp");
+        timestamps.forEach(function(timestamp) {
+            if (toggleButton.checked) {
+                timestamp.style.display = "inline-block";
+            } else {
+                timestamp.style.display = "none";
+            }
+        });
     });
-}
-for (i = 0; i < descToggler.length; i++) {
-    descToggler[i].addEventListener("click", function() {
-        this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
-        this.classList.toggle("active");
-    });
-}
-for (i = 0; i < attachmentToggler.length; i++) {
-    attachmentToggler[i].addEventListener("click", function() {
-        this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
-        this.classList.toggle("active");
-    });
-}
-</script>
+  </script>
+

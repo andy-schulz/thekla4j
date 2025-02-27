@@ -25,7 +25,8 @@ public class YAML {
       .registerModule(new VavrModule())
       .registerModule(new JavaTimeModule())
       .registerModule(new SimpleModule().addSerializer(LocalDateTime.class, new LocalDateTimeSerializer()))
-      .registerModule(new SimpleModule().addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()));
+      .registerModule(new SimpleModule().addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
+      .enable(SerializationFeature.INDENT_OUTPUT);
 
 
   public static <T> String jStringify(T obj) {

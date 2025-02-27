@@ -8,6 +8,9 @@ import io.vavr.Function1;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
+
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.BROWSER_CONFIG;
+
 /**
  * Functions to load the BrowserConfig from a file
  */
@@ -30,20 +33,21 @@ public class ConfigFunctions {
    * Load the default browser config from the browser config list
    */
   public static final Function1<Option<BrowserConfigList>, Option<BrowserConfig>> loadDefaultBrowserConfig = browserConfigList ->
-    browserConfigList.map(bcl -> bcl.browserConfigs().get(bcl.defaultConfig())
+
+    browserConfigList.map(bcl -> bcl.browserConfigs().get(BROWSER_CONFIG.optionValue().getOrElse(bcl.defaultConfig()))
       .getOrElseThrow(() -> new IllegalArgumentException(
         """
-            Cant find default browser config '$$DEFAULT_CONFIG$$' in config file.
+          Cant find default browser config '$$DEFAULT_CONFIG$$' in config file.
           
-            $$CONFIG_FILE$$
+          $$CONFIG_FILE$$
           
-            Please specify a default browser config in the browserConfig.yaml file like:
+          Please specify a default browser config in the browserConfig.yaml file like:
           
-            defaultConfig: myBrowserConfig
+          defaultConfig: myBrowserConfig
           
-            myBrowserConfig:
-              browserName: Chrome
-            ...
+          myBrowserConfig:
+            browserName: Chrome
+          ...
           """
           .replace("$$DEFAULT_CONFIG$$", bcl.defaultConfig())
           .replace("$$CONFIG_FILE$$", browserConfigList.map(YAML::jStringify).getOrElse("No Config found")))));
@@ -61,7 +65,7 @@ public class ConfigFunctions {
   /**
    * Parse the BrowserConfig from a string
    */
-  private static final Function1<Option<String>, Try<Option<BrowserConfigList>>> parseBrowserConfig =
+  static final Function1<Option<String>, Try<Option<BrowserConfigList>>> parseBrowserConfig =
     browserConfigString ->
       browserConfigString.map(YAML.jParse(BrowserConfigList.class))
         .transform(LiftTry.fromOption())
