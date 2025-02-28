@@ -12,6 +12,14 @@ class PerformerDecorator implements Performer {
    * {@inheritDoc}
    */
   @Override
+  public Actor actor() {
+    return actor;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <P, R1> AttemptsWithThrows<P, R1> attemptsTo_(Activity<P, R1> a1) {
     return x -> actor.attemptsTo_(a1).using(x).getOrElseThrow(Function1.identity());
   }
@@ -92,7 +100,7 @@ class PerformerDecorator implements Performer {
    * {@inheritDoc}
    */
   @Override
-  public <R1> R1 attemptsTo(Activity<Void, R1> a1)  throws ActivityError{
+  public <R1> R1 attemptsTo(Activity<Void, R1> a1) throws ActivityError {
     return actor.attemptsTo(a1).getOrElseThrow(Function1.identity());
   }
 

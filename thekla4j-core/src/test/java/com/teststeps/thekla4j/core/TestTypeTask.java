@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import com.teststeps.thekla4j.core.tasks.AddNumber;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
@@ -17,24 +18,37 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestTypeTask {
 
   @Test
-  @DisplayName("calling perform on a task with null actor should throw exception")
+  @DisplayName("calling runAs on a task with null actor should throw exception")
   public void testUsingRunAsMethod() {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> AddNumber.of(1).runAs(null, 1));
+      () -> AddNumber.of(1).runAs((Actor) null, 1));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }
 
   @Test
-  public void testResultForRunAsMethod() throws ActivityError {
+  public void testResultForRunAsMethodWithActor() throws ActivityError {
 
     Actor actor = Actor.named("TheActor");
 
     AddNumber task = AddNumber.of(1);
 
     Integer result =  task.runAs(actor, 2);
+
+    assertThat("output is as expected", result, equalTo(3));
+
+  }
+
+  @Test
+  public void testResultForRunAsMethodWithPerformer() throws ActivityError {
+
+    Performer performer = Performer.of(Actor.named("TheActor"));
+
+    AddNumber task = AddNumber.of(1);
+
+    Integer result =  task.runAs(performer, 2);
 
     assertThat("output is as expected", result, equalTo(3));
 

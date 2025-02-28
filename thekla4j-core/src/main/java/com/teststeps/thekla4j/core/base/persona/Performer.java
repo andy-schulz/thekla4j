@@ -18,6 +18,12 @@ public interface Performer {
   }
 
   /**
+  * get the decorated actor
+  * @return the actor
+  */
+  Actor actor();
+
+  /**
    * execute the given activities in sequence
    * @param a1 the first activity
    * @return the result of the last activity
