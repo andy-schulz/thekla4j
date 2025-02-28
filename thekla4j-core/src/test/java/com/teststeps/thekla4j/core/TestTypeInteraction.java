@@ -3,6 +3,8 @@ package com.teststeps.thekla4j.core;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
+import com.teststeps.thekla4j.core.tasks.SupplyString;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,7 @@ public class TestTypeInteraction {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> InteractionTask.start().runAs(null, null));
+      () -> InteractionTask.start().runAs((Actor) null, null));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }
@@ -58,5 +60,25 @@ public class TestTypeInteraction {
     public static InteractionTask start() {
       return new InteractionTask();
     }
+  }
+
+  @Test
+  public void runBasicSupplierTaskWithRunMethod() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    Integer result = InteractionTask.start().runAs(actor, 2);
+
+    assertThat("result is correct", result, equalTo(2));
+
+  }
+
+  @Test
+  public void runBasicSupplierTaskWithRunMethodAsPerformer() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    Integer result = InteractionTask.start().runAs(Performer.of(actor),3);
+
+    assertThat("result is correct", result, equalTo(3));
+
   }
 }

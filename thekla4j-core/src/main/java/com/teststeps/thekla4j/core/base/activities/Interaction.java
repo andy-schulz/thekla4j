@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
@@ -50,12 +51,24 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
     /**
      * run the interaction as the given actor
      *
-     * @param actor the actor to run the interaction as
+     * @param actor the actor running the interaction
      * @param input the input for the interaction
      * @return the result of the interaction
      * @throws ActivityError if the interaction fails
      */
-    final public RT runAs(Actor actor, PT input) throws ActivityError {
-        return perform(actor, input).getOrElseThrow(Function.identity());
+    final public RT runAs(@NonNull Actor actor, PT input) throws ActivityError {
+        return actor.attemptsTo_(this).using(input).getOrElseThrow(Function.identity());
+    }
+
+    /**
+     * run the interaction as the given performer
+     *
+     * @param performer the performer running the interaction
+     * @param input the input for the interaction
+     * @return the result of the interaction
+     * @throws ActivityError if the interaction fails
+     */
+    final public RT runAs(@NonNull Performer performer, PT input) throws ActivityError {
+        return performer.attemptsTo_(this).using(input);
     }
 }

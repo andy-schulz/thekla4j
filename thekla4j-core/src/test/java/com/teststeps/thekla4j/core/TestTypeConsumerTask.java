@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import com.teststeps.thekla4j.core.tasks.ConsumeString;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
@@ -57,8 +58,16 @@ public class TestTypeConsumerTask {
     assertThrows(
       ActivityError.class,
       () -> ConsumeString.print().runAs(tester, "throw"));
+  }
 
+  @Test
+  public void runBasicConsumerTaskWithExceptionRunAsPerformer() throws ActivityError {
 
+    ConsumeString.print().runAs(Performer.of(tester), "test");
+
+    assertThrows(
+      ActivityError.class,
+      () -> ConsumeString.print().runAs(tester, "throw"));
   }
 }
 

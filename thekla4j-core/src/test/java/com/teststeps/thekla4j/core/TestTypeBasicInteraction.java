@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,12 +56,19 @@ public class TestTypeBasicInteraction {
   }
 
   @Test
+  public void testBasicInteractionWithRunMethodAsPerformer() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    BasicInteractionTask.start().runAs(Performer.of(actor));
+  }
+
+  @Test
   @DisplayName("calling perform on a BasicInteraction with null actor should throw exception")
   public void testUsingANullActor() {
 
     Throwable thrown = assertThrows(
       NullPointerException.class,
-      () -> BasicInteractionTask.start().runAs(null));
+      () -> BasicInteractionTask.start().runAs((Actor) null));
 
     assertThat(thrown.getMessage(), startsWith("actor is marked non-null but is null"));
   }

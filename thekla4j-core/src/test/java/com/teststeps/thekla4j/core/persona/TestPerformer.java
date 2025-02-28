@@ -30,6 +30,11 @@ public class TestPerformer {
   //******************************************/
 
   @Test
+  public void testPerformerActor() {
+    assertThat("check correct actor name", performer.actor(), equalTo(actor));
+  }
+
+  @Test
   public void testPerformerSingleTask() throws ActivityError {
     assertThat("check correct output",
       performer.attemptsTo(SupplyNumber.supplyNumber(2)),

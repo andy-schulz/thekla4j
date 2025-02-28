@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
@@ -35,11 +36,24 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   protected abstract Either<ActivityError, Void> performAs(Actor actor);
 
   /**
-   * Run the activity as the given actor. It is easier to read than using the attemptsTo method of an actor
+   * Run the activity as the given actor.
+   * It is easier to read than using the attemptsTo method of an actor
+   * 
    * @param actor the actor to run the activity as
    * @throws ActivityError if the activity fails
    */
   final public void runAs(@NonNull Actor actor) throws ActivityError {
     actor.attemptsTo(this).getOrElseThrow(Function.identity());
+  }
+
+  /**
+   * Run the activity as the given performer.
+   * It is easier to read than using the attemptsTo method of a performer
+   *
+   * @param performer the actor to run the activity as
+   * @throws ActivityError if the activity fails
+   */
+  final public void runAs(@NonNull Performer performer) throws ActivityError {
+    performer.attemptsTo(this);
   }
 }

@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
@@ -46,6 +47,17 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    * @throws ActivityError if the task fails
    */
   final public RT runAs(Actor actor) throws ActivityError {
-    return perform(actor, null).getOrElseThrow(Function.identity());
+    return actor.attemptsTo(this).getOrElseThrow(Function.identity());
+  }
+
+  /**
+   * run the task as the given performer
+   *
+   * @param performer the actor to run the task as
+   * @return the result of the task
+   * @throws ActivityError if the task fails
+   */
+  final public RT runAs(Performer performer) throws ActivityError {
+    return performer.attemptsTo(this);
   }
 }

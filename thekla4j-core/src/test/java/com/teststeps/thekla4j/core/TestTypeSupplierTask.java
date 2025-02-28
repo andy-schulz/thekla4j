@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.core;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import com.teststeps.thekla4j.core.tasks.SupplyString;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
@@ -46,11 +47,29 @@ public class TestTypeSupplierTask {
   }
 
   @Test
+  public void runBasicSupplierTaskWithRunMethodAsPerformer() throws ActivityError {
+
+    String result = SupplyString.shallThrow(false).runAs(Performer.of(tester));
+
+    assertThat("result is correct", result, equalTo("Hello World"));
+
+  }
+
+  @Test
   public void runBasicConsumerTaskWithException() throws ActivityError {
 
     assertThrows(
       ActivityError.class,
       () -> SupplyString.shallThrow(true).runAs(tester));
+
+  }
+
+  @Test
+  public void runBasicConsumerTaskWithExceptionAsPerformer() throws ActivityError {
+
+    assertThrows(
+      ActivityError.class,
+      () -> SupplyString.shallThrow(true).runAs(Performer.of(tester)));
 
   }
 }
