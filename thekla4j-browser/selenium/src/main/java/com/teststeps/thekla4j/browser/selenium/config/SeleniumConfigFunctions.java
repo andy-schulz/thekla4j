@@ -55,7 +55,9 @@ public class SeleniumConfigFunctions {
    */
   public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig = seleniumConfigList ->
 
-    seleniumConfigList.map(scl -> scl.seleniumConfigs().get(SELENIUM_CONFIG.optionValue().getOrElse(scl.defaultConfig()))
+    seleniumConfigList
+      .map(scl -> scl.seleniumConfigs()
+      .get(SELENIUM_CONFIG.optionValue().getOrElse(scl.defaultConfig()))
       .getOrElseThrow(() -> new IllegalArgumentException(
         """
           Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.

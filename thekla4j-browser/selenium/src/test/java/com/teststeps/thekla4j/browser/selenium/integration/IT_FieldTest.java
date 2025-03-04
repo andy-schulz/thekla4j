@@ -7,18 +7,27 @@ import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.*;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 public class IT_FieldTest {
 
   private Actor actor;
+
+  @BeforeAll
+  public static void init() {
+    Thekla4jProperty.resetPropertyCache();
+    System.clearProperty(SELENIUM_CONFIG.property().name());
+  }
 
   @AfterEach
   public void tearDown() throws InterruptedException {

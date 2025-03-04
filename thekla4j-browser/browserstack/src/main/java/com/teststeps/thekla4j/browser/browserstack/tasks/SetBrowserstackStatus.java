@@ -3,7 +3,7 @@ package com.teststeps.thekla4j.browser.browserstack.tasks;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.browser.spp.activities.ExecuteJavaScript;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Interaction;
+import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.control.Either;
@@ -20,7 +20,7 @@ import static com.teststeps.thekla4j.core.activities.API.map;
 @Log4j2(topic = "Set Browserstack Status")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("set the status of the current Browserstack session to failed")
-public class SetBrowserstackStatus extends Interaction<Void, Void> {
+public class SetBrowserstackStatus extends BasicInteraction {
 
 
   private Executor status;
@@ -29,7 +29,7 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
   private boolean failsOnError;
 
   @Override
-  protected Either<ActivityError, Void> performAs(Actor actor, Void result) {
+  protected Either<ActivityError, Void> performAs(Actor actor) {
 
     String sessionScript = "browserstack_executor: " + JSON.jStringify(session);
     String statusScript = "browserstack_executor: " + JSON.jStringify(status);
@@ -41,11 +41,10 @@ public class SetBrowserstackStatus extends Interaction<Void, Void> {
           ExecuteJavaScript.onBrowser(sessionScript),
             map(__ -> null),
           ExecuteJavaScript.onBrowser(statusScript))
-        .recover(x -> {
+        .fold(x -> {
           log.error("Failed to set Browserstack status: {}", x.getMessage());
-          return null;
-        })
-        .map(__ -> null);
+          return Either.right(null);
+        }, __ -> Either.right(null));
     } else {
       return actor.attemptsTo(
         ExecuteJavaScript.onBrowser(sessionScript),

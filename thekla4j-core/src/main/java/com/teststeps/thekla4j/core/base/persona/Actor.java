@@ -478,7 +478,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
       ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
       return perform(a1, param)
-        .peek(x -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
+        .peek(x -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));
 
     };
   }
@@ -499,7 +500,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1).using(param)
         .flatMap(r -> perform(a2, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));
     };
   }
 
@@ -520,8 +522,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2).using(param)
         .flatMap(r -> perform(a3, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -542,8 +544,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3).using(param)
         .flatMap(r -> perform(a4, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -565,8 +567,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4).using(param)
         .flatMap(r -> perform(a5, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -589,8 +591,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4, a5).using(param)
         .flatMap(r -> perform(a6, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -614,8 +616,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4, a5, a6).using(param)
         .flatMap(r -> perform(a7, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -640,8 +642,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).using(param)
         .flatMap(r -> perform(a8, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -667,8 +669,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).using(param)
         .flatMap(r -> perform(a9, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -697,8 +699,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
       return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).using(param)
         .flatMap(r -> perform(a10, r))
-        .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-    };
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));    };
   }
 
   /**
@@ -713,8 +715,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
     ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
 
     return perform(a1, null)
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));
   }
 
   /**
@@ -731,8 +733,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1)
       .flatMap(r -> perform(a2, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -749,8 +751,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2)
       .flatMap(r -> perform(a3, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -768,8 +770,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3)
       .flatMap(r -> perform(a4, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -789,8 +791,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4)
       .flatMap(r -> perform(a5, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -810,8 +812,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4, a5)
       .flatMap(r -> perform(a6, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -832,8 +834,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6)
       .flatMap(r -> perform(a7, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -855,8 +857,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7)
       .flatMap(r -> perform(a8, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -879,8 +881,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8)
       .flatMap(r -> perform(a9, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
   /**
    * {@inheritDoc}
@@ -906,8 +908,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
 
     return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9)
       .flatMap(r -> perform(a10, r))
-      .peek(res -> this.activityLog.reset(entry), x -> this.activityLog.reset(entry));
-  }
+      .peek(res -> this.activityLog.reset(entry))
+      .peekLeft(x -> this.activityLog.reset(entry));  }
 
 
   private Actor(String name) {

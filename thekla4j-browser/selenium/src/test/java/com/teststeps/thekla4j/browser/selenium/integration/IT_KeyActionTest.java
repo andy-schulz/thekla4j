@@ -10,9 +10,11 @@ import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -21,11 +23,18 @@ import java.time.Duration;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
 
 public class IT_KeyActionTest {
 
   private Actor actor;
+
+  @BeforeAll
+  public static void cleanupOldTests() {
+    Thekla4jProperty.resetPropertyCache();
+    System.clearProperty(SELENIUM_CONFIG.property().name());
+  }
 
   @BeforeEach
   public void init() {

@@ -13,9 +13,11 @@ import com.teststeps.thekla4j.browser.spp.activities.Text;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -23,6 +25,7 @@ import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.enabled;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.present;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
@@ -31,6 +34,13 @@ public class IT_ElementTest {
 
   Actor actor = Actor.named("Test Actor");
   Element header = Element.found(By.css(".headerElement"));
+
+  @BeforeAll
+  public static void init() {
+    Thekla4jProperty.resetPropertyCache();
+    System.clearProperty(SELENIUM_CONFIG.property().name());
+  }
+
   @AfterEach
   public void tearDown() throws InterruptedException {
     Thread.sleep(10);
