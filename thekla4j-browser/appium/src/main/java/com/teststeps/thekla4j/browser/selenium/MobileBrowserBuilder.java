@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function2;
@@ -33,26 +34,26 @@ public class MobileBrowserBuilder {
   /**
    * Load the Browser from the configuration
    *
-   * @param testName      the name of the test
+   * @param startupConfig the Browser Startup Configuration
    * @param mobileConfig  the Mobile Browser Configuration
    * @param browserConfig the Browser Configuration
    * @return a Try of the Browser
    */
-  static Try<Browser> remote(Option<String> testName, SeleniumConfig mobileConfig, BrowserConfig browserConfig) {
+  static Try<Browser> remote(Option<BrowserStartupConfig> startupConfig, SeleniumConfig mobileConfig, BrowserConfig browserConfig) {
     return createRemoteCapabilities.apply(browserConfig, mobileConfig)
-      .flatMap(caps -> MobileBrowser.startRemote(mobileConfig.remoteUrl(), caps));
+      .flatMap(caps -> MobileBrowser.startRemote(mobileConfig.remoteUrl(), caps, startupConfig));
   }
 
   /**
    * Load default local Chrome Browser, no browser configuration was found
    *
-   * @param testName      the name of the test
+   * @param startupConfig the browser startup configuration
    * @param browserConfig the mobile tool configuration
    * @return a Try of the Browser
    */
-  static Try<Browser> local(Option<String> testName, BrowserConfig browserConfig) {
+  static Try<Browser> local(Option<BrowserStartupConfig> startupConfig, BrowserConfig browserConfig) {
     return createLocalCapabilities.apply(browserConfig, new DesiredCapabilities())
-      .flatMap(MobileBrowser::startLocal);
+      .flatMap(d -> MobileBrowser.startLocal(d, startupConfig));
   }
 
   static final Function3<BrowserConfig, SeleniumConfig, DesiredCapabilities, Try<DesiredCapabilities>> setAutomationNameFromConfigs =

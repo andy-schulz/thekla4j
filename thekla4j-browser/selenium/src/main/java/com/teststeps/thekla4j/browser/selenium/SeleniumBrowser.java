@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
@@ -22,6 +23,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Objects;
 
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
@@ -37,16 +39,23 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   private Option<BrowsersStackOptions> bsOptions = Option.none();
   private Option<Frame> currentFrame = Option.none();
 
-  SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options) {
+  SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options, Option<BrowserStartupConfig> startupConfig) {
     this.driver = driver;
     this.options = Option.of(options);
-    this.driver.manage().window().maximize();
+
+    if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
+      this.driver.manage().window().maximize();
+    }
+
   }
 
-  protected SeleniumBrowser(RemoteWebDriver driver) {
+  protected SeleniumBrowser(RemoteWebDriver driver, Option<BrowserStartupConfig> startupConfig) {
     this.driver = driver;
     this.options = Option.of(SeleniumOptions.empty());
-    this.driver.manage().window().maximize();
+
+    if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
+      this.driver.manage().window().maximize();
+    }
   }
 
   protected SeleniumBrowser withBrowserStackOptions(BrowsersStackOptions bsOptions) {

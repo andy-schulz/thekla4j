@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function1;
@@ -28,44 +29,44 @@ class SeleniumBrowserBuilder {
 
   /**
    * Load the Browser from the configuration
-   * @param testName the name of the test
+   * @param startupConfig the browser startup configuration
    * @param seleniumConfig the Selenium Configuration
    * @param browserConfig the Browser Configuration
    * @return a Try of the Browser
    */
-  static Try<Browser> with(Option<String> testName, SeleniumConfig seleniumConfig, BrowserConfig browserConfig) {
+  static Try<Browser> with(Option<BrowserStartupConfig> startupConfig, SeleniumConfig seleniumConfig, BrowserConfig browserConfig) {
 
     return createCapabilities.apply(browserConfig)
-      .map(addBrowserStackOptions.apply(seleniumConfig, browserConfig, testName))
+      .map(addBrowserStackOptions.apply(seleniumConfig, browserConfig, startupConfig.map(BrowserStartupConfig::testName)))
       .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .peek(driver -> log.debug("Connecting to: {}", seleniumConfig.remoteUrl()))
       .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()))
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions(), startupConfig))
       .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
   }
 
   /**
    * Load default local Chrome Browser, no configuration was found
    *
-   * @param testName the name of the test
+   * @param startupConfig the browser startup configuration
    * @param seleniumConfig the Selenium Configuration
    * @return a Try of the Browser
    */
-  static Try<Browser> defaultChromeBrowser(Option<String> testName, SeleniumConfig seleniumConfig) {
+  static Try<Browser> defaultChromeBrowser(Option<BrowserStartupConfig> startupConfig, SeleniumConfig seleniumConfig) {
 
     DesiredCapabilities capabilities = new DesiredCapabilities();
     capabilities.setBrowserName("chrome");
 
     return Try.of(() -> capabilities)
-      .map(addBrowserStackOptions.apply(seleniumConfig, null, testName))
+      .map(addBrowserStackOptions.apply(seleniumConfig, null, startupConfig.map(BrowserStartupConfig::testName)))
 
       .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions()))
+      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions(), startupConfig))
       .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
   }
 

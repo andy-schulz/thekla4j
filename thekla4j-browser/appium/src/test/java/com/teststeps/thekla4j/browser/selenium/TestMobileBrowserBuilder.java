@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.control.Option;
@@ -82,7 +83,7 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowser> builder = mockStatic(MobileBrowser.class)) {
 
       builder
-        .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class)))
+        .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class), any(Option.class)))
         .thenReturn(Try.of(() -> browser));
 
       Browser appiumBrowser = Appium.browser();
@@ -95,14 +96,16 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     try (MockedStatic<MobileBrowserBuilder> builder = mockStatic(MobileBrowserBuilder.class)) {
 
       builder
-        .when(() -> MobileBrowserBuilder.local(Option.of("test"), standardBrowserConfig))
+        .when(() -> MobileBrowserBuilder.local(conf, standardBrowserConfig))
         .thenReturn(Try.of(() -> browser));
 
       Try<Browser> br = Appium.createBrowserWithConfig.apply(
-        Option.of("test"), Option.none(), Option.of(standardBrowserConfig));
+        conf, Option.none(), Option.of(standardBrowserConfig));
 
       assertThat("getting browser is successful", br.isSuccess());
       assertThat("browser is not null", br.get(), equalTo(browser));
@@ -113,6 +116,8 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser_callingMobileBrowser() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     DesiredCapabilities caps = MobileBrowserBuilder.createRemoteCapabilities.apply(standardBrowserConfig, standardSeleniumConfig)
       .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
 
@@ -120,10 +125,10 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowser> br = mockStatic(MobileBrowser.class)) {
 
       br
-        .when(() -> MobileBrowser.startLocal(caps))
+        .when(() -> MobileBrowser.startLocal(caps, conf))
         .thenReturn(Try.of(() -> browser));
 
-      Try<Browser> finalBrowser = MobileBrowserBuilder.local(Option.of("test"), standardBrowserConfig);
+      Try<Browser> finalBrowser = MobileBrowserBuilder.local(conf, standardBrowserConfig);
 
       assertThat("getting browser is successful", finalBrowser.isSuccess());
       assertThat("browser is not null", finalBrowser.get(), equalTo(browser));
@@ -134,9 +139,10 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser_EmptyBrowserConfig() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
 
     Try<Browser> br = Appium.createBrowserWithConfig.apply(
-      Option.of("test"), Option.none(), Option.none());
+      conf, Option.none(), Option.none());
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(),
@@ -151,10 +157,12 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser_NoDeviceName() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     BrowserConfig browserConfig = standardBrowserConfig.withDeviceName(null);
 
     Try<Browser> br = Appium.createBrowserWithConfig.apply(
-      Option.of("test"), Option.none(), Option.of(browserConfig));
+      conf, Option.none(), Option.of(browserConfig));
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
@@ -168,10 +176,12 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser_NoPlatformName() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     BrowserConfig browserConfig = standardBrowserConfig.withPlatformName(null);
 
     Try<Browser> br = Appium.createBrowserWithConfig.apply(
-      Option.of("test"), Option.none(), Option.of(browserConfig));
+      conf, Option.none(), Option.of(browserConfig));
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
@@ -185,10 +195,12 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadLocalBrowser_NoBrowserName() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     BrowserConfig browserConfig = standardBrowserConfig.withBrowserName(null);
 
     Try<Browser> br = Appium.createBrowserWithConfig.apply(
-      Option.of("test"), Option.none(), Option.of(browserConfig));
+      conf, Option.none(), Option.of(browserConfig));
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
@@ -202,17 +214,19 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadRemoteBrowser() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     try (MockedStatic<MobileBrowserBuilder> builder = mockStatic(MobileBrowserBuilder.class)) {
 
       builder
         .when(() -> MobileBrowserBuilder.remote(
-          Option.of("test"),
+          conf,
           standardSeleniumConfig,
           standardBrowserConfig))
         .thenReturn(Try.of(() -> browser));
 
       Try<Browser> br = Appium.createBrowserWithConfig.apply(
-        Option.of("test"), Option.of(standardSeleniumConfig), Option.of(standardBrowserConfig));
+        conf, Option.of(standardSeleniumConfig), Option.of(standardBrowserConfig));
 
       assertThat("getting browser is successful", br.isSuccess());
       assertThat("browser is not null", br.get(), equalTo(browser));
@@ -223,15 +237,17 @@ public class TestMobileBrowserBuilder {
   @Test
   public void loadRemoteBrowser_callingMobileBrowser() {
 
+    Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
+
     DesiredCapabilities caps = MobileBrowserBuilder.createRemoteCapabilities.apply(standardBrowserConfig, standardSeleniumConfig)
       .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
 
     try (MockedStatic<MobileBrowser> mobileBrowser = mockStatic(MobileBrowser.class)) {
 
-      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps)).thenReturn(Try.of(() -> browser));
+      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps, conf)).thenReturn(Try.of(() -> browser));
 
         Try<Browser> finalBrowser = MobileBrowserBuilder.remote(
-          Option.of("test"),
+          conf,
           standardSeleniumConfig,
           standardBrowserConfig);
 

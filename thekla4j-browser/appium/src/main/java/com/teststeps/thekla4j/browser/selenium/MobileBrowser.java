@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
@@ -33,25 +34,22 @@ public class MobileBrowser implements Browser {
   private final SeleniumBrowser seleniumBrowser;
 
   private static Option<AppiumDriverLocalService> service = Option.none();
-  private final RemoteWebDriver driver;
 
-  private MobileBrowser(RemoteWebDriver driver) {
-    seleniumBrowser = new SeleniumBrowser(driver);
-    this.driver = driver;
-    this.driver.manage().window().maximize();
+  private MobileBrowser(RemoteWebDriver driver, Option<BrowserStartupConfig> startupConfig) {
+    seleniumBrowser = new SeleniumBrowser(driver, startupConfig);
   }
 
-  static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps) {
+  static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, Option<BrowserStartupConfig> startupConfig) {
 
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
       .peek(driver -> log.info("Connecting to: {}", url))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .peek(d -> System.out.println("SessionID: " + d.getSessionId()))
       .onFailure(log::error)
-      .map(MobileBrowser::new);
+      .map(d -> new MobileBrowser(d, startupConfig));
   }
 
-  static Try<Browser> startLocal(DesiredCapabilities caps) {
+  static Try<Browser> startLocal(DesiredCapabilities caps, Option<BrowserStartupConfig> startupConfig) {
 
     service = Option.of(AppiumDriverLocalService.buildDefaultService())
       .peek(AppiumDriverLocalService::start);
@@ -59,7 +57,7 @@ public class MobileBrowser implements Browser {
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(LOCAL_APPIUM_SERVICE), caps, false))
       .peek(driver -> log.info("Connecting to: {}", LOCAL_APPIUM_SERVICE))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
-      .map(MobileBrowser::new);
+      .map(d -> new MobileBrowser(d, startupConfig));
   }
 
 

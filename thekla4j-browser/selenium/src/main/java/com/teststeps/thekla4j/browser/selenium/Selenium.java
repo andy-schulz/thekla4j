@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function0;
@@ -43,20 +44,20 @@ public class Selenium {
   /**
    * Load the Browser from the configuration
    *
-   * @param testName - the name of the test
+   * @param startupConfig - the name of the test
    * @return a Try of the Browser
    */
-  public static Browser browser(String testName) {
-    return loadBrowser.apply(Option.of(testName))
+  public static Browser browser(BrowserStartupConfig startupConfig) {
+    return loadBrowser.apply(Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function1<Option<String>, Try<Browser>> loadBrowser =
-    testName -> Selenium.loadConfigs.apply()
-      .flatMap(t -> Selenium.createBrowserWithConfig.apply(testName, t._1, t._2));
+  private static final Function1<Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    startupConfig -> Selenium.loadConfigs.apply()
+      .flatMap(t -> Selenium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
   /**
    * Load the Selenium and Browser Configurations from files
@@ -119,17 +120,17 @@ public class Selenium {
   /**
    * Create a Browser with the given configuration
    */
-  private static final Function3<Option<String>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
-    (testName, seleniumConfig, browserConfig) -> {
+  private static final Function3<Option<BrowserStartupConfig>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
+    (startupConfigs, seleniumConfig, browserConfig) -> {
 
       if (seleniumConfig.isDefined() && browserConfig.isDefined()) {
         log.info(() -> "Loading Remote Browser with com.teststeps.thekla4j.browser.appium.config.");
-        return SeleniumBrowserBuilder.with(testName, seleniumConfig.get(), browserConfig.get());
+        return SeleniumBrowserBuilder.with(startupConfigs, seleniumConfig.get(), browserConfig.get());
       }
 
       if (seleniumConfig.isDefined() && browserConfig.isEmpty()) {
         log.info(() -> "No BrowserConfig found. Loading default Chrome Remote Browser.");
-        return SeleniumBrowserBuilder.defaultChromeBrowser(testName, seleniumConfig.get());
+        return SeleniumBrowserBuilder.defaultChromeBrowser(startupConfigs, seleniumConfig.get());
       }
 
       if (seleniumConfig.isEmpty() && browserConfig.isDefined()) {

@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function0;
@@ -37,20 +38,20 @@ public class Appium {
 
   /**
    * Load the Browser from the configuration
-   * @param testName the name of the test
+   * @param startupConfig the browser startup configuration
    * @return a Try of the Browser
    */
-  public static Browser browser(String testName) {
-    return loadBrowser.apply(Option.of(testName))
+  public static Browser browser(BrowserStartupConfig startupConfig) {
+    return loadBrowser.apply(Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function1<Option<String>, Try<Browser>> loadBrowser =
-    testName -> Appium.loadConfigs.apply()
-      .flatMap(t -> Appium.createBrowserWithConfig.apply(testName, t._1, t._2));
+  private static final Function1<Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    startupConfig -> Appium.loadConfigs.apply()
+      .flatMap(t -> Appium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
 
   /**
@@ -67,8 +68,8 @@ public class Appium {
   /**
    * Create a Browser with the given configuration
    */
-  static final Function3<Option<String>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
-    (testName, toolConfig, browserConfig) -> {
+  static final Function3<Option<BrowserStartupConfig>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
+    (startupConfig, toolConfig, browserConfig) -> {
 
       if (browserConfig.isEmpty()) {
         String errorMsg = "No BrowserConfig was found. To connect to a mobile device you have to specify at least the following capabilities: \n" +
@@ -95,13 +96,13 @@ public class Appium {
 
       if (toolConfig.isEmpty()) {
         log.info(() -> "No Selenium Automation Config found. Loading local browser with " + browserConfig.get());
-        return MobileBrowserBuilder.local(testName, browserConfig.get());
+        return MobileBrowserBuilder.local(startupConfig, browserConfig.get());
       }
 
 
       if (toolConfig.isDefined()) {
         log.info(() -> "Loading Remote Mobil Browser with com.teststeps.thekla4j.browser.appium.config.");
-        return MobileBrowserBuilder.remote(testName, toolConfig.get(), browserConfig.get());
+        return MobileBrowserBuilder.remote(startupConfig, toolConfig.get(), browserConfig.get());
       }
 
       return Try.failure(new RuntimeException("Error starting browser."));

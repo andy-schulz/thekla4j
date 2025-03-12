@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
+import io.vavr.control.Option;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
@@ -22,7 +23,7 @@ public class FirefoxBrowser {
 
     options.addArguments(config.firefoxOptions().args().toArray(new String[0]));
 
-    return new SeleniumBrowser(new FirefoxDriver(options));
+    return new SeleniumBrowser(new FirefoxDriver(options), Option.none());
   }
 
   /**
@@ -31,6 +32,6 @@ public class FirefoxBrowser {
    * @return - the new browser
    */
   public static Browser withoutOptions() {
-    return new SeleniumBrowser(new FirefoxDriver());
+    return new SeleniumBrowser(new FirefoxDriver(), Option.none());
   }
 }

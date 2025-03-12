@@ -24,7 +24,7 @@ public class ChromeBrowser {
       .peek(opts -> Option.of(opts.debuggerAddress()).peek(debAddr -> options.setExperimentalOption("debuggerAddress", debAddr)))
       .peek(opts -> Option.of(opts.args()).peek(args -> args.forEach(options::addArguments)));
 
-    return new SeleniumBrowser(new ChromeDriver(options));
+    return new SeleniumBrowser(new ChromeDriver(options), Option.none());
   }
 
   /**
@@ -32,6 +32,6 @@ public class ChromeBrowser {
    * @return - the new Chrome browser
    */
   public static Browser withoutOptions() {
-    return new SeleniumBrowser(new ChromeDriver());
+    return new SeleniumBrowser(new ChromeDriver(), Option.none());
   }
 }

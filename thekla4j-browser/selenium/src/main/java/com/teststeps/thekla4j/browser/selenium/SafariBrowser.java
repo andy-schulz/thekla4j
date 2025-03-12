@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
+import io.vavr.control.Option;
 import org.openqa.selenium.safari.SafariDriver;
 
 /**
@@ -15,7 +16,7 @@ public class SafariBrowser {
    * @return - the new Safari browser
    */
   public static Browser with(BrowserConfig config) {
-    return new SeleniumBrowser(new SafariDriver());
+    return new SeleniumBrowser(new SafariDriver(), Option.none());
   }
 
   /**
@@ -23,6 +24,6 @@ public class SafariBrowser {
    * @return - the new Safari browser
    */
   public static Browser withoutOptions() {
-    return new SeleniumBrowser(new SafariDriver());
+    return new SeleniumBrowser(new SafariDriver(), Option.none());
   }
 }
