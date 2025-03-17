@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.core;
 
+import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
+import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
@@ -61,6 +63,21 @@ public class TestTypeConsumerTask {
   }
 
   @Test
+  public void runBasicConsumerTaskWithExceptionRunAs$() throws ActivityError {
+
+    ConsumeString.print().runAs$(tester, "test", "group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
+  }
+
+  @Test
   public void runBasicConsumerTaskWithExceptionRunAsPerformer() throws ActivityError {
 
     ConsumeString.print().runAs(Performer.of(tester), "test");
@@ -68,6 +85,21 @@ public class TestTypeConsumerTask {
     assertThrows(
       ActivityError.class,
       () -> ConsumeString.print().runAs(tester, "throw"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskWithExceptionRunAs$Performer() throws ActivityError {
+
+    ConsumeString.print().runAs$(Performer.of(tester), "test", "group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
   }
 }
 

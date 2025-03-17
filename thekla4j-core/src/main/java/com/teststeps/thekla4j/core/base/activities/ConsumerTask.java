@@ -17,12 +17,13 @@ import java.util.function.Function;
 public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
 
   @Override
-  final protected Either<ActivityError, Void> perform(@NonNull Actor actor, PT input){
+  final protected Either<ActivityError, Void> perform(@NonNull Actor actor, PT input) {
     return performAs(actor, input);
   }
 
   /**
    * string representation of the task
+   *
    * @return the name of the task
    */
   @Override
@@ -51,15 +52,39 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
   }
 
   /**
+   * run the task as the given actor
+   *
+   * @param actor       the actor to run the task as
+   * @param input       the input to the task
+   * @param group       the group name used in the log file
+   * @param description the description used in the log file
+   * @throws ActivityError if the task fails
+   */
+  final public void runAs$(Actor actor, PT input, String group, String description) throws ActivityError {
+    actor.attemptsTo$_(this, group, description).using(input).getOrElseThrow(Function.identity());
+  }
+
+  /**
    * run the task as the given performer
    *
    * @param performer the actor to run the task as
-   * @param input the input to the task
+   * @param input     the input to the task
    * @throws ActivityError if the task fails
    */
   final public void runAs(Performer performer, PT input) throws ActivityError {
     performer.attemptsTo_(this).using(input);
   }
 
-
+  /**
+   * run the task as the given performer
+   *
+   * @param performer   the actor to run the task as
+   * @param input       the input to the task
+   * @param group       the group name used in the log file
+   * @param description the description used in the log file
+   * @throws ActivityError if the task fails
+   */
+  final public void runAs$(Performer performer, PT input, String group, String description) throws ActivityError {
+    performer.attemptsTo$_(this, group, description).using(input);
+  }
 }

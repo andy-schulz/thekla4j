@@ -60,4 +60,31 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
   final public RT runAs(Performer performer) throws ActivityError {
     return performer.attemptsTo(this);
   }
+
+  /**
+   * run the task as the given actor
+   *
+   * @param actor the actor to run the task as
+   * @param group the group name used in the log file
+   * @param description the description used in the log file
+   * @return the result of the task
+   * @throws ActivityError if the task fails
+   */
+  final public RT runAs$(Actor actor, String group, String description) throws ActivityError {
+    return actor.attemptsTo$(this, group, description)
+      .getOrElseThrow(Function.identity());
+  }
+
+  /**
+   * run the task as the given performer
+   *
+   * @param performer the actor to run the task as
+   * @param group the group name used in the log file
+   * @param description the description used in the log file
+   * @return the result of the task
+   * @throws ActivityError if the task fails
+   */
+  final public RT runAs$(Performer performer, String group, String description) throws ActivityError {
+    return performer.attemptsTo$(this, group, description);
+  }
 }

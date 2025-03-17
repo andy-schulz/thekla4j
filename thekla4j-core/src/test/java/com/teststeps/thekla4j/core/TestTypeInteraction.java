@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.core;
 
+import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
+import com.teststeps.thekla4j.activityLog.annotations.Action;
+import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
-import com.teststeps.thekla4j.core.tasks.SupplyString;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +52,7 @@ public class TestTypeInteraction {
     assertThat("task is evaluated", result.get(), equalTo(3));
   }
 
+  @Action("Interaction Task")
   static class InteractionTask extends Interaction<Integer, Integer> {
 
     @Override
@@ -73,6 +76,24 @@ public class TestTypeInteraction {
   }
 
   @Test
+  public void runBasicInteractionWithRunAs$Method() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    Integer result = InteractionTask.start().runAs$(actor, 2, "group", "description");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootLog = log.getLogTree();
+
+    assertThat("result is correct", result, equalTo(2));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("InteractionTask"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Interaction Task"));
+  }
+
+  @Test
   public void runBasicSupplierTaskWithRunMethodAsPerformer() throws ActivityError {
     Actor actor = Actor.named("TestActor");
 
@@ -80,5 +101,23 @@ public class TestTypeInteraction {
 
     assertThat("result is correct", result, equalTo(3));
 
+  }
+
+  @Test
+  public void runBasicSupplierTaskWithRunMethodAsPerformer$() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    Integer result = InteractionTask.start().runAs$(Performer.of(actor), 3, "group", "description");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootLog = log.getLogTree();
+
+    assertThat("result is correct", result, equalTo(3));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("InteractionTask"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Interaction Task"));
   }
 }

@@ -55,7 +55,23 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @throws ActivityError if the task fails
      */
     final public RT runAs(@NonNull Actor actor, PT input) throws ActivityError {
-        return actor.attemptsTo_(this).using(input).getOrElseThrow(Function.identity());
+        return actor.attemptsTo_(this).using(input)
+          .getOrElseThrow(Function.identity());
+    }
+
+    /**
+     * Run the task as the given actor
+     *
+     * @param actor the actor to run the task as
+     * @param input the input to the task
+     * @param group the group name used in the log file
+     * @param description the description used in the log file
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public RT runAs$(@NonNull Actor actor, PT input, String group, String description) throws ActivityError {
+        return actor.attemptsTo$_(this, group, description).using(input)
+          .getOrElseThrow(Function.identity());
     }
 
     /**
@@ -68,5 +84,19 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      */
     final public RT runAs(@NonNull Performer performer, PT input) throws ActivityError {
         return performer.attemptsTo_(this).using(input);
+    }
+
+    /**
+     * Run the task as the given performer
+     *
+     * @param performer the actor to run the task as
+     * @param input the input to the task
+     * @param group the group name used in the log file
+     * @param description the description used in the log file
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public RT runAs$(@NonNull Performer performer, PT input, String group, String description) throws ActivityError {
+        return performer.attemptsTo$_(this, group, description).using(input);
     }
 }

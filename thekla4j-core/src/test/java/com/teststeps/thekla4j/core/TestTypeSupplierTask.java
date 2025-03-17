@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.core;
 
+import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
+import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
@@ -47,11 +49,47 @@ public class TestTypeSupplierTask {
   }
 
   @Test
+  public void runBasicSupplierTaskWithRunAs$Method() throws ActivityError {
+
+    String result = SupplyString.shallThrow(false).runAs$(tester, "group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode node = log.getLogTree();
+
+    assertThat("result is correct", result, equalTo("Hello World"));
+
+    assertThat("log node is correct", node.activityNodes.get(0).name, equalTo("group"));
+    assertThat("log node description is correct", node.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("log node is correct", node.activityNodes.get(0).activityNodes.get(0).name, equalTo("SupplyString"));
+    assertThat("log node description is correct", node.activityNodes.get(0).activityNodes.get(0).description, equalTo("Supply a string"));
+
+  }
+
+  @Test
   public void runBasicSupplierTaskWithRunMethodAsPerformer() throws ActivityError {
 
     String result = SupplyString.shallThrow(false).runAs(Performer.of(tester));
 
     assertThat("result is correct", result, equalTo("Hello World"));
+
+  }
+
+  @Test
+  public void runBasicSupplierTaskWithRunMethodAs$Performer() throws ActivityError {
+
+    String result = SupplyString.shallThrow(false).runAs$(Performer.of(tester), "group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode node = log.getLogTree();
+
+    assertThat("result is correct", result, equalTo("Hello World"));
+
+    assertThat("log node is correct", node.activityNodes.get(0).name, equalTo("group"));
+    assertThat("log node description is correct", node.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("log node is correct", node.activityNodes.get(0).activityNodes.get(0).name, equalTo("SupplyString"));
+    assertThat("log node description is correct", node.activityNodes.get(0).activityNodes.get(0).description, equalTo("Supply a string"));
 
   }
 

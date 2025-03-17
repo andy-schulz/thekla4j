@@ -47,6 +47,20 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   }
 
   /**
+   * Run the activity as the given actor.
+   * It is easier to read than using the attemptsTo method of an actor
+   *
+   * @param actor the actor to run the activity as
+   *  @param group the group name used in the log file
+   *  @param description the description used in the log file
+   * @throws ActivityError if the activity fails
+   */
+  final public void runAs$(@NonNull Actor actor, String group, String description) throws ActivityError {
+    actor.attemptsTo$(this, group, description)
+      .getOrElseThrow(Function.identity());
+  }
+
+  /**
    * Run the activity as the given performer.
    * It is easier to read than using the attemptsTo method of a performer
    *
@@ -56,4 +70,21 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   final public void runAs(@NonNull Performer performer) throws ActivityError {
     performer.attemptsTo(this);
   }
+
+
+  /**
+   * Run the activity as the given performer.
+   * It is easier to read than using the attemptsTo method of a performer
+   *
+   * @param performer the actor to run the activity as
+   *  @param group the group name used in the log file
+   *  @param description the description used in the log file
+   * @throws ActivityError if the activity fails
+   */
+  final public void runAs$(@NonNull Performer performer, String group, String description) throws ActivityError {
+    performer.attemptsTo$(this, group, description);
+  }
+
+
+
 }

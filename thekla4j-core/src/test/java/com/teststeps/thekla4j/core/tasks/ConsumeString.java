@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.core.tasks;
 
+import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.ConsumerTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -7,6 +8,7 @@ import io.vavr.control.Either;
 
 import java.util.Objects;
 
+@Action("Consume a string")
 public class ConsumeString extends ConsumerTask<String> {
 
   @Override

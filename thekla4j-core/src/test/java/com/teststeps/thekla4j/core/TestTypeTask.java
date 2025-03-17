@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.core;
 
+import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
+import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -38,6 +40,30 @@ public class TestTypeTask {
     Integer result =  task.runAs(actor, 2);
 
     assertThat("output is as expected", result, equalTo(3));
+
+  }
+
+  @Test
+  public void testResultForRunAs$MethodWithActor() throws ActivityError {
+
+    Actor actor = Actor.named("TheActor");
+
+    AddNumber task = AddNumber.of(1);
+
+    Integer result =  task.runAs$(actor, 2, "group", "description");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootNode = log.getLogTree();
+
+    assertThat("output is as expected", result, equalTo(3));
+
+    assertThat("log group is set", rootNode.activityNodes.get(0).name, equalTo("group"));
+    assertThat("log description is set", rootNode.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("log node name is correct", rootNode.activityNodes.get(0).activityNodes.get(0).name, equalTo("AddNumber"));
+    assertThat("log node task description is correct", rootNode.activityNodes.get(0).activityNodes.get(0).description, equalTo("add number 1 to given number 2"));
+
+
 
   }
 

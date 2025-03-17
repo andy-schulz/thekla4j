@@ -61,6 +61,20 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
     }
 
     /**
+     * run the interaction as the given actor
+     *
+     * @param actor the actor running the interaction
+     * @param input the input for the interaction
+     * @param group the group name used in the log file
+     * @param description the description used in the log file
+     * @return the result of the interaction
+     * @throws ActivityError if the interaction fails
+     */
+    final public RT runAs$(@NonNull Actor actor, PT input, String group, String description) throws ActivityError {
+        return actor.attemptsTo$_(this, group, description).using(input).getOrElseThrow(Function.identity());
+    }
+
+    /**
      * run the interaction as the given performer
      *
      * @param performer the performer running the interaction
@@ -70,5 +84,19 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
      */
     final public RT runAs(@NonNull Performer performer, PT input) throws ActivityError {
         return performer.attemptsTo_(this).using(input);
+    }
+
+    /**
+     * run the interaction as the given performer
+     *
+     * @param performer the performer running the interaction
+     * @param input the input for the interaction
+     * @param group the group name used in the log file
+     * @param description the description used in the log file
+     * @return the result of the interaction
+     * @throws ActivityError if the interaction fails
+     */
+    final public RT runAs$(@NonNull Performer performer, PT input, String group, String description) throws ActivityError {
+        return performer.attemptsTo$_(this, group, description).using(input);
     }
 }
