@@ -9,6 +9,7 @@ import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.utils.url.UrlHelper;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -42,7 +43,7 @@ public class MobileBrowser implements Browser {
   static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, Option<BrowserStartupConfig> startupConfig) {
 
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
-      .peek(driver -> log.info("Connecting to: {}", url))
+      .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(url).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .peek(d -> System.out.println("SessionID: " + d.getSessionId()))
       .onFailure(log::error)
@@ -55,7 +56,7 @@ public class MobileBrowser implements Browser {
       .peek(AppiumDriverLocalService::start);
 
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(LOCAL_APPIUM_SERVICE), caps, false))
-      .peek(driver -> log.info("Connecting to: {}", LOCAL_APPIUM_SERVICE))
+      .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(LOCAL_APPIUM_SERVICE).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .map(d -> new MobileBrowser(d, startupConfig));
   }

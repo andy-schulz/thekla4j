@@ -4,6 +4,7 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
+import com.teststeps.thekla4j.utils.url.UrlHelper;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.Function3;
@@ -40,8 +41,8 @@ class SeleniumBrowserBuilder {
       .map(addBrowserStackOptions.apply(seleniumConfig, browserConfig, startupConfig.map(BrowserStartupConfig::testName)))
       .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
-      .peek(driver -> log.debug("Connecting to: {}", seleniumConfig.remoteUrl()))
-      .peek(driver -> log.debug("SessionID: {}", driver.getSessionId()))
+      .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(seleniumConfig.remoteUrl()).getOrElse("Error reading URL")))
+      .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
       .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions(), startupConfig))
