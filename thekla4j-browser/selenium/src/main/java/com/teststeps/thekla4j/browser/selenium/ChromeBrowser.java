@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import io.vavr.control.Option;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,7 +17,7 @@ public class ChromeBrowser {
    * @param config - the browser configuration
    * @return - the new Chrome browser
    */
-  public static Browser with(BrowserConfig config) {
+  public static Browser with(Option<BrowserStartupConfig> startUp, BrowserConfig config) {
 
     ChromeOptions options = new ChromeOptions();
 
@@ -24,14 +25,14 @@ public class ChromeBrowser {
       .peek(opts -> Option.of(opts.debuggerAddress()).peek(debAddr -> options.setExperimentalOption("debuggerAddress", debAddr)))
       .peek(opts -> Option.of(opts.args()).peek(args -> args.forEach(options::addArguments)));
 
-    return new SeleniumBrowser(new ChromeDriver(options), Option.none());
+    return new SeleniumBrowser(new ChromeDriver(options), startUp);
   }
 
   /**
    * Create a new Chrome browser without options
    * @return - the new Chrome browser
    */
-  public static Browser withoutOptions() {
-    return new SeleniumBrowser(new ChromeDriver(), Option.none());
+  public static Browser withoutOptions(Option<BrowserStartupConfig> startUp) {
+    return new SeleniumBrowser(new ChromeDriver(), startUp);
   }
 }

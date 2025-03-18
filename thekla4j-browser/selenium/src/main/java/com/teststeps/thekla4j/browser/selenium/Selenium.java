@@ -7,15 +7,13 @@ import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function0;
 import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
 import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
@@ -72,20 +70,19 @@ public class Selenium {
   /**
    * Load default local Chrome Browser, no configuration was found
    */
-  private static final Function0<Try<Browser>> loadDefaultLocalChromeBrowser =
-    () -> Try.of(ChromeBrowser::withoutOptions);
+  private static final Function1<Option<BrowserStartupConfig>, Try<Browser>> loadDefaultLocalChromeBrowser =
+    startUp -> Try.of(() -> ChromeBrowser.withoutOptions(startUp));
 
   /**
    * Load specific local Browser
    */
-  private static final Function1<BrowserConfig, Try<Browser>> loadBrowserByConfig =
-    browserConfig -> Match(browserConfig.browserName())
+  private static final Function2<Option<BrowserStartupConfig>, BrowserConfig, Try<Browser>> loadBrowserByConfig =
+    (startUp, browserConfig) -> Match(browserConfig.browserName())
       .of(
-        Case($(BrowserName.CHROME), Selenium.loadLocalChromeBrowser.apply(browserConfig)),
-        Case($(BrowserName.FIREFOX), Selenium.loadLocalFirefoxBrowser.apply(browserConfig)),
-        Case($(BrowserName.EDGE), Selenium.loadLocalEdgeBrowser.apply(browserConfig)),
-        Case($(BrowserName.SAFARI), Selenium.loadLocalSafariBrowser.apply(browserConfig)),
-        Case($(Objects::isNull), Selenium.loadDefaultLocalChromeBrowser),
+        Case($(BrowserName.CHROME), Selenium.loadLocalChromeBrowser.apply(startUp, browserConfig)),
+        Case($(BrowserName.FIREFOX), Selenium.loadLocalFirefoxBrowser.apply(startUp, browserConfig)),
+        Case($(BrowserName.EDGE), Selenium.loadLocalEdgeBrowser.apply(startUp, browserConfig)),
+        Case($(BrowserName.SAFARI), Selenium.loadLocalSafariBrowser.apply(startUp, browserConfig)),
         Case($(), browser -> Try.<Browser>failure(new RuntimeException("Unknown or Unsupported Browser: " + browser))))
 
       .onSuccess(
@@ -96,51 +93,51 @@ public class Selenium {
   /**
    * Load local Chrome Browser
    */
-  private static final Function1<BrowserConfig, Function0<Try<Browser>>> loadLocalChromeBrowser =
-    config -> () -> Try.of(() -> ChromeBrowser.with(config));
+  private static final Function2<Option<BrowserStartupConfig>, BrowserConfig, Function0<Try<Browser>>> loadLocalChromeBrowser =
+    (startUp, config) -> () -> Try.of(() -> ChromeBrowser.with(startUp, config));
 
   /**
    * Load local Firefox Browser
    */
-  private static final Function1<BrowserConfig, Function0<Try<Browser>>> loadLocalFirefoxBrowser =
-    config -> () -> Try.of(() -> FirefoxBrowser.with(config));
+  private static final Function2<Option<BrowserStartupConfig>, BrowserConfig, Function0<Try<Browser>>> loadLocalFirefoxBrowser =
+    (startUp, config) -> () -> Try.of(() -> FirefoxBrowser.with(startUp, config));
 
   /**
    * Load local Edge Browser
    */
-  private static final Function<BrowserConfig, Function0<Try<Browser>>> loadLocalEdgeBrowser =
-    browserName -> () -> Try.of(() -> EdgeBrowser.with(browserName));
+  private static final Function2<Option<BrowserStartupConfig>, BrowserConfig, Function0<Try<Browser>>> loadLocalEdgeBrowser =
+    (startUp, browserName) -> () -> Try.of(() -> EdgeBrowser.with(startUp, browserName));
 
   /**
    * Load local Safari Browser
    */
-  private static final Function<BrowserConfig, Function0<Try<Browser>>> loadLocalSafariBrowser =
-    browserName -> () -> Try.of(() -> SafariBrowser.with(browserName));
+  private static final Function2<Option<BrowserStartupConfig>, BrowserConfig, Function0<Try<Browser>>> loadLocalSafariBrowser =
+    (startUp, browserName) -> () -> Try.of(() -> SafariBrowser.with(startUp, browserName));
 
   /**
    * Create a Browser with the given configuration
    */
   private static final Function3<Option<BrowserStartupConfig>, Option<SeleniumConfig>, Option<BrowserConfig>, Try<Browser>> createBrowserWithConfig =
-    (startupConfigs, seleniumConfig, browserConfig) -> {
+    (startUp, seleniumConfig, browserConfig) -> {
 
       if (seleniumConfig.isDefined() && browserConfig.isDefined()) {
         log.info(() -> "Loading Remote Browser with com.teststeps.thekla4j.browser.appium.config.");
-        return SeleniumBrowserBuilder.with(startupConfigs, seleniumConfig.get(), browserConfig.get());
+        return SeleniumBrowserBuilder.with(startUp, seleniumConfig.get(), browserConfig.get());
       }
 
       if (seleniumConfig.isDefined() && browserConfig.isEmpty()) {
         log.info(() -> "No BrowserConfig found. Loading default Chrome Remote Browser.");
-        return SeleniumBrowserBuilder.defaultChromeBrowser(startupConfigs, seleniumConfig.get());
+        return SeleniumBrowserBuilder.defaultChromeBrowser(startUp, seleniumConfig.get());
       }
 
       if (seleniumConfig.isEmpty() && browserConfig.isDefined()) {
         log.info(() -> "No SeleniumConfig found. Loading local browser with com.teststeps.thekla4j.browser.appium.config.");
-        return loadBrowserByConfig.apply(browserConfig.get());
+        return loadBrowserByConfig.apply(startUp, browserConfig.get());
       }
 
       if (seleniumConfig.isEmpty() && browserConfig.isEmpty()) {
         log.info(() -> "No BrowserConfig and no SeleniumConfig found. Loading Local Chrome Browser.");
-        return loadDefaultLocalChromeBrowser.apply();
+        return loadDefaultLocalChromeBrowser.apply(startUp);
       }
 
       return Try.failure(new RuntimeException("Error starting browser."));

@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Move;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
@@ -17,6 +18,7 @@ import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -65,6 +67,14 @@ public class IT_DrawTest {
     System.clearProperty(SELENIUM_CONFIG.property().name());
   }
 
+  @BeforeEach
+  public void initActor() {
+
+    BrowserStartupConfig conf = BrowserStartupConfig.startMaximized();
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser(conf)));
+  }
   @AfterEach
   public void tearDown() throws InterruptedException {
     Thread.sleep(10);
@@ -74,9 +84,6 @@ public class IT_DrawTest {
 
   @Test
   public void writingLetterOnCanvas() throws ActivityError {
-
-    actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
@@ -100,9 +107,6 @@ public class IT_DrawTest {
 
   @Test
   public void drawingMultipleShapes() throws ActivityError {
-
-    actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");
@@ -129,9 +133,6 @@ public class IT_DrawTest {
 
   @Test
   public void drawingMultipleShapesAtOnce() throws ActivityError {
-
-    actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element canvas = Element.found(By.css("#canvas"))
       .withName("Canvas");

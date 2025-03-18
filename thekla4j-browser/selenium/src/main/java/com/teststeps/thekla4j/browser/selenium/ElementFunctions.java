@@ -52,6 +52,12 @@ class ElementFunctions {
       .flatMap(scrollIntoView.apply(driver));
   }
 
+  static Try<WebElement> findElementOnFirstTry(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
+
+    return locateElement.apply(driver).apply(element)
+      .map(highlightElement.apply(driver, highlightContext, element.highlight()));
+  }
+
   static Try<WebElement> findElement(RemoteWebDriver driver, Element element) {
 
     return retryUntil.apply(
@@ -184,13 +190,12 @@ class ElementFunctions {
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<State>> getElementState =
     (driver, hlx, element) ->
-      findElement(driver, hlx, element)
+      findElementOnFirstTry(driver, hlx, element)
         .map(webElement ->
           State.of(element)
             .withIsPresent(true)
             .withIsEnabled(webElement.isEnabled())
             .withIsVisible(webElement.isDisplayed()))
-        .onFailure(log::error)
         .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
   final static Function1<RemoteWebDriver, Try<String>> getTitle =

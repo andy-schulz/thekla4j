@@ -1,18 +1,21 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
 import com.teststeps.thekla4j.assertions.Expected;
+import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
@@ -21,6 +24,8 @@ import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class IT_ElementStateTest {
 
@@ -32,6 +37,15 @@ public class IT_ElementStateTest {
     System.clearProperty(SELENIUM_CONFIG.property().name());
   }
 
+  @BeforeEach
+  public void initActor() {
+
+    BrowserStartupConfig config = BrowserStartupConfig.startMaximized();
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser(config)));
+  }
+
   @AfterEach
   public void tearDown() throws InterruptedException {
     Thread.sleep(10);
@@ -40,8 +54,6 @@ public class IT_ElementStateTest {
 
   @Test
   public void testVisibilityStateTrue() throws ActivityError {
-    actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element clientButton = Element.found(By.css("#ButtonWithId"));
 
@@ -61,9 +73,6 @@ public class IT_ElementStateTest {
   @Test
   public void testVisibilityStateFalse() throws ActivityError {
 
-    actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(Selenium.browser()));
-
     Element clientButton = Element.found(By.css("#visibilitySwitchingButton"));
 
     String url = ELEMENT_STATES;
@@ -77,6 +86,25 @@ public class IT_ElementStateTest {
 
 
         .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testPresentStateFalse() throws ActivityError {
+
+    Element clientButton = Element.found(By.css("#notPresent"));
+
+    String url = ELEMENT_STATES;
+
+    State state = actor.attemptsTo(
+
+        Navigate.to(url),
+        ElementState.of(clientButton))
+
+      .getOrElseThrow(Function.identity());
+
+    assertThat("present state is false", state.isPresent(), equalTo(false));
+    assertThat("visible state is false", state.isVisible(), equalTo(false));
+    assertThat("enabled state is false", state.isEnabled(), equalTo(false));
   }
 }
 
