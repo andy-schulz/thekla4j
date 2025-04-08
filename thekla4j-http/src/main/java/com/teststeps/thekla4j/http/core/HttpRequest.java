@@ -1,8 +1,9 @@
 package com.teststeps.thekla4j.http.core;
 
+import com.teststeps.thekla4j.http.spp.multipart.FilePart;
+import com.teststeps.thekla4j.http.spp.multipart.Part;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
-
-import java.io.File;
 
 public interface HttpRequest {
 
@@ -10,7 +11,7 @@ public interface HttpRequest {
 
     Either<Throwable, HttpResult> post();
 
-  Either<Throwable, HttpResult> postFile(File file, String fieldName);
+  Either<Throwable, HttpResult> postFile(List<FilePart> fileParts, List<Part> parts);
 
   Either<Throwable, HttpResult> patch();
 

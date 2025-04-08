@@ -1,0 +1,61 @@
+# @name upload document to portfolio
+POST http://localhost:3001/post
+Accept: application/json
+Content-Type: multipart/form-data; boundary=7d33a816d302b6
+
+
+--7d33a816d302b6
+Content-Disposition: form-data; name="documentname"
+Content-Type: text/plain
+
+Name
+--7d33a816d302b6
+Content-Disposition: form-data; name="keepFieldValues"
+Content-Type: text/plain
+
+true
+--7d33a816d302b6
+Content-Disposition: form-data; name="scriptIds"
+Content-Type: text/plain
+
+
+--7d33a816d302b6
+Content-Disposition: form-data; name="docScriptingId"
+Content-Type: text/plain
+
+
+--7d33a816d302b6
+Content-Disposition: form-data; name="docData"; filename="Test.pdf"
+Content-Type: application/json
+
+< ./testFile.txt
+--7d33a816d302b6--
+###
+
+# @name upload document to portfolio
+POST http://localhost:3001/post
+Accept: application/json
+Content-Type: multipart/form-data; boundary=7d33a816d302b6
+
+
+--7d33a816d302b6
+Content-Disposition: form-data; name="documentname"
+Content-Type: text/plain
+
+Name
+--7d33a816d302b6
+Content-Disposition: form-data; name="keepFieldValues"
+Content-Type: text/plain
+
+true
+--7d33a816d302b6
+Content-Disposition: form-data; name="scriptIds"
+Content-Type: text/plain
+
+
+--7d33a816d302b6
+Content-Disposition: form-data; name="docScriptingId"
+Content-Type: text/plain
+
+--7d33a816d302b6--
+###

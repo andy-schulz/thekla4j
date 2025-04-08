@@ -6,7 +6,10 @@ import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
-import io.vavr.*;
+import com.teststeps.thekla4j.http.spp.multipart.FilePart;
+import com.teststeps.thekla4j.http.spp.multipart.Part;
+import io.vavr.Function1;
+import io.vavr.Function3;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -18,10 +21,16 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -32,6 +41,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.teststeps.thekla4j.http.httpConn.MultipartFunctions.appendFileParts;
+import static com.teststeps.thekla4j.http.httpConn.MultipartFunctions.appendParts;
 import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.percentEncode;
 
 @Log4j2(topic = "HcHttpRequest")
@@ -77,72 +88,48 @@ public class HcHttpRequest implements HttpRequest {
     return con;
   });
 
-  private final Function3<File, String, HttpURLConnection, Try<HttpURLConnection>> writeFile = (file, fieldName, con) -> Try.of(() -> {
+  private final Function3<List<FilePart>, List<Part>, HttpURLConnection, Try<HttpURLConnection>> writeFile =
+    (fileParts, parts, con) -> Try.of(() -> {
 
-    String boundary = UUID.randomUUID().toString().replace("-", "");
-    String crlf = "\r\n";
-    String twoHyphens = "--";
+        String boundary = UUID.randomUUID().toString().replace("-", "");
+        String crlf = "\r\n";
+        String twoHyphens = "--";
 
-    String LINE = crlf;
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Connection", "Keep-Alive");
+        con.setRequestProperty("Cache-Control", "no-cache");
+        con.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 
-    con.setRequestMethod("POST");
-    con.setRequestProperty("Connection", "Keep-Alive");
-    con.setRequestProperty("Cache-Control", "no-cache");
-    con.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+        DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
+        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
 
-    DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
-    PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
+        StringWriter sw = new StringWriter();
+        sw.append(crlf).append(crlf).append(twoHyphens).append(boundary).append(crlf);
 
-    // add file part
-    String fileName = file.getName();
+        StringWriter logWriter = new StringWriter();
 
-    StringWriter sw = new StringWriter();
-    this.appendFormParameters.apply(this.opts, boundary, LINE, sw);
+        return appendParts.apply(parts, boundary, crlf, sw)
 
-    sw.append(twoHyphens + boundary).append(LINE);
-    sw.append("Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\"").append(LINE);
-    sw.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(fileName)).append(LINE);
-    sw.append("Content-Transfer-Encoding: binary").append(LINE);
-    sw.append(LINE);
+          .peek(__ -> {
+            printWriter.append(sw.toString());
+            logWriter.append(sw.toString());
+          })
 
-    log.trace(() -> "Content: " + sw);
-    writer.append(sw.toString());
-    writer.flush();
+          .peek(__ -> {
+            if (!fileParts.isEmpty() && !parts.isEmpty()) {
+              printWriter.append(crlf);
+              logWriter.append(crlf);
+            }
+          })
 
-    FileInputStream inputStream = new FileInputStream(file);
-    byte[] buffer = new byte[4096];
-    int bytesRead = -1;
-    while ((bytesRead = inputStream.read(buffer)) != -1) {
-      outputStream.write(buffer, 0, bytesRead);
-    }
-    outputStream.flush();
-    inputStream.close();
-    writer.append(LINE);
-    writer.flush();
+          .flatMap(__ -> appendFileParts.apply(fileParts, boundary, crlf, printWriter, outputStream, logWriter))
+          .andFinally(() -> logWriter.append(twoHyphens))
+          .andFinally(() -> printWriter.append(twoHyphens).close())
+          .onSuccess(__ -> log.trace(() -> "Multipart writing content: " + logWriter));
+      })
+      .flatMap(Function.identity())
+      .map(__ -> con);
 
-    writer.append(twoHyphens + boundary + twoHyphens).append(LINE);
-    writer.close();
-
-    return con;
-  });
-
-  private final Function4<HttpOptions, String, String, StringWriter, StringWriter> appendFormParameters = (opts, boundary, LINE, writer) -> {
-    HashMap.ofAll(opts.formParameters)
-        .forEach((k,v) -> this.appendFormParameter.apply(k, v, boundary, LINE, writer));
-    return null;
-  };
-
-  private final Function5<String, String, String, String, StringWriter, Void> appendFormParameter = (key, value, boundary, LINE, writer) -> {
-
-    writer.append("--").append(boundary).append(LINE)
-        .append("Content-Disposition: form-data; name=\"" + key + "\"")
-        .append(LINE)
-        .append(LINE)
-        .append(value)
-        .append(LINE);
-
-    return null;
-  };
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeFormParameter = con -> Try.of(() -> {
 
@@ -160,11 +147,11 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeContent =
 
-      con -> ConnectionFunctions.isXWwwFormUrlencoded.apply(this.opts)
-          .map(isForm -> isForm ?
-              writeFormParameter :
-              writeBody)
-          .flatMap(func -> func.apply(con));
+    con -> ConnectionFunctions.isXWwwFormUrlencoded.apply(this.opts)
+      .map(isForm -> isForm ?
+        writeFormParameter :
+        writeBody)
+      .flatMap(func -> func.apply(con));
 
   public static HCRequestHelper on(String resource) {
     return new HCRequestHelper(resource);
@@ -172,14 +159,14 @@ public class HcHttpRequest implements HttpRequest {
 
   private Try<HttpURLConnection> executeRequest(String method) {
     return
-        Try.of(() -> {
-          this.connection.setRequestMethod(method);
-          this.connection.setInstanceFollowRedirects(opts.getFollowRedirects());
-          return this.connection;
-        }).map(con -> {
-          con.setDoOutput(true);
-          return con;
-        });
+      Try.of(() -> {
+        this.connection.setRequestMethod(method);
+        this.connection.setInstanceFollowRedirects(opts.getFollowRedirects());
+        return this.connection;
+      }).map(con -> {
+        con.setDoOutput(true);
+        return con;
+      });
   }
 
   @Override
@@ -187,8 +174,8 @@ public class HcHttpRequest implements HttpRequest {
     log.debug("Method: GET");
 
     return this.executeRequest("GET")
-        .toEither()
-        .flatMap(this::send);
+      .toEither()
+      .flatMap(this::send);
   }
 
   @Override
@@ -196,20 +183,20 @@ public class HcHttpRequest implements HttpRequest {
     log.debug("Method: POST with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     return this.executeRequest("POST")
-        .flatMap(this.writeContent)
-        .toEither()
-        .flatMap(this::send);
+      .flatMap(this.writeContent)
+      .toEither()
+      .flatMap(this::send);
 //        return t.isSuccess() ? t.map(this::send).get() : Either.left(t.getCause());
   }
 
   @Override
-  public Either<Throwable, HttpResult> postFile(File file, String fieldName) {
+  public Either<Throwable, HttpResult> postFile(List<FilePart> fileParts, List<Part> parts) {
     log.debug("Method: POST of file with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     return this.executeRequest("POST")
-        .flatMap(this.writeFile.apply(file, fieldName))
-        .toEither()
-        .flatMap(this::send);
+      .flatMap(this.writeFile.apply(fileParts, parts))
+      .toEither()
+      .flatMap(this::send);
   }
 
   @Override
@@ -228,9 +215,9 @@ public class HcHttpRequest implements HttpRequest {
 
 
     return this.executeRequest("PUT")
-        .flatMap(this.writeBody)
-        .toEither()
-        .flatMap(this::send);
+      .flatMap(this.writeBody)
+      .toEither()
+      .flatMap(this::send);
 
   }
 
@@ -242,9 +229,9 @@ public class HcHttpRequest implements HttpRequest {
       this.connection.setFixedLengthStreamingMode(0);
 
     return this.executeRequest("DELETE")
-        .flatMap(this.writeBody)
-        .toEither()
-        .flatMap(this::send);
+      .flatMap(this.writeBody)
+      .toEither()
+      .flatMap(this::send);
   }
 
   private Try<HttpURLConnection> init(String resource, HttpOptions opts) {
@@ -254,8 +241,8 @@ public class HcHttpRequest implements HttpRequest {
     log.debug(() -> "with options: " + opts.toString(1));
 
     return Try.of(() -> new URL(u))
-        .mapTry(url -> (HttpURLConnection) url.openConnection())
-        .map(con -> this.setHeaders(con, opts.headers));
+      .mapTry(url -> (HttpURLConnection) url.openConnection())
+      .map(con -> this.setHeaders(con, opts.headers));
   }
 
   private HttpURLConnection setHeaders(HttpURLConnection con, Map<String, String> headers) {
@@ -265,23 +252,23 @@ public class HcHttpRequest implements HttpRequest {
 
   private String getUrl(String baseUrl, int port, String resource, Map<String, String> queryParameters, Map<String, String> pathParameters) {
     String url = (!baseUrl.isEmpty() ?
-        baseUrl.concat(port > 0 ? ":" + port + resource : resource) :
-        resource)
-        .concat(queryParameters != null && !queryParameters.isEmpty() ? "?" : "")
-        .concat(getParameterString(queryParameters));
+      baseUrl.concat(port > 0 ? ":" + port + resource : resource) :
+      resource)
+      .concat(queryParameters != null && !queryParameters.isEmpty() ? "?" : "")
+      .concat(getParameterString(queryParameters));
 
     return pathParameters.entrySet().stream()
-        .map(entry -> (Function<String, String>) s -> s.replaceAll(":" + entry.getKey(), entry.getValue()))
-        .reduce(Function.identity(), Function::andThen)
-        .apply(url);
+      .map(entry -> (Function<String, String>) s -> s.replaceAll(":" + entry.getKey(), entry.getValue()))
+      .reduce(Function.identity(), Function::andThen)
+      .apply(url);
   }
 
   private String getParameterString(Map<String, String> params) {
     return params
-        .entrySet()
-        .stream()
-        .map(entry -> entry.getKey() + "=" + percentEncode.apply(entry.getValue()))
-        .collect(Collectors.joining("&"));
+      .entrySet()
+      .stream()
+      .map(entry -> entry.getKey() + "=" + percentEncode.apply(entry.getValue()))
+      .collect(Collectors.joining("&"));
   }
 
   private Either<Throwable, HttpResult> send(HttpURLConnection con) {
@@ -290,21 +277,21 @@ public class HcHttpRequest implements HttpRequest {
       log.debug("Response Code: {}", con.getResponseCode());
 
       BufferedReader br = con.getResponseCode() < 400 ?
-          new BufferedReader(
-              new InputStreamReader(
-                  con.getInputStream() == null ?
-                      new ByteArrayInputStream(new byte[0]) :
-                      con.getInputStream(),
-                  StandardCharsets.UTF_8
-              )) :
+        new BufferedReader(
+          new InputStreamReader(
+            con.getInputStream() == null ?
+              new ByteArrayInputStream(new byte[0]) :
+              con.getInputStream(),
+            StandardCharsets.UTF_8
+          )) :
 
-          new BufferedReader(
-              new InputStreamReader(
-                  con.getErrorStream() == null ?
-                      new ByteArrayInputStream(new byte[0]) :
-                      con.getErrorStream(),
-                  StandardCharsets.UTF_8
-              ));
+        new BufferedReader(
+          new InputStreamReader(
+            con.getErrorStream() == null ?
+              new ByteArrayInputStream(new byte[0]) :
+              con.getErrorStream(),
+            StandardCharsets.UTF_8
+          ));
 
 
       StringBuilder response = new StringBuilder();
@@ -325,47 +312,47 @@ public class HcHttpRequest implements HttpRequest {
       });
 
       io.vavr.collection.HashMap<String, List<String>> headers =
-          HashMap.ofAll(con.getHeaderFields())
-              .mapValues(List::ofAll);
+        HashMap.ofAll(con.getHeaderFields())
+          .mapValues(List::ofAll);
       log.debug("Response Headers: {}", () -> headers);
 
       io.vavr.collection.List<Cookie> cookies =
-          headers.filter((k, v) -> Objects.equals(Option.of(k).map(String::toLowerCase).getOrNull(), "set-cookie"))
-              .toList()
-              .flatMap(tuple -> tuple._2)
-              .map(CookieFunctions.toCookie);
+        headers.filter((k, v) -> Objects.equals(Option.of(k).map(String::toLowerCase).getOrNull(), "set-cookie"))
+          .toList()
+          .flatMap(tuple -> tuple._2)
+          .map(CookieFunctions.toCookie);
       log.debug("Cookies: {}", () -> cookies);
 
 
       return HcHttpResult
-          .response(response.toString())
-          .statusCode(con.getResponseCode())
-          .headers(headers)
-          .cookies(cookies);
+        .response(response.toString())
+        .statusCode(con.getResponseCode())
+        .headers(headers)
+        .cookies(cookies);
     });
 
     con.disconnect();
 
     return t.isSuccess() ?
-        Either.right(t.get()) :
-        Either.left(t.getCause());
+      Either.right(t.get()) :
+      Either.left(t.getCause());
 
   }
 
   private void disableSSLCertificateValidation() {
     // Create a trust manager that does not validate certificate chains
     TrustManager[] trustAllCerts = new TrustManager[]{
-        new X509TrustManager() {
-          public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-            return null;
-          }
-
-          public void checkClientTrusted(X509Certificate[] certs, String authType) {
-          }
-
-          public void checkServerTrusted(X509Certificate[] certs, String authType) {
-          }
+      new X509TrustManager() {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+          return null;
         }
+
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+        }
+
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+        }
+      }
     };
 
     // Install the all-trusting trust manager
@@ -393,7 +380,7 @@ public class HcHttpRequest implements HttpRequest {
     this.resource = resource;
     this.description = description;
     this.connection = this.init(resource, opts)
-        .getOrElseThrow(ex -> new Exception(ex.toString(), ex));
+      .getOrElseThrow(ex -> new Exception(ex.toString(), ex));
 //                .onSuccess(con -> this.connection = con);
     this.connection.setReadTimeout(opts.getResponseTimeout());
     this.opts = opts;

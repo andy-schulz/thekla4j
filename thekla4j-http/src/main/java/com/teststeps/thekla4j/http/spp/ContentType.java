@@ -13,8 +13,10 @@ public enum ContentType implements HttpHeaderValue{
   APPLICATION_JSON("application/json"),
   APPLICATION_X_WWW_FORM_URLENCODED("application/x-www-form-urlencoded"),
   APPLICATION_ID_JSON("application/ld+json"),
-  APPLICATION_EDIFACT("application/EDIFACT");
+  APPLICATION_EDIFACT("application/EDIFACT"),
 
+  TEXT_PLAIN("text/plain"),
+;
 
   private final String asString;
 
