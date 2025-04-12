@@ -89,12 +89,16 @@ Uploads a file to the backend.
 
 Methods:
 
-| type   | name                                       | description                                                            |
-|--------|--------------------------------------------|------------------------------------------------------------------------|
-| static | `file(File file)`                          | creates a POST file task with the given file to upload                 |
-|        | `to(Request request)`                      | sets the destination for the request                                   |
-|        | `options(HttpOptions options)`             | sets the http options (headers, attributes like response timeout etc.) |
-|        | `followRedirects(Boolean followRedirects)` | set the followRedirects option                                         |
+| type   | name                                       | description                                                                                           |
+|--------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| static | `file(File file, String fieldName)`        | creates a POST file task with the given file to upload, the fileName is placed into field "fieldName" |
+| static | `filePart(File file)`                      | creates a POST file task with the given filePart                                                      |
+| static | `part(Part part)`                          | creates a POST file task with the given part to upload                                                |
+|        | `add(FilePart filePart)`                   | adds a FilePart to the PostFile request                                                               |
+|        | `add(Part part)`                           | adds a Part to the PostFile request                                                                   |
+|        | `to(Request request)`                      | sets the destination for the request                                                                  |
+|        | `options(HttpOptions options)`             | sets the http options (headers, attributes like response timeout etc.)                                |
+|        | `followRedirects(Boolean followRedirects)` | set the followRedirects option                                                                        |
 
 
 Returns:
@@ -104,9 +108,39 @@ Returns:
 **Example:**
 
 ```java
-actor.attemptsTo(
-      PostFile.file(new File("path/to/file")).to(Request.of("https://example.com/api/data"))))
-    .peek(response ->System.out.println(response));
+class Test {
+  
+    @Test
+    public void uploadFile() {
+        
+        File file = new File("path/to/file");
+        
+        actor.attemptsTo(
+        PostFile.file(file, "fieldName").to(Request.of("https://example.com/api/data")))
+        .peek(response ->System.out.println(response));
+    }
+  
+    @Test
+        public void uploadFilePart() {
+        
+        File file = new File("path/to/file");
+        FilePart filePart = new FilePart(file, "fieldName");
+        
+        actor.attemptsTo(
+          PostFile.filePart(file).to(Request.of("https://example.com/api/data")))
+        .peek(response ->System.out.println(response));
+    }
+  
+    @Test
+    public void uploadPartWithoutFile() {
+        
+        Part part = new Part("data", "{var: \"test\", var2: \"test2\"}", ContentType.APPLICATION_JSON);
+        
+        actor.attemptsTo(
+          Post.part(part).to(Request.of("https://example.com/api/data")))
+        .peek(response ->System.out.println(response));
+    }
+}
 
 ```
 ---
