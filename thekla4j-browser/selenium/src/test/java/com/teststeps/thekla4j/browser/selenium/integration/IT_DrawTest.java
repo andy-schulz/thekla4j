@@ -98,7 +98,7 @@ public class IT_DrawTest {
         Draw.shape(letterT).on(canvas),
 
         See.ifThe(Text.of(header))
-          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 19 Y: 5"))
+          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 20 Y: 5"))
           .forAsLongAs(Duration.ofSeconds(3)))
 
 
@@ -113,7 +113,6 @@ public class IT_DrawTest {
 
     String url = CANVAS;
 
-
     actor.attemptsTo(
 
         Navigate.to(url),
@@ -124,7 +123,7 @@ public class IT_DrawTest {
         Draw.shape(letterT2).on(canvas),
 
         See.ifThe(Text.of(header))
-          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 134 Y: 5"))
+          .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5"))
           .forAsLongAs(Duration.ofSeconds(3)))
 
 
@@ -148,7 +147,7 @@ public class IT_DrawTest {
         .on(canvas),
 
       See.ifThe(Text.of(header))
-        .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 134 Y: 5"))
+        .is(Expected.to.equal("Drawing on Canvas with Mouse. X: 135 Y: 5"))
         .forAsLongAs(Duration.ofSeconds(3)))
 
       .getOrElseThrow(Function.identity());

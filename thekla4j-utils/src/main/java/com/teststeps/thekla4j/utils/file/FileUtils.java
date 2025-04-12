@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -35,6 +36,14 @@ public class FileUtils {
         .map(File::new)
         .onFailure(log::error);
 
+  public static Function<File, String> readStringFromFile =
+    file ->
+      Try.of(() -> file)
+        .map(File::toPath)
+        .mapTry(Files::lines)
+        .map(lines -> lines.collect(Collectors.joining("\n")))
+        .getOrElseGet(e -> {log.error("Error reading file: {}", e.getMessage());return "";
+        });
 
   public static Function1<String, Try<String>> readStringFromLocation =
     location ->

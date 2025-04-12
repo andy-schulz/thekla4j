@@ -118,5 +118,4 @@ public class Appium {
   private Appium() {
     // prevent initialization of utility class
   }
-
 }

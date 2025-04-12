@@ -3,6 +3,8 @@ package com.teststeps.thekla4j.browser.config;
 import com.teststeps.thekla4j.utils.yaml.YAML;
 import lombok.With;
 
+import java.util.Objects;
+
 /**
  * Configuration for the browser
  * @param browserName - the name of the browser e.g. chrome, firefox
@@ -53,6 +55,20 @@ public record BrowserConfig(
   String deviceName,
 
   /**
+   * enable file upload
+   * @param enableFileUpload - enable file upload
+   * @return - enable file upload
+   */
+  Boolean enableFileUpload,
+
+  /**
+   * enable file download
+   * @param enableFileDownload - enable file download
+   * @return - enable file download
+   */
+  Boolean enableFileDownload,
+
+  /**
    * the chrome options
    * @param chromeOptions - the chrome options
    * @return - the chrome options
@@ -66,7 +82,6 @@ public record BrowserConfig(
    */
   FirefoxOptions firefoxOptions) {
 
-
   /**
    * Create a BrowserConfig object with the given browser name
    * @param browserName - the name of the browser
@@ -79,6 +94,8 @@ public record BrowserConfig(
       null ,
       null,
       null,
+      false,
+      false,
       null,
       null);
   }
@@ -90,5 +107,47 @@ public record BrowserConfig(
   @Override
   public String toString() {
     return YAML.jStringify(this);
+  }
+
+
+  public static String help() {
+    return """
+      browser config yaml:
+      
+      browserName: BrowserName < chrome | firefox | edge | safari >
+      browserVersion: String, <optional>
+      platformName: OperatingSystem, < windows | linux | mac >
+      osVersion: String, <optional>
+      deviceName: String, <optional, mandatory for mobile devices>
+      enableFileUpload: Boolean, <optional, default: false>
+      enableFileDownload: Boolean, <optional, default: false>
+      chromeOptions: ChromeOptions, <optional>
+      firefoxOptions: FirefoxOptions, <optional>
+      """;
+  }
+
+  public BrowserConfig() {
+    this(BrowserName.CHROME, null, null, null, null, false, false, null, null);
+  }
+
+  public BrowserConfig(
+    BrowserName browserName,
+    String browserVersion,
+    OperatingSystem platformName,
+    String osVersion,
+    String deviceName,
+    Boolean enableFileUpload,
+    Boolean enableFileDownload,
+    ChromeOptions chromeOptions,
+    FirefoxOptions firefoxOptions) {
+    this.browserName = browserName;
+    this.browserVersion = browserVersion;
+    this.platformName = platformName;
+    this.osVersion = osVersion;
+    this.deviceName = deviceName;
+    this.enableFileUpload = Objects.requireNonNullElse(enableFileUpload, false);
+    this.enableFileDownload = Objects.requireNonNullElse(enableFileDownload, false);
+    this.chromeOptions = chromeOptions;
+    this.firefoxOptions = firefoxOptions;
   }
 }

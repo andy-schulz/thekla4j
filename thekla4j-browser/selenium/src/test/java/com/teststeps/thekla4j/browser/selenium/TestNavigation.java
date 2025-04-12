@@ -1,20 +1,21 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.RefreshCurrentBrowser;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import io.vavr.control.Option;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -60,8 +61,6 @@ public class TestNavigation {
 
   private Actor actor;
 
-  @InjectMocks
-  @Spy
   SeleniumBrowser chromeMock;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -77,6 +76,12 @@ public class TestNavigation {
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
+
+    chromeMock = SeleniumBrowser.local(driverMock,
+      BrowserConfig.of(BrowserName.CHROME),
+      Option.none());
+
+
     when(driverMock.navigate()).thenReturn(navigationMock);
   }
 
@@ -88,20 +93,21 @@ public class TestNavigation {
 
   @Test
   public void testNavigateTo() throws ActivityError {
+    String url = "theUrl";
 
     actor = Actor.named("Test Actor")
       .whoCan(BrowseTheWeb.with(chromeMock));
 
-    String url = "theUrl";
+    when(driverMock.navigate()).thenReturn(navigationMock);
 
     actor.attemptsTo(
         Navigate.to(url))
       .getOrElseThrow(Function.identity());
 
-    verify(chromeMock).navigateTo(urlCaptor.capture());
     verify(driverMock, times(1)).navigate();
-    verify(navigationMock, times(1)).to(url);
 
+    verify(navigationMock).to(urlCaptor.capture());
+    verify(navigationMock, times(1)).to(url);
 
     String urlValue = urlCaptor.getValue();
     assertThat(urlValue, equalTo(url));
@@ -117,7 +123,6 @@ public class TestNavigation {
         Navigate.back())
       .getOrElseThrow(Function.identity());
 
-    verify(chromeMock).navigateBack();
     verify(driverMock, times(1)).navigate();
     verify(navigationMock, times(1)).back();
   }
@@ -132,7 +137,6 @@ public class TestNavigation {
         Navigate.forward())
       .getOrElseThrow(Function.identity());
 
-    verify(chromeMock).navigateForward();
     verify(driverMock, times(1)).navigate();
     verify(navigationMock, times(1)).forward();
   }
@@ -149,7 +153,6 @@ public class TestNavigation {
 
       .getOrElseThrow(Function.identity());
 
-    verify(chromeMock).refresh();
     verify(driverMock, times(1)).navigate();
     verify(navigationMock, times(1)).refresh();
   }

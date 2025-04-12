@@ -83,7 +83,7 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowser> builder = mockStatic(MobileBrowser.class)) {
 
       builder
-        .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class), any(Option.class)))
+        .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class), any(BrowserConfig.class), any(Option.class)))
         .thenReturn(Try.of(() -> browser));
 
       Browser appiumBrowser = Appium.browser();
@@ -125,7 +125,7 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowser> br = mockStatic(MobileBrowser.class)) {
 
       br
-        .when(() -> MobileBrowser.startLocal(caps, conf))
+        .when(() -> MobileBrowser.startLocal(caps, standardBrowserConfig, conf))
         .thenReturn(Try.of(() -> browser));
 
       Try<Browser> finalBrowser = MobileBrowserBuilder.local(conf, standardBrowserConfig);
@@ -244,7 +244,7 @@ public class TestMobileBrowserBuilder {
 
     try (MockedStatic<MobileBrowser> mobileBrowser = mockStatic(MobileBrowser.class)) {
 
-      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps, conf)).thenReturn(Try.of(() -> browser));
+      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps, standardBrowserConfig, conf)).thenReturn(Try.of(() -> browser));
 
         Try<Browser> finalBrowser = MobileBrowserBuilder.remote(
           conf,

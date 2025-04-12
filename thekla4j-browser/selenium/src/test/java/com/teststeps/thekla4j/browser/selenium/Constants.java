@@ -8,4 +8,5 @@ public class Constants {
   public static String FRAMES = FRAMEWORKTESTER + "/frames/";
   public static String CANVAS = FRAMEWORKTESTER + "/canvas/";
   public static String TABLE = FRAMEWORKTESTER + "/table/";
+  public static String DOWNLOAD = FRAMEWORKTESTER + "/download/";
 }

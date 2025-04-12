@@ -53,6 +53,7 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
    * The browser configuration to use
    */
   BROWSER_CONFIG(PropertyElement.of("thekla4j.browser.config", Option.none(), "The browser configuration to use"));
+
   final PropertyElement property;
 
   /**

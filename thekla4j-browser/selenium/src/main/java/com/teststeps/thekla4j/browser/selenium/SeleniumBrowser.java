@@ -1,11 +1,14 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
+import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
+import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
@@ -27,6 +30,7 @@ import java.util.Objects;
 
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
+import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOAD_PREFIX;
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
@@ -38,24 +42,57 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   private final Option<SeleniumOptions> options;
   private Option<BrowsersStackOptions> bsOptions = Option.none();
   private Option<Frame> currentFrame = Option.none();
+  private Option<Path> downloadPath = Option.none();
+  private final BrowserConfig browserConfig;
+  private final Boolean localExecution;
 
-  SeleniumBrowser(RemoteWebDriver driver, SeleniumOptions options, Option<BrowserStartupConfig> startupConfig) {
+
+
+  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, SeleniumOptions seleniumOptions, Option<BrowserStartupConfig> startupConfig) {
     this.driver = driver;
-    this.options = Option.of(options);
+    this.options = Option.of(seleniumOptions);
+    this.browserConfig = browserConfig;
 
     if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
       this.driver.manage().window().maximize();
     }
 
+    this.localExecution = false;
+
+    createDownloadPath(browserConfig);
   }
 
-  protected SeleniumBrowser(RemoteWebDriver driver, Option<BrowserStartupConfig> startupConfig) {
+  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
     this.driver = driver;
     this.options = Option.of(SeleniumOptions.empty());
+    this.browserConfig = browserConfig;
 
     if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
       this.driver.manage().window().maximize();
     }
+
+    this.localExecution = true;
+
+    createDownloadPath(browserConfig);
+  }
+
+
+  protected static SeleniumBrowser local(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
+    return new SeleniumBrowser(driver, browserConfig, startupConfig);
+  }
+
+  protected static SeleniumBrowser grid(RemoteWebDriver driver, BrowserConfig browserConfig, SeleniumOptions seleniumOptions, Option<BrowserStartupConfig> startupConfig) {
+    return new SeleniumBrowser(driver, browserConfig, seleniumOptions, startupConfig);
+  }
+
+  protected SeleniumBrowser withDownloadPath(Option<Path> downloadPath) {
+    this.downloadPath = downloadPath;
+    return this;
+  }
+
+  private void createDownloadPath(BrowserConfig browserConfig) {
+    if(browserConfig.enableFileDownload() && downloadPath.isEmpty())
+      this.downloadPath = Option.of(TempFolderUtil.newSubTempFolder(DOWNLOAD_PREFIX));
   }
 
   protected SeleniumBrowser withBrowserStackOptions(BrowsersStackOptions bsOptions) {
@@ -65,7 +102,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
 
-    boolean slowDownExecution = Boolean.parseBoolean(SLOW_DOWN_EXECUTION.value() );
+    boolean slowDownExecution = Boolean.parseBoolean(SLOW_DOWN_EXECUTION.value());
 
     Duration slowDownTime = Duration.ofSeconds(Long.parseLong(SLOW_DOWN_TIME.value()));
 
@@ -77,20 +114,20 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     };
   }
 
-  protected Try<Void> switchFrame (Option<Frame> frame) {
+  protected Try<Void> switchFrame(Option<Frame> frame) {
 
-    if((currentFrame.isEmpty() && frame.isEmpty())) {
+    if ((currentFrame.isEmpty() && frame.isEmpty())) {
       return Try.success(null);
     }
 
-    if(currentFrame.isDefined() && frame.isEmpty()) {
+    if (currentFrame.isDefined() && frame.isEmpty()) {
       currentFrame = Option.none();
       switchToDefaultContent();
       return Try.success(null);
     }
 
 
-    if(currentFrame.isDefined() && frame.isDefined() && currentFrame.get().equals(frame.get())) {
+    if (currentFrame.isDefined() && frame.isDefined() && currentFrame.get().equals(frame.get())) {
       return Try.success(null);
     }
 
@@ -128,6 +165,13 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  @Override
+  public Try<Void> clickOnPositionInsideElement(Element element, StartPoint position) {
+    return switchFrame(element.frame())
+      .flatMap(x -> ActionFunctions.clickOnPositionInsideElement(driver, highlightContext, element, position))
+      .map(applyExecutionSlowDown());
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -145,6 +189,13 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return switchFrame(element.frame())
       .flatMap(x -> enterTextIntoElement.apply(driver, highlightContext, element, text, clearField))
+      .map(applyExecutionSlowDown());
+  }
+
+  @Override
+  public Try<Void> clear(Element element) {
+    return switchFrame(element.frame())
+      .flatMap(x -> clearElement.apply(driver, highlightContext, element))
       .map(applyExecutionSlowDown());
   }
 
@@ -267,7 +318,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return switchFrame(element.frame())
-      .flatMap(x -> DrawingFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes));
+      .flatMap(x -> ActionFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes));
   }
 
   /**
@@ -335,6 +386,10 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .onFailure(log::error);
 
     highlightContext.release();
+
+    downloadPath
+      .map(TempFolderUtil::delete)
+      .map(t -> t.onFailure(log::error));
 
     return Try.success(null);
   }
@@ -409,6 +464,27 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  @Override
+  public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
+
+    if (!browserConfig.enableFileDownload())
+      return Try.failure(new RuntimeException("""
+        File download is not enabled in the browser configuration.
+        Set enableFileDownload to true in the browser configuration to enable file download.
+        {{HELP}}
+        """.replace("{{HELP}}", BrowserConfig.help())));
+
+    if (downloadPath.isEmpty())
+      return Try.failure(new RuntimeException("""
+           download path is not set. Its a framework bug.
+        """));
+
+    if (localExecution) {
+      return getLocalDownloadedFile.apply(downloadPath.map(TempFolderUtil::directory).get(), fileName, timeout, waitBetweenRetries);
+    }
+    return getRemoteDownloadedFile.apply(driver, downloadPath.map(TempFolderUtil::directory).get(), fileName, timeout, waitBetweenRetries);
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -416,4 +492,5 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Boolean executesOnBrowserStack() {
     return bsOptions.isDefined();
   }
+
 }

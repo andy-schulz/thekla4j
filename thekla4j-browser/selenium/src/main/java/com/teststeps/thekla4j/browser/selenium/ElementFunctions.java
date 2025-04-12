@@ -12,19 +12,24 @@ import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.Function4;
 import io.vavr.Function5;
+import io.vavr.Function6;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.HasDownloads;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
 
 import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
@@ -72,11 +77,11 @@ class ElementFunctions {
   static Try<WebElement> findElementWithoutScrolling(RemoteWebDriver driver, Element element) {
 
     return retryUntil.apply(
-        ElementFunctions.locateElement.apply(driver),
-        locateElement.apply(driver).apply(element),
-        element,
-        Instant.now(),
-        Duration.ofMillis(0));
+      ElementFunctions.locateElement.apply(driver),
+      locateElement.apply(driver).apply(element),
+      element,
+      Instant.now(),
+      Duration.ofMillis(0));
   }
 
   private static final Function1<RemoteWebDriver, Function1<Element, Try<WebElement>>> locateElement =
@@ -89,7 +94,8 @@ class ElementFunctions {
     (elementFinder, webElement, element, start, waitFor) -> {
 
       Try.run(() -> Thread.sleep(waitFor.toMillis()))
-        .onFailure(log::error);
+        .onFailure(log::error)
+        .getOrElseThrow(() -> new RuntimeException("Error while waiting for next iteration"));
 
       Duration waitForNextIteration = Duration.ofMillis(500);
 
@@ -165,6 +171,12 @@ class ElementFunctions {
         }
       })
       .peek(webElement -> webElement.sendKeys(text))
+      .onFailure(log::error)
+      .map(x -> null);
+
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clearElement =
+    (driver, hlx, element) -> findElement(driver, hlx, element)
+      .peek(WebElement::clear)
       .onFailure(log::error)
       .map(x -> null);
 
@@ -248,8 +260,8 @@ class ElementFunctions {
 
   final static Function2<RemoteWebDriver, Element, Try<File>> takeScreenShotOfElement =
     (driver, element) -> findElement(driver, element)
-        .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
-        .onFailure(log::error);
+      .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
+      .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, String, Try<Object>> executeJavaScript =
     (driver, script) -> Try.of(() -> driver.executeScript(script))
@@ -324,5 +336,94 @@ class ElementFunctions {
       .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString(",")))
         .onFailure(log::error))
       .map(x -> null);
+
+  final static Function5<HasDownloads, Path, String, Duration, Duration, Try<File>> getRemoteDownloadedFile =
+    (driver, tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(
+        driver,
+        tempDir,
+        fileName,
+        0L,
+        Instant.now().plusSeconds(timeout.getSeconds()),
+        waitBetweenRetries)
+      .map(fileExists -> tempDir.resolve(fileName).toFile());
+
+  final static Function4<Path, String, Duration, Duration, Try<File>> getLocalDownloadedFile =
+    (tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.localFileExistsAndFinishedDownloading.apply(
+        tempDir,
+        fileName,
+        0L,
+        Instant.now().plusSeconds(timeout.getSeconds()),
+        waitBetweenRetries)
+      .map(fileExists -> tempDir.resolve(fileName).toFile());
+
+  final static Function6<HasDownloads, Path, String, Long, Instant, Duration, Try<File>> remoteFileExistsAndFinishedDownloading =
+    (driver, tempDir, fileName, fileSize, end, waitBetweenTrys) -> Try.run(() -> Thread.sleep(waitBetweenTrys.toMillis()))
+      .flatMap(__ -> {
+        if (Instant.now().isAfter(end)) {
+          return Try.failure(new TimeoutException("File download timed out"));
+        }
+
+        List<String> files = List.ofAll(driver.getDownloadableFiles());
+
+        if (!files.contains(fileName)) {
+          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+        }
+
+        Try<Void> downloadRemote = Try.run(() ->
+        {
+          Files.deleteIfExists(tempDir.resolve(fileName));
+          driver.downloadFile(fileName, tempDir);
+        });
+
+        if (downloadRemote.isFailure()) {
+          log.debug("Download failed with error: {}", downloadRemote.getCause().getMessage());
+          log.debug("Failed to download file from remote site: {}, retrying ...", fileName);
+          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+        }
+
+        File file = tempDir.resolve(fileName).toFile();
+
+        if (!file.exists()) {
+          log.debug("Downloaded File {} does not yet exist, retrying ...", fileName);
+          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+        }
+
+        if (!fileSize.equals(file.length())) {
+          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, file.length(), end, waitBetweenTrys);
+        }
+
+        return Try.success(file);
+
+      })
+      .onFailure(log::error);
+
+  final static Function5<Path, String, Long, Instant, Duration, Try<File>> localFileExistsAndFinishedDownloading =
+    (downloadPath, fileName, fileSize, end, waitBetweenTrys) ->
+
+      io.vavr.control.Try.run(() -> Thread.sleep(waitBetweenTrys.toMillis()))
+        .flatMap(__ -> {
+
+          if (Instant.now().isAfter(end)) {
+            log.error("File download timed out");
+            return Try.failure(new TimeoutException("File download timed out"));
+          }
+
+          File file = downloadPath.resolve(fileName).toFile();
+
+          if (!file.exists()) {
+            log.debug("Downloaded File {} does not yet exist in {}, retrying ...", fileName, downloadPath);
+            return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, fileSize, end, waitBetweenTrys);
+          }
+
+          if (!fileSize.equals(file.length())) {
+            log.debug("Downloaded File {} is not yet finished downloading. Last file size: {}, current file size: {}, retrying ...", fileName,
+              fileSize, file.length());
+            return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, file.length(), end, waitBetweenTrys);
+          }
+
+          return Try.success(file);
+
+        })
+        .onFailure(log::error);
 
 }

@@ -2,7 +2,10 @@ defaultConfig: seleniumLocal
 
 seleniumLocal:
   remoteUrl: "http://localhost:4444/wd/hub"
-  bStack:
-    projectName: "THEKLA_UI_TEST_DEV"
-    buildName: "Build_201"
-    sessionName: "master1"
+  capabilities:
+    se:
+      downloadsEnabled: true
+ # bStack:
+  #  projectName: "THEKLA_UI_TEST_DEV"
+   # buildName: "Build_201"
+    #sessionName: "master1"

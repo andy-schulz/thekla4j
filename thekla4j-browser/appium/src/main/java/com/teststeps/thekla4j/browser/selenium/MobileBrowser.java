@@ -1,9 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
+import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
@@ -31,26 +33,28 @@ public class MobileBrowser implements Browser {
 
   private final HighlightContext highlightContext = new HighlightContext();
   private static final String LOCAL_APPIUM_SERVICE = "http://localhost:4723";
+  private final BrowserConfig browserConfig;
 
   private final SeleniumBrowser seleniumBrowser;
 
   private static Option<AppiumDriverLocalService> service = Option.none();
 
-  private MobileBrowser(RemoteWebDriver driver, Option<BrowserStartupConfig> startupConfig) {
-    seleniumBrowser = new SeleniumBrowser(driver, startupConfig);
+  private MobileBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
+    this.browserConfig = browserConfig;
+    seleniumBrowser = SeleniumBrowser.local(driver, browserConfig, startupConfig);
   }
 
-  static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, Option<BrowserStartupConfig> startupConfig) {
+  static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
 
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
       .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(url).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .peek(d -> System.out.println("SessionID: " + d.getSessionId()))
       .onFailure(log::error)
-      .map(d -> new MobileBrowser(d, startupConfig));
+      .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }
 
-  static Try<Browser> startLocal(DesiredCapabilities caps, Option<BrowserStartupConfig> startupConfig) {
+  static Try<Browser> startLocal(DesiredCapabilities caps, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
 
     service = Option.of(AppiumDriverLocalService.buildDefaultService())
       .peek(AppiumDriverLocalService::start);
@@ -58,7 +62,7 @@ public class MobileBrowser implements Browser {
     return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(LOCAL_APPIUM_SERVICE), caps, false))
       .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(LOCAL_APPIUM_SERVICE).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
-      .map(d -> new MobileBrowser(d, startupConfig));
+      .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }
 
 
@@ -73,6 +77,11 @@ public class MobileBrowser implements Browser {
   }
 
   @Override
+  public Try<Void> clickOnPositionInsideElement(Element element, StartPoint position) {
+    return seleniumBrowser.clickOnPositionInsideElement(element, position);
+  }
+
+  @Override
   public Try<Void> doubleClickOn(Element element) {
     return Try.failure(ActivityError.of("Double Click is not supported to work on mobile devices"));
   }
@@ -80,6 +89,11 @@ public class MobileBrowser implements Browser {
   @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return seleniumBrowser.enterTextInto(text, element, clearField);
+  }
+
+  @Override
+  public Try<Void> clear(Element element) {
+    return seleniumBrowser.clear(element);
   }
 
   @Override
@@ -229,5 +243,10 @@ public class MobileBrowser implements Browser {
   @Override
   public Try<Object> executeJavaScript(String script) {
     return seleniumBrowser.executeJavaScript(script);
+  }
+
+  @Override
+  public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
+    return Try.failure(ActivityError.of("Download is not yet supported on mobile devices"));
   }
 }

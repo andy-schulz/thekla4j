@@ -27,7 +27,7 @@ import java.time.Duration;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2(topic = "DrawingFunctions")
-class DrawingFunctions {
+class ActionFunctions {
 
   /**
    * Draw a shape on a web page
@@ -48,32 +48,46 @@ class DrawingFunctions {
       .map(__ -> null);
   }
 
+  protected static Try<Void> clickOnPositionInsideElement(RemoteWebDriver driver, HighlightContext hlx, Element element, StartPoint startPoint) {
+
+    return ElementFunctions.findElement(driver, hlx, element)
+      .flatMap(webElement -> ActionFunctions.moveAndClick.apply(webElement,new Actions(driver), startPoint));
+  }
+
+  private static final Function3<WebElement, Actions, StartPoint, Try<Void>> moveAndClick =
+    (element, actions, startPoint) -> Try.of(() -> element)
+      .flatMap(ActionFunctions.moveToStartPoint.apply(actions, startPoint))
+      .flatMap(ActionFunctions.click)
+      .peek(Actions::perform)
+      .map(__ -> null);
+
   private static final Function5<WebElement, Boolean, Option<Duration>, Shape, Actions, Try<Void>> drawSingleShape =
     (element, releaseAndHold, pause, shape, actions) ->
       Try.of(() -> element)
-        .flatMap(DrawingFunctions.moveToStartPoint.apply(actions, shape.startPoint()))
-        .flatMap(DrawingFunctions.mouseDown)
-        .map(DrawingFunctions.addDrawingActions.apply(shape.directions(), releaseAndHold, pause))
-        .flatMap(DrawingFunctions.mouseUp)
+        .flatMap(ActionFunctions.moveToStartPoint.apply(actions, shape.startPoint()))
+        .flatMap(ActionFunctions.mouseDown)
+        .map(ActionFunctions.addDrawingActions.apply(shape.directions(), releaseAndHold, pause))
+        .flatMap(ActionFunctions.mouseUp)
         .peek(Actions::perform)
         .map(__ -> null);
 
 
   private static final Function1<Actions, Try<Actions>> mouseDown =
-    actions -> Try.run(actions::clickAndHold)
-      .map(__ -> actions)
+    actions -> Try.of(actions::clickAndHold)
       .onSuccess(__ -> log.debug("Mouse down"));
 
   private static final Function1<Actions, Try<Actions>> mouseUp =
-    actions -> Try.run(actions::release)
-      .map(__ -> actions)
+    actions -> Try.of(actions::release)
       .onSuccess(__ -> log.debug("Mouse up"));
+
+  private static final Function1<Actions, Try<Actions>> click =
+    actions -> Try.of(actions::click)
+      .onSuccess(__ -> log.debug("Mouse click"));
 
   private static final Function3<Actions, StartPoint, WebElement, Try<Actions>> moveToStartPoint =
     (actions, startPoint, element) ->
       Try.of(() -> element.getLocation().moveBy(startPoint.x(), startPoint.y()))
         .onSuccess(point -> log.debug("Element located at: {}", element.getLocation()))
-        .onSuccess(point -> log.debug("Start Drawing at location: {}", point))
         .map(point -> actions.moveToLocation(point.x, point.y))
         .onSuccess(__ -> log.debug("Move to start point inside element: {}", startPoint));
 

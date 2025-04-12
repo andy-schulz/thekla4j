@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
+import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
@@ -19,7 +20,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.Consumer;
 
+import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOADS_ENABLED;
 import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.RECORD_VIDEO;
 
 /**
@@ -45,7 +48,7 @@ class SeleniumBrowserBuilder {
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .onFailure(log::error)
       .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions(), startupConfig))
+      .map(d -> SeleniumBrowser.grid(d, browserConfig, seleniumConfig.seOptions(), startupConfig))
       .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
   }
 
@@ -57,18 +60,7 @@ class SeleniumBrowserBuilder {
    * @return a Try of the Browser
    */
   static Try<Browser> defaultChromeBrowser(Option<BrowserStartupConfig> startupConfig, SeleniumConfig seleniumConfig) {
-
-    DesiredCapabilities capabilities = new DesiredCapabilities();
-    capabilities.setBrowserName("chrome");
-
-    return Try.of(() -> capabilities)
-      .map(addBrowserStackOptions.apply(seleniumConfig, null, startupConfig.map(BrowserStartupConfig::testName)))
-
-      .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
-      .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
-      .map(applySeleniumConfig.apply(seleniumConfig))
-      .map(d -> new SeleniumBrowser(d, seleniumConfig.seOptions(), startupConfig))
-      .map(s -> s.withBrowserStackOptions(seleniumConfig.bStack()));
+    return with(startupConfig, seleniumConfig, BrowserConfig.of(BrowserName.CHROME));
   }
 
   /**
@@ -151,7 +143,16 @@ class SeleniumBrowserBuilder {
           Option.of(browserConfig.browserName()).forEach(bn -> capabilities.setBrowserName(bn.getName().toLowerCase()));
           Option.of(browserConfig.browserVersion()).forEach(capabilities::setVersion);
           Option.of(browserConfig.platformName()).forEach(pName -> capabilities.setPlatform(Platform.fromString(pName.getName())));
+          Option.of(browserConfig.enableFileDownload()).forEach(SeleniumBrowserBuilder.setDownloadEnabled.apply(capabilities));
+
           return capabilities;
         })
         .onSuccess(capa -> log.debug("Capabilities created: " + capa));
+
+  private static final Function1<DesiredCapabilities, Consumer<Boolean>> setDownloadEnabled =
+    caps -> downloadEnabled -> {
+      if (downloadEnabled) {
+        caps.setCapability(DOWNLOADS_ENABLED, true);
+      }
+    };
 }

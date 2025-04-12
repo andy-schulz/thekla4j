@@ -2,6 +2,7 @@ defaultConfig: localChrome
 
 localChrome:
   browserName: "Chrome"
+  enableFileDownload: true
   chromeOptions:
     args:
       - "disable-search-engine-choice-screen"

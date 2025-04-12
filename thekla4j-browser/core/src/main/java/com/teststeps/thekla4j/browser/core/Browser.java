@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
+import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
 import com.teststeps.thekla4j.http.commons.Cookie;
@@ -34,6 +35,15 @@ public interface Browser {
   Try<Void> clickOn(Element element);
 
   /**
+   * Click on a given element at a specific position
+   *
+   * @param element    the element to click on
+   * @param position the position to click on
+   * @return a Try containing a Void
+   */
+  Try<Void> clickOnPositionInsideElement(Element element, StartPoint position);
+
+  /**
    * Double click on a given element
    *
    * @param element the element to double click on
@@ -50,6 +60,14 @@ public interface Browser {
    * @return a Try containing a Void
    */
   Try<Void> enterTextInto(String text, Element element, Boolean clearField);
+
+  /**
+   * Clear existing text from a given element
+   *
+   * @param element the element to clear
+   * @return a Try containing a Void
+   */
+  Try<Void> clear(Element element);
 
   /**
    * Get the text of a given element
@@ -273,4 +291,6 @@ public interface Browser {
    * @return a Try containing the result of the script
    */
   Try<Object> executeJavaScript(String script);
+
+  Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries);
 }

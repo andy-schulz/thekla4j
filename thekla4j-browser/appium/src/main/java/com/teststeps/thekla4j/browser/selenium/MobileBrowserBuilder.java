@@ -41,7 +41,7 @@ public class MobileBrowserBuilder {
    */
   static Try<Browser> remote(Option<BrowserStartupConfig> startupConfig, SeleniumConfig mobileConfig, BrowserConfig browserConfig) {
     return createRemoteCapabilities.apply(browserConfig, mobileConfig)
-      .flatMap(caps -> MobileBrowser.startRemote(mobileConfig.remoteUrl(), caps, startupConfig));
+      .flatMap(caps -> MobileBrowser.startRemote(mobileConfig.remoteUrl(), caps, browserConfig, startupConfig));
   }
 
   /**
@@ -53,7 +53,7 @@ public class MobileBrowserBuilder {
    */
   static Try<Browser> local(Option<BrowserStartupConfig> startupConfig, BrowserConfig browserConfig) {
     return createLocalCapabilities.apply(browserConfig, new DesiredCapabilities())
-      .flatMap(d -> MobileBrowser.startLocal(d, startupConfig));
+      .flatMap(d -> MobileBrowser.startLocal(d, browserConfig, startupConfig));
   }
 
   static final Function3<BrowserConfig, SeleniumConfig, DesiredCapabilities, Try<DesiredCapabilities>> setAutomationNameFromConfigs =
