@@ -53,19 +53,75 @@ public class TestTypeConsumerTask {
   }
 
   @Test
-  public void runBasicConsumerTaskWithException() throws ActivityError {
+  public void runBasicConsumerTaskWithInput() throws ActivityError {
 
-    ConsumeString.print().runAs(tester, "test");
+    Either<ActivityError, Void> result = ConsumeString.print().runAs(tester, "test");
 
-    assertThrows(
-      ActivityError.class,
-      () -> ConsumeString.print().runAs(tester, "throw"));
+    assertThat("either is right", result.isRight(), equalTo(true));
+
+    Either<ActivityError, Void> fails = ConsumeString.print().runAs(tester, "throw");
+
+    assertThat("either is left", fails.isLeft(), equalTo(true));
+
   }
 
   @Test
-  public void runBasicConsumerTaskWithExceptionRunAs$() throws ActivityError {
+  public void runBasicConsumerTaskWithAttemptsWith() {
 
-    ConsumeString.print().runAs$(tester, "test", "group", "description");
+    Either<ActivityError, Void> result = ConsumeString.print().runAs(tester).using("test");
+
+    assertThat("either is right", result.isRight(), equalTo(true));
+
+    Either<ActivityError, Void> fails = ConsumeString.print().runAs(tester).using("throw");
+
+    assertThat("either is left", fails.isLeft(), equalTo(true));
+  }
+
+  @Test
+  public void runBasicConsumerTaskRunAs$AllParameter() {
+
+    Either<ActivityError, Void> result = ConsumeString.print().runAs$(tester, "test", "group", "description");
+
+    assertThat("either is right", result.isRight(), equalTo(true));
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskRunAs$LogAnnotator() {
+
+    Either<ActivityError, Void> result = ConsumeString.print()
+      .runAs$(tester, "test")
+      .annotate("group", "description");
+
+    assertThat("either is right", result.isRight(), equalTo(true));
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskRunAs$LogAnnotatorAttemptsWith() {
+
+    Either<ActivityError, Void> result = ConsumeString.print()
+      .runAs$(tester)
+      .annotate("group", "description")
+      .using("test");
+
+    assertThat("either is right", result.isRight(), equalTo(true));
 
     TheklaActivityLog log = tester.activityLog;
     ActivityLogNode lastLog = log.getLogTree();
@@ -84,13 +140,58 @@ public class TestTypeConsumerTask {
 
     assertThrows(
       ActivityError.class,
-      () -> ConsumeString.print().runAs(tester, "throw"));
+      () -> ConsumeString.print().runAs(Performer.of(tester), "throw"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskWithExceptionRunAsPerformerAttemptsWith() throws ActivityError {
+
+    ConsumeString.print()
+      .runAs(Performer.of(tester))
+      .using("test");
+
+    assertThrows(
+      ActivityError.class,
+      () -> ConsumeString.print().runAs(Performer.of(tester), "throw"));
   }
 
   @Test
   public void runBasicConsumerTaskWithExceptionRunAs$Performer() throws ActivityError {
 
     ConsumeString.print().runAs$(Performer.of(tester), "test", "group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskWithExceptionRunAs$PerformerLogAnnotator() throws ActivityError {
+
+    ConsumeString.print().runAs$(Performer.of(tester), "test").annotate("group", "description");
+
+    TheklaActivityLog log = tester.activityLog;
+    ActivityLogNode lastLog = log.getLogTree();
+
+    assertThat("group name is correct", lastLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description is correct", lastLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("task group name is correct", lastLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("ConsumeString"));
+    assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
+  }
+
+  @Test
+  public void runBasicConsumerTaskWithExceptionRunAs$PerformerLogAnnotatorAttemptsWith() throws ActivityError {
+
+    ConsumeString.print()
+      .runAs$(Performer.of(tester))
+      .annotate("group", "description")
+      .using("test");
 
     TheklaActivityLog log = tester.activityLog;
     ActivityLogNode lastLog = log.getLogTree();

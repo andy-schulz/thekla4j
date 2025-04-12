@@ -3,11 +3,11 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
+import com.teststeps.thekla4j.core.base.persona.AttemptsWithThrows;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
-
-import java.util.function.Function;
 
 /**
  * A task is an activity that returns a result
@@ -54,9 +54,20 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @return the result of the task
      * @throws ActivityError if the task fails
      */
-    final public RT runAs(@NonNull Actor actor, PT input) throws ActivityError {
-        return actor.attemptsTo_(this).using(input)
-          .getOrElseThrow(Function.identity());
+    final public Either<ActivityError, RT> runAs(@NonNull Actor actor, PT input) {
+        return actor.attemptsTo_(this).using(input);
+    }
+
+
+    /**
+     * Run the task as the given actor
+     *
+     * @param actor the actor to run the task as
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public AttemptsWith<PT, Either<ActivityError, RT>> runAs(@NonNull Actor actor) {
+        return input -> actor.attemptsTo_(this).using(input);
     }
 
     /**
@@ -69,9 +80,33 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @return the result of the task
      * @throws ActivityError if the task fails
      */
-    final public RT runAs$(@NonNull Actor actor, PT input, String group, String description) throws ActivityError {
-        return actor.attemptsTo$_(this, group, description).using(input)
-          .getOrElseThrow(Function.identity());
+    final public Either<ActivityError, RT> runAs$(@NonNull Actor actor, PT input, String group, String description) {
+        return actor.attemptsTo$_(this, group, description).using(input);
+    }
+
+
+    /**
+     * Run the task as the given actor
+     *
+     * @param actor the actor to run the task as
+     * @param input the input to the task
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public LogAnnotator<Either<ActivityError, RT>> runAs$(@NonNull Actor actor, PT input) {
+        return (group, description) -> actor.attemptsTo$_(this, group, description).using(input);
+    }
+
+
+    /**
+     * Run the task as the given actor
+     *
+     * @param actor the actor to run the task as
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, RT>>> runAs$(@NonNull Actor actor) {
+        return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
     }
 
     /**
@@ -90,6 +125,17 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * Run the task as the given performer
      *
      * @param performer the actor to run the task as
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public AttemptsWithThrows<PT,RT> runAs(@NonNull Performer performer) throws ActivityError {
+        return input -> performer.attemptsTo_(this).using(input);
+    }
+
+    /**
+     * Run the task as the given performer
+     *
+     * @param performer the actor to run the task as
      * @param input the input to the task
      * @param group the group name used in the log file
      * @param description the description used in the log file
@@ -98,5 +144,28 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      */
     final public RT runAs$(@NonNull Performer performer, PT input, String group, String description) throws ActivityError {
         return performer.attemptsTo$_(this, group, description).using(input);
+    }
+
+    /**
+     * Run the task as the given performer
+     *
+     * @param performer the actor to run the task as
+     * @param input the input to the task
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public LogAnnotatorThrows<RT> runAs$(@NonNull Performer performer, PT input) throws ActivityError {
+        return (group, description) -> performer.attemptsTo$_(this, group, description).using(input);
+    }
+
+    /**
+     * Run the task as the given performer
+     *
+     * @param performer the actor to run the task as
+     * @return the result of the task
+     * @throws ActivityError if the task fails
+     */
+    final public LogAnnotatorThrows<AttemptsWithThrows<PT,RT>> runAs$(@NonNull Performer performer) throws ActivityError {
+        return (group, description) -> input -> performer.attemptsTo$_(this, group, description).using(input);
     }
 }

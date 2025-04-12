@@ -51,10 +51,10 @@ public class TestTypeBasicInteraction {
   public void failingBasicInteractionTaskThrowing() throws ActivityError {
     Actor actor = Actor.named("TestActor");
 
-    ActivityError error = assertThrows(ActivityError.class,
-      () -> FailingBasicInteractionTask.start().runAs(actor));
+    Either<ActivityError, Void> error = FailingBasicInteractionTask.start().runAs(actor);
 
-    assertThat("task execution is not successful", error.getMessage(), equalTo("test"));
+    assertThat("task execution is not successful", error.isLeft(), equalTo(true));
+    assertThat("task execution is not successful", error.getLeft().getMessage(), equalTo("test"));
   }
 
   @Test
@@ -70,12 +70,37 @@ public class TestTypeBasicInteraction {
   }
 
   @Test
-  public void testBasicInteractionWithRun$Method() throws ActivityError {
+  public void testBasicInteractionWithRunAs$Method() throws ActivityError {
     Actor actor = Actor.named("TestActor");
 
     List<String> testList = new ArrayList<>();
 
     BasicInteractionTask.start(testList).runAs$(actor, "myGroup", "myDescription");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootLog = log.getLogTree();
+
+    assertThat("list was changed during execution", testList.size(), equalTo(1));
+    assertThat("test was added to test list during execution", testList.get(0), equalTo("task executed"));
+
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("myGroup"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("myDescription"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("BasicInteractionTask"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Basic Interaction Task"));
+
+  }
+
+  @Test
+  public void testBasicInteractionWithRunAs$Annotator() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+
+    List<String> testList = new ArrayList<>();
+
+    BasicInteractionTask.start(testList)
+      .runAs$(actor)
+      .annotate("myGroup", "myDescription");
 
     TheklaActivityLog log = actor.activityLog;
     ActivityLogNode rootLog = log.getLogTree();
@@ -104,11 +129,34 @@ public class TestTypeBasicInteraction {
   }
 
   @Test
-  public void testBasicInteractionWithRunMethodAs$Performer() throws ActivityError {
+  public void testBasicInteractionWithRunAs$MethodPerformer() throws ActivityError {
     Actor actor = Actor.named("TestActor");
     List<String> testList = new ArrayList<>();
 
     BasicInteractionTask.start(testList).runAs$(Performer.of(actor), "myGroup", "myDescription");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootLog = log.getLogTree();
+
+    assertThat("list was changed during execution", testList.size(), equalTo(1));
+    assertThat("test was added to test list during execution", testList.get(0), equalTo("task executed"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("myGroup"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("myDescription"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("BasicInteractionTask"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Basic Interaction Task"));
+  }
+
+  @Test
+  public void testBasicInteractionWithRunAs$AnnotatorPerformer() throws ActivityError {
+    Actor actor = Actor.named("TestActor");
+    List<String> testList = new ArrayList<>();
+
+    BasicInteractionTask
+      .start(testList)
+      .runAs$(Performer.of(actor))
+      .annotate( "myGroup", "myDescription");
 
     TheklaActivityLog log = actor.activityLog;
     ActivityLogNode rootLog = log.getLogTree();

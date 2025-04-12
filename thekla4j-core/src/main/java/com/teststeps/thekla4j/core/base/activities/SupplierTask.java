@@ -7,8 +7,6 @@ import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
-import java.util.function.Function;
-
 /**
  * A task that returns a result
  *
@@ -44,10 +42,9 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    *
    * @param actor the actor to run the task as
    * @return the result of the task
-   * @throws ActivityError if the task fails
    */
-  final public RT runAs(Actor actor) throws ActivityError {
-    return actor.attemptsTo(this).getOrElseThrow(Function.identity());
+  final public Either<ActivityError, RT> runAs(Actor actor) {
+    return actor.attemptsTo(this);
   }
 
   /**
@@ -68,11 +65,20 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    * @param group the group name used in the log file
    * @param description the description used in the log file
    * @return the result of the task
+   */
+  final public Either<ActivityError, RT> runAs$(Actor actor, String group, String description) {
+    return actor.attemptsTo$(this, group, description);
+  }
+
+  /**
+   * run the task as the given actor
+   *
+   * @param actor the actor to run the task as
+   * @return the result of the task
    * @throws ActivityError if the task fails
    */
-  final public RT runAs$(Actor actor, String group, String description) throws ActivityError {
-    return actor.attemptsTo$(this, group, description)
-      .getOrElseThrow(Function.identity());
+  final public LogAnnotator<Either<ActivityError, RT>> runAs$(Actor actor) {
+    return (group, description) -> actor.attemptsTo$(this, group, description);
   }
 
   /**
@@ -86,5 +92,16 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    */
   final public RT runAs$(Performer performer, String group, String description) throws ActivityError {
     return performer.attemptsTo$(this, group, description);
+  }
+
+  /**
+   * run the task as the given performer
+   *
+   * @param performer the actor to run the task as
+   * @return the result of the task
+   * @throws ActivityError if the task fails
+   */
+  final public LogAnnotatorThrows<RT> runAs$(Performer performer) throws ActivityError {
+    return (group, description) -> performer.attemptsTo$(this, group, description);
   }
 }

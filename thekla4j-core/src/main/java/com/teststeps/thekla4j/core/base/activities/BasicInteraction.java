@@ -7,8 +7,6 @@ import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
-import java.util.function.Function;
-
 /**
  * A basic interaction that does not require any input
  */
@@ -42,8 +40,8 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * @param actor the actor to run the activity as
    * @throws ActivityError if the activity fails
    */
-  final public void runAs(@NonNull Actor actor) throws ActivityError {
-    actor.attemptsTo(this).getOrElseThrow(Function.identity());
+  final public Either<ActivityError, Void> runAs(@NonNull Actor actor) {
+    return actor.attemptsTo(this);
   }
 
   /**
@@ -55,10 +53,21 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    *  @param description the description used in the log file
    * @throws ActivityError if the activity fails
    */
-  final public void runAs$(@NonNull Actor actor, String group, String description) throws ActivityError {
-    actor.attemptsTo$(this, group, description)
-      .getOrElseThrow(Function.identity());
+  final public Either<ActivityError, Void> runAs$(@NonNull Actor actor, String group, String description) {
+    return actor.attemptsTo$(this, group, description);
   }
+
+  /**
+   * Run the activity as the given actor.
+   * It is easier to read than using the attemptsTo method of an actor
+   *
+   * @param actor the actor to run the activity as
+   * @return a LogAnnotator adding group and description to the log
+   */
+  final public LogAnnotator<Either<ActivityError, Void>> runAs$(@NonNull Actor actor) {
+    return (group, description) -> actor.attemptsTo$(this, group, description);
+  }
+
 
   /**
    * Run the activity as the given performer.
@@ -84,6 +93,18 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   final public void runAs$(@NonNull Performer performer, String group, String description) throws ActivityError {
     performer.attemptsTo$(this, group, description);
   }
+
+  /**
+   * Run the activity as the given performer.
+   * It is easier to read than using the attemptsTo method of a performer
+   *
+   * @param performer the actor to run the activity as
+   * @return a LogAnnotator adding group and description to the log
+   */
+  final public LogAnnotatorThrows<Void> runAs$(@NonNull Performer performer) throws ActivityError {
+    return (group, description) -> performer.attemptsTo$(this, group, description);
+  }
+
 
 
 
