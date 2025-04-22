@@ -52,7 +52,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @param actor the actor to run the task as
      * @param input the input to the task
      * @return the result of the task
-     * @throws ActivityError if the task fails
      */
     final public Either<ActivityError, RT> runAs(@NonNull Actor actor, PT input) {
         return actor.attemptsTo_(this).using(input);
@@ -64,7 +63,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      *
      * @param actor the actor to run the task as
      * @return the result of the task
-     * @throws ActivityError if the task fails
      */
     final public AttemptsWith<PT, Either<ActivityError, RT>> runAs(@NonNull Actor actor) {
         return input -> actor.attemptsTo_(this).using(input);
@@ -78,7 +76,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @param group the group name used in the log file
      * @param description the description used in the log file
      * @return the result of the task
-     * @throws ActivityError if the task fails
      */
     final public Either<ActivityError, RT> runAs$(@NonNull Actor actor, PT input, String group, String description) {
         return actor.attemptsTo$_(this, group, description).using(input);
@@ -91,7 +88,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      * @param actor the actor to run the task as
      * @param input the input to the task
      * @return the result of the task
-     * @throws ActivityError if the task fails
      */
     final public LogAnnotator<Either<ActivityError, RT>> runAs$(@NonNull Actor actor, PT input) {
         return (group, description) -> actor.attemptsTo$_(this, group, description).using(input);
@@ -103,7 +99,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
      *
      * @param actor the actor to run the task as
      * @return the result of the task
-     * @throws ActivityError if the task fails
      */
     final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, RT>>> runAs$(@NonNull Actor actor) {
         return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);

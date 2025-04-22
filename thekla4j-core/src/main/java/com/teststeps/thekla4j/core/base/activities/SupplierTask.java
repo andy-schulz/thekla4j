@@ -75,7 +75,6 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    *
    * @param actor the actor to run the task as
    * @return the result of the task
-   * @throws ActivityError if the task fails
    */
   final public LogAnnotator<Either<ActivityError, RT>> runAs$(Actor actor) {
     return (group, description) -> actor.attemptsTo$(this, group, description);

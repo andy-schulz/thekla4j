@@ -38,7 +38,6 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * It is easier to read than using the attemptsTo method of an actor
    * 
    * @param actor the actor to run the activity as
-   * @throws ActivityError if the activity fails
    */
   final public Either<ActivityError, Void> runAs(@NonNull Actor actor) {
     return actor.attemptsTo(this);
@@ -51,7 +50,6 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * @param actor the actor to run the activity as
    *  @param group the group name used in the log file
    *  @param description the description used in the log file
-   * @throws ActivityError if the activity fails
    */
   final public Either<ActivityError, Void> runAs$(@NonNull Actor actor, String group, String description) {
     return actor.attemptsTo$(this, group, description);

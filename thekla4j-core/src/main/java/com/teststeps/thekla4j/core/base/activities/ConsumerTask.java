@@ -45,7 +45,6 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    *
    * @param actor the actor to run the task as
    * @param input the input to the task
-   * @throws ActivityError if the task fails
    */
   final public Either<ActivityError, Void> runAs(Actor actor, PT input) {
     return actor.attemptsTo_(this).using(input);
@@ -67,7 +66,6 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    * @param input       the input to the task
    * @param group       the group name used in the log file
    * @param description the description used in the log file
-   * @throws ActivityError if the task fails
    */
   final public Either<ActivityError, Void> runAs$(Actor actor, PT input, String group, String description) {
     return actor.attemptsTo$_(this, group, description).using(input);
