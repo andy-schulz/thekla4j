@@ -6,10 +6,13 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
+import io.vavr.control.Option;
+import lombok.AllArgsConstructor;
 
 /**
  * A list of Selenium configurations
  */
+@AllArgsConstructor
 public class SeleniumConfigList {
   private String defaultConfig;
 
@@ -75,5 +78,14 @@ public class SeleniumConfigList {
     return seleniumConfigs.toJavaMap();
   }
 
+  public SeleniumConfigList withNoneValue() {
+    return new SeleniumConfigList(this.defaultConfig, seleniumConfigs.put("NONE", null));
+  }
+
+  public SeleniumConfigList withDefaultConfig(Option<String> configName) {
+    return configName
+      .map(name ->  new SeleniumConfigList(name, seleniumConfigs))
+      .getOrElse(this);
+  }
 
 }

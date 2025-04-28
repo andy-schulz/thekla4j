@@ -10,14 +10,14 @@ import java.util.List;
  * @param binary - the path to the binary
  * @param headless - if the browser should be
  * @param args - the arguments for the browser
- * @param debuggerAddress - the address of the debugger
+ * @param debug - the address of the debugger
  */
 public record ChromeOptions(
     @JsonIgnore
     String binary,
     Boolean headless,
     List<String> args,
-    String debuggerAddress
+    DebugOptions debug
 ) {
 
   /**
@@ -29,7 +29,7 @@ public record ChromeOptions(
       "binary='" + binary + '\'' +
       ", headless=" + headless +
       ", args=" + args +
-      ", debuggerAddress='" + debuggerAddress + '\'' +
+      ", debugOptions='" + debug + '\'' +
       '}';
   }
 }

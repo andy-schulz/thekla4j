@@ -4,8 +4,8 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
-import io.vavr.Function0;
 import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -32,7 +32,7 @@ public class Appium {
    * @return a Try of the Browser
    */
   public static Browser browser() {
-    return loadBrowser.apply(Option.none())
+    return loadBrowser.apply(Option.none(), Option.none())
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
@@ -42,23 +42,24 @@ public class Appium {
    * @return a Try of the Browser
    */
   public static Browser browser(BrowserStartupConfig startupConfig) {
-    return loadBrowser.apply(Option.of(startupConfig))
+    return loadBrowser.apply(Option.none(), Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function1<Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
-    startupConfig -> Appium.loadConfigs.apply()
+  private static final Function2<Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    (appiumConfigName, startupConfig) -> Appium.loadConfigs.apply(appiumConfigName)
       .flatMap(t -> Appium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
 
   /**
    * Load the Selenium and Browser Configurations from files
    */
-  static final Function0<Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
-    () -> loadSeleniumConfig.apply()
+  static final Function1<Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
+    (appiumConfigName) -> loadSeleniumConfig.apply()
+      .map(op -> op.map(cl -> cl.withDefaultConfig(appiumConfigName)))
       .map(loadDefaultSeleniumConfig)
       .flatMap(sc -> loadBrowserConfigList.apply()
         .map(loadDefaultBrowserConfig)

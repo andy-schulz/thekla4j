@@ -13,6 +13,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
@@ -29,13 +30,18 @@ import static io.vavr.API.Match;
 @Log4j2(topic = "Selenium Browser Load")
 public class Selenium {
 
+
+  public static SeleniumHelper usingConfig(String seleniumConfigName) {
+    return new SeleniumHelper(seleniumConfigName);
+  }
+
   /**
    * Load the Browser from the configuration
    *
    * @return a Try of the Browser
    */
   public static Browser browser() {
-    return loadBrowser.apply(Option.none())
+    return loadBrowser.apply(Option.none(), Option.none())
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
@@ -46,22 +52,23 @@ public class Selenium {
    * @return a Try of the Browser
    */
   public static Browser browser(BrowserStartupConfig startupConfig) {
-    return loadBrowser.apply(Option.of(startupConfig))
+    return loadBrowser.apply(Option.none(), Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function1<Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
-    startupConfig -> Selenium.loadConfigs.apply()
+  private static final Function2<Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    (seleniumConfigName, startupConfig) -> Selenium.loadConfigs.apply(seleniumConfigName)
       .flatMap(t -> Selenium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
   /**
    * Load the Selenium and Browser Configurations from files
    */
-  static final Function0<Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
-    () -> loadSeleniumConfig.apply()
+  static final Function1<Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
+    (seleniumConfigName) -> loadSeleniumConfig.apply()
+      .map(op -> op.map(c -> c.withDefaultConfig(seleniumConfigName)))
       .map(loadDefaultSeleniumConfig)
       .flatMap(sc -> loadBrowserConfigList.apply()
         .map(loadDefaultBrowserConfig)
@@ -87,7 +94,7 @@ public class Selenium {
 
       .onSuccess(
         x -> log.warn(
-          "Running Browser on Local Machine: " + browserConfig.browserName() + ". Ignoring platform and version information in com.teststeps.thekla4j.browser.appium.config. " + browserConfig));
+          "Running Browser on Local Machine: " + browserConfig.browserName() + ". Ignoring platform and version information in BrowserConfig. \n" + browserConfig));
 
 
   /**
@@ -121,7 +128,7 @@ public class Selenium {
     (startUp, seleniumConfig, browserConfig) -> {
 
       if (seleniumConfig.isDefined() && browserConfig.isDefined()) {
-        log.info(() -> "Loading Remote Browser with com.teststeps.thekla4j.browser.appium.config.");
+        log.info(() -> "Loading Remote Browser from BrowserConfig.");
         return SeleniumBrowserBuilder.with(startUp, seleniumConfig.get(), browserConfig.get());
       }
 
@@ -131,7 +138,7 @@ public class Selenium {
       }
 
       if (seleniumConfig.isEmpty() && browserConfig.isDefined()) {
-        log.info(() -> "No SeleniumConfig found. Loading local browser with com.teststeps.thekla4j.browser.appium.config.");
+        log.info(() -> "No SeleniumConfig found. Loading local browser from BrowserConfig.");
         return loadBrowserByConfig.apply(startUp, browserConfig.get());
       }
 
@@ -144,6 +151,33 @@ public class Selenium {
 
     };
 
+
+  @AllArgsConstructor
+  public static class SeleniumHelper {
+
+    private final String seleniumConfigName;
+
+    /**
+     * Load the Browser from the configuration
+     *
+     * @return a Try of the Browser
+     */
+    public Browser browser() {
+      return loadBrowser.apply(Option.of(seleniumConfigName), Option.none())
+        .getOrElseThrow((e) -> new RuntimeException(e));
+    }
+
+    /**
+     * Load the Browser from the configuration
+     *
+     * @param startupConfig - the name of the test
+     * @return a Try of the Browser
+     */
+    public Browser browser(BrowserStartupConfig startupConfig) {
+      return loadBrowser.apply(Option.of(seleniumConfigName), Option.of(startupConfig))
+        .getOrElseThrow((e) -> new RuntimeException(e));
+    }
+  }
 
 
 }

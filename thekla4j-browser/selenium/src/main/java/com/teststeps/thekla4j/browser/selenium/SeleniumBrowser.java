@@ -62,7 +62,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     createDownloadPath(browserConfig);
   }
 
-  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
+  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig, Option<Path> downloadPath) {
     this.driver = driver;
     this.options = Option.of(SeleniumOptions.empty());
     this.browserConfig = browserConfig;
@@ -73,12 +73,19 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
     this.localExecution = true;
 
-    createDownloadPath(browserConfig);
+    if(downloadPath.isEmpty()) {
+      createDownloadPath(browserConfig);
+    } else {
+      this.downloadPath = downloadPath;
+    }
   }
 
-
   protected static SeleniumBrowser local(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
-    return new SeleniumBrowser(driver, browserConfig, startupConfig);
+    return new SeleniumBrowser(driver, browserConfig, startupConfig, Option.none());
+  }
+
+  protected static SeleniumBrowser debug(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig, Option<Path> downloadPath) {
+    return new SeleniumBrowser(driver, browserConfig, startupConfig, downloadPath);
   }
 
   protected static SeleniumBrowser grid(RemoteWebDriver driver, BrowserConfig browserConfig, SeleniumOptions seleniumOptions, Option<BrowserStartupConfig> startupConfig) {

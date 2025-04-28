@@ -1,4 +1,4 @@
-defaultConfig: seleniumLocal
+defaultConfig: NONE
 
 seleniumLocal:
   remoteUrl: "http://localhost:4444/wd/hub"
@@ -9,3 +9,6 @@ seleniumLocal:
   #  projectName: "THEKLA_UI_TEST_DEV"
    # buildName: "Build_201"
     #sessionName: "master1"
+
+passedByCode:
+  remoteUrl: "http://passedByCode:1234"

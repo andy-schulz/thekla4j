@@ -6,3 +6,11 @@ localChrome:
   chromeOptions:
     args:
       - "disable-search-engine-choice-screen"
+
+chromeDebug:
+  browserName: "Chrome"
+  enableFileDownload: false
+  chromeOptions:
+    debug:
+      debuggerAddress: "localhost:9222"
+      downloadPath: "C:\\Users\\andy.schulz\\Downloads"

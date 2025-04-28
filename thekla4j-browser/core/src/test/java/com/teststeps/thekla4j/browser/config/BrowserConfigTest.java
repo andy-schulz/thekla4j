@@ -64,7 +64,7 @@ public class BrowserConfigTest {
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
     assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
-    assertThat("check ChromeOptions", browserConfig.chromeOptions().toString(), equalTo("ChromeOptions{binary='null', headless=true, args=[--disable-gpu, --no-sandbox], debuggerAddress='null'}"));
+    assertThat("check ChromeOptions", browserConfig.chromeOptions().toString(), equalTo("ChromeOptions{binary='null', headless=true, args=[--disable-gpu, --no-sandbox], debugOptions='null'}"));
   }
 
   @Test

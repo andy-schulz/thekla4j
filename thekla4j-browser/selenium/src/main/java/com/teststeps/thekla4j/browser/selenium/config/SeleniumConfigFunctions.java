@@ -50,30 +50,37 @@ public class SeleniumConfigFunctions {
         .transform(LiftTry.fromOption())
         .onFailure(e -> log.error(() -> "Error parsing SeleniumConfig: " + e));
 
+  private static final Function1<String, String> configName = (defaultName) ->
+    SELENIUM_CONFIG.optionValue().getOrElse(defaultName);
+
   /**
    * Load the default SeleniumConfig from the configuration object
    */
-  public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig = seleniumConfigList ->
+  public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig =
+    (seleniumConfigList) ->
 
     seleniumConfigList
+      .map(SeleniumConfigList::withNoneValue)
       .map(scl -> scl.seleniumConfigs()
-      .get(SELENIUM_CONFIG.optionValue().getOrElse(scl.defaultConfig()))
-      .getOrElseThrow(() -> new IllegalArgumentException(
-        """
-          Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
-          
-          $$CONFIG_FILE$$
-          
-          Please specify a default selenium config in the seleniumConfig.yaml file like:
-          
-          defaultConfig: mySeleniumConfig
-          
-          mySeleniumConfig:
-            remoteUrl: http://localhost:4444/wd/hub
-          ...
-          """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
-          .replace("$$CONFIG_FILE$$", seleniumConfigList
-            .map(YAML::jStringify).getOrElse("No Config found")))));
+        .get(configName.apply(scl.defaultConfig()))
+        .getOrElseThrow(() -> new IllegalArgumentException(
+          """
+            Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
+            
+            $$CONFIG_FILE$$
+            
+            Please specify a default selenium config in the seleniumConfig.yaml file like:
+            
+            defaultConfig: mySeleniumConfig
+            
+            mySeleniumConfig:
+              remoteUrl: http://localhost:4444/wd/hub
+            ...
+            """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
+            .replace("$$CONFIG_FILE$$", seleniumConfigList.map(YAML::jStringify).getOrElse("No Config found")))))
+      .flatMap(Option::of); // convert Option(null) to Option.none()
+
+
 
 
   /**

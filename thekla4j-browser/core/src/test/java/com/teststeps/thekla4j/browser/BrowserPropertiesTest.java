@@ -1,6 +1,8 @@
 package com.teststeps.thekla4j.browser;
 
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED;
@@ -17,6 +19,11 @@ import static org.hamcrest.Matchers.startsWith;
 
 
 public class BrowserPropertiesTest {
+
+  @BeforeAll
+  public static void setup() {
+    Thekla4jProperty.resetPropertyCache();
+  }
 
   @Test
   public void checkDefaultBrowserProperties() {

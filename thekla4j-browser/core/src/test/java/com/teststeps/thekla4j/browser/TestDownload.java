@@ -8,6 +8,7 @@ import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.DownloadFile;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +60,7 @@ public class TestDownload {
       any(Duration.class)))
       .thenReturn(Try.of(() -> file));
 
-   File resultFile = DownloadFile.by(Click.on(element)).runAs(actor);
+   File resultFile = DownloadFile.by(Click.on(element)).runAs(Performer.of(actor));
 
     verify(chromeMock, times(1)).clickOn(element);
     verify(chromeMock, times(1))

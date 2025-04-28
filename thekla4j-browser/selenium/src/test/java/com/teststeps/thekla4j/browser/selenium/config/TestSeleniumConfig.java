@@ -1,21 +1,26 @@
 package com.teststeps.thekla4j.browser.selenium.config;
 
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.addCapabilities;
 import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
 import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.parseSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @Log4j2
 public class TestSeleniumConfig {
 
+  @BeforeEach
+  public void reset() {
+    Thekla4jProperty.resetPropertyCache();
+  }
 
   @Test
   public void loadSeleniumConfig() {
@@ -138,8 +143,6 @@ public class TestSeleniumConfig {
   @Test
   public void loadSeleniumConfigSetBySystemEnvironment() {
 
-    SELENIUM_CONFIG.property().name();
-
     System.setProperty("thekla4j.browser.selenium.config", "setBySystem");
 
     String config = """
@@ -163,4 +166,5 @@ public class TestSeleniumConfig {
     assertThat("remote url is set", seleniumConfig.get().get().remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
 
   }
+
 }
