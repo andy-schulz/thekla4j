@@ -32,4 +32,15 @@ public record ChromeOptions(
       ", debugOptions='" + debug + '\'' +
       '}';
   }
+
+  public static String help() {
+    return """
+      binary: "/path/to/binary" # the path to the binary
+      headless: true/false # if the browser should be headless
+      args: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"]
+      debug: # chrome debugging options
+      {{DEBUG_OPTIONS}}
+      """
+      .replace("{{DEBUG_OPTIONS}}", DebugOptions.help().indent(2));
+  }
 }

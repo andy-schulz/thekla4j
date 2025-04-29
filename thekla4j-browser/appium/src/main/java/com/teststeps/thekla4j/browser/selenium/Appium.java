@@ -11,6 +11,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Objects;
@@ -32,8 +33,16 @@ public class Appium {
    * @return a Try of the Browser
    */
   public static Browser browser() {
-    return loadBrowser.apply(Option.none(), Option.none())
+    return loadBrowser.apply(Option.none(), Option.none(), Option.none())
       .getOrElseThrow((e) -> new RuntimeException(e));
+  }
+
+  public static AppiumHelper withSeleniumConfig(String seleniumConfigName) {
+    return new AppiumHelper(Option.of(seleniumConfigName), Option.none());
+  }
+
+  public static AppiumHelper withBrowserConfig(String browserConfigName) {
+    return new AppiumHelper(Option.none(), Option.of(browserConfigName));
   }
 
   /**
@@ -42,26 +51,28 @@ public class Appium {
    * @return a Try of the Browser
    */
   public static Browser browser(BrowserStartupConfig startupConfig) {
-    return loadBrowser.apply(Option.none(), Option.of(startupConfig))
+    return loadBrowser.apply(Option.none(), Option.none(), Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function2<Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
-    (appiumConfigName, startupConfig) -> Appium.loadConfigs.apply(appiumConfigName)
+  private static final Function3<Option<String>, Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    (appiumConfigName, browserConfigName, startupConfig) ->
+      Appium.loadConfigs.apply(appiumConfigName, browserConfigName)
       .flatMap(t -> Appium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
 
   /**
    * Load the Selenium and Browser Configurations from files
    */
-  static final Function1<Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
-    (appiumConfigName) -> loadSeleniumConfig.apply()
+  static final Function2<Option<String>, Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
+    (appiumConfigName, browserConfigName) -> loadSeleniumConfig.apply()
       .map(op -> op.map(cl -> cl.withDefaultConfig(appiumConfigName)))
       .map(loadDefaultSeleniumConfig)
       .flatMap(sc -> loadBrowserConfigList.apply()
+        .map(op -> op.map(bc -> bc.withDefaultConfig(browserConfigName)))
         .map(loadDefaultBrowserConfig)
         .map(bc -> Tuple.of(sc, bc)));
 
@@ -118,5 +129,41 @@ public class Appium {
 
   private Appium() {
     // prevent initialization of utility class
+  }
+
+  @AllArgsConstructor
+  public static class AppiumHelper {
+    private final Option<String> seleniumConfigName;
+    private final Option<String> browserConfigName;
+
+
+    public AppiumHelper withSeleniumConfig(String seleniumConfigName) {
+      return new AppiumHelper(Option.of(seleniumConfigName), browserConfigName);
+    }
+
+    public AppiumHelper withBrowserConfig(String browserConfigName) {
+      return new AppiumHelper(seleniumConfigName, Option.of(browserConfigName));
+    }
+
+    /**
+     * Load the Browser from the configuration
+     *
+     * @return a Try of the Browser
+     */
+    public Browser browser() {
+      return loadBrowser.apply(seleniumConfigName, browserConfigName, Option.none())
+        .getOrElseThrow((e) -> new RuntimeException(e));
+    }
+
+    /**
+     * Load the Browser from the configuration
+     *
+     * @param startupConfig - the name of the test
+     * @return a Try of the Browser
+     */
+    public Browser browser(BrowserStartupConfig startupConfig) {
+      return loadBrowser.apply(seleniumConfigName, browserConfigName, Option.of(startupConfig))
+        .getOrElseThrow((e) -> new RuntimeException(e));
+    }
   }
 }

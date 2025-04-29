@@ -188,4 +188,38 @@ public class BrowserConfigTest {
     assertThat("browser is set", browserConfig.get().get().browserName().getName(), equalTo("Edge"));
 
   }
+
+  @Test
+  public void printBrowserConfigHelp() {
+
+    String expectedHelp = """
+      browserConfigName:
+        browserName: BrowserName < chrome | firefox | edge | safari >
+        browserVersion: String, <optional>
+        platformName: OperatingSystem, < windows | linux | mac >
+        osVersion: String, <optional>
+        deviceName: String, <optional, mandatory for mobile devices>
+        enableFileUpload: Boolean, <optional, default: false>
+        enableFileDownload: Boolean, <optional, default: false>
+        chromeOptions: ChromeOptions, <optional>
+          binary: "/path/to/binary" # the path to the binary
+          headless: true/false # if the browser should be headless
+          args: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"]
+          debug: # chrome debugging options
+            debuggerAddress: "localhost:9222"
+            downloadPath: "absolute/path/to/downloads"
+      
+        firefoxOptions: # FirefoxOptions, <optional>
+          args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
+      
+        video: # VideoConfig, <optional>
+          record: true / false
+          relativePath: "path/to/video"
+          filePrefix: "FilePrefix"
+      """;
+    String help = BrowserConfig.help();
+
+    assertThat("help is printed", help.trim().strip(), equalTo(expectedHelp.trim().strip()));
+
+  }
 }

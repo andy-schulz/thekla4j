@@ -13,4 +13,10 @@ chromeDebug:
   chromeOptions:
     debug:
       debuggerAddress: "localhost:9222"
-      downloadPath: "C:\\Users\\andy.schulz\\Downloads"
+      downloadPath: "download/path"
+
+passedByCode:
+  browserName: "Chrome"
+  chromeOptions:
+    debug:
+      debuggerAddress: "passedByCode"

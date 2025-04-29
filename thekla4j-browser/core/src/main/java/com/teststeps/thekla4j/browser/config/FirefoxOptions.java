@@ -18,4 +18,10 @@ public record FirefoxOptions(
       "args=" + args +
       '}';
   }
+
+  public static String help() {
+    return """
+      args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
+      """;
+  }
 }

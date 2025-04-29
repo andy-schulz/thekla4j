@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.teststeps.thekla4j.utils.yaml.YAML;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
+import io.vavr.control.Option;
 import lombok.With;
+
 
 /**
  * A list of browser configurations
@@ -99,6 +101,12 @@ public class BrowserConfigList {
     return browserConfigs.toJavaMap();
   }
 
+
+  public BrowserConfigList withDefaultConfig(Option<String> defaultConfigName) {
+    return defaultConfigName
+      .map(name -> new BrowserConfigList(name, browserConfigs))
+      .getOrElse(this);
+  }
 
   /**
    * the string representation of the BrowserConfigList

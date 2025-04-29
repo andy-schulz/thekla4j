@@ -14,6 +14,7 @@ import java.util.Objects;
  * @param deviceName - the name of the device, only for mobile devices
  * @param chromeOptions - the chrome options
  * @param firefoxOptions - the firefox options
+ * @param video - the video options
  *
  */
 @With
@@ -80,7 +81,14 @@ public record BrowserConfig(
    * @param firefoxOptions - the firefox options
    * @return - the firefox options
    */
-  FirefoxOptions firefoxOptions) {
+  FirefoxOptions firefoxOptions,
+
+  /**
+   * the video options
+   * @param video - the video options
+   * @return - the video options
+   */
+  VideoConfig video) {
 
   /**
    * Create a BrowserConfig object with the given browser name
@@ -97,6 +105,7 @@ public record BrowserConfig(
       false,
       false,
       null,
+      null,
       null);
   }
 
@@ -111,23 +120,29 @@ public record BrowserConfig(
 
 
   public static String help() {
-    return """
-      browser config yaml:
-      
-      browserName: BrowserName < chrome | firefox | edge | safari >
-      browserVersion: String, <optional>
-      platformName: OperatingSystem, < windows | linux | mac >
-      osVersion: String, <optional>
-      deviceName: String, <optional, mandatory for mobile devices>
-      enableFileUpload: Boolean, <optional, default: false>
-      enableFileDownload: Boolean, <optional, default: false>
-      chromeOptions: ChromeOptions, <optional>
-      firefoxOptions: FirefoxOptions, <optional>
-      """;
+    return """ 
+      browserConfigName:
+        browserName: BrowserName < chrome | firefox | edge | safari >
+        browserVersion: String, <optional>
+        platformName: OperatingSystem, < windows | linux | mac >
+        osVersion: String, <optional>
+        deviceName: String, <optional, mandatory for mobile devices>
+        enableFileUpload: Boolean, <optional, default: false>
+        enableFileDownload: Boolean, <optional, default: false>
+        chromeOptions: ChromeOptions, <optional>
+      {{CHROME_OPTIONS}}
+        firefoxOptions: # FirefoxOptions, <optional>
+      {{FIREFOX_OPTIONS}}
+        video: # VideoConfig, <optional>
+      {{VIDEO_OPTIONS}}
+      """
+      .replace("{{CHROME_OPTIONS}}", ChromeOptions.help().trim().indent(4))
+      .replace("{{FIREFOX_OPTIONS}}", FirefoxOptions.help().trim().indent(4))
+      .replace("{{VIDEO_OPTIONS}}", VideoConfig.help().indent(4));
   }
 
   public BrowserConfig() {
-    this(BrowserName.CHROME, null, null, null, null, false, false, null, null);
+    this(BrowserName.CHROME, null, null, null, null, false, false, null, null, null);
   }
 
   public BrowserConfig(
@@ -139,7 +154,8 @@ public record BrowserConfig(
     Boolean enableFileUpload,
     Boolean enableFileDownload,
     ChromeOptions chromeOptions,
-    FirefoxOptions firefoxOptions) {
+    FirefoxOptions firefoxOptions,
+    VideoConfig video) {
     this.browserName = browserName;
     this.browserVersion = browserVersion;
     this.platformName = platformName;
@@ -149,5 +165,6 @@ public record BrowserConfig(
     this.enableFileDownload = Objects.requireNonNullElse(enableFileDownload, false);
     this.chromeOptions = chromeOptions;
     this.firefoxOptions = firefoxOptions;
+    this.video = video;
   }
 }

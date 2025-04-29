@@ -19,9 +19,8 @@ public record DebugOptions(
 
   public static String help() {
     return """
-      debug:
-        debuggerAddress: "localhost:9222"
-        downloadPath: "absolute/path/to/downloads"
+      debuggerAddress: "localhost:9222"
+      downloadPath: "absolute/path/to/downloads"
       """;
   }
 }

@@ -31,8 +31,12 @@ import static io.vavr.API.Match;
 public class Selenium {
 
 
-  public static SeleniumHelper usingConfig(String seleniumConfigName) {
-    return new SeleniumHelper(seleniumConfigName);
+  public static SeleniumHelper usingSeleniumConfig(String seleniumConfigName) {
+    return new SeleniumHelper(Option.of(seleniumConfigName), Option.none());
+  }
+
+  public static SeleniumHelper usingBrowserConfig(String browserConfigName) {
+    return new SeleniumHelper(Option.none(), Option.of(browserConfigName));
   }
 
   /**
@@ -41,7 +45,7 @@ public class Selenium {
    * @return a Try of the Browser
    */
   public static Browser browser() {
-    return loadBrowser.apply(Option.none(), Option.none())
+    return loadBrowser.apply(Option.none(), Option.none(), Option.none())
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
@@ -52,25 +56,28 @@ public class Selenium {
    * @return a Try of the Browser
    */
   public static Browser browser(BrowserStartupConfig startupConfig) {
-    return loadBrowser.apply(Option.none(), Option.of(startupConfig))
+    return loadBrowser.apply(Option.none(), Option.none(), Option.of(startupConfig))
       .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
   /**
    * Load the Browser from the configuration
    */
-  private static final Function2<Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
-    (seleniumConfigName, startupConfig) -> Selenium.loadConfigs.apply(seleniumConfigName)
+  private static final Function3<Option<String>, Option<String>, Option<BrowserStartupConfig>, Try<Browser>> loadBrowser =
+    (seleniumConfigName, browserConfigName,  startupConfig) ->
+      Selenium.loadConfigs.apply(seleniumConfigName, browserConfigName)
       .flatMap(t -> Selenium.createBrowserWithConfig.apply(startupConfig, t._1, t._2));
 
   /**
    * Load the Selenium and Browser Configurations from files
    */
-  static final Function1<Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
-    (seleniumConfigName) -> loadSeleniumConfig.apply()
+  static final Function2<Option<String>, Option<String>, Try<Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>>>> loadConfigs =
+    (seleniumConfigName, browserConfigName) ->
+      loadSeleniumConfig.apply()
       .map(op -> op.map(c -> c.withDefaultConfig(seleniumConfigName)))
       .map(loadDefaultSeleniumConfig)
       .flatMap(sc -> loadBrowserConfigList.apply()
+        .map(op -> op.map(c -> c.withDefaultConfig(browserConfigName)))
         .map(loadDefaultBrowserConfig)
         .map(bc -> Tuple.of(sc, bc)));
 
@@ -155,7 +162,17 @@ public class Selenium {
   @AllArgsConstructor
   public static class SeleniumHelper {
 
-    private final String seleniumConfigName;
+    private final Option<String> seleniumConfigName;
+    private final Option<String> browserConfigName;
+
+
+    public SeleniumHelper withSeleniumConfig(String seleniumConfigName) {
+      return new SeleniumHelper(Option.of(seleniumConfigName), browserConfigName);
+    }
+
+    public SeleniumHelper withBrowserConfig(String browserConfigName) {
+      return new SeleniumHelper(seleniumConfigName, Option.of(browserConfigName));
+    }
 
     /**
      * Load the Browser from the configuration
@@ -163,7 +180,7 @@ public class Selenium {
      * @return a Try of the Browser
      */
     public Browser browser() {
-      return loadBrowser.apply(Option.of(seleniumConfigName), Option.none())
+      return loadBrowser.apply(seleniumConfigName, browserConfigName, Option.none())
         .getOrElseThrow((e) -> new RuntimeException(e));
     }
 
@@ -174,7 +191,7 @@ public class Selenium {
      * @return a Try of the Browser
      */
     public Browser browser(BrowserStartupConfig startupConfig) {
-      return loadBrowser.apply(Option.of(seleniumConfigName), Option.of(startupConfig))
+      return loadBrowser.apply(seleniumConfigName, browserConfigName, Option.of(startupConfig))
         .getOrElseThrow((e) -> new RuntimeException(e));
     }
   }
