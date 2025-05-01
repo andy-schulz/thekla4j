@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
+import com.teststeps.thekla4j.browser.config.OperatingSystem;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
@@ -12,6 +13,9 @@ import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.utils.url.UrlHelper;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.screenrecording.CanRecordScreen;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -22,8 +26,14 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Base64;
+import java.util.Objects;
+
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_BASE_PATH;
 
 /**
  * A Browser implementation for mobile devices
@@ -39,14 +49,32 @@ public class MobileBrowser implements Browser {
 
   private static Option<AppiumDriverLocalService> service = Option.none();
 
+  private CanRecordScreen screenRecorder;
+
   private MobileBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
     this.browserConfig = browserConfig;
+    this.screenRecorder = (CanRecordScreen) driver;
     seleniumBrowser = SeleniumBrowser.local(driver, browserConfig, startupConfig);
+
+    startVideoRecording(driver, browserConfig);
+
+  }
+
+  private static Try<RemoteWebDriver> createDriver(OperatingSystem os, String url, DesiredCapabilities caps) {
+    if (os.equals(OperatingSystem.ANDROID))
+      return Try.of(() -> new AndroidDriver(new URL(url), caps));
+
+    if (os.equals(OperatingSystem.IOS))
+      return Try.of(() -> new IOSDriver(new URL(url), caps));
+
+    return Try.failure(ActivityError.of("Unsupported Operating System: " + os));
+
   }
 
   static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
 
-    return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
+    return createDriver(browserConfig.platformName(), url, caps)
+//    return Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
       .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(url).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
       .peek(d -> System.out.println("SessionID: " + d.getSessionId()))
@@ -54,15 +82,45 @@ public class MobileBrowser implements Browser {
       .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }
 
+  private void startVideoRecording(RemoteWebDriver driver, BrowserConfig browserConfig) {
+
+    if (isVideoRecordingActive()) {
+      this.screenRecorder = (CanRecordScreen) driver;
+      this.screenRecorder.startRecordingScreen();
+    }
+
+  }
+
+  private void stopVideoRecording() {
+
+    if (isVideoRecordingActive()) {
+
+      String video = screenRecorder.stopRecordingScreen();
+      byte[] videoData = Base64.getDecoder().decode(video);
+
+      Try.of(() -> Paths.get(TEMP_DIR_BASE_PATH.value()).resolve("recording"))
+        .mapTry(Files::createDirectories)
+        .map(p -> p.resolve(((RemoteWebDriver) screenRecorder).getSessionId() + ".mp4"))
+        .mapTry(p -> Files.write(p, videoData))
+        .onFailure(x -> log.error("Error writing video file: {}", x.getMessage()))
+        .onSuccess(p -> log.info("Save Recording to: {}", p));
+
+    }
+  }
+
+
   static Try<Browser> startLocal(DesiredCapabilities caps, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
 
     service = Option.of(AppiumDriverLocalService.buildDefaultService())
       .peek(AppiumDriverLocalService::start);
 
-    return io.vavr.control.Try.of(() -> new RemoteWebDriver(new URL(LOCAL_APPIUM_SERVICE), caps, false))
-      .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(LOCAL_APPIUM_SERVICE).getOrElse("Error reading URL")))
-      .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
-      .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
+    return
+      createDriver(browserConfig.platformName(), LOCAL_APPIUM_SERVICE, caps)
+//      Try.of(() -> new AndroidDriver(new URL(LOCAL_APPIUM_SERVICE), caps))
+//    return Try.of(() -> new RemoteWebDriver(new URL(LOCAL_APPIUM_SERVICE), caps, false))
+        .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(LOCAL_APPIUM_SERVICE).getOrElse("Error reading URL")))
+        .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
+        .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }
 
 
@@ -99,6 +157,11 @@ public class MobileBrowser implements Browser {
   @Override
   public Try<String> textOf(Element element) {
     return seleniumBrowser.textOf(element);
+  }
+
+  @Override
+  public Try<List<String>> textOfAll(Element element) {
+    return seleniumBrowser.textOfAll(element);
   }
 
   @Override
@@ -214,6 +277,8 @@ public class MobileBrowser implements Browser {
   @Override
   public Try<Void> quit() {
 
+    stopVideoRecording();
+
     Try<Void> quit = seleniumBrowser.quit();
     service.peek(AppiumDriverLocalService::stop);
 
@@ -227,7 +292,9 @@ public class MobileBrowser implements Browser {
 
   @Override
   public Boolean isVideoRecordingActive() {
-    return seleniumBrowser.isVideoRecordingActive();
+    return !Objects.isNull(browserConfig.video()) &&
+      !Objects.isNull(browserConfig.video().record()) &&
+      browserConfig.video().record();
   }
 
   @Override

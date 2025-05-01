@@ -37,21 +37,25 @@ public class TempFolderUtil {
     return dateTime.format(formatter);
   }
 
+  static Supplier<Path> baseTempPath = () ->
+    Files.exists(gradleDir) ?
+      gradleDir.resolve("thekla4j") :
+      Files.exists(mavenDir) ?
+        mavenDir.resolve("thekla4j") :
+        Path.of(System.getProperty("java.io.tmpdir")).resolve("thekla4j");
+
+  static Supplier<Option<String>> baseTempDir = () ->
+    Option.of(baseTempPath.get())
+      .map(Path::toString);
+
+
   /**
    * Get the path to save temporary files
    */
   static Supplier<Option<String>> tempDir = () ->
-    Files.exists(gradleDir) ?
-      Option.of(gradleDir
-        .resolve("thekla4j")
-        .resolve(nowString() + "_" + TempFolderUtil.shortUUID.get()).toString()) :
-      Files.exists(mavenDir) ?
-        Option.of(mavenDir
-          .resolve("thekla4j")
-          .resolve(nowString() + "_" + TempFolderUtil.shortUUID.get()).toString()) :
-        Option.of(Path.of(System.getProperty("java.io.tmpdir"))
-          .resolve("thekla4j")
-          .resolve(nowString() + "_" + TempFolderUtil.shortUUID.get()).toString());
+
+    Option.of(baseTempPath.get())
+      .map(p -> p.resolve(nowString() + "_" + TempFolderUtil.shortUUID.get()).toString());
 
   /**
    * Create the temporary folder

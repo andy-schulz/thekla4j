@@ -84,11 +84,26 @@ class ElementFunctions {
       Duration.ofMillis(0));
   }
 
+  static Try<List<WebElement>> findElementsWithoutScrolling(RemoteWebDriver driver, Element element) {
+
+    return retryUntil.apply(
+      ElementFunctions.locateElement.apply(driver),
+      locateElement.apply(driver).apply(element),
+      element,
+      Instant.now(),
+      Duration.ofMillis(0))
+      .flatMap(__ -> locateElements.apply(driver).apply(element));
+  }
+
   private static final Function1<RemoteWebDriver, Function1<Element, Try<WebElement>>> locateElement =
     drvr -> element ->
       Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()))
         .mapTry(l -> l.getOrElseThrow(() -> ElementNotFoundError.of("Could not find " + element)));
 
+
+  private static final Function1<RemoteWebDriver, Function1<Element, Try<List<WebElement>>>> locateElements =
+    drvr -> element ->
+      Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()));
 
   private static final Function5<Function1<Element, Try<WebElement>>, Try<WebElement>, Element, Instant, Duration, Try<WebElement>> retryUntil =
     (elementFinder, webElement, element, start, waitFor) -> {
@@ -184,6 +199,12 @@ class ElementFunctions {
     (driver, hlx, element) ->
       findElement(driver, hlx, element)
         .map(WebElement::getText)
+        .onFailure(log::error);
+
+  final static Function2<RemoteWebDriver, Element, Try<List<String>>> getTextFromElements =
+    (driver, element) ->
+      findElementsWithoutScrolling(driver, element)
+        .map(l -> l.map(WebElement::getText))
         .onFailure(log::error);
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getValueOfElement =

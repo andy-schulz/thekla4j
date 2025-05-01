@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 
 import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
+import static com.teststeps.thekla4j.core.properties.TempFolderUtil.baseTempDir;
 import static com.teststeps.thekla4j.core.properties.TempFolderUtil.tempDir;
 
 public enum DefaultThekla4jCoreProperties implements DefaultThekla4jProperties {
@@ -12,7 +13,8 @@ public enum DefaultThekla4jCoreProperties implements DefaultThekla4jProperties {
   /**
    * absolute path to the used temp directory
    */
-  TEMP_DIR_PATH(PropertyElement.of("thekla4j.tempDir.path", tempDir.get(), "temp directory path"));
+  TEMP_DIR_PATH(PropertyElement.of("thekla4j.tempDir.path", tempDir.get(), "temp directory path")),
+  TEMP_DIR_BASE_PATH(PropertyElement.of("thekla4j.tempDir.base.path", baseTempDir.get(), "temp directory path"));
 
   final PropertyElement property;
 

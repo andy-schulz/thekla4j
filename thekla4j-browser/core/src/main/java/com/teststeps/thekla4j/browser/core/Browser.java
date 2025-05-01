@@ -78,6 +78,14 @@ public interface Browser {
   Try<String> textOf(Element element);
 
   /**
+   * Get the text of all elements found by given element locator
+   *
+   * @param element the element locator to get the text of
+   * @return a Try containing a text list of the elements
+   */
+  Try<List<String>> textOfAll(Element element);
+
+  /**
    * Get the value of a given element
    *
    * @param element the element to get the value of

@@ -226,7 +226,8 @@ public class TestMobileBrowser {
     org.openqa.selenium.Cookie cookie3 = new org.openqa.selenium.Cookie("testCookie3", "testCookieValue");
     when(webDriverOptionsMock.getCookies()).thenReturn( Set.of(cookie1, cookie2, cookie3));
 
-    io.vavr.collection.List<Cookie> cookies =  GetAllCookies.fromBrowser().runAs(actor);
+    io.vavr.collection.List<Cookie> cookies =  GetAllCookies.fromBrowser().runAs(actor)
+      .getOrElseThrow(() -> new RuntimeException("cant get cookies"));
 
     verify(mobileBrowserMock).getAllCookies();
     verify(webDriverOptionsMock).getCookies();
@@ -268,7 +269,8 @@ public class TestMobileBrowser {
     File screenShotDummy = new File("screenShotDummyPath");
     when(driverMock.getScreenshotAs(any())).thenReturn(screenShotDummy);
 
-    File screenshot = TakeScreenshot.ofPage().runAs(actor);
+    File screenshot = TakeScreenshot.ofPage().runAs(actor)
+      .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
 
     verify(mobileBrowserMock).takeScreenShot();
     verify(driverMock).getScreenshotAs(any());
@@ -282,7 +284,8 @@ public class TestMobileBrowser {
     File screenShotDummy = new File("elementScreenshotDummy");
     when(webElementMock.getScreenshotAs(any())).thenReturn(screenShotDummy);
 
-    File screenshot = TakeScreenshot.ofElement(element).runAs(actor);
+    File screenshot = TakeScreenshot.ofElement(element).runAs(actor)
+      .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
 
     verify(mobileBrowserMock).takeScreenShotOfElement(element);
     verify(webElementMock).getScreenshotAs(any());

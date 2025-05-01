@@ -1,4 +1,4 @@
-defaultConfig: pixel
+defaultConfig: emulator
 
 pixel:
   browserName: Chrome
@@ -15,3 +15,13 @@ galaxy:
   chromeOptions:
     args:
       - "disable-search-engine-choice-screen"
+
+emulator:
+  browserName: Chrome
+  platformName: Android
+  deviceName: MyDevice
+  chromeOptions:
+    args:
+      - "disable-search-engine-choice-screen"
+  video:
+    record: true

@@ -20,3 +20,11 @@ passedByCode:
   chromeOptions:
     debug:
       debuggerAddress: "passedByCode"
+
+emulator:
+  browserName: Chrome
+  platformName: Android
+  deviceName: MyDevice
+  chromeOptions:
+    args:
+      - "disable-search-engine-choice-screen"

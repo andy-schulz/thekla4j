@@ -217,6 +217,14 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
       .map(applyExecutionSlowDown());
   }
 
+  @Override
+  public Try<List<String>> textOfAll(Element element) {
+
+    return switchFrame(element.frame())
+      .flatMap(x -> getTextFromElements.apply(driver, element))
+      .map(applyExecutionSlowDown());
+  }
+
   /**
    * {@inheritDoc}
    */
