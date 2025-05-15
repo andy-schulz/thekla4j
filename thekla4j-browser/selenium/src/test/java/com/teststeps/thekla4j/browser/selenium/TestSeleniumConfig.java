@@ -2,7 +2,9 @@ package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
+import io.vavr.Function1;
 import io.vavr.Tuple2;
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +20,7 @@ public class TestSeleniumConfig {
 
     Option<String> configToLoad = Option.of("passedByCode");
 
-    SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none())
+    SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
       .getOrElseThrow(Function.identity())
       ._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
 
@@ -30,11 +32,30 @@ public class TestSeleniumConfig {
   }
 
   @Test
+  public void updateSeleniumConfig() throws Throwable {
+
+    Option<String> configToLoad = Option.of("passedByCode");
+
+    List<Function1<SeleniumConfig, SeleniumConfig>> seleniumConfigUpdate =
+      List.of(c -> c.withRemoteUrl("http://updatedUrl:3333"));
+
+    SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), seleniumConfigUpdate, List.empty())
+      .getOrElseThrow(Function.identity())
+      ._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
+
+
+    assertThat("retrieving seleniumConfig is success",
+      config.remoteUrl(),
+      equalTo("http://updatedUrl:3333"));
+
+  }
+
+  @Test
   public void loadBrowserConfigSetByPassedVariable() throws Throwable {
 
     Option<String> browserConfigToLoad = Option.of("passedByCode");
 
-    BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad)
+    BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), List.empty())
       .getOrElseThrow(Function.identity())
       ._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
 
@@ -46,12 +67,32 @@ public class TestSeleniumConfig {
   }
 
   @Test
+  public void updateBrowserConfig() throws Throwable {
+
+    Option<String> browserConfigToLoad = Option.of("passedByCode");
+
+    List<Function1<BrowserConfig, BrowserConfig>> browserConfigUpdate =
+      List.of(c -> c.withBrowserVersion("newBrowserVersion"));
+
+    BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), browserConfigUpdate)
+      .getOrElseThrow(Function.identity())
+      ._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
+
+
+    assertThat("browser version is set",
+      config.browserVersion(),
+      equalTo("newBrowserVersion"));
+
+  }
+
+  @Test
   public void loadBrowserAndSeleniumConfigSetByPassedVariable() throws Throwable {
 
     Option<String> browserConfigToLoad = Option.of("passedByCode");
     Option<String> seleniumConfigToLoad = Option.of("passedByCode");
 
-    Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>> config = loadConfigs.apply(seleniumConfigToLoad, browserConfigToLoad)
+    Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>> config = loadConfigs.apply(seleniumConfigToLoad, browserConfigToLoad,
+        List.empty(), List.empty())
       .getOrElseThrow(Function.identity());
 
 
@@ -78,7 +119,7 @@ public class TestSeleniumConfig {
 
     Option<String> configToLoad = Option.of("NONE");
 
-    Option<SeleniumConfig> config = loadConfigs.apply(configToLoad, Option.none())
+    Option<SeleniumConfig> config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
       .getOrElseThrow(Function.identity())._1;
 
 

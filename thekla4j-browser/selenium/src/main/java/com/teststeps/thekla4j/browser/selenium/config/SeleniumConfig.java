@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.browser.selenium.config;
 
 import io.vavr.collection.Map;
+import lombok.With;
 
 /**
  * The Selenium configuration
  */
+@With
 public record SeleniumConfig(
 
   /**

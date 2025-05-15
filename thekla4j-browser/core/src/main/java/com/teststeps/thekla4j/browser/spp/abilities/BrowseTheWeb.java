@@ -47,7 +47,7 @@ public class BrowseTheWeb implements Ability {
   @Override
   public void destroy() {
     browser.quit()
-      .getOrElseThrow((e) -> new RuntimeException(e));
+      .onFailure(log::error);
   }
 
   /**
@@ -62,7 +62,9 @@ public class BrowseTheWeb implements Ability {
       .map(screenshot ->
         new LogAttachment("screenshot", screenshot.getAbsolutePath(), LogAttachmentType.IMAGE_PNG))
       .map(List::<NodeAttachment>of)
-      .getOrElseThrow((e) -> new RuntimeException(e));
+      .peekLeft(log::error)
+      .getOrElseGet(x -> List.of(
+        new LogAttachment("screenshotError", x.getMessage(), LogAttachmentType.TEXT_PLAIN)));
   }
 
   private BrowseTheWeb(Browser browser) {

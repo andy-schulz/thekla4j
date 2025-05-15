@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOADS_ENABLED;
 import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.RECORD_VIDEO;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.addCapabilities;
 
 /**
  * Functions to build a Selenium Browser
@@ -43,6 +44,8 @@ class SeleniumBrowserBuilder {
     return createCapabilities.apply(browserConfig)
       .map(addBrowserStackOptions.apply(seleniumConfig, browserConfig, startupConfig.map(BrowserStartupConfig::testName)))
       .map(addSeleniumOptionsToCapabilities.apply(seleniumConfig))
+      .flatMap(addCapabilities.apply(seleniumConfig))
+      .onSuccess(caps -> log.debug("Capabilities created: " + caps))
       .mapTry(caps -> new RemoteWebDriver(new URL(seleniumConfig.remoteUrl()), caps, false))
       .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(seleniumConfig.remoteUrl()).getOrElse("Error reading URL")))
       .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
@@ -146,8 +149,7 @@ class SeleniumBrowserBuilder {
           Option.of(browserConfig.enableFileDownload()).forEach(SeleniumBrowserBuilder.setDownloadEnabled.apply(capabilities));
 
           return capabilities;
-        })
-        .onSuccess(capa -> log.debug("Capabilities created: " + capa));
+        });
 
   private static final Function1<DesiredCapabilities, Consumer<Boolean>> setDownloadEnabled =
     caps -> downloadEnabled -> {

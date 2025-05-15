@@ -8,12 +8,12 @@ import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
-import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
+import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
 import io.vavr.collection.List;
@@ -343,6 +343,12 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
 
     List<String> files = filePaths.map(Path::toString);
+
+    log.info(() ->
+      "Uploading files: {{FILES}}"
+        .replace("{{FILES}}",
+          filePaths.map(Path::getFileName)
+            .foldLeft("", (s, i) -> s + i + ", ")));
 
     return switchFrame(targetFileUploadInput.frame())
       .flatMap(x -> setUploadFilesTo.apply(driver, files, targetFileUploadInput))

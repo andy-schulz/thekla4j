@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core.properties;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -74,15 +75,19 @@ public class TempFolderUtil {
    */
   public static Try<Void> delete(Path path) {
 
+    if (Files.notExists(path)) {
+      return Try.success(null);
+    }
+
     return Try.run(() -> Files.walkFileTree(path, new SimpleFileVisitor<>() {
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      public @NonNull FileVisitResult visitFile(@NonNull Path file, @NonNull BasicFileAttributes attrs) throws IOException {
         Files.delete(file);
         return FileVisitResult.CONTINUE;
       }
 
       @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+      public @NonNull FileVisitResult postVisitDirectory(@NonNull Path dir, IOException exc) throws IOException {
         Files.delete(dir);
         return FileVisitResult.CONTINUE;
       }
