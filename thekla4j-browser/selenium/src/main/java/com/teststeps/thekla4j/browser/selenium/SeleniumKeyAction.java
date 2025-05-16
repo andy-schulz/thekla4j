@@ -44,6 +44,15 @@ class SeleniumKeyAction implements KeyActions {
    * {@inheritDoc}
    */
   @Override
+  public KeyActions keyPress(CharSequence keys) {
+    this.selAction = selAction.map(a -> a.sendKeys(keys));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<Void> perform() {
     return selAction.map(a -> {
       a.perform();

@@ -41,6 +41,16 @@ public class DoKey extends BasicInteraction {
   }
 
   /**
+   * Presses the given key sequence
+   *
+   * @param sequence the key sequence to press
+   * @return the DoKeys task
+   */
+  public static DoKey press(CharSequence sequence) {
+    return new DoKey(List.of(new PressSequence(sequence)));
+  }
+
+  /**
    * Presses and holds the given keys
    *
    * @param keys the keys to press and hold

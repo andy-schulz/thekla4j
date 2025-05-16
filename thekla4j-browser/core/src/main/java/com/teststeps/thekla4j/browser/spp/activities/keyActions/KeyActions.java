@@ -32,6 +32,14 @@ public interface KeyActions {
   KeyActions keyPress(Key key);
 
   /**
+   * schedule the press key sequence action
+   *
+   * @param sequence - the keys to press
+   * @return - the key actions object
+   */
+  KeyActions keyPress(CharSequence sequence);
+
+  /**
    * execute the key action
    *
    * @return - Try{VOID}

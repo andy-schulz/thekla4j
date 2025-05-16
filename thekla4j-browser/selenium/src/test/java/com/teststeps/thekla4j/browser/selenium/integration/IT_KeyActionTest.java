@@ -5,8 +5,10 @@ import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
+import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.ElementState;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.Value;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -15,9 +17,7 @@ import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 import java.time.Duration;
 import java.util.function.Function;
@@ -34,11 +34,6 @@ public class IT_KeyActionTest {
   public static void cleanupOldTests() {
     Thekla4jProperty.resetPropertyCache();
     System.clearProperty(SELENIUM_CONFIG.property().name());
-  }
-
-  @BeforeEach
-  public void init() {
-    MockitoAnnotations.openMocks(this);
   }
 
   @AfterEach
@@ -65,6 +60,29 @@ public class IT_KeyActionTest {
 
         See.ifThe(ElementState.of(clientButton))
           .is(Expected.to.be(visible))
+          .forAsLongAs(Duration.ofSeconds(5)))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testKeyPressSequence() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    String url = FRAMEWORKTESTER;
+
+    Element nameField = Element.found(By.css("#first_name"));
+
+
+    actor.attemptsTo(
+        Navigate.to(url),
+        Click.on(nameField),
+        DoKey.press("1234"),
+
+        See.ifThe(Value.of(nameField))
+          .is(Expected.to.equal("1234"))
           .forAsLongAs(Duration.ofSeconds(5)))
 
       .getOrElseThrow(Function.identity());
