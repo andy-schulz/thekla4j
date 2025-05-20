@@ -3,7 +3,7 @@ package com.teststeps.thekla4j.browser.core;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.spp.activities.State;
-import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -281,7 +281,7 @@ public interface Browser {
    *
    * @return a Try containing the key actions
    */
-  Try<KeyActions> executeKeyActions();
+  Try<Void> executeKeyActions(List<KeyAction> keyActions);
 
   /**
    * Execute JavaScript

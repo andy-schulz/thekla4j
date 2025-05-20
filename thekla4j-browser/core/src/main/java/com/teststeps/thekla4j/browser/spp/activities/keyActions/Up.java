@@ -13,8 +13,20 @@ class Up implements KeyAction {
    * @param action - the key to release
    */
   @Override
-  public void performKeyAction(KeyActions action) {
+  public void performKeyAction(KeyActionDriver action) {
     action.keyUp(this.key);
+  }
+
+  /**
+   * get the string representation of the key up action
+   *
+   * @return - the string representation of the key up action
+   */
+  @Override
+  public String toString() {
+    return "Up{" +
+        "key=" + key.name() +
+        '}';
   }
 
   Up(Key key) {

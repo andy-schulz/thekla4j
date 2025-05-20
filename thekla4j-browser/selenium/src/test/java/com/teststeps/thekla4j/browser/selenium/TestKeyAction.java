@@ -5,7 +5,6 @@ import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.control.Try;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,9 @@ import org.openqa.selenium.interactions.Actions;
 
 import java.util.function.Function;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class TestKeyAction {
 
@@ -34,7 +35,8 @@ public class TestKeyAction {
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
-    when(chromeMock.executeKeyActions()).thenReturn(Try.of(() -> new SeleniumKeyAction(actions)));
+//    when(chromeMock.executeKeyActions(any()))
+//      .thenReturn(Try.of(() -> null));
   }
 
   @AfterEach
@@ -56,7 +58,7 @@ public class TestKeyAction {
       .getOrElseThrow(Function.identity());
 
 
-    verify(chromeMock, times(1)).executeKeyActions();
+    verify(chromeMock, times(1)).executeKeyActions(any());
     verify(actions, times(3)).sendKeys(Keys.TAB);
     verify(actions, times(1)).sendKeys(Keys.ENTER);
   }

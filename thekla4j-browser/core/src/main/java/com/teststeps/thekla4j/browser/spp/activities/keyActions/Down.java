@@ -21,7 +21,20 @@ class Down implements KeyAction {
    *
    * @param action - the action to perform
    */
-  public void performKeyAction(KeyActions action) {
+  @Override
+  public void performKeyAction(KeyActionDriver action) {
     action.keyDown(this.key);
+  }
+
+  /**
+   * return the string representation of the key down action
+   *
+   * @return - the string representation of the key down action
+   */
+  @Override
+  public String toString() {
+    return "Down{" +
+        "key=" + key.name() +
+        '}';
   }
 }

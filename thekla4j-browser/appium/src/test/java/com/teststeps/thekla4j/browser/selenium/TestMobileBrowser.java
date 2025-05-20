@@ -413,7 +413,7 @@ public class TestMobileBrowser {
 
     DoKey.press(Key.ENTER).runAs(actor);
 
-    verify(mobileBrowserMock).executeKeyActions();
+    verify(mobileBrowserMock).executeKeyActions(any());
     verify(driverMock, times(1)).perform(any());
 
   }

@@ -2,10 +2,12 @@ package com.teststeps.thekla4j.browser.spp.activities.keyActions;
 
 import io.vavr.control.Try;
 
+import java.time.Duration;
+
 /**
  * interface for key actions
  */
-public interface KeyActions {
+public interface KeyActionDriver {
 
   /**
    * schedule the down key action
@@ -13,7 +15,7 @@ public interface KeyActions {
    * @param key - the key to press
    * @return - the key actions object
    */
-  KeyActions keyDown(Key key);
+  KeyActionDriver keyDown(Key key);
 
   /**
    * schedule the up key action
@@ -21,7 +23,7 @@ public interface KeyActions {
    * @param key - the key to release
    * @return - the key actions object
    */
-  KeyActions keyUp(Key key);
+  KeyActionDriver keyUp(Key key);
 
   /**
    * schedule the press key action
@@ -29,7 +31,7 @@ public interface KeyActions {
    * @param key - the key to press
    * @return - the key actions object
    */
-  KeyActions keyPress(Key key);
+  KeyActionDriver keyPress(Key key);
 
   /**
    * schedule the press key sequence action
@@ -37,7 +39,16 @@ public interface KeyActions {
    * @param sequence - the keys to press
    * @return - the key actions object
    */
-  KeyActions keyPress(CharSequence sequence);
+  KeyActionDriver keyPress(CharSequence sequence);
+
+  /**
+   * schedule the pause action
+   *
+   * @param duration - the duration to pause
+   * @return - the key actions driver
+   */
+  KeyActionDriver pause(Duration duration);
+
 
   /**
    * execute the key action

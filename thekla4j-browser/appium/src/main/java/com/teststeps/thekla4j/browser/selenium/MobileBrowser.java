@@ -9,7 +9,7 @@ import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
-import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.utils.url.UrlHelper;
@@ -298,8 +298,8 @@ public class MobileBrowser implements Browser {
   }
 
   @Override
-  public Try<KeyActions> executeKeyActions() {
-    return seleniumBrowser.executeKeyActions();
+  public Try<Void> executeKeyActions(List<KeyAction> actions) {
+    return seleniumBrowser.executeKeyActions(actions);
   }
 
   @Override

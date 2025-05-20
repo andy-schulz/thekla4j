@@ -16,7 +16,19 @@ class Press implements KeyAction {
    * @param action - the action to perform
    */
   @Override
-  public void performKeyAction(KeyActions action) {
+  public void performKeyAction(KeyActionDriver action) {
     action.keyPress(this.key);
+  }
+
+  /**
+   * get the string representation of the key press action
+   *
+   * @return - the string representation of the key press action
+   */
+  @Override
+  public String toString() {
+    return "Press{" +
+        "key=" + key.name() +
+        '}';
   }
 }

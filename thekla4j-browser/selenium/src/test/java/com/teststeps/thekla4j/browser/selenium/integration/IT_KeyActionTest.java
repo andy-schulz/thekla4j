@@ -20,11 +20,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class IT_KeyActionTest {
 
@@ -86,6 +89,60 @@ public class IT_KeyActionTest {
           .forAsLongAs(Duration.ofSeconds(5)))
 
       .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testKeyPressSequenceAfterSequence() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    String url = FRAMEWORKTESTER;
+
+    Element nameField = Element.found(By.css("#first_name"));
+
+
+    actor.attemptsTo(
+        Navigate.to(url),
+        Click.on(nameField),
+        DoKey.press("1234").thenPress("56"),
+
+        See.ifThe(Value.of(nameField))
+          .is(Expected.to.equal("123456"))
+          .forAsLongAs(Duration.ofSeconds(5)))
+
+      .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testKeyPressSequenceAfterSequenceWithPause() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    String url = FRAMEWORKTESTER;
+
+    Element nameField = Element.found(By.css("#first_name"));
+
+
+    Instant start = Instant.now();
+
+    actor.attemptsTo(
+        Navigate.to(url),
+        Click.on(nameField),
+        DoKey.press("1234")
+          .thenPause(Duration.ofSeconds(10))
+          .thenPress("56"),
+
+        See.ifThe(Value.of(nameField))
+          .is(Expected.to.equal("123456"))
+          .forAsLongAs(Duration.ofSeconds(5)))
+
+      .getOrElseThrow(Function.identity());
+
+    assertThat("Pause duration is correct",
+      Duration.between(start, Instant.now()).toMillis(),
+      greaterThan(10000L));
   }
 
   @Test

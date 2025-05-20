@@ -2,13 +2,14 @@ package com.teststeps.thekla4j.browser.spp.activities.keyActions;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
-import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+
+import java.time.Duration;
 
 /**
  * Perform key actions
@@ -23,9 +24,7 @@ public class DoKey extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::executeKeyActions)
-      .peek(ka -> actions.forEach(a -> a.performKeyAction(ka)))
-      .flatMap(KeyActions::perform)
+      .flatMap(b -> b.executeKeyActions(actions))
       .transform(ActivityError.toEither("Error while executing key actions"))
       .map(__ -> null);
   }
@@ -72,6 +71,11 @@ public class DoKey extends BasicInteraction {
     return new DoKey(List.of(keys).map(Up::new));
   }
 
+  public DoKey thenPause(Duration duration) {
+    this.actions = actions.append(new Pause(duration));
+    return this;
+  }
+
   /**
    * Presses the given keys (and holds them down)
    *
@@ -91,6 +95,17 @@ public class DoKey extends BasicInteraction {
    */
   public DoKey thenPress(Key... keys) {
     this.actions = actions.appendAll(List.of(keys).map(Press::new));
+    return this;
+  }
+
+  /**
+   * Presses the given key sequence (and releases them)
+   *
+   * @param sequence the key sequence to press
+   * @return the DoKeys task
+   */
+  public DoKey thenPress(CharSequence sequence) {
+    this.actions = actions.appendAll(List.of(sequence).map(PressSequence::new));
     return this;
   }
 

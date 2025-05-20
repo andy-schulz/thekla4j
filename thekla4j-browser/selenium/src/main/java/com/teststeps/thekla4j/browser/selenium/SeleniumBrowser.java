@@ -12,7 +12,8 @@ import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
-import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActions;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
+import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActionDriver;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
@@ -435,8 +436,10 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Try<KeyActions> executeKeyActions() {
-    return Try.of(() -> new SeleniumKeyAction(new Actions(driver)));
+  public Try<Void> executeKeyActions(List<KeyAction> actions) {
+    return Try.of(() -> new SeleniumKeyActionDriver(new Actions(driver)))
+      .peek(actionDriver -> actions.forEach(a -> a.performKeyAction(actionDriver)))
+      .flatMap(KeyActionDriver::perform);
   }
 
   /**
