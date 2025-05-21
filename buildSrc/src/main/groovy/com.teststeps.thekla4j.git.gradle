@@ -7,7 +7,23 @@ tasks.register("installLocalGitHook", Copy) {
   group = "_sp-help"
   from new File(rootProject.rootDir, 'scripts/git/pre-commit')
   into { new File(rootProject.rootDir, '.git/hooks')}
-  fileMode 0775
+  filePermissions {
+    user {
+      read = true
+      write = true
+      execute = true
+    }
+    group {
+      read = true
+        write = true
+      execute = true
+    }
+    other {
+        read = true
+        write = false
+        execute = true
+    }
+  }
 }
 
 build.dependsOn installLocalGitHook
