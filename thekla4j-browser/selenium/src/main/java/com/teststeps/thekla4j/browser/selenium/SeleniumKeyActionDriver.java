@@ -3,10 +3,9 @@ package com.teststeps.thekla4j.browser.selenium;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActionDriver;
 import io.vavr.control.Try;
+import java.time.Duration;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
-
-import java.time.Duration;
 
 /**
  * A key action for Selenium

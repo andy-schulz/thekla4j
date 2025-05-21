@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.DOWNLOAD;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromFile;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -11,18 +17,11 @@ import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.DOWNLOAD;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
-import static com.teststeps.thekla4j.utils.file.FileUtils.readStringFromFile;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class IT_Download {
 
@@ -42,7 +41,7 @@ public class IT_Download {
     BrowserStartupConfig conf = BrowserStartupConfig.startMaximized();
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser(conf)));
+        .whoCan(BrowseTheWeb.with(Selenium.browser(conf)));
   }
 
   @AfterEach
@@ -55,21 +54,21 @@ public class IT_Download {
   public void downloadFileTest() throws ActivityError {
 
     Element downloadButton = Element.found(By.css("#downloadFile"))
-      .withName("Download Button");
+        .withName("Download Button");
 
     String url = DOWNLOAD;
 
 
-    String file =  actor.attemptsTo(
+    String file = actor.attemptsTo(
 
-        Navigate.to(url),
+      Navigate.to(url),
 
-        DownloadFile.by(Click.on(downloadButton))
+      DownloadFile.by(Click.on(downloadButton))
           .named("DownloadFile.txt"))
-      .map(readStringFromFile)
+        .map(readStringFromFile)
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
-      assertThat("content is correct", file, equalTo("Hello World!\nI am a downloaded file."));
+    assertThat("content is correct", file, equalTo("Hello World!\nI am a downloaded file."));
   }
 }

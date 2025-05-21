@@ -1,11 +1,11 @@
 package com.teststeps.thekla4j.http;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class TestMergeHttpOptions {
 
@@ -13,43 +13,43 @@ public class TestMergeHttpOptions {
   @DisplayName("Test merge http options with body")
   public void testMergeHttpOptionsOfBody() {
 
-      HttpOptions bodyOptions1 = HttpOptions.empty()
+    HttpOptions bodyOptions1 = HttpOptions.empty()
         .body("test");
 
-      HttpOptions bodyOptions2 = HttpOptions.empty();
+    HttpOptions bodyOptions2 = HttpOptions.empty();
 
-      HttpOptions mergeFilledBodyOnEmptyBody = bodyOptions2.mergeOnTopOf(bodyOptions1);
+    HttpOptions mergeFilledBodyOnEmptyBody = bodyOptions2.mergeOnTopOf(bodyOptions1);
 
-      assertThat("body is set", mergeFilledBodyOnEmptyBody.body, equalTo("test"));
+    assertThat("body is set", mergeFilledBodyOnEmptyBody.body, equalTo("test"));
   }
 
   @Test
   @DisplayName("Test merge empty body on filled body")
   public void testMergeEmptyBodyOnFilledBody() {
 
-      HttpOptions bodySet = HttpOptions.empty()
+    HttpOptions bodySet = HttpOptions.empty()
         .body("test");
 
-      HttpOptions bodyEmpty = HttpOptions.empty();
+    HttpOptions bodyEmpty = HttpOptions.empty();
 
-      HttpOptions mergeEmptyBodyOnFilledBody = bodyEmpty.mergeOnTopOf(bodySet);
+    HttpOptions mergeEmptyBodyOnFilledBody = bodyEmpty.mergeOnTopOf(bodySet);
 
-      assertThat("body is set", mergeEmptyBodyOnFilledBody.body, equalTo("test"));
+    assertThat("body is set", mergeEmptyBodyOnFilledBody.body, equalTo("test"));
   }
 
   @Test
   @DisplayName("Test merge set body on set body")
   public void testMergeSetBodyOnSetBody() {
 
-      HttpOptions bodySet1 = HttpOptions.empty()
+    HttpOptions bodySet1 = HttpOptions.empty()
         .body("test1");
 
-      HttpOptions bodySet2 = HttpOptions.empty()
+    HttpOptions bodySet2 = HttpOptions.empty()
         .body("test2");
 
-      HttpOptions mergeSetBodyOnSetBody = bodySet2.mergeOnTopOf(bodySet1);
+    HttpOptions mergeSetBodyOnSetBody = bodySet2.mergeOnTopOf(bodySet1);
 
-      assertThat("body is set", mergeSetBodyOnSetBody.body, equalTo("test2"));
+    assertThat("body is set", mergeSetBodyOnSetBody.body, equalTo("test2"));
   }
 
   @Test
@@ -149,13 +149,13 @@ public class TestMergeHttpOptions {
   @DisplayName("Test merge http options with headers")
   public void testMergeHttpOptionsOfHeaders() {
 
-      HttpOptions headerOptions1 = HttpOptions.empty()
+    HttpOptions headerOptions1 = HttpOptions.empty()
         .header("header1", "value1");
 
-      HttpOptions headerOptions2 = HttpOptions.empty();
+    HttpOptions headerOptions2 = HttpOptions.empty();
 
-      HttpOptions mergeFilledHeaderOnEmptyHeader = headerOptions2.mergeOnTopOf(headerOptions1);
+    HttpOptions mergeFilledHeaderOnEmptyHeader = headerOptions2.mergeOnTopOf(headerOptions1);
 
-      assertThat("header is set", mergeFilledHeaderOnEmptyHeader.headers.get("header1"), equalTo("value1"));
+    assertThat("header is set", mergeFilledHeaderOnEmptyHeader.headers.get("header1"), equalTo("value1"));
   }
 }

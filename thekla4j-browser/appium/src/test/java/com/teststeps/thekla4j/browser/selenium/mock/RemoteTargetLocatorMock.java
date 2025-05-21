@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
 
-public class RemoteTargetLocatorMock implements WebDriver.TargetLocator{
+public class RemoteTargetLocatorMock implements WebDriver.TargetLocator {
   @Override
   public WebDriver frame(int index) {
     return null;

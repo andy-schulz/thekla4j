@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.config;
 
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+
 import com.teststeps.thekla4j.utils.file.FileUtils;
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import com.teststeps.thekla4j.utils.yaml.YAML;
@@ -11,12 +13,9 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import java.util.Objects;
-
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 /**
  * Functions to work with SeleniumConfig
@@ -31,79 +30,74 @@ public class SeleniumConfigFunctions {
   }
 
   /**
-   * Load the SeleniumConfig from the configuration file in case the file cant be loaded an empty SeleniumConfig is returned in case the file cant be
+   * Load the SeleniumConfig from the configuration file in case the file cant be loaded an empty SeleniumConfig is
+   * returned in case the file cant be
    * parsed the function fails with an error
    */
   public static final Function0<Try<Option<SeleniumConfigList>>> loadSeleniumConfig =
-    () -> FileUtils.readStringFromResourceFile.apply(SELENIUM_CONFIG_FILE)
-      .map(Option::of)
-      .recover(x -> Option.none())
-      .flatMap(SeleniumConfigFunctions.parseSeleniumConfig);
+      () -> FileUtils.readStringFromResourceFile.apply(SELENIUM_CONFIG_FILE)
+          .map(Option::of)
+          .recover(x -> Option.none())
+          .flatMap(SeleniumConfigFunctions.parseSeleniumConfig);
 
 
   /**
    * Parse the SeleniumConfig from a string
    */
   static final Function1<Option<String>, Try<Option<SeleniumConfigList>>> parseSeleniumConfig =
-    seleniumConfigString ->
-      seleniumConfigString.map(YAML.jParse(SeleniumConfigList.class))
-        .transform(LiftTry.fromOption())
-        .onFailure(e -> log.error(() -> "Error parsing SeleniumConfig: " + e));
+      seleniumConfigString -> seleniumConfigString.map(YAML.jParse(SeleniumConfigList.class))
+          .transform(LiftTry.fromOption())
+          .onFailure(e -> log.error(() -> "Error parsing SeleniumConfig: " + e));
 
-  private static final Function1<String, String> configName = (defaultName) ->
-    SELENIUM_CONFIG.optionValue().getOrElse(defaultName);
+  private static final Function1<String, String> configName = (defaultName) -> SELENIUM_CONFIG.optionValue().getOrElse(defaultName);
 
   /**
    * Load the default SeleniumConfig from the configuration object
    */
   public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig =
-    (seleniumConfigList) ->
+      (seleniumConfigList) ->
 
-    seleniumConfigList
-      .map(SeleniumConfigList::withNoneValue)
-      .map(scl -> scl.seleniumConfigs()
-        .get(configName.apply(scl.defaultConfig()))
-        .getOrElseThrow(() -> new IllegalArgumentException(
-          """
-            Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
-            
-            $$CONFIG_FILE$$
-            
-            Please specify a default selenium config in the seleniumConfig.yaml file like:
-            
-            defaultConfig: mySeleniumConfig
-            
-            mySeleniumConfig:
-              remoteUrl: http://localhost:4444/wd/hub
-            ...
-            """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
-            .replace("$$CONFIG_FILE$$", seleniumConfigList.map(YAML::jStringify).getOrElse("No Config found")))))
-      .flatMap(Option::of); // convert Option(null) to Option.none()
+      seleniumConfigList
+          .map(SeleniumConfigList::withNoneValue)
+          .map(scl -> scl.seleniumConfigs()
+              .get(configName.apply(scl.defaultConfig()))
+              .getOrElseThrow(() -> new IllegalArgumentException(
+                                                                 """
+                                                                     Cant find default selenium config '$$DEFAULT_CONFIG$$' in config file.
 
+                                                                     $$CONFIG_FILE$$
 
+                                                                     Please specify a default selenium config in the seleniumConfig.yaml file like:
+
+                                                                     defaultConfig: mySeleniumConfig
+
+                                                                     mySeleniumConfig:
+                                                                       remoteUrl: http://localhost:4444/wd/hub
+                                                                     ...
+                                                                     """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
+                                                                     .replace("$$CONFIG_FILE$$", seleniumConfigList.map(YAML::jStringify)
+                                                                         .getOrElse("No Config found")))))
+          .flatMap(Option::of); // convert Option(null) to Option.none()
 
 
   /**
    * Create a capability map with the prefix as key and the value as value
    */
   public static final Function1<Map<String, Map<String, String>>, Map<String, String>> createCapabilityMapWithPrefix =
-    capabilityMap ->
-      Objects.isNull(capabilityMap) ? HashMap.empty() :
-        capabilityMap.map((prefix, valueMap) ->
-            Objects.isNull(valueMap) ? Tuple.of(prefix, HashMap.<String, String>empty()) :
+      capabilityMap -> Objects.isNull(capabilityMap) ? HashMap.empty() :
+          capabilityMap.map((prefix, valueMap) -> Objects.isNull(valueMap) ? Tuple.of(prefix, HashMap.<String, String>empty()) :
               Tuple.of(prefix, valueMap.map((key, value) -> Tuple.of(prefix + ":" + key, value))))
-          .foldLeft(HashMap.empty(), (acc, tuple) -> acc.merge(tuple._2, (v1, v2) -> v2));
+              .foldLeft(HashMap.empty(), (acc, tuple) -> acc.merge(tuple._2, (v1, v2) -> v2));
 
 
   /**
    * Add the capabilities of the capability map to the DesiredCapabilities
    */
   public static final Function2<SeleniumConfig, DesiredCapabilities, Try<DesiredCapabilities>> addCapabilities =
-    (seleniumConfig, desiredCapabilities) ->
-      Try.of(() -> createCapabilityMapWithPrefix.apply(seleniumConfig.capabilities())
-        .foldLeft(desiredCapabilities, (caps, entry) -> {
-          caps.setCapability(entry._1, entry._2);
-          return caps;
-        }));
+      (seleniumConfig, desiredCapabilities) -> Try.of(() -> createCapabilityMapWithPrefix.apply(seleniumConfig.capabilities())
+          .foldLeft(desiredCapabilities, (caps, entry) -> {
+            caps.setCapability(entry._1, entry._2);
+            return caps;
+          }));
 
 }

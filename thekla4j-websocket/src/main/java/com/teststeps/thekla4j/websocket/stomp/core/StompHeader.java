@@ -3,8 +3,8 @@ package com.teststeps.thekla4j.websocket.stomp.core;
 import com.teststeps.thekla4j.utils.json.JSON;
 
 public record StompHeader(
-    String name,
-    String value
+                          String name,
+                          String value
 
 ) {
 

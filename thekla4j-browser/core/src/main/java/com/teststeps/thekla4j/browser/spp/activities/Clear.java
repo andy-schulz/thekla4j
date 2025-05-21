@@ -25,9 +25,9 @@ public class Clear extends BasicInteraction {
   protected Either<ActivityError, Void> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.clear(element))
-      .onSuccess(__ -> log.info("Clear element: {}", element))
-      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
+        .flatMap(b -> b.clear(element))
+        .onSuccess(__ -> log.info("Clear element: {}", element))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
   /**

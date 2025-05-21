@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 /**
  * This task is used to pass the result of the last activity to the next activity.
  * This is useful when the result of the last activity is needed in the next activity.
+ * 
  * @param <A> the type of the result of the last activity
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,6 +20,7 @@ public class PassedActivityResult<A> extends Task<A, A> {
 
   /**
    * Create a new instance of the task
+   * 
    * @param <A1> the type of the result of the last activity
    * @return a new instance of the task
    */
@@ -28,6 +30,7 @@ public class PassedActivityResult<A> extends Task<A, A> {
 
   /**
    * return the string representation of the task.
+   * 
    * @return the string representation of the task
    */
   @Override
@@ -37,7 +40,8 @@ public class PassedActivityResult<A> extends Task<A, A> {
 
   /**
    * Perform the task as the given actor
-   * @param actor the actor to perform the task as
+   * 
+   * @param actor  the actor to perform the task as
    * @param result the result of the last activity
    * @return the result of the task
    */

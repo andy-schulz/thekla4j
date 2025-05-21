@@ -1,12 +1,12 @@
 package com.teststeps.thekla4j.browser.selenium.properties;
 
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.value;
+
 import com.teststeps.thekla4j.commons.properties.PropertyElement;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.properties.DefaultThekla4jProperties;
 import io.vavr.control.Option;
-
-import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
-import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.value;
 
 
 /**
@@ -18,6 +18,7 @@ public enum DefaultThekla4jSeleniumProperties implements DefaultThekla4jProperti
    * The browser configuration to use
    */
   SELENIUM_CONFIG(PropertyElement.of("thekla4j.browser.selenium.config", Option.none(), "The Selenium configuration to use"));
+
   final PropertyElement property;
 
   /**

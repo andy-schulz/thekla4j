@@ -1,7 +1,6 @@
 package com.teststeps.thekla4j.browser.spp.activities.keyActions;
 
 import io.vavr.control.Try;
-
 import java.time.Duration;
 
 /**

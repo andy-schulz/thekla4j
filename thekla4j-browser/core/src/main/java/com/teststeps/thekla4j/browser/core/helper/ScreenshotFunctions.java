@@ -5,14 +5,13 @@ import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProp
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Either;
-import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Helper functions for taking screenshots
@@ -29,13 +28,13 @@ public class ScreenshotFunctions {
   protected static String getScreenshotPath() {
 
     return Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_RELATIVE_PATH.property())
-      .map(s -> s.isEmpty() ?
-        Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_ABSOLUTE_PATH.property()).get() :
-        System.getProperty("user.dir") + File.separator + s)
-      .map(s -> s.isEmpty() ? System.getProperty("user.dir") : s)
-      .peek(s -> log.info("Screenshot directory: {}", s))
-      .peek(s -> new File(s).mkdirs())
-      .getOrElse(System.getProperty("java.io.tmpdir"));
+        .map(s -> s.isEmpty() ?
+            Thekla4jProperty.of(DefaultThekla4jBrowserProperties.SCREENSHOT_ABSOLUTE_PATH.property()).get() :
+            System.getProperty("user.dir") + File.separator + s)
+        .map(s -> s.isEmpty() ? System.getProperty("user.dir") : s)
+        .peek(s -> log.info("Screenshot directory: {}", s))
+        .peek(s -> new File(s).mkdirs())
+        .getOrElse(System.getProperty("java.io.tmpdir"));
 
   }
 
@@ -51,11 +50,10 @@ public class ScreenshotFunctions {
     // new formatted data
     String date = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
-    return
-      browser.getSessionId()
+    return browser.getSessionId()
         .flatMap(sessId -> browser.takeScreenShot()
-          .mapTry(file -> Files.move(file.toPath(),
-            (new File(getScreenshotPath() + "/screenshot_" + date + "_" + UUID.randomUUID() + "_" + sessId + ".png")).toPath())))
+            .mapTry(file -> Files.move(file.toPath(),
+              (new File(getScreenshotPath() + "/screenshot_" + date + "_" + UUID.randomUUID() + "_" + sessId + ".png")).toPath())))
         .map(path -> new File(path.toUri()))
         .peek(file -> log.info("Screenshot taken: {}", file.getAbsolutePath()))
         .onFailure(log::error)

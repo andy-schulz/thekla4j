@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.core.activities;
 
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static java.time.temporal.ChronoUnit.SECONDS;
+
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
@@ -14,16 +19,10 @@ import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Ask if the result of an activity is matching the validations
@@ -47,20 +46,19 @@ public class See<P, M> extends Interaction<P, P> {
   private Duration nextTryIn = Duration.of(1, SECONDS);
 
   private final Function3<Instant, Duration, Function0<Either<ActivityError, String>>, Either<ActivityError, String>> retryExecutingTaskIfFails =
-    (endTry, next, askQuestion) -> Match(askQuestion.apply()).of(
+      (endTry, next, askQuestion) -> Match(askQuestion.apply()).of(
 
-      Case($(e -> e.isLeft() &&
-          Instant.now()
-            .plusMillis(next.toMillis())
-            .isBefore(endTry)),
-        // Wait before trying to ask the question again
-        () -> Try.run(() -> Thread.sleep(next.toMillis()))
-          .toEither()
-          .mapLeft(ActivityError::of)
-          .flatMap(x -> this.retryExecutingTaskIfFails.apply(endTry, next, askQuestion))),
+        Case($(e -> e.isLeft() &&
+            Instant.now()
+                .plusMillis(next.toMillis())
+                .isBefore(endTry)),
+          // Wait before trying to ask the question again
+          () -> Try.run(() -> Thread.sleep(next.toMillis()))
+              .toEither()
+              .mapLeft(ActivityError::of)
+              .flatMap(x -> this.retryExecutingTaskIfFails.apply(endTry, next, askQuestion))),
 
-      Case($(), e -> e)
-                                                                );
+        Case($(), e -> e));
 
   private See(Activity<P, M> question) {
     this.activity = question;
@@ -77,13 +75,12 @@ public class See<P, M> extends Interaction<P, P> {
   protected Either<ActivityError, P> performAs(Actor actor, P passedResult) {
 
     Function0<Either<ActivityError, String>> executeActivity =
-      () -> actor.attemptsTo_(this.activity
-          , ValidateResult.with(this.matchers2))
-        .using(passedResult);
+        () -> actor.attemptsTo_(this.activity, ValidateResult.with(this.matchers2))
+            .using(passedResult);
 
     return retryExecutingTaskIfFails.apply(Instant.now()
         .plusMillis(duration.toMillis()), nextTryIn, executeActivity)
-      .map(x -> passedResult);
+        .map(x -> passedResult);
   }
 
 

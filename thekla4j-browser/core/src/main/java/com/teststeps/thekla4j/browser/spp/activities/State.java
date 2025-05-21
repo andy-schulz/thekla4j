@@ -18,6 +18,7 @@ public class State {
 
   /**
    * The element
+   * 
    * @param element the element
    * @return the element.
    */
@@ -25,6 +26,7 @@ public class State {
 
   /**
    * is the element visible
+   * 
    * @param isVisible element is visible.
    * @return element is visible.
    */
@@ -32,6 +34,7 @@ public class State {
 
   /**
    * is the element enabled
+   * 
    * @param isEnabled element is enabled.
    * @return element is enabled.
    */
@@ -39,6 +42,7 @@ public class State {
 
   /**
    * is the element present
+   * 
    * @param isPresent element is present.
    * @return element is present.
    */
@@ -47,7 +51,7 @@ public class State {
   /**
    * Create a new default state of an element
    *
-   * @param element   - the element
+   * @param element - the element
    * @return - the state of the element
    */
   public static State of(Element element) {

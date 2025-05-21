@@ -1,14 +1,13 @@
 package com.teststeps.thekla4j.commons.properties;
 
+import static io.vavr.API.*;
+
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
 import java.util.Properties;
-
-import static io.vavr.API.*;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2(topic = "Thekla4jProperty")
 public class Thekla4jProperty {
@@ -41,6 +40,7 @@ public class Thekla4jProperty {
     private TestPropertyHelper() {
       // prevent instantiation of utility class
     }
+
     /**
      * load the property file
      */
@@ -66,17 +66,16 @@ public class Thekla4jProperty {
      * get property from property object
      */
     private static final Function2<String, Properties, Try<String>> getProperty =
-        (propertyName, props) ->
-        Option.of(props.getProperty(propertyName))
-        .toTry(() -> new Exception("No property with name '" + propertyName + "' found"));
+        (propertyName, props) -> Option.of(props.getProperty(propertyName))
+            .toTry(() -> new Exception("No property with name '" + propertyName + "' found"));
 
     /**
      * check if the property is empty
      */
     private static final Function2<String, String, Try<String>> checkEmptyValue =
         (name, value) -> Match(value).of(
-        Case($(""::equals), () -> Try.failure(new Exception("Property '" + name + "' is empty"))),
-        Case($(), () -> Try.success(value)));
+          Case($(""::equals), () -> Try.failure(new Exception("Property '" + name + "' is empty"))),
+          Case($(), () -> Try.success(value)));
 
     /**
      * load the property from System
@@ -120,5 +119,3 @@ public class Thekla4jProperty {
     };
   }
 }
-
-

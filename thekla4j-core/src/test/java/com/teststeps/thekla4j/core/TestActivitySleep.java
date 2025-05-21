@@ -1,17 +1,16 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Sleep;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-import org.junit.jupiter.api.Test;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.jupiter.api.Test;
 
 public class TestActivitySleep {
 

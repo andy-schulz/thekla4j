@@ -9,11 +9,11 @@ package com.teststeps.thekla4j.core.base.persona;
 @FunctionalInterface
 public interface AttemptsWith<T, R> {
 
-    /**
-     * Pass the data object to the first activity
-     *
-     * @param t - the data object
-     * @return - the result of the first activity
-     */
+  /**
+   * Pass the data object to the first activity
+   *
+   * @param t - the data object
+   * @return - the result of the first activity
+   */
   R using(T t);
 }

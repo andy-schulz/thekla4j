@@ -1,14 +1,13 @@
 package com.teststeps.thekla4j.browser.core;
 
+import static com.teststeps.thekla4j.browser.core.status.ElementStatusFunctions.defaultWaiter;
+
 import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-import lombok.With;
-
 import java.util.stream.Collectors;
-
-import static com.teststeps.thekla4j.browser.core.status.ElementStatusFunctions.defaultWaiter;
+import lombok.With;
 
 /**
  * A representation of an element on a web page
@@ -22,40 +21,45 @@ import static com.teststeps.thekla4j.browser.core.status.ElementStatusFunctions.
 @With
 public record Element(
 
-  /**
-   * the locators to find the element
-   * @param locators the locators to find the element
-   * @return the locators to find the element
-   */
-  List<Locator> locators,
+                      /**
+                       * the locators to find the element
+                       * 
+                       * @param locators the locators to find the element
+                       * @return the locators to find the element
+                       */
+                      List<Locator> locators,
 
-  /**
-   * the frame to find the element in
-   * @param frame the frame to find the element in
-   * @return the frame to find the element in
-   */
-  Option<Frame> frame,
+                      /**
+                       * the frame to find the element in
+                       * 
+                       * @param frame the frame to find the element in
+                       * @return the frame to find the element in
+                       */
+                      Option<Frame> frame,
 
-  /**
-   * the name of the element
-   * @param name the name of the element
-   * @return the name of the element
-   */
-  String name,
+                      /**
+                       * the name of the element
+                       * 
+                       * @param name the name of the element
+                       * @return the name of the element
+                       */
+                      String name,
 
-  /**
-   * whether to highlight the element
-   * @param highlight whether to highlight the element
-   * @return whether to highlight the element
-   */
-  Boolean highlight,
+                      /**
+                       * whether to highlight the element
+                       * 
+                       * @param highlight whether to highlight the element
+                       * @return whether to highlight the element
+                       */
+                      Boolean highlight,
 
-  /**
-   * the waiter for the element
-   * @param waiter the waiter for the element
-   * @return the waiter for the element
-   */
-  UntilElement waiter
+                      /**
+                       * the waiter for the element
+                       * 
+                       * @param waiter the waiter for the element
+                       * @return the waiter for the element
+                       */
+                      UntilElement waiter
 ) {
 
   /**
@@ -66,11 +70,11 @@ public record Element(
    */
   public static Element found(Locator locator) {
     return new Element(
-      List.of(locator),
-      Option.none(),
-      "unnamed",
-      true,
-      defaultWaiter());
+                       List.of(locator),
+                       Option.none(),
+                       "unnamed",
+                       true,
+                       defaultWaiter());
   }
 
   /**
@@ -82,11 +86,11 @@ public record Element(
    */
   static Element inFrame(Frame frame, Locator locator) {
     return new Element(
-      List.of(locator),
-      Option.of(frame),
-      "unnamed",
-      true,
-      defaultWaiter());
+                       List.of(locator),
+                       Option.of(frame),
+                       "unnamed",
+                       true,
+                       defaultWaiter());
   }
 
   /**
@@ -96,8 +100,8 @@ public record Element(
    */
   public String toString() {
     return String.format("Element<%s> found By (%s)", name, this.locators
-      .map(Object::toString)
-      .collect(Collectors.joining(" > ")));
+        .map(Object::toString)
+        .collect(Collectors.joining(" > ")));
   }
 
   /**

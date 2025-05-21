@@ -4,8 +4,8 @@ package com.teststeps.thekla4j.browser.core.drawing;
  * A start point for a drawing
  */
 public record StartPoint(
-  Integer x,
-  Integer y
+                         Integer x,
+                         Integer y
 ) {
 
   /**

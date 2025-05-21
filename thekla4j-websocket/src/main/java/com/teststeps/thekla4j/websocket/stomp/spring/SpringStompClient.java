@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.websocket.stomp.spring;
 
+import static com.teststeps.thekla4j.websocket.stomp.spring.functions.ClientConfiguration.setTaskScheduler;
+
 import com.teststeps.thekla4j.utils.vavr.TransformOption;
 import com.teststeps.thekla4j.websocket.stomp.core.Destination;
 import com.teststeps.thekla4j.websocket.stomp.core.Endpoint;
@@ -10,6 +12,10 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.WebSocketContainer;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -25,13 +31,6 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.websocket.stomp.spring.functions.ClientConfiguration.setTaskScheduler;
 
 @Log4j2(topic = "SpringStompClient")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -89,14 +88,13 @@ public class SpringStompClient implements StompClient {
 
   private Try<SpringSockJsSession> sessionForEndpoint(Option<Endpoint> endpoint) {
 
-    return
-        endpoint.transform(TransformOption.toTry(
-                "No endpoint found. Set a default endpoint when creating the ability or provide an endpoint for each destination"))
-            .flatMap(ep -> sessions
-                .filter(s -> s.url().equals(ep.url()))
-                .map(Try::success)
-                .getOrElse(() -> createNewSessionForEndpoint(ep)))
-            .map(this::addSession);
+    return endpoint.transform(TransformOption.toTry(
+      "No endpoint found. Set a default endpoint when creating the ability or provide an endpoint for each destination"))
+        .flatMap(ep -> sessions
+            .filter(s -> s.url().equals(ep.url()))
+            .map(Try::success)
+            .getOrElse(() -> createNewSessionForEndpoint(ep)))
+        .map(this::addSession);
   }
 
   private Try<SpringSockJsSession> createNewSessionForEndpoint(Endpoint endpoint) {
@@ -123,10 +121,9 @@ public class SpringStompClient implements StompClient {
           CompletableFuture<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> future = new CompletableFuture<>();
 
           SpringStompSessionConnectHandler sessionHandler = new SpringStompSessionConnectHandler(
-              endpoint.url(),
-              future,
-              endpoint.connectionTimeout()
-          );
+                                                                                                 endpoint.url(),
+                                                                                                 future,
+                                                                                                 endpoint.connectionTimeout());
 
           WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
 

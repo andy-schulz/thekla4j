@@ -8,7 +8,6 @@ import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -37,7 +36,7 @@ public interface Browser {
   /**
    * Click on a given element at a specific position
    *
-   * @param element    the element to click on
+   * @param element  the element to click on
    * @param position the position to click on
    * @return a Try containing a Void
    */

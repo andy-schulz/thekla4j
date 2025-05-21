@@ -1,11 +1,10 @@
 package com.teststeps.thekla4j.assertions;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.function.Predicate;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 
 public class PassTest {
 
@@ -13,11 +12,11 @@ public class PassTest {
   public void passSucceeds() {
     Predicate<String> expected = s -> true;
 
-     assertThat("Expected.to.be.pass succeeds", Expected.to.be.pass(expected).affirm("unused").isRight());
-     assertThat("Expected.to.pass succeeds", Expected.to.pass(expected).affirm("unused").isRight());
+    assertThat("Expected.to.be.pass succeeds", Expected.to.be.pass(expected).affirm("unused").isRight());
+    assertThat("Expected.to.pass succeeds", Expected.to.pass(expected).affirm("unused").isRight());
 
-      assertThat("Expected.to.be.pass and has reason",
-          Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
+    assertThat("Expected.to.be.pass and has reason",
+      Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
   }
 
   @Test
@@ -27,7 +26,7 @@ public class PassTest {
     assertThat("Expected.to.not.pass succeeds", Expected.to.not.pass(expected).affirm("unused").isRight());
 
     assertThat("Expected.to.not.pass and has reason",
-        Expected.to.not.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.not.pass(expected, "reason")._1(), equalTo("reason"));
   }
 
   @Test
@@ -37,7 +36,7 @@ public class PassTest {
     assertThat("Expected.to.not.pass succeeds", Expected.to.not.pass(expected, "reason")._2.affirm("unused").isRight());
 
     assertThat("Expected.to.not.pass and has reason",
-        Expected.to.not.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.not.pass(expected, "reason")._1(), equalTo("reason"));
   }
 
   @Test
@@ -46,11 +45,11 @@ public class PassTest {
 
     assertThat("Expected.to.be.pass succeeds", Expected.to.be.pass(expected, "reason")._2().affirm("unused").isRight());
     assertThat("Expected.to.be.pass and has reason",
-        Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
 
     assertThat("Expected.to.pass succeeds", Expected.to.pass(expected, "reason")._2.affirm("unused").isRight());
     assertThat("Expected.to.pass and has reason",
-        Expected.to.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.pass(expected, "reason")._1(), equalTo("reason"));
   }
 
   @Test
@@ -58,7 +57,9 @@ public class PassTest {
     Predicate<String> expected = s -> false;
 
     assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected).affirm("unused").isLeft());
-    assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected).affirm("unused").getLeft()
+    assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected)
+        .affirm("unused")
+        .getLeft()
         .getMessage(), equalTo("expect unnamed predicate to pass on \nunused"));
   }
 
@@ -68,11 +69,11 @@ public class PassTest {
 
     assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected, "reason")._2().affirm("unused").isLeft());
     assertThat("Expected.to.be.pass and has reason",
-        Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.be.pass(expected, "reason")._1(), equalTo("reason"));
 
     assertThat("Expected.to.pass fails", Expected.to.pass(expected, "reason")._2.affirm("unused").isLeft());
     assertThat("Expected.to.pass and has reason",
-        Expected.to.pass(expected, "reason")._1(), equalTo("reason"));
+      Expected.to.pass(expected, "reason")._1(), equalTo("reason"));
   }
 
   @Test
@@ -82,11 +83,15 @@ public class PassTest {
     };
 
     assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected).affirm("unused").isLeft());
-    assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected).affirm("unused").getLeft()
+    assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected)
+        .affirm("unused")
+        .getLeft()
         .getMessage(), equalTo("RuntimeException was thrown executing unspecified predicate \nMessage: Test Exception"));
 
     assertThat("Expected.to.pass fails", Expected.to.pass(expected).affirm("unused").isLeft());
-    assertThat("Expected.to.pass fails", Expected.to.pass(expected).affirm("unused").getLeft()
+    assertThat("Expected.to.pass fails", Expected.to.pass(expected)
+        .affirm("unused")
+        .getLeft()
         .getMessage(), equalTo("RuntimeException was thrown executing unspecified predicate \nMessage: Test Exception"));
 
   }

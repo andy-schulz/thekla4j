@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.browser;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.NumberOfBrowser;
@@ -8,17 +12,12 @@ import com.teststeps.thekla4j.browser.spp.activities.SwitchToNewBrowser;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Try;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.function.Function;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestSwitchWindow {
 
@@ -77,13 +76,13 @@ public class TestSwitchWindow {
     when(chromeMock.switchToNewBrowserTab()).thenReturn(Try.of(() -> null));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        SwitchToNewBrowser.tab())
+      SwitchToNewBrowser.tab())
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).switchToNewBrowserTab();
 
@@ -94,13 +93,13 @@ public class TestSwitchWindow {
     when(chromeMock.switchToNewBrowserWindow()).thenReturn(Try.of(() -> null));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        SwitchToNewBrowser.window())
+      SwitchToNewBrowser.window())
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).switchToNewBrowserWindow();
 
@@ -111,13 +110,13 @@ public class TestSwitchWindow {
     when(chromeMock.numberOfOpenTabsAndWindows()).thenReturn(Try.of(() -> 2));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        NumberOfBrowser.tabsAndWindows())
+      NumberOfBrowser.tabsAndWindows())
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).numberOfOpenTabsAndWindows();
 

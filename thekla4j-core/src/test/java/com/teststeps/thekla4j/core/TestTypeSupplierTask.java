@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.activityLog.ActivityStatus;
 import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
@@ -11,10 +15,6 @@ import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTypeSupplierTask {
 
@@ -33,7 +33,7 @@ public class TestTypeSupplierTask {
   @Test
   public void runBasicSupplierTask() {
     Either<ActivityError, String> result = tester.attemptsTo(
-        SupplyString.shallThrow(false));
+      SupplyString.shallThrow(false));
 
     assertThat("execution of consumer task is successful", result.isRight(), equalTo(true));
     assertThat("result is correct", result.get(), equalTo("Hello World"));
@@ -44,8 +44,8 @@ public class TestTypeSupplierTask {
   public void runBasicSupplierTaskWithRunMethod() throws ActivityError {
 
     Either<ActivityError, String> result = SupplyString
-      .shallThrow(false)
-      .runAs(tester);
+        .shallThrow(false)
+        .runAs(tester);
 
     assertThat("either is right", result.isRight(), equalTo(true));
     assertThat("result is correct", result.get(), equalTo("Hello World"));
@@ -56,7 +56,7 @@ public class TestTypeSupplierTask {
   public void runBasicSupplierTaskWithRunAs$Method() throws ActivityError {
 
     Either<ActivityError, String> result = SupplyString.shallThrow(false)
-      .runAs$(tester, "group", "description");
+        .runAs$(tester, "group", "description");
 
     assertThat("either is right", result.isRight(), equalTo(true));
     assertThat("result is correct", result.get(), equalTo("Hello World"));
@@ -122,8 +122,8 @@ public class TestTypeSupplierTask {
   public void runBasicSupplierTaskWithRunMethodAs$PerformerLogAnnotator() throws ActivityError {
 
     String result = SupplyString.shallThrow(false)
-      .runAs$(Performer.of(tester))
-      .annotate("group", "description");
+        .runAs$(Performer.of(tester))
+        .annotate("group", "description");
 
     assertThat("result is correct", result, equalTo("Hello World"));
 
@@ -152,7 +152,7 @@ public class TestTypeSupplierTask {
   public void runBasicConsumerTaskWithExceptionRunAs$Method() {
 
     Either<ActivityError, String> result = SupplyString.shallThrow(true)
-      .runAs$(tester, "group", "description");
+        .runAs$(tester, "group", "description");
 
     assertThat("either is left", result.isLeft(), equalTo(true));
     assertThat("error message is correct", result.getLeft().getMessage(), equalTo("Error thrown"));
@@ -174,7 +174,8 @@ public class TestTypeSupplierTask {
   public void runBasicConsumerTaskWithExceptionRunAs$MethodLogAnnotator() {
 
     Either<ActivityError, String> result = SupplyString.shallThrow(true)
-      .runAs$(tester).annotate("group", "description");
+        .runAs$(tester)
+        .annotate("group", "description");
 
     assertThat("either is left", result.isLeft(), equalTo(true));
     assertThat("error message is correct", result.getLeft().getMessage(), equalTo("Error thrown"));
@@ -208,7 +209,7 @@ public class TestTypeSupplierTask {
     assertThrows(
       ActivityError.class,
       () -> SupplyString.shallThrow(true)
-        .runAs$(Performer.of(tester), "group", "description"));
+          .runAs$(Performer.of(tester), "group", "description"));
 
     TheklaActivityLog log = tester.activityLog;
     ActivityLogNode node = log.getLogTree();
@@ -229,8 +230,8 @@ public class TestTypeSupplierTask {
     assertThrows(
       ActivityError.class,
       () -> SupplyString.shallThrow(true)
-        .runAs$(Performer.of(tester))
-        .annotate("groupLogAnnotator", "descriptionLogAnnotator"));
+          .runAs$(Performer.of(tester))
+          .annotate("groupLogAnnotator", "descriptionLogAnnotator"));
 
     TheklaActivityLog log = tester.activityLog;
     ActivityLogNode node = log.getLogTree();

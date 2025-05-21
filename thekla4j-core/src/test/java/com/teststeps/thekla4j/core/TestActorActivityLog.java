@@ -1,19 +1,17 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Sleep;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.tasks.*;
 import io.vavr.control.Either;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-
-import java.time.Duration;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestActorActivityLog {
   private final Actor John = Actor.named("John");
@@ -25,30 +23,26 @@ public class TestActorActivityLog {
   @Test
   public void generateActorActivityLog() {
     John.attemptsTo(
-      Sleep.forA(Duration.ofMillis(1))
-                   );
+      Sleep.forA(Duration.ofMillis(1)));
 
     assertThat(
       John.activityLog.getStructuredLog("\t"),
       equalTo("[✓ START] - John attempts to\n" +
-        "\t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)")
-              );
+          "\t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)"));
   }
 
   @Test
   public void generateFailedActivityLog() {
     John.attemptsTo(
       Sleep.forA(Duration.ofMillis(1)),
-      T_V2V_Failing.start()
-                   );
+      T_V2V_Failing.start());
 
     assertThat(
       John.activityLog.getStructuredLog("\t"),
       equalTo("""
-        [✗ START] - John attempts to
-        \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
-        \t[✗ T_V2V_Failing] - start a failing Task""")
-              );
+          [✗ START] - John attempts to
+          \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
+          \t[✗ T_V2V_Failing] - start a failing Task"""));
 
 //    assertThat(John.activityLog.getEncodedStructuredHtmlLog(), equalTo("PHN0eWxlPgp1bCwgI0FjdGl2aXR5TG9nIHsNCiAgICBsaXN0LXN0eWxlLXR5cGU6IG5vbmU7DQogICAgZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsNCn0NCg0KI0FjdGl2aXR5TG9nIHsNCiAgICBtYXJnaW46IDA7DQogICAgcGFkZGluZzogMDsNCn0NCg0KLnRhc2sgew0KICAgIGN1cnNvcjogcG9pbnRlcjsNCiAgICAtd2Via2l0LXVzZXItc2VsZWN0OiBub25lOyAvKiBTYWZhcmkgMy4xKyAqLw0KICAgIC1tb3otdXNlci1zZWxlY3Q6IG5vbmU7IC8qIEZpcmVmb3ggMisgKi8NCiAgICAtbXMtdXNlci1zZWxlY3Q6IG5vbmU7IC8qIElFIDEwKyAqLw0KICAgIHVzZXItc2VsZWN0OiBub25lOw0KfQ0KDQoudGFzazo6YmVmb3JlIHsNCiAgICAvKmNvbnRlbnQ6ICJcMjVCNiI7ICovDQogICAgY29udGVudDogIlwyNUI2IjsNCiAgICBjb2xvcjogYmxhY2s7DQogICAgZGlzcGxheTogaW5saW5lLWJsb2NrOw0KICAgIG1hcmdpbi1yaWdodDogNnB4Ow0KfQ0KDQoudGFzay5mYWlsZWQ6OmJlZm9yZSB7DQogICAgY29sb3I6IHJlZDsNCn0NCg0KLnRhc2sucGFzc2VkOjpiZWZvcmUgew0KICAgIGNvbG9yOiBncmVlbjsNCn0NCg0KLnRhc2sucnVubmluZzo6YmVmb3JlIHsNCiAgICBjb2xvcjogYmxhY2s7DQp9DQoNCi50YXNrLW9wZW46OmJlZm9yZSB7DQogICAgLW1zLXRyYW5zZm9ybTogcm90YXRlKDkwZGVnKTsgLyogSUUgOSAqLw0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoOTBkZWcpOyAvKiBTYWZhcmkgKi8nDQp0cmFuc2Zvcm06IHJvdGF0ZSg5MGRlZyk7DQp9DQoNCi5uZXN0ZWQgew0KICAgIGRpc3BsYXk6IG5vbmU7DQp9DQoNCi5hY3RpdmUgew0KICAgIGRpc3BsYXk6IGJsb2NrOw0KfQ0KDQouaW50ZXJhY3Rpb246OmJlZm9yZSB7DQogICAgY29udGVudDogIlwyNUI3IjsNCiAgICBjb2xvcjogYmxhY2s7DQogICAgbWFyZ2luLXJpZ2h0OiA2cHg7DQp9DQoNCi5pbnRlcmFjdGlvbi5mYWlsZWQ6OmJlZm9yZSB7DQogICAgY29sb3I6IHJlZDsNCn0NCg0KLmludGVyYWN0aW9uLnBhc3NlZDo6YmVmb3JlIHsNCiAgICBjb2xvcjogZ3JlZW47DQp9DQoNCi5pbnRlcmFjdGlvbi5ydW5uaW5nOjpiZWZvcmUgew0KICAgIGNvbG9yOiBibGFjazsNCn0NCg0KLmxvZ01lc3NhZ2UuZmFpbCB7DQogICAgY29sb3I6IHJlZDsNCn0NCg0KLmFjdGl2aXR5TmFtZSB7DQogICAgY29sb3I6ICNmZjBiYjE7DQp9Cjwvc3R5bGU+IAoKPHVsIGlkID0gIkFjdGl2aXR5TG9nIj48bGk+PHNwYW4gY2xhc3M9InRhc2sgZmFpbGVkIj48c3BhbiBjbGFzcz0ibG9nTWVzc2FnZSI+PHNwYW4gY2xhc3M9ImFjdGl2aXR5TmFtZSI+W1NUQVJUXTwvc3Bhbj4gLSA8c3BhbiBjbGFzcz0iYWN0aXZpdHlEZXNjcmlwdGlvbiI+IEpvaG4gYXR0ZW1wdHMgdG88L3NwYW4+PC9zcGFuPjwvc3Bhbj48dWwgY2xhc3M9Im5lc3RlZCI+PGxpIGNsYXNzPSJpbnRlcmFjdGlvbiBwYXNzZWQiPjxzcGFuIGNsYXNzPSJsb2dNZXNzYWdlIj48c3BhbiBjbGFzcz0iYWN0aXZpdHlOYW1lIj5bU2xlZXBdPC9zcGFuPiAtIDxzcGFuIGNsYXNzPSJhY3Rpdml0eURlc2NyaXB0aW9uIj4gcGF1c2UgYWxsIGFjdGl2aXRpZXMgZm9yIDAgU2Vjb25kcyAoMSBtcyk8L3NwYW4+PC9zcGFuPjwvbGk+PGxpPjxzcGFuIGNsYXNzPSJ0YXNrIGZhaWxlZCI+PHNwYW4gY2xhc3M9ImxvZ01lc3NhZ2UiPjxzcGFuIGNsYXNzPSJhY3Rpdml0eU5hbWUiPltUX1YyVl9GYWlsaW5nXTwvc3Bhbj4gLSA8c3BhbiBjbGFzcz0iYWN0aXZpdHlEZXNjcmlwdGlvbiI+IHN0YXJ0IGEgZmFpbGluZyBUYXNrPC9zcGFuPjwvc3Bhbj48L3NwYW4+PHVsIGNsYXNzPSJuZXN0ZWQiPjwvdWw+PC9saT48L3VsPjwvbGk+PC91bD4gCgo8c2NyaXB0Pgp2YXIgdG9nZ2xlciA9IGRvY3VtZW50LmdldEVsZW1lbnRzQnlDbGFzc05hbWUoInRhc2siKTsKdmFyIGk7Cgpmb3IgKGkgPSAwOyBpIDwgdG9nZ2xlci5sZW5ndGg7IGkrKykgewogIHRvZ2dsZXJbaV0uYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCBmdW5jdGlvbigpIHsKICAgIHRoaXMucGFyZW50RWxlbWVudC5xdWVyeVNlbGVjdG9yKCIubmVzdGVkIikuY2xhc3NMaXN0LnRvZ2dsZSgiYWN0aXZlIik7CiAgICB0aGlzLmNsYXNzTGlzdC50b2dnbGUoInRhc2stb3BlbiIpOwogIH0pOwp9Cjwvc2NyaXB0Pg=="));
   }
@@ -59,16 +53,14 @@ public class TestActorActivityLog {
     // in case the task does not contain an annotation
     John.attemptsTo(
       Sleep.forA(Duration.ofMillis(1)),
-      T_V2S.start()
-                   );
+      T_V2S.start());
 
     assertThat(
       John.activityLog.getStructuredLog("\t"),
       equalTo("""
-        [✓ START] - John attempts to
-        \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
-        \t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)""")
-              );
+          [✓ START] - John attempts to
+          \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
+          \t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)"""));
 
 //    assertThat(
 //        John.activityLog.getEncodedStructuredHtmlLog(),
@@ -86,8 +78,7 @@ public class TestActorActivityLog {
     assertThat(
       John.activityLog.getStructuredLog("\t"),
       equalTo("[✓ START] - John attempts to\n" +
-        "\t[✓ TaskWithRecordData] - task with user data name: 'TesterRecord'")
-              );
+          "\t[✓ TaskWithRecordData] - task with user data name: 'TesterRecord'"));
   }
 
   @Test
@@ -97,18 +88,16 @@ public class TestActorActivityLog {
     John.attemptsTo(
       Sleep.forA(Duration.ofMillis(1)),
       T_V2S.start(),
-      T_S2S.start()
-                   );
+      T_S2S.start());
 
     assertThat(
       John.activityLog.getStructuredLog("\t"),
       equalTo("""
-        [✓ START] - John attempts to
-        \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
-        \t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)
-        \t[✓ T_S2S] - start a String to String Task
-        \t\t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)""")
-              );
+          [✓ START] - John attempts to
+          \t[✓ Sleep] - pause all activities for 0 Seconds (1 ms)
+          \t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)
+          \t[✓ T_S2S] - start a String to String Task
+          \t\t[✓ Sleep] - pause all activities for 0 Seconds (3 ms)"""));
 
     System.out.println(John.activityLog.getEncodedStructuredHtmlLog());
 
@@ -333,7 +322,7 @@ public class TestActorActivityLog {
     Either<ActivityError, Void> result = actor.attemptsTo$_(
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -351,7 +340,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -370,7 +359,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -390,7 +379,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -411,7 +400,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -433,7 +422,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -456,7 +445,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -480,7 +469,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -505,7 +494,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 
@@ -531,7 +520,7 @@ public class TestActorActivityLog {
       TaskReturningVoid.start(),
       T_V2V_Failing.start(),
       "Group", "Group Description")
-      .using(null);
+        .using(null);
 
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
 

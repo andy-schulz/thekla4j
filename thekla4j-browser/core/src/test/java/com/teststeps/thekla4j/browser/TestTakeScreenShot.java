@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.browser;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -8,18 +12,13 @@ import com.teststeps.thekla4j.browser.spp.activities.TakeScreenshot;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Try;
+import java.io.File;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.io.File;
-import java.util.function.Function;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestTakeScreenShot {
   private Actor actor;
@@ -60,16 +59,16 @@ public class TestTakeScreenShot {
     Element testElement = Element.found(By.css("css"));
 
     when(chromeMock.takeScreenShotOfElement(testElement))
-      .thenReturn(Try.success(new File("test.png")));
+        .thenReturn(Try.success(new File("test.png")));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        TakeScreenshot.ofElement(testElement))
+      TakeScreenshot.ofElement(testElement))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).takeScreenShotOfElement(testElement);
   }

@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
@@ -8,17 +13,11 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTypeBasicInteraction {
 
@@ -99,8 +98,8 @@ public class TestTypeBasicInteraction {
     List<String> testList = new ArrayList<>();
 
     BasicInteractionTask.start(testList)
-      .runAs$(actor)
-      .annotate("myGroup", "myDescription");
+        .runAs$(actor)
+        .annotate("myGroup", "myDescription");
 
     TheklaActivityLog log = actor.activityLog;
     ActivityLogNode rootLog = log.getLogTree();
@@ -154,9 +153,9 @@ public class TestTypeBasicInteraction {
     List<String> testList = new ArrayList<>();
 
     BasicInteractionTask
-      .start(testList)
-      .runAs$(Performer.of(actor))
-      .annotate( "myGroup", "myDescription");
+        .start(testList)
+        .runAs$(Performer.of(actor))
+        .annotate("myGroup", "myDescription");
 
     TheklaActivityLog log = actor.activityLog;
     ActivityLogNode rootLog = log.getLogTree();
@@ -170,7 +169,6 @@ public class TestTypeBasicInteraction {
     assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("BasicInteractionTask"));
     assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Basic Interaction Task"));
   }
-
 
 
   @Test
@@ -201,7 +199,6 @@ public class TestTypeBasicInteraction {
     assertThat("test was added to test list during execution", testList.get(0), equalTo("task executed"));
     assertThat("task is evaluated", result.get(), equalTo(null));
   }
-
 
 
 }

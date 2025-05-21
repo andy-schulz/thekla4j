@@ -7,17 +7,17 @@ import lombok.With;
 @With
 public class Request {
 
-    // properties
-    public final String resource;
-    public final String description;
-    public final HttpOptions options;
+  // properties
+  public final String resource;
+  public final String description;
+  public final HttpOptions options;
 
-    public static Request on(String resource) {
-        return new Request(resource, "", HttpOptions.empty());
-    }
+  public static Request on(String resource) {
+    return new Request(resource, "", HttpOptions.empty());
+  }
 
 
-    public Request called(String description) {
-        return this.withDescription(description);
-    }
+  public Request called(String description) {
+    return this.withDescription(description);
+  }
 }

@@ -13,12 +13,13 @@ import lombok.NonNull;
 public abstract class BasicInteraction extends Activity<Void, Void> {
 
   @Override
-  final protected Either<ActivityError, Void> perform(@NonNull Actor actor, Void unused){
+  final protected Either<ActivityError, Void> perform(@NonNull Actor actor, Void unused) {
     return performAs(actor);
   }
 
   /**
    * Returns a string representation of the action
+   * 
    * @return the name of the action
    */
   @Override
@@ -28,6 +29,7 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
 
   /**
    * Perform the activity as the given actor
+   * 
    * @param actor the actor to run the activity as
    * @return an Either with the result of the activity or an error
    */
@@ -47,9 +49,9 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * Run the activity as the given actor.
    * It is easier to read than using the attemptsTo method of an actor
    *
-   * @param actor the actor to run the activity as
-   *  @param group the group name used in the log file
-   *  @param description the description used in the log file
+   * @param actor       the actor to run the activity as
+   * @param group       the group name used in the log file
+   * @param description the description used in the log file
    */
   final public Either<ActivityError, Void> runAs$(@NonNull Actor actor, String group, String description) {
     return actor.attemptsTo$(this, group, description);
@@ -83,9 +85,9 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * Run the activity as the given performer.
    * It is easier to read than using the attemptsTo method of a performer
    *
-   * @param performer the actor to run the activity as
-   *  @param group the group name used in the log file
-   *  @param description the description used in the log file
+   * @param performer   the actor to run the activity as
+   * @param group       the group name used in the log file
+   * @param description the description used in the log file
    * @throws ActivityError if the activity fails
    */
   final public void runAs$(@NonNull Performer performer, String group, String description) throws ActivityError {
@@ -102,8 +104,6 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   final public LogAnnotatorThrows<Void> runAs$(@NonNull Performer performer) throws ActivityError {
     return (group, description) -> performer.attemptsTo$(this, group, description);
   }
-
-
 
 
 }

@@ -26,9 +26,9 @@ public class DoubleClick extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(browser -> browser.doubleClickOn(element))
-      .onSuccess(__ -> log.info("Double clicked on element: {}", element))
-      .transform(ActivityError.toEither("Could not double click on element!"));
+        .flatMap(browser -> browser.doubleClickOn(element))
+        .onSuccess(__ -> log.info("Double clicked on element: {}", element))
+        .transform(ActivityError.toEither("Could not double click on element!"));
   }
 
   /**

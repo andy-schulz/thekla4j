@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.CANVAS;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Element;
@@ -13,16 +16,12 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.time.Duration;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.CANVAS;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 public class IT_ClickTest {
 
@@ -42,7 +41,7 @@ public class IT_ClickTest {
     BrowserStartupConfig conf = BrowserStartupConfig.startMaximized();
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser(conf)));
+        .whoCan(BrowseTheWeb.with(Selenium.browser(conf)));
   }
 
   @AfterEach
@@ -55,22 +54,22 @@ public class IT_ClickTest {
   public void clicking_on_canvas() throws ActivityError {
 
     Element canvas = Element.found(By.css("#canvas"))
-      .withName("Canvas");
+        .withName("Canvas");
 
     String url = CANVAS;
 
 
     actor.attemptsTo(
 
-        Navigate.to(url),
+      Navigate.to(url),
 
-        Click.on(canvas).atPosition(20,20),
+      Click.on(canvas).atPosition(20, 20),
 
-        See.ifThe(Text.of(header))
+      See.ifThe(Text.of(header))
           .is(Expected.to.equal("Start Drawing on Canvas with Mouse. X: 20 Y: 20"))
           .forAsLongAs(Duration.ofSeconds(3)))
 
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 }

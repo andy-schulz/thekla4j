@@ -10,6 +10,7 @@ public class PropertyElement {
 
   /**
    * get the name of the property
+   * 
    * @return the name of the property
    */
   public String name() {
@@ -18,6 +19,7 @@ public class PropertyElement {
 
   /**
    * get the default value of the property
+   * 
    * @return the default value of the property
    */
   public Option<String> defaultValue() {
@@ -26,6 +28,7 @@ public class PropertyElement {
 
   /**
    * get the help text of the property
+   * 
    * @return the help text of the property
    */
   public String helpText() {
@@ -34,7 +37,8 @@ public class PropertyElement {
 
   /**
    * create a new PropertyElement with the given name and default value
-   * @param name the name of the property
+   * 
+   * @param name         the name of the property
    * @param defaultValue the default value of the property
    * @return the new PropertyElement
    */

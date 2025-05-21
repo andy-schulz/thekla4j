@@ -26,8 +26,8 @@ public class Attribute extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.attributeValueOf(attributeName, element))
-      .toEither(ActivityError.of(String.format("could not get value of attribute '%s' from %s", attributeName, element)));
+        .flatMap(b -> b.attributeValueOf(attributeName, element))
+        .toEither(ActivityError.of(String.format("could not get value of attribute '%s' from %s", attributeName, element)));
   }
 
   /**

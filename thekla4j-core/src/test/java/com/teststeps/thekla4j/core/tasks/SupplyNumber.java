@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 public class SupplyNumber extends SupplierTask<Integer> {
 
   private int number = 0;
+
   @Override
   protected Either<ActivityError, Integer> performAs(Actor actor) {
     return Either.right(number);

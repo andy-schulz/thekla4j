@@ -16,8 +16,7 @@ public class SpringFunctions {
           .prepend(StompHeaderValue.DESTINATION.of(destination))
           .foldLeft(new org.springframework.messaging.simp.stomp.StompHeaders(), SpringFunctions.addElementToStompHeaders);
 
-  private static final Function2<org.springframework.messaging.simp.stomp.StompHeaders, StompHeader, org.springframework.messaging.simp.stomp.StompHeaders>
-      addElementToStompHeaders =
+  private static final Function2<org.springframework.messaging.simp.stomp.StompHeaders, StompHeader, org.springframework.messaging.simp.stomp.StompHeaders> addElementToStompHeaders =
       (headers, elem) -> {
         headers.add(elem.name(), elem.value());
         return headers;

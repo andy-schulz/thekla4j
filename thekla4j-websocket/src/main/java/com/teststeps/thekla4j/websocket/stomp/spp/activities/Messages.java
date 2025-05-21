@@ -14,7 +14,6 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-
 import java.util.function.Predicate;
 
 @Action("getting messages of destination @{destination}")
@@ -31,14 +30,14 @@ public class Messages<T> extends Interaction<Void, List<StompFrame<T>>> {
   protected Either<ActivityError, List<StompFrame<T>>> performAs(Actor actor, Void result) {
 
     return UseWebsocketWithStomp.as(actor)
-      .flatMap(ability -> ability.atDestination(destination))
-      .flatMap(StompDestination::messages)
-      .map(l -> l.filter(f -> headerFilter.test(f.headers)))
-      .map(l -> l.map(f -> payloadParser.apply(f.payload).map(p -> StompFrame.of(f.command, f.headers, p))))
-      .map(l -> l.map(t -> t.onFailure(System.err::println)))
-      .map(LiftTry.fromList())
-      .flatMap(ActivityError.toEither("Error while parsing StompFrame"))
-      .map(frames -> frames.filter(f -> payloadFilter.test(f.payload)));
+        .flatMap(ability -> ability.atDestination(destination))
+        .flatMap(StompDestination::messages)
+        .map(l -> l.filter(f -> headerFilter.test(f.headers)))
+        .map(l -> l.map(f -> payloadParser.apply(f.payload).map(p -> StompFrame.of(f.command, f.headers, p))))
+        .map(l -> l.map(t -> t.onFailure(System.err::println)))
+        .map(LiftTry.fromList())
+        .flatMap(ActivityError.toEither("Error while parsing StompFrame"))
+        .map(frames -> frames.filter(f -> payloadFilter.test(f.payload)));
   }
 
 
@@ -47,7 +46,7 @@ public class Messages<T> extends Interaction<Void, List<StompFrame<T>>> {
   }
 
   public static <P> Messages<P> of(Destination destination, Function1<Object, Try<P>> payloadParser) {
-    return new Messages<>(destination, x -> true, x-> true, payloadParser);
+    return new Messages<>(destination, x -> true, x -> true, payloadParser);
   }
 
   public Messages<T> filterByHeader(Predicate<StompHeaders> filter) {

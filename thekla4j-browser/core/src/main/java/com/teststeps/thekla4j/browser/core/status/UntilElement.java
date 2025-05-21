@@ -9,8 +9,8 @@ import java.time.Duration;
  * @param duration          - the duration to wait for the element status to be true
  */
 public record UntilElement(
-  ElementStatusType elementStatusType,
-  Duration duration
+                           ElementStatusType elementStatusType,
+                           Duration duration
 ) {
 
   /**

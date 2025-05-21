@@ -4,10 +4,9 @@ import com.teststeps.thekla4j.browser.browserstack.tasks.SetBrowserstackStatus;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-
-import java.util.function.Function;
 
 public class IT_BrowserStackStatus {
 
@@ -29,6 +28,6 @@ public class IT_BrowserStackStatus {
     actor.attemptsTo(
       Navigate.to("https://www.browserstack.com/status"),
       SetBrowserstackStatus.ofTestCaseToFailed("The name of the test case", "Test failed"))
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 }

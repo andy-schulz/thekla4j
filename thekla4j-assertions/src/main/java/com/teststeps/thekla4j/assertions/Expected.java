@@ -9,4 +9,3 @@ public class Expected {
   public static final AssertionNot not = new AssertionNot();
 
 }
-

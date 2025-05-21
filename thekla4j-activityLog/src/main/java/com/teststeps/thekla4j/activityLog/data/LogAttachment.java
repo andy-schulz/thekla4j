@@ -1,9 +1,9 @@
 package com.teststeps.thekla4j.activityLog.data;
 
 public record LogAttachment(
-    String name,
-    String content,
-    LogAttachmentType type
+                            String name,
+                            String content,
+                            LogAttachmentType type
 
 ) implements NodeAttachment {
   @Override

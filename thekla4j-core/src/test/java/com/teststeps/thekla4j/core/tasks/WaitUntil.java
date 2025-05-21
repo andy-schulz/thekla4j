@@ -7,33 +7,34 @@ import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class WaitUntil <T> extends Interaction<T, Boolean> {
+public class WaitUntil<T> extends Interaction<T, Boolean> {
 
-    private int counter;
-    private int maxCounter;
-    private int succeedWhenReaching;
-    @Override
-    protected Either<ActivityError, Boolean> performAs(Actor actor, T result) {
-        counter++;
+  private int counter;
+  private int maxCounter;
+  private int succeedWhenReaching;
 
-        if(maxCounter >= 0)
-            return Either.right(counter == maxCounter);
+  @Override
+  protected Either<ActivityError, Boolean> performAs(Actor actor, T result) {
+    counter++;
 
-        if(succeedWhenReaching >= 0){
-            if(counter >= succeedWhenReaching)
-                return Either.right(true);
-            else
-                return Either.left(ActivityError.of("Counter did not reach the expected value"));
-        }
+    if (maxCounter >= 0)
+      return Either.right(counter == maxCounter);
 
-        return Either.right(false);
+    if (succeedWhenReaching >= 0) {
+      if (counter >= succeedWhenReaching)
+        return Either.right(true);
+      else
+        return Either.left(ActivityError.of("Counter did not reach the expected value"));
     }
 
-    public static <I> WaitUntil<I> counterIs(int maxCounter) {
-        return new WaitUntil<>(0, maxCounter, -1);
-    }
+    return Either.right(false);
+  }
 
-    public static <I> WaitUntil<I> doesNotFailWhenReaching(int maxCounter) {
-        return new WaitUntil<>(0, -1, maxCounter);
-    }
+  public static <I> WaitUntil<I> counterIs(int maxCounter) {
+    return new WaitUntil<>(0, maxCounter, -1);
+  }
+
+  public static <I> WaitUntil<I> doesNotFailWhenReaching(int maxCounter) {
+    return new WaitUntil<>(0, -1, maxCounter);
+  }
 }

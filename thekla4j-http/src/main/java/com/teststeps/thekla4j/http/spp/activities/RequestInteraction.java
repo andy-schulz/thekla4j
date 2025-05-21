@@ -10,7 +10,6 @@ import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import com.teststeps.thekla4j.http.spp.abilities.UseTheRestApi;
 import io.vavr.control.Either;
-
 import java.util.function.Function;
 
 public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> extends Interaction<Void, HttpResult> {
@@ -31,7 +30,8 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
   @Override
   public Either<ActivityError, HttpResult> performAs(Actor actor, Void result) {
 
-    HttpOptions opts = !this.followRedirects ? this.httpOptions.followRedirects(false) : this.httpOptions;;
+    HttpOptions opts = !this.followRedirects ? this.httpOptions.followRedirects(false) : this.httpOptions;
+    ;
 
     return UseTheRestApi.as(actor)
         .map(useRestAbility -> useRestAbility.send(this.request, opts))

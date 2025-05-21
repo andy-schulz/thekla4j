@@ -11,10 +11,9 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-
-import java.time.Duration;
 
 /**
  * Interaction to draw a shape to an element
@@ -33,8 +32,8 @@ public class Draw extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(browser -> browser.drawShapes(shapes, element, releaseAndHold, pause))
-      .transform(ActivityError.toEither("Could not draw shape to element!"));
+        .flatMap(browser -> browser.drawShapes(shapes, element, releaseAndHold, pause))
+        .transform(ActivityError.toEither("Could not draw shape to element!"));
   }
 
   /**

@@ -24,7 +24,7 @@ public class T_V2V_Failing extends Task<Void, Void> {
   public static T_V2V_Failing withLongErrorMessage(Integer length, String pattern) {
 
     String errorMessage =
-      List.fill(length, pattern).foldLeft("", (acc, s) -> acc + s);
+        List.fill(length, pattern).foldLeft("", (acc, s) -> acc + s);
 
     return new T_V2V_Failing(errorMessage);
   }

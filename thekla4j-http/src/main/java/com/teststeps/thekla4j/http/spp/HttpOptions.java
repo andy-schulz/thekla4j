@@ -5,13 +5,12 @@ import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-import lombok.NonNull;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 
 public class HttpOptions {
 
@@ -31,20 +30,23 @@ public class HttpOptions {
   private Boolean followRedirects = null;
 
   /**
-   * Default timeout to receive a response from server. Overwrite this value for long running requests where needed, calling responseTimeout() setter
+   * Default timeout to receive a response from server. Overwrite this value for long running requests where needed,
+   * calling responseTimeout() setter
    */
   private int responseTimeout = 0;
 
   /**
    * Getters
+   * 
    * @return int value of responseTimeout
    */
   public int getResponseTimeout() {
-    return responseTimeout <=0 ? DEFAULT_TIMEOUT: responseTimeout;
+    return responseTimeout <= 0 ? DEFAULT_TIMEOUT : responseTimeout;
   }
 
   /**
    * Getters
+   * 
    * @return boolean value of followRedirects
    */
   public boolean getFollowRedirects() {
@@ -53,6 +55,7 @@ public class HttpOptions {
 
   /**
    * Getters
+   * 
    * @return boolean value of disableSSLCertificateValidation
    */
   public boolean getDisableSSLCertificateValidation() {
@@ -117,12 +120,10 @@ public class HttpOptions {
   }
 
   public <T> HttpOptions queryParameter(@NonNull String queryParameterName, @NonNull Option<T> queryParameterValue) {
-    return
-        queryParameterValue
-            .map(val -> getNewRestOptions()
-                .setParameterValue(queryParameterName, Objects.toString(val)))
-            .getOrElse(this)
-        ;
+    return queryParameterValue
+        .map(val -> getNewRestOptions()
+            .setParameterValue(queryParameterName, Objects.toString(val)))
+        .getOrElse(this);
   }
 
   public HttpOptions queryParameter(@NonNull String queryParameterName, @NonNull String queryParameterValue) {
@@ -141,12 +142,10 @@ public class HttpOptions {
   }
 
   public HttpOptions formParameter(@NonNull String formParameterName, @NonNull Option<String> formParameterValue) {
-    return
-        formParameterValue
-            .map(val -> getNewRestOptions()
-                .setFormPropertyValues(formParameterName, Objects.toString(val)))
-            .getOrElse(this)
-        ;
+    return formParameterValue
+        .map(val -> getNewRestOptions()
+            .setFormPropertyValues(formParameterName, Objects.toString(val)))
+        .getOrElse(this);
   }
 
   public HttpOptions port(int port) {
@@ -200,9 +199,8 @@ public class HttpOptions {
 
 
     if (this.responseTimeout > 0) {
-        clone.setResponseTimeout(this.responseTimeout);
+      clone.setResponseTimeout(this.responseTimeout);
     }
-
 
 
     this.headers.forEach(clone::setHeaderValue);
@@ -223,9 +221,8 @@ public class HttpOptions {
 
   private HttpOptions getNewRestOptions() {
     return new HttpOptions(
-        this.headers, this.queryParameters, this.pathParameters, this.formParameters, this.baseUrl, this.port, this.body,
-        this.disableSSLCertificateValidation, this.responseTimeout, this.followRedirects
-    );
+                           this.headers, this.queryParameters, this.pathParameters, this.formParameters, this.baseUrl, this.port, this.body,
+                           this.disableSSLCertificateValidation, this.responseTimeout, this.followRedirects);
   }
 
   private HttpOptions setBody(String body) {
@@ -247,7 +244,8 @@ public class HttpOptions {
   }
 
   private HttpOptions dropNullHeader() {
-    this.headers = this.headers.entrySet().stream()
+    this.headers = this.headers.entrySet()
+        .stream()
         .filter(entry -> entry.getValue() != null)
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     return this;
@@ -298,14 +296,13 @@ public class HttpOptions {
   public String toString(int indent) {
     String indStr = "\n" + String.join("", Collections.nCopies(indent, "\t"));
 
-    return
-        indStr + "BaseUrl: " + this.baseUrl +
-            indStr + "Resource Port: " + this.port +
-            indStr + "Path Parameters: " + this.pathParameters.toString() +
-            indStr + "Query Parameters: " + this.queryParameters.toString() +
-            indStr + "Form Parameters: " + this.formParameters.toString() +
-            indStr + "Headers: " + this.headers.toString() +
-            indStr + "Body: " + this.body.replaceAll("\n", indStr);
+    return indStr + "BaseUrl: " + this.baseUrl +
+        indStr + "Resource Port: " + this.port +
+        indStr + "Path Parameters: " + this.pathParameters.toString() +
+        indStr + "Query Parameters: " + this.queryParameters.toString() +
+        indStr + "Form Parameters: " + this.formParameters.toString() +
+        indStr + "Headers: " + this.headers.toString() +
+        indStr + "Body: " + this.body.replaceAll("\n", indStr);
   }
 
   /**
@@ -317,16 +314,7 @@ public class HttpOptions {
   }
 
   private HttpOptions(
-      Map<String, String> headers,
-      Map<String, String> queryParameters,
-      Map<String, String> pathParameters,
-      Map<String, String> formParameters,
-      String baseUrl,
-      int port,
-      String body,
-      Boolean disableSSLCertificateValidation,
-      int responseTimeout,
-      Boolean followRedirects
+                      Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> pathParameters, Map<String, String> formParameters, String baseUrl, int port, String body, Boolean disableSSLCertificateValidation, int responseTimeout, Boolean followRedirects
   ) {
     // clone fields of request
 

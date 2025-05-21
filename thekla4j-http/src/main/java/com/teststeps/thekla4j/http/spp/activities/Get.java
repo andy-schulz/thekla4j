@@ -8,10 +8,11 @@ import com.teststeps.thekla4j.http.spp.Request;
 @Action("post to resource: '@{resource}' with options: @{options}")
 public class Get extends RequestInteraction<Get> {
 
-    public static Get from(Request request) {
-        return new Get(request);
-    }
-    private Get(Request request) {
-        super(request, HttpRequest::get);
-    }
+  public static Get from(Request request) {
+    return new Get(request);
+  }
+
+  private Get(Request request) {
+    super(request, HttpRequest::get);
+  }
 }

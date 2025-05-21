@@ -6,7 +6,6 @@ import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -38,6 +37,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * the current activity log entry
+   * 
    * @return the current activity log entry
    */
   public Option<ActivityLogEntry> getFailedActivity() {
@@ -46,28 +46,25 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * adds a new activity log entry to the current activity
-   * @param activityName - the name of the added activity
+   * 
+   * @param activityName        - the name of the added activity
    * @param activityDescription - the description of the added activity
-   * @param activityType - the type of the added activity
-   * @param activityLogType - the log type of the added activity
-   * @param activityStatus - the status of the added activity
+   * @param activityType        - the type of the added activity
+   * @param activityLogType     - the log type of the added activity
+   * @param activityStatus      - the status of the added activity
    * @return the current activity log entry
    */
   @Override
   public ActivityLogEntry addActivityLogEntry(
-    String activityName,
-    String activityDescription,
-    ActivityLogEntryType activityType,
-    TASK_LOG activityLogType,
-    ActivityStatus activityStatus) {
+                                              String activityName, String activityDescription, ActivityLogEntryType activityType, TASK_LOG activityLogType, ActivityStatus activityStatus) {
 
     final ActivityLogEntry logEntry = new ActivityLogEntry(
-      activityName,
-      activityDescription,
-      activityType,
-      activityStatus,
-      activityLogType,
-      this._currentActivity);
+                                                           activityName,
+                                                           activityDescription,
+                                                           activityType,
+                                                           activityStatus,
+                                                           activityLogType,
+                                                           this._currentActivity);
     // if parent entry is passed in constructor, the new entry is already added to the parent entry
     this._currentActivity = logEntry;
 
@@ -77,23 +74,23 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * adds a new task group to the current activity
-   * @param groupName - the name of the added activity
+   * 
+   * @param groupName        - the name of the added activity
    * @param groupDescription - the description of the added activity
    * @return the current activity log entry
    */
   @Override
   public ActivityLogEntry addGroup(
-    String groupName,
-    String groupDescription
-                                  ) {
+                                   String groupName, String groupDescription
+  ) {
 
     final ActivityLogEntry logEntry = new ActivityLogEntry(
-        groupName,
-        groupDescription,
-      ActivityLogEntryType.Group,
-      ActivityStatus.running,
-      TASK_LOG.FULL_LOG,
-      this._currentActivity);
+                                                           groupName,
+                                                           groupDescription,
+                                                           ActivityLogEntryType.Group,
+                                                           ActivityStatus.running,
+                                                           TASK_LOG.FULL_LOG,
+                                                           this._currentActivity);
     this._currentActivity = logEntry;
 
     return logEntry;
@@ -101,6 +98,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * append video attachment to root node
+   * 
    * @param videoAttachment - the video attachment
    */
   public void appendVideoAttachmentToRootNode(NodeAttachment videoAttachment) {
@@ -122,7 +120,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
     entry.setEndTime(LocalDateTime.now());
 
-    if(entry.status() == ActivityStatus.failed && this._failedActivity.isEmpty())
+    if (entry.status() == ActivityStatus.failed && this._failedActivity.isEmpty())
       this._failedActivity = Option.of(entry);
 
     entry.calculateStatus();
@@ -142,10 +140,10 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     List<ActivityStatus> list = this.rootActivityLogEntry.getSubTreeStatusList();
 
     this.rootActivityLogEntry.status(list.contains(ActivityStatus.failed) ?
-                                       ActivityStatus.failed :
-                                       list.contains(ActivityStatus.running) ?
-                                         ActivityStatus.running :
-                                         ActivityStatus.passed);
+        ActivityStatus.failed :
+        list.contains(ActivityStatus.running) ?
+            ActivityStatus.running :
+            ActivityStatus.passed);
   }
 
   /**
@@ -166,6 +164,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * return the structured activity log as a tree
+   * 
    * @return the structured activity log
    */
   public ActivityLogNode getLogTree() {
@@ -199,6 +198,7 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
 
   /**
    * get Structured html log of activity log list
+   * 
    * @param logs - the activity log list
    * @return the html log
    */
@@ -223,7 +223,8 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
    */
   @Override
   public String getStructuredHtmlLogWithoutIO() {
-    ActivityLogNode logTree = getLogTree();;
+    ActivityLogNode logTree = getLogTree();
+    ;
     return LogFormatter.formatLogAsHtmlTree(removeIO.apply(logTree));
   }
 
@@ -248,12 +249,12 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
   }
 
   private List<NodeAttachment> getFailedNodeAttachment(ActivityLogNode node) {
-    if(node.activityNodes.isEmpty())
+    if (node.activityNodes.isEmpty())
       return List.ofAll(node.attachments);
 
     List<ActivityLogNode> failedNode = List.ofAll(node.activityNodes).filter(n -> n.status == ActivityStatus.failed);
 
-    if(failedNode.isEmpty())
+    if (failedNode.isEmpty())
       return List.empty();
 
     return getFailedNodeAttachment(failedNode.head());
@@ -263,27 +264,30 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return getFailedNodeAttachment(this.rootActivityLogEntry.getLogTree());
   }
 
-  /**\
+  /**
+   * \
    * create an activity log for an actor
+   * 
    * @param actorName - the name of the actor
    */
   public TheklaActivityLog(String actorName) {
     this._currentActivity = new ActivityLogEntry(
-      "START",
-      actorName + " attempts to",
-      ActivityLogEntryType.Task,
-      ActivityStatus.running,
-      TASK_LOG.FULL_LOG,
-      null);
+                                                 "START",
+                                                 actorName + " attempts to",
+                                                 ActivityLogEntryType.Task,
+                                                 ActivityStatus.running,
+                                                 TASK_LOG.FULL_LOG,
+                                                 null);
 
     this.rootActivityLogEntry = this._currentActivity;
   }
+
   /**
    * The activityLog in JSON format
    *
    * @return JSON-formatted string of the activityLog with its tree structure
    */
-  public String toJson(){
+  public String toJson() {
     return JSON.jStringify(rootActivityLogEntry.getLogTree());
   }
 }

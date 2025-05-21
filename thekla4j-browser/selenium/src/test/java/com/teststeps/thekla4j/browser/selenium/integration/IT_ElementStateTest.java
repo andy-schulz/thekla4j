@@ -1,5 +1,12 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Element;
@@ -13,19 +20,11 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
-import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class IT_ElementStateTest {
 
@@ -43,7 +42,7 @@ public class IT_ElementStateTest {
     BrowserStartupConfig config = BrowserStartupConfig.startMaximized();
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser(config)));
+        .whoCan(BrowseTheWeb.with(Selenium.browser(config)));
   }
 
   @AfterEach
@@ -61,10 +60,10 @@ public class IT_ElementStateTest {
 
     actor.attemptsTo(
 
-            Navigate.to(url),
+      Navigate.to(url),
 
-            See.ifThe(ElementState.of(clientButton))
-                .is(Expected.to.be(visible)))
+      See.ifThe(ElementState.of(clientButton))
+          .is(Expected.to.be(visible)))
 
 
         .getOrElseThrow(Function.identity());
@@ -79,10 +78,10 @@ public class IT_ElementStateTest {
 
     actor.attemptsTo(
 
-            Navigate.to(url),
+      Navigate.to(url),
 
-            See.ifThe(ElementState.of(clientButton))
-                .is(Expected.not.to.be(visible)))
+      See.ifThe(ElementState.of(clientButton))
+          .is(Expected.not.to.be(visible)))
 
 
         .getOrElseThrow(Function.identity());
@@ -97,14 +96,13 @@ public class IT_ElementStateTest {
 
     State state = actor.attemptsTo(
 
-        Navigate.to(url),
-        ElementState.of(clientButton))
+      Navigate.to(url),
+      ElementState.of(clientButton))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     assertThat("present state is false", state.isPresent(), equalTo(false));
     assertThat("visible state is false", state.isVisible(), equalTo(false));
     assertThat("enabled state is false", state.isEnabled(), equalTo(false));
   }
 }
-

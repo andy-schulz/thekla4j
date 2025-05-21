@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium.config;
 
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.addCapabilities;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.parseSeleniumConfig;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -7,12 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.addCapabilities;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.parseSeleniumConfig;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 @Log4j2
 public class TestSeleniumConfig {
@@ -26,21 +26,21 @@ public class TestSeleniumConfig {
   public void loadSeleniumConfig() {
 
     String config = """
-        defaultConfig: local
-      
-        local:
-          remoteUrl: "http://localhost:4444/wd/hub"
-          setLocalFileDetector: false
-          capabilities:
-            bStack:
-              browserstack.local: "false"
-              browserstack.debug: "true"
-              browserstack.networkLogs: "true"
-              browserstack.video: "true"
-              browserstack.timezone: "UTC"
-              browserstack.seleniumVersion: "3.141.59"
-              browserstack.seleniumLogs: "true"
-      """;
+          defaultConfig: local
+
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            setLocalFileDetector: false
+            capabilities:
+              bStack:
+                browserstack.local: "false"
+                browserstack.debug: "true"
+                browserstack.networkLogs: "true"
+                browserstack.video: "true"
+                browserstack.timezone: "UTC"
+                browserstack.seleniumVersion: "3.141.59"
+                browserstack.seleniumLogs: "true"
+        """;
 
 
     Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
@@ -54,8 +54,9 @@ public class TestSeleniumConfig {
     assertThat("check default config", seleniumConfigList.defaultConfig(), equalTo("local"));
     assertThat("has one config element", seleniumConfigList.seleniumConfigs().size(), equalTo(1));
 
-    SeleniumConfig seleniumConfig = seleniumConfigList.seleniumConfigs().get("local")
-      .getOrElseThrow(() -> new IllegalArgumentException("Cant find default selenium config 'local' in config file"));
+    SeleniumConfig seleniumConfig = seleniumConfigList.seleniumConfigs()
+        .get("local")
+        .getOrElseThrow(() -> new IllegalArgumentException("Cant find default selenium config 'local' in config file"));
 
     assertThat("check remote url", seleniumConfig.remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
 
@@ -69,14 +70,14 @@ public class TestSeleniumConfig {
   public void loadSeleniumConfigWithEmptyAppiumCapabilities() {
 
     String config = """
-        defaultConfig: local
-      
-        local:
-          remoteUrl: "http://localhost:4444/wd/hub"
-          setLocalFileDetector: false
-          capabilities:
-            appium:
-      """;
+          defaultConfig: local
+
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            setLocalFileDetector: false
+            capabilities:
+              appium:
+        """;
 
     Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
     configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
@@ -95,13 +96,13 @@ public class TestSeleniumConfig {
   public void loadSeleniumConfigWithEmptyCapabilities() {
 
     String config = """
-        defaultConfig: local
-      
-        local:
-          remoteUrl: "http://localhost:4444/wd/hub"
-          setLocalFileDetector: false
-          capabilities:
-      """;
+          defaultConfig: local
+
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            setLocalFileDetector: false
+            capabilities:
+        """;
 
     Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
     configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
@@ -120,12 +121,12 @@ public class TestSeleniumConfig {
   public void loadSeleniumConfigWithMissingCapabilities() {
 
     String config = """
-        defaultConfig: local
-      
-        local:
-          remoteUrl: "http://localhost:4444/wd/hub"
-          setLocalFileDetector: false
-      """;
+          defaultConfig: local
+
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            setLocalFileDetector: false
+        """;
 
     Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
     configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
@@ -146,19 +147,19 @@ public class TestSeleniumConfig {
     System.setProperty("thekla4j.browser.selenium.config", "setBySystem");
 
     String config = """
-        defaultConfig: local
-      
-        setBySystem:
-          remoteUrl: "http://localhost:4444/wd/hub"
-          setLocalFileDetector: false
-      """;
+          defaultConfig: local
+
+          setBySystem:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            setLocalFileDetector: false
+        """;
 
     Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
     configList.onFailure(e -> log.error("Error parsing SeleniumConfigList", e));
 
 
     Try<Option<SeleniumConfig>> seleniumConfig = configList.map(loadDefaultSeleniumConfig)
-      .onFailure(e -> log.error("Error loading SeleniumConfig", e));
+        .onFailure(e -> log.error("Error loading SeleniumConfig", e));
 
     assertThat("retrieving seleniumConfig is success", seleniumConfig.isSuccess());
     assertThat("seleniumConfig is defined", seleniumConfig.get().isDefined());

@@ -9,7 +9,7 @@ import lombok.With;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @With
-public class StompFrame <T>{
+public class StompFrame<T> {
 
   public StompCommand command;
   public StompHeaders headers;

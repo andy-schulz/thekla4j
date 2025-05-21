@@ -1,10 +1,10 @@
 package com.teststeps.thekla4j.http;
 
-import com.teststeps.thekla4j.http.spp.HttpOptions;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import com.teststeps.thekla4j.http.spp.HttpOptions;
+import org.junit.jupiter.api.Test;
 
 public class TestRedirectOptions {
 
@@ -78,7 +78,6 @@ public class TestRedirectOptions {
 
     assertThat(mergeFalseOnFalse.getFollowRedirects(), equalTo(false));
   }
-
 
 
 }

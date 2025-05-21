@@ -1,11 +1,11 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Cast;
 import io.vavr.collection.HashMap;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestCast {
 

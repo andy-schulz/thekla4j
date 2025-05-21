@@ -22,7 +22,7 @@ public class ActivityError extends Throwable {
    * @param cause   the cause of the error
    */
   public ActivityError(String message, Throwable cause) {
-    super( message, cause);
+    super(message, cause);
   }
 
   /**
@@ -79,7 +79,7 @@ public class ActivityError extends Throwable {
    * if the Try is a success, the function returns an Either.right with the value of the Try
    *
    * @param errorMessage the value to be used in the ActivityError
-   * @param <R> the type of the Try
+   * @param <R>          the type of the Try
    * @return the function
    */
   public static <R> Function1<Try<R>, Either<ActivityError, R>> toEither(String errorMessage) {

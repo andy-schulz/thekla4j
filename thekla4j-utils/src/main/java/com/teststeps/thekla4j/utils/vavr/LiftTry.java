@@ -30,8 +30,9 @@ public class LiftTry {
    * @return the function that transforms the tuple
    */
   public static <T, U> Function1<Tuple2<Try<T>, Try<U>>, Try<Tuple2<T, U>>> fromTuple2() {
-    return tuple2 -> tuple2._1().map(t -> Tuple.of(t, tuple2._2))
-                           .flatMap(t -> tuple2._2.map(u -> Tuple.of(t._1, u)));
+    return tuple2 -> tuple2._1()
+        .map(t -> Tuple.of(t, tuple2._2))
+        .flatMap(t -> tuple2._2.map(u -> Tuple.of(t._1, u)));
   }
 
 
@@ -91,9 +92,10 @@ public class LiftTry {
    * @return
    */
   public static <T, U, V> Function1<Tuple3<Try<T>, Try<U>, Try<V>>, Try<Tuple3<T, U, V>>> fromTuple3() {
-    return tuple3 -> tuple3._1().map(t -> Tuple.of(t, tuple3._2, tuple3._3))
-                           .flatMap(t -> tuple3._2.map(u -> Tuple.of(t._1, u, t._3)))
-                           .flatMap(t -> tuple3._3.map(v -> Tuple.of(t._1, t._2, v)));
+    return tuple3 -> tuple3._1()
+        .map(t -> Tuple.of(t, tuple3._2, tuple3._3))
+        .flatMap(t -> tuple3._2.map(u -> Tuple.of(t._1, u, t._3)))
+        .flatMap(t -> tuple3._3.map(v -> Tuple.of(t._1, t._2, v)));
   }
 
   public static <U1, U2, U3> Function3<Try<U1>, Try<U2>, Try<U3>, Try<Tuple3<U1, U2, U3>>> toTuple3() {
@@ -158,8 +160,8 @@ public class LiftTry {
    */
   public static <T, U, V> Function1<Tuple3<T, Try<U>, Try<V>>, Try<Tuple3<T, U, V>>> fromTuple3$2$3() {
     return tuple3 -> tuple3._2()
-                           .map(t -> Tuple.of(tuple3._1, t, tuple3._3))
-                           .flatMap(t -> tuple3._3.map(v -> Tuple.of(t._1, t._2, v)));
+        .map(t -> Tuple.of(tuple3._1, t, tuple3._3))
+        .flatMap(t -> tuple3._3.map(v -> Tuple.of(t._1, t._2, v)));
   }
 
 
@@ -190,8 +192,9 @@ public class LiftTry {
    * Try{Tuple4{T,U,V,W}}
    */
   public static <T, U, V, W> Function1<Tuple4<Try<T>, U, Try<V>, W>, Try<Tuple4<T, U, V, W>>> fromTuple4$1$3() {
-    return tuple4 -> LiftTry.<T, U, Try<V>, W>fromTuple4$1().apply(tuple4)
-                            .flatMap(LiftTry.fromTuple4$3());
+    return tuple4 -> LiftTry.<T, U, Try<V>, W>fromTuple4$1()
+        .apply(tuple4)
+        .flatMap(LiftTry.fromTuple4$3());
 
   }
 
@@ -209,7 +212,7 @@ public class LiftTry {
   }
 
 
-  public static <S,T> Function1<HashMap<Try<S>, Try<T>>, Try<HashMap<S,T>>> fromHashMap() {
+  public static <S, T> Function1<HashMap<Try<S>, Try<T>>, Try<HashMap<S, T>>> fromHashMap() {
     return hashMap -> hashMap.foldLeft(
       Try.success(HashMap.empty()),
       (theTry, entry) -> theTry.flatMap(accMap -> entry._1.flatMap(key -> entry._2.map(value -> accMap.put(key, value)))));
@@ -218,10 +221,10 @@ public class LiftTry {
 
   public static <S, T> Function1<Map<S, Try<T>>, Try<Map<S, T>>> fromMap() {
     return map -> map.foldLeft(
-        // have to remove all entries from the map as I don't know which type of map it is (e.g. HashMap, TreeMap, ...)
-        // values mapping has to be done so that the return types match, it has no effect as the map is already empty
-        Try.success(map.removeAll(map.keySet()).mapValues(Try::get)),
-        (theTry, entry) -> theTry.flatMap(newMap -> entry._2.map(value -> newMap.put(entry._1, value))));
+      // have to remove all entries from the map as I don't know which type of map it is (e.g. HashMap, TreeMap, ...)
+      // values mapping has to be done so that the return types match, it has no effect as the map is already empty
+      Try.success(map.removeAll(map.keySet()).mapValues(Try::get)),
+      (theTry, entry) -> theTry.flatMap(newMap -> entry._2.map(value -> newMap.put(entry._1, value))));
   }
 
   public static <T> Function1<List<Try<T>>, Try<List<T>>> fromList() {

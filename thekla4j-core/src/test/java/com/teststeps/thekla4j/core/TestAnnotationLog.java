@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
@@ -12,10 +16,6 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestAnnotationLog {
 
@@ -52,9 +52,9 @@ public class TestAnnotationLog {
     Actor actor = Actor.named("Tester");
 
     Either<ActivityError, Integer> result =
-      actor.attemptsTo_(
-        MissingLogAnnotationParameter.start())
-        .using(2);
+        actor.attemptsTo_(
+          MissingLogAnnotationParameter.start())
+            .using(2);
 
     // task is successful even when the value does not exist
     assertThat("task execution is successful", result.isRight());
@@ -70,7 +70,7 @@ public class TestAnnotationLog {
     Actor actor = Actor.named("Tester");
 
     Either<ActivityError, Void> result =
-      actor.attemptsTo(
+        actor.attemptsTo(
           PackagePrivateAnnotationParameter.start(1));
 
     assertThat("task execution is successful", result.isRight());
@@ -85,8 +85,8 @@ public class TestAnnotationLog {
     Actor actor = Actor.named("Tester");
 
     Either<ActivityError, Void> result =
-      actor.attemptsTo(
-        ProtectedAnnotationParameter.start(1));
+        actor.attemptsTo(
+          ProtectedAnnotationParameter.start(1));
 
     assertThat("task execution is successful", result.isRight());
     assertThat("output is as expected", result.get(), equalTo(null));
@@ -100,10 +100,11 @@ public class TestAnnotationLog {
 
 
     Try<ProcessLogAnnotation.ActivityLogData> data =
-      ProcessLogAnnotation.forActivity(AddNumber.of(1)).withParameter(1).andActor(null);
+        ProcessLogAnnotation.forActivity(AddNumber.of(1)).withParameter(1).andActor(null);
 
     assertThat("data is a failure", data.isFailure());
-    assertThat("correct description is thrown", data.getCause().getMessage(), startsWith("Property  ProcessLogAnnotation::actor is null, but should not."));
+    assertThat("correct description is thrown", data.getCause().getMessage(), startsWith(
+      "Property  ProcessLogAnnotation::actor is null, but should not."));
   }
 
   @Test
@@ -112,10 +113,11 @@ public class TestAnnotationLog {
     Actor actor = Actor.named("TestActor");
 
     Try<ProcessLogAnnotation.ActivityLogData> data =
-      ProcessLogAnnotation.forActivity(null).withParameter(1).andActor(actor);
+        ProcessLogAnnotation.forActivity(null).withParameter(1).andActor(actor);
 
     assertThat("data is a failure", data.isFailure());
-    assertThat("correct description is thrown", data.getCause().getMessage(), startsWith("Property  ProcessLogAnnotation::activity is null, but should not."));
+    assertThat("correct description is thrown", data.getCause().getMessage(), startsWith(
+      "Property  ProcessLogAnnotation::activity is null, but should not."));
   }
 
   @Test
@@ -125,7 +127,7 @@ public class TestAnnotationLog {
     Actor actor = Actor.named("TestActor");
 
     Try<ProcessLogAnnotation.ActivityLogData> data =
-      ProcessLogAnnotation.forActivity(AnnotationOnActor.start(1)).withParameter(2).andActor(actor);
+        ProcessLogAnnotation.forActivity(AnnotationOnActor.start(1)).withParameter(2).andActor(actor);
 
     assertThat("data is a success", data.isSuccess(), equalTo(true));
     assertThat("correct description is thrown", data.get().description, startsWith("parameter: 1, input: 2,  actor: @{name}"));
@@ -157,11 +159,9 @@ public class TestAnnotationLog {
 
     @Override
     protected Either<ActivityError, Integer> performAs(
-      Actor actor,
-      @Called(name = "one")
-      @Called(name = "two")
-      Integer integer
-                                                      ) {
+                                                       Actor actor, @Called(name = "one")
+                                                                     @Called(name = "two") Integer integer
+    ) {
       return Either.right(integer + 1);
     }
 
@@ -242,7 +242,6 @@ public class TestAnnotationLog {
       this.integer = integer;
     }
   }
-
 
 
 }

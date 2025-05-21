@@ -1,16 +1,5 @@
 package com.teststeps.thekla4j.http;
 
-import com.teststeps.thekla4j.http.commons.Cookie;
-import com.teststeps.thekla4j.http.spp.ContentType;
-import com.teststeps.thekla4j.http.spp.HttpHeaderType;
-import com.teststeps.thekla4j.http.spp.HttpHeaderValue;
-import com.teststeps.thekla4j.http.spp.HttpOptions;
-import io.vavr.control.Option;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
@@ -18,6 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.http.spp.ContentType;
+import com.teststeps.thekla4j.http.spp.HttpHeaderType;
+import com.teststeps.thekla4j.http.spp.HttpHeaderValue;
+import com.teststeps.thekla4j.http.spp.HttpOptions;
+import io.vavr.control.Option;
+import java.util.HashMap;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class TestHttpOption {
 
@@ -163,7 +162,7 @@ public class TestHttpOption {
   @DisplayName("Test setting a query parameter as an option")
   public void setQueryParameterAsOption() {
     HttpOptions httpOption = HttpOptions.empty()
-      .queryParameter("queryParam", Option.of("query param value"));
+        .queryParameter("queryParam", Option.of("query param value"));
 
     assertThat(httpOption.queryParameters.get("queryParam"), equalTo("query param value"));
   }
@@ -171,7 +170,7 @@ public class TestHttpOption {
   @Test
   public void setQueryParameterAsString() {
     HttpOptions httpOption = HttpOptions.empty()
-      .queryParameter("queryParam", "query param value");
+        .queryParameter("queryParam", "query param value");
 
     assertThat(httpOption.queryParameters.get("queryParam"), equalTo("query param value"));
   }
@@ -179,7 +178,7 @@ public class TestHttpOption {
   @Test
   public void setQueryParameterAsOptionNone() {
     HttpOptions httpOption = HttpOptions.empty()
-      .queryParameter("queryParam", Option.none());
+        .queryParameter("queryParam", Option.none());
 
     assertThat("no query parameter is set when option is null",
       !httpOption.queryParameters.containsKey("queryParam"));
@@ -189,7 +188,7 @@ public class TestHttpOption {
   @DisplayName("Test setting a path parameter as string")
   public void setPathParameterAsString() {
     HttpOptions httpOption = HttpOptions.empty()
-      .pathParameter("pathParam", "pathParamValue");
+        .pathParameter("pathParam", "pathParamValue");
 
     assertThat(httpOption.pathParameters.get("pathParam"), equalTo("pathParamValue"));
   }
@@ -198,7 +197,7 @@ public class TestHttpOption {
   @DisplayName("Test setting a form parameter as an option")
   public void setFormParameterAsOption() {
     HttpOptions httpOption = HttpOptions.empty()
-      .formParameter("formParam", Option.of("formParamValue"));
+        .formParameter("formParam", Option.of("formParamValue"));
 
     assertThat(httpOption.formParameters.get("formParam"), equalTo("formParamValue"));
   }
@@ -207,7 +206,7 @@ public class TestHttpOption {
   @DisplayName("Test setting a form parameter as string")
   public void setFormParameterAsString() {
     HttpOptions httpOption = HttpOptions.empty()
-      .formParameter("formParam", "formParamValue");
+        .formParameter("formParam", "formParamValue");
 
     assertThat(httpOption.formParameters.get("formParam"), equalTo("formParamValue"));
   }
@@ -216,7 +215,7 @@ public class TestHttpOption {
   @DisplayName("Test setting a form parameter as option none")
   public void setFormParameterAsOptionNone() {
     HttpOptions httpOption = HttpOptions.empty()
-      .formParameter("formParam", Option.none());
+        .formParameter("formParam", Option.none());
 
     assertThat("no form parameter is set when option is null",
       !httpOption.formParameters.containsKey("formParam"));

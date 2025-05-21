@@ -1,15 +1,15 @@
 package com.teststeps.thekla4j.core;
 
+import static com.teststeps.thekla4j.core.activities.API.run;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-
-import static com.teststeps.thekla4j.core.activities.API.run;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestRunner {
 
@@ -20,8 +20,8 @@ public class TestRunner {
 
 
     Either<ActivityError, String> result = tester.attemptsTo(
-        StringTask.of(input),
-        run(StringTask::of));
+      StringTask.of(input),
+      run(StringTask::of));
 
     assertThat("either is right", result.isRight(), equalTo(true));
     assertThat("result is as expected", result.get(), equalTo(input));

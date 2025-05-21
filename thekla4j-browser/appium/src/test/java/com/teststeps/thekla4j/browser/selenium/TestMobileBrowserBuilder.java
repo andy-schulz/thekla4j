@@ -1,5 +1,14 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.selenium.ConfigurationHelper.getDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.ConfigurationHelper.getDefaultSeleniumConfig;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
@@ -17,15 +26,6 @@ import org.mockito.MockitoAnnotations;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import static com.teststeps.thekla4j.browser.selenium.ConfigurationHelper.getDefaultBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.ConfigurationHelper.getDefaultSeleniumConfig;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mockStatic;
-
 public class TestMobileBrowserBuilder {
 
 
@@ -39,22 +39,22 @@ public class TestMobileBrowserBuilder {
   RemoteWebDriver driver;
 
   private static final String browserStringConfig = """
-      defaultConfig: Browser1
-    
-      Browser1:
-        browserName: Safari
-        platformName: Android
-        deviceName: Pixel 3
-    """;
+        defaultConfig: Browser1
+
+        Browser1:
+          browserName: Safari
+          platformName: Android
+          deviceName: Pixel 3
+      """;
 
   private static final String seleniumStringConfig = """
-    defaultConfig: local
-    
-    local:
-      remoteUrl: "http://localhost:4444/wd/hub"
-      setLocalFileDetector: false
-    
-    """;
+      defaultConfig: local
+
+      local:
+        remoteUrl: "http://localhost:4444/wd/hub"
+        setLocalFileDetector: false
+
+      """;
 
   private static BrowserConfig standardBrowserConfig;
   private static SeleniumConfig standardSeleniumConfig;
@@ -79,12 +79,11 @@ public class TestMobileBrowserBuilder {
   public void loadAppiumBrowser() {
 
 
-
     try (MockedStatic<MobileBrowser> builder = mockStatic(MobileBrowser.class)) {
 
       builder
-        .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class), any(BrowserConfig.class), any(Option.class)))
-        .thenReturn(Try.of(() -> browser));
+          .when(() -> MobileBrowser.startRemote(anyString(), any(DesiredCapabilities.class), any(BrowserConfig.class), any(Option.class)))
+          .thenReturn(Try.of(() -> browser));
 
       Browser appiumBrowser = Appium.browser();
 
@@ -101,8 +100,8 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowserBuilder> builder = mockStatic(MobileBrowserBuilder.class)) {
 
       builder
-        .when(() -> MobileBrowserBuilder.local(conf, standardBrowserConfig))
-        .thenReturn(Try.of(() -> browser));
+          .when(() -> MobileBrowserBuilder.local(conf, standardBrowserConfig))
+          .thenReturn(Try.of(() -> browser));
 
       Try<Browser> br = Appium.createBrowserWithConfig.apply(
         conf, Option.none(), Option.of(standardBrowserConfig));
@@ -119,14 +118,14 @@ public class TestMobileBrowserBuilder {
     Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
 
     DesiredCapabilities caps = MobileBrowserBuilder.createRemoteCapabilities.apply(standardBrowserConfig, standardSeleniumConfig)
-      .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
+        .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
 
 
     try (MockedStatic<MobileBrowser> br = mockStatic(MobileBrowser.class)) {
 
       br
-        .when(() -> MobileBrowser.startLocal(caps, standardBrowserConfig, conf))
-        .thenReturn(Try.of(() -> browser));
+          .when(() -> MobileBrowser.startLocal(caps, standardBrowserConfig, conf))
+          .thenReturn(Try.of(() -> browser));
 
       Try<Browser> finalBrowser = MobileBrowserBuilder.local(conf, standardBrowserConfig);
 
@@ -147,11 +146,11 @@ public class TestMobileBrowserBuilder {
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(),
       containsString("""
-        No BrowserConfig was found. To connect to a mobile device you have to specify at least the following capabilities:\s
-          browserName: "<BROWSER NAME>"
-          deviceName: "MyDevice"
-          platformName: "Android"
-        """));
+          No BrowserConfig was found. To connect to a mobile device you have to specify at least the following capabilities:\s
+            browserName: "<BROWSER NAME>"
+            deviceName: "MyDevice"
+            platformName: "Android"
+          """));
   }
 
   @Test
@@ -166,11 +165,11 @@ public class TestMobileBrowserBuilder {
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
-      Mobile Browser Config is not complete. Please provide the following capabilities:\s
-        browserName: "<BROWSER NAME>"
-        deviceName: "MyDevice"
-        platformName: "Android"
-      """));
+        Mobile Browser Config is not complete. Please provide the following capabilities:\s
+          browserName: "<BROWSER NAME>"
+          deviceName: "MyDevice"
+          platformName: "Android"
+        """));
   }
 
   @Test
@@ -185,11 +184,11 @@ public class TestMobileBrowserBuilder {
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
-      Mobile Browser Config is not complete. Please provide the following capabilities:\s
-        browserName: "<BROWSER NAME>"
-        deviceName: "MyDevice"
-        platformName: "Android"
-      """));
+        Mobile Browser Config is not complete. Please provide the following capabilities:\s
+          browserName: "<BROWSER NAME>"
+          deviceName: "MyDevice"
+          platformName: "Android"
+        """));
   }
 
   @Test
@@ -204,11 +203,11 @@ public class TestMobileBrowserBuilder {
 
     assertThat("getting browser has failed", br.isFailure());
     assertThat("browser is not null", br.getCause().getMessage(), containsString("""
-      Mobile Browser Config is not complete. Please provide the following capabilities:\s
-        browserName: "<BROWSER NAME>"
-        deviceName: "MyDevice"
-        platformName: "Android"
-      """));
+        Mobile Browser Config is not complete. Please provide the following capabilities:\s
+          browserName: "<BROWSER NAME>"
+          deviceName: "MyDevice"
+          platformName: "Android"
+        """));
   }
 
   @Test
@@ -219,11 +218,11 @@ public class TestMobileBrowserBuilder {
     try (MockedStatic<MobileBrowserBuilder> builder = mockStatic(MobileBrowserBuilder.class)) {
 
       builder
-        .when(() -> MobileBrowserBuilder.remote(
-          conf,
-          standardSeleniumConfig,
-          standardBrowserConfig))
-        .thenReturn(Try.of(() -> browser));
+          .when(() -> MobileBrowserBuilder.remote(
+            conf,
+            standardSeleniumConfig,
+            standardBrowserConfig))
+          .thenReturn(Try.of(() -> browser));
 
       Try<Browser> br = Appium.createBrowserWithConfig.apply(
         conf, Option.of(standardSeleniumConfig), Option.of(standardBrowserConfig));
@@ -240,19 +239,20 @@ public class TestMobileBrowserBuilder {
     Option<BrowserStartupConfig> conf = Option.of(BrowserStartupConfig.testName("test"));
 
     DesiredCapabilities caps = MobileBrowserBuilder.createRemoteCapabilities.apply(standardBrowserConfig, standardSeleniumConfig)
-      .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
+        .getOrElseThrow(x -> new RuntimeException("Error creating remote capabilities", x));
 
     try (MockedStatic<MobileBrowser> mobileBrowser = mockStatic(MobileBrowser.class)) {
 
-      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps, standardBrowserConfig, conf)).thenReturn(Try.of(() -> browser));
+      mobileBrowser.when(() -> MobileBrowser.startRemote(standardSeleniumConfig.remoteUrl(), caps, standardBrowserConfig, conf))
+          .thenReturn(Try.of(() -> browser));
 
-        Try<Browser> finalBrowser = MobileBrowserBuilder.remote(
-          conf,
-          standardSeleniumConfig,
-          standardBrowserConfig);
+      Try<Browser> finalBrowser = MobileBrowserBuilder.remote(
+        conf,
+        standardSeleniumConfig,
+        standardBrowserConfig);
 
-        assertThat("getting browser is successful", finalBrowser.isSuccess());
-        assertThat("browser is not null", finalBrowser.get(), equalTo(browser));
+      assertThat("getting browser is successful", finalBrowser.isSuccess());
+      assertThat("browser is not null", finalBrowser.get(), equalTo(browser));
     }
   }
 }

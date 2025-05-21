@@ -17,7 +17,7 @@ public class TaskSucceeding extends Task<Void, Integer> {
   @Override
   protected Either<ActivityError, Integer> performAs(Actor actor, Void unused) {
     counter++;
-    if(counter < tries) {
+    if (counter < tries) {
       return Either.left(new ActivityError("Task failed in attempt " + (counter - 1)));
     }
     return Either.right(counter);

@@ -1,11 +1,11 @@
 package com.teststeps.thekla4j.browser.core.properties;
 
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
+
 import com.teststeps.thekla4j.commons.properties.PropertyElement;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.properties.DefaultThekla4jProperties;
 import io.vavr.control.Option;
-
-import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
 
 
 /**
@@ -41,13 +41,15 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
   /**
    * Relative project path to store the screenshots
    */
-  SCREENSHOT_RELATIVE_PATH(PropertyElement.of("thekla4j.browser.screenshot.relativePath", Option.of(""), "Relative project path to store the screenshots")),
+  SCREENSHOT_RELATIVE_PATH(PropertyElement.of("thekla4j.browser.screenshot.relativePath", Option.of(""),
+    "Relative project path to store the screenshots")),
 
   /**
    * Absolute path to store the screenshots
    */
   SCREENSHOT_ABSOLUTE_PATH(
-    PropertyElement.of("thekla4j.browser.screenshot.absolutePath", Option.of(System.getProperty("user.dir")), "Absolute path to store the screenshots")),
+                           PropertyElement.of("thekla4j.browser.screenshot.absolutePath", Option.of(System.getProperty("user.dir")),
+                             "Absolute path to store the screenshots")),
 
   /**
    * The browser configuration to use
@@ -70,7 +72,7 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
   @Override
   public String value() {
     return Thekla4jProperty.of(property)
-      .getOrElseThrow(() -> new RuntimeException("Property not found: " + property.name() + ". Its a framework problem."));
+        .getOrElseThrow(() -> new RuntimeException("Property not found: " + property.name() + ". Its a framework problem."));
   }
 
   /**

@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -10,10 +14,6 @@ import io.vavr.control.Either;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTypeConsumerTask {
 
@@ -32,8 +32,8 @@ public class TestTypeConsumerTask {
   @Test
   public void runBasicConsumerTask() {
     Either<ActivityError, Void> result = tester.attemptsTo_(
-        ConsumeString.print())
-      .using("test");
+      ConsumeString.print())
+        .using("test");
 
     assertThat("execution of consumer task is successful", result.isRight(), equalTo(true));
   }
@@ -46,8 +46,8 @@ public class TestTypeConsumerTask {
     assertThat("toString is task name", print.toString(), equalTo("ConsumeString"));
 
     Either<ActivityError, Void> result = tester.attemptsTo_(
-        print)
-      .using("throw");
+      print)
+        .using("throw");
 
     assertThat("execution of consumer task fails", result.isLeft(), equalTo(true));
   }
@@ -98,8 +98,8 @@ public class TestTypeConsumerTask {
   public void runBasicConsumerTaskRunAs$LogAnnotator() {
 
     Either<ActivityError, Void> result = ConsumeString.print()
-      .runAs$(tester, "test")
-      .annotate("group", "description");
+        .runAs$(tester, "test")
+        .annotate("group", "description");
 
     assertThat("either is right", result.isRight(), equalTo(true));
 
@@ -117,9 +117,9 @@ public class TestTypeConsumerTask {
   public void runBasicConsumerTaskRunAs$LogAnnotatorAttemptsWith() {
 
     Either<ActivityError, Void> result = ConsumeString.print()
-      .runAs$(tester)
-      .annotate("group", "description")
-      .using("test");
+        .runAs$(tester)
+        .annotate("group", "description")
+        .using("test");
 
     assertThat("either is right", result.isRight(), equalTo(true));
 
@@ -147,8 +147,8 @@ public class TestTypeConsumerTask {
   public void runBasicConsumerTaskWithExceptionRunAsPerformerAttemptsWith() throws ActivityError {
 
     ConsumeString.print()
-      .runAs(Performer.of(tester))
-      .using("test");
+        .runAs(Performer.of(tester))
+        .using("test");
 
     assertThrows(
       ActivityError.class,
@@ -189,9 +189,9 @@ public class TestTypeConsumerTask {
   public void runBasicConsumerTaskWithExceptionRunAs$PerformerLogAnnotatorAttemptsWith() throws ActivityError {
 
     ConsumeString.print()
-      .runAs$(Performer.of(tester))
-      .annotate("group", "description")
-      .using("test");
+        .runAs$(Performer.of(tester))
+        .annotate("group", "description")
+        .using("test");
 
     TheklaActivityLog log = tester.activityLog;
     ActivityLogNode lastLog = log.getLogTree();
@@ -203,4 +203,3 @@ public class TestTypeConsumerTask {
     assertThat("task description is correct", lastLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Consume a string"));
   }
 }
-

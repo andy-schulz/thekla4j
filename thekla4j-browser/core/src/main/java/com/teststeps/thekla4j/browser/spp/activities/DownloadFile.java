@@ -7,7 +7,6 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.activities.SupplierTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-
 import java.io.File;
 import java.time.Duration;
 
@@ -23,10 +22,10 @@ public class DownloadFile extends SupplierTask<File> {
   protected Either<ActivityError, File> performAs(Actor actor) {
 
     return actor.attemptsTo(fileNameActivity)
-      .map(__ -> BrowseTheWeb.as(actor)
-          .flatMap(browser -> browser.getDownloadedFile(fileName, timeout, pollingInterval)))
-      .peekLeft(System.out::println)
-      .flatMap(ActivityError.toEither("Error downloading file: " + fileName));
+        .map(__ -> BrowseTheWeb.as(actor)
+            .flatMap(browser -> browser.getDownloadedFile(fileName, timeout, pollingInterval)))
+        .peekLeft(System.out::println)
+        .flatMap(ActivityError.toEither("Error downloading file: " + fileName));
   }
 
   public static DownloadFile by(BasicInteraction activity) {

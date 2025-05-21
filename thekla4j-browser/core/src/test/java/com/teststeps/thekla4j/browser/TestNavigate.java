@@ -1,22 +1,21 @@
 package com.teststeps.thekla4j.browser;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Try;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.function.Function;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestNavigate {
 
@@ -40,13 +39,13 @@ public class TestNavigate {
     when(chromeMock.navigateBack()).thenReturn(Try.of(() -> null));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        Navigate.back())
+      Navigate.back())
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).navigateBack();
 
@@ -57,13 +56,13 @@ public class TestNavigate {
     when(chromeMock.navigateForward()).thenReturn(Try.of(() -> null));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        Navigate.forward())
+      Navigate.forward())
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(chromeMock, times(1)).navigateForward();
 

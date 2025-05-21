@@ -21,8 +21,8 @@ public class Title extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::title)
-      .transform(TransformTry.toEither(ActivityError::of));
+        .flatMap(Browser::title)
+        .transform(TransformTry.toEither(ActivityError::of));
   }
 
   /**

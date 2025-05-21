@@ -8,12 +8,11 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.With;
 import org.springframework.messaging.simp.stomp.StompSession;
-
-import java.util.UUID;
 
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -63,7 +62,6 @@ public class SpringStompDestination implements StompDestination {
   }
 
 
-
   public Boolean equals(Destination destination) {
     return this.destination
         .map(dest -> dest.equals(destination.destination()))
@@ -88,12 +86,11 @@ public class SpringStompDestination implements StompDestination {
   public static SpringStompDestination usingSession(SpringSockJsSession session, Destination destination) {
 
     return new SpringStompDestination(
-        session,
-        Option.of(destination.destination()),
-        Option.none(),
-        Option.none(),
-        new SpringStompSessionHandler(destination.destination() + String.format(" (%s)", destination.name()))
-    );
+                                      session,
+                                      Option.of(destination.destination()),
+                                      Option.none(),
+                                      Option.none(),
+                                      new SpringStompSessionHandler(destination.destination() + String.format(" (%s)", destination.name())));
 
   }
 

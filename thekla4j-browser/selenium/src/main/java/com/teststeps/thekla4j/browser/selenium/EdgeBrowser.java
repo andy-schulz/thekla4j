@@ -1,19 +1,18 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import io.vavr.control.Option;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
-
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 /**
  * The Edge browser
@@ -44,7 +43,7 @@ class EdgeBrowser {
     options.setExperimentalOption("prefs", prefs);
 
     return SeleniumBrowser.local(new EdgeDriver(options), config, startUp)
-      .withDownloadPath(downloadFolder);
+        .withDownloadPath(downloadFolder);
   }
 
   /**

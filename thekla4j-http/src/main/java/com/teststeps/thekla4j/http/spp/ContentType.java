@@ -1,6 +1,6 @@
 package com.teststeps.thekla4j.http.spp;
 
-public enum ContentType implements HttpHeaderValue{
+public enum ContentType implements HttpHeaderValue {
   APPLICATION_JAVA_ARCHIVE("application/java-archive"),
   APPLICATION_EDI_X12("application/EDI-X12"),
   APPLICATION_JAVASCRIPT("application/javascript"),
@@ -16,7 +16,7 @@ public enum ContentType implements HttpHeaderValue{
   APPLICATION_EDIFACT("application/EDIFACT"),
 
   TEXT_PLAIN("text/plain"),
-;
+  ;
 
   private final String asString;
 

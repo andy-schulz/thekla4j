@@ -1,5 +1,12 @@
 package com.teststeps.thekla4j.browser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -10,21 +17,13 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Try;
+import java.io.File;
+import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.io.File;
-import java.time.Duration;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestDownload {
 
@@ -49,24 +48,24 @@ public class TestDownload {
   }
 
   @Test
-  public void  downloadFile() throws ActivityError {
+  public void downloadFile() throws ActivityError {
 
-    File file = new File("","");
+    File file = new File("", "");
 
     when(chromeMock.clickOn(element)).thenReturn(Try.of(() -> null));
 
     when(chromeMock.getDownloadedFile(any(String.class),
       any(Duration.class),
       any(Duration.class)))
-      .thenReturn(Try.of(() -> file));
+        .thenReturn(Try.of(() -> file));
 
-   File resultFile = DownloadFile.by(Click.on(element)).runAs(Performer.of(actor));
+    File resultFile = DownloadFile.by(Click.on(element)).runAs(Performer.of(actor));
 
     verify(chromeMock, times(1)).clickOn(element);
     verify(chromeMock, times(1))
-      .getDownloadedFile(any(String.class),
-        any(Duration.class),
-        any(Duration.class));
+        .getDownloadedFile(any(String.class),
+          any(Duration.class),
+          any(Duration.class));
 
     assertThat("returned file is correct", file.equals(resultFile), equalTo(true));
 

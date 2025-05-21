@@ -8,9 +8,9 @@ public class ClientConfiguration {
 
   public static Function1<WebSocketStompClient, Void> setTaskScheduler =
       client -> {
-    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-    scheduler.initialize();
-    client.setTaskScheduler(scheduler);
-    return null;
-  };
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.initialize();
+        client.setTaskScheduler(scheduler);
+        return null;
+      };
 }

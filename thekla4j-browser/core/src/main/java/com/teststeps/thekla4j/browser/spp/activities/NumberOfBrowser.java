@@ -19,8 +19,8 @@ public class NumberOfBrowser extends SupplierTask<Integer> {
   @Override
   protected Either<ActivityError, Integer> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::numberOfOpenTabsAndWindows)
-      .transform(ActivityError.toEither("Error while getting number of browser"));
+        .flatMap(Browser::numberOfOpenTabsAndWindows)
+        .transform(ActivityError.toEither("Error while getting number of browser"));
   }
 
   /**

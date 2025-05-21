@@ -2,18 +2,16 @@ package com.teststeps.thekla4j.websocket.stomp.spring;
 
 import com.teststeps.thekla4j.websocket.stomp.spring.functions.SpringFunctions;
 import io.vavr.control.Try;
+import java.lang.reflect.Type;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
-
-import java.lang.reflect.Type;
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Log4j2(topic = "SpringStompSessionConnectHandler")
 public class SpringStompSessionConnectHandler implements StompSessionHandler {
@@ -58,10 +56,8 @@ public class SpringStompSessionConnectHandler implements StompSessionHandler {
   }
 
   public SpringStompSessionConnectHandler(
-      String prefix,
-      CompletableFuture<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> future,
-      Duration connectionTimeout
-                                         ) {
+                                          String prefix, CompletableFuture<com.teststeps.thekla4j.websocket.stomp.core.StompHeaders> future, Duration connectionTimeout
+  ) {
     this.prefix = prefix;
     this.future = future;
     this.future.orTimeout(connectionTimeout.getSeconds(), TimeUnit.SECONDS);

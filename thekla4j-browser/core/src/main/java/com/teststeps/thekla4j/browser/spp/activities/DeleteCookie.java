@@ -23,8 +23,8 @@ public class DeleteCookie extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.deleteCookie(cookieName))
-      .transform(ActivityError.toEither(String.format("Error while deleting cookie '%s' from browser", cookieName)));
+        .flatMap(b -> b.deleteCookie(cookieName))
+        .transform(ActivityError.toEither(String.format("Error while deleting cookie '%s' from browser", cookieName)));
   }
 
   /**

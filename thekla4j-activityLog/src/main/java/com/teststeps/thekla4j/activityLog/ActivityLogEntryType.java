@@ -7,18 +7,18 @@ package com.teststeps.thekla4j.activityLog;
  * Group - a group of activities
  */
 public enum ActivityLogEntryType {
-    /**
-     * a task which can have multiple sub tasks or interactions
-     */
-    Task,
+  /**
+   * a task which can have multiple sub tasks or interactions
+   */
+  Task,
 
-    /**
-     * an interaction which is has no sub activities
-     */
-    Interaction,
-    /**
-     * a group of activities is only a container for other activities within the log
-     */
-    Group,
+  /**
+   * an interaction which is has no sub activities
+   */
+  Interaction,
+  /**
+   * a group of activities is only a container for other activities within the log
+   */
+  Group,
 
 }

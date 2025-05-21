@@ -1,7 +1,6 @@
 import com.teststeps.thekla4j.utils.yaml.YAML;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class YamlTest {
 

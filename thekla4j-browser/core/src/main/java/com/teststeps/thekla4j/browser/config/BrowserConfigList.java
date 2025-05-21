@@ -18,6 +18,7 @@ public class BrowserConfigList {
 
   /**
    * the default configuration
+   * 
    * @param defaultConfig - the default configuration
    * @return - the default configuration
    */
@@ -26,6 +27,7 @@ public class BrowserConfigList {
 
   /**
    * the browser configurations
+   * 
    * @param browserConfigs - the browser configurations
    * @return - the browser configurations
    */
@@ -42,7 +44,7 @@ public class BrowserConfigList {
   /**
    * Create a new BrowserConfigList
    *
-   * @param defaultConfig - the default configuration
+   * @param defaultConfig  - the default configuration
    * @param browserConfigs - the browser configurations
    */
   public BrowserConfigList(String defaultConfig, Map<String, BrowserConfig> browserConfigs) {
@@ -80,12 +82,12 @@ public class BrowserConfigList {
   /**
    * Set the browser configurations
    *
-   * @param key - the key of the browser configuration
+   * @param key   - the key of the browser configuration
    * @param value - the browser configuration
    */
   @JsonAnySetter
   public void browserConfigs(String key, BrowserConfig value) {
-    if(browserConfigs.containsKey(key)) {
+    if (browserConfigs.containsKey(key)) {
       throw new IllegalArgumentException("BrowserConfig with key: " + key + " already exists");
     }
     browserConfigs = browserConfigs.put(key, value);
@@ -104,8 +106,8 @@ public class BrowserConfigList {
 
   public BrowserConfigList withDefaultConfig(Option<String> defaultConfigName) {
     return defaultConfigName
-      .map(name -> new BrowserConfigList(name, browserConfigs))
-      .getOrElse(this);
+        .map(name -> new BrowserConfigList(name, browserConfigs))
+        .getOrElse(this);
   }
 
   /**

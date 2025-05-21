@@ -8,7 +8,6 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-
 import java.time.Duration;
 
 /**
@@ -24,9 +23,9 @@ public class DoKey extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.executeKeyActions(actions))
-      .transform(ActivityError.toEither("Error while executing key actions"))
-      .map(__ -> null);
+        .flatMap(b -> b.executeKeyActions(actions))
+        .transform(ActivityError.toEither("Error while executing key actions"))
+        .map(__ -> null);
   }
 
   /**

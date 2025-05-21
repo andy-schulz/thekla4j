@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.core.persona;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
@@ -9,10 +13,6 @@ import com.teststeps.thekla4j.core.tasks.FailingSupplierTask;
 import com.teststeps.thekla4j.core.tasks.SupplyNumber;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestPerformer {
 
@@ -70,6 +70,7 @@ public class TestPerformer {
         AddNumber.of(5)),
       equalTo(14));
   }
+
   @Test
   public void testPerformerFiveTasks() throws ActivityError {
     assertThat("check correct output",
@@ -81,6 +82,7 @@ public class TestPerformer {
         AddNumber.of(6)),
       equalTo(20));
   }
+
   @Test
   public void testPerformerSixTasks() throws ActivityError {
     assertThat("check correct output",

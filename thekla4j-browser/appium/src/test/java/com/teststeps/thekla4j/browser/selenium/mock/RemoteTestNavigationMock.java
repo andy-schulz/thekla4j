@@ -1,8 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.mock;
 
-import org.openqa.selenium.WebDriver;
-
 import java.net.URL;
+import org.openqa.selenium.WebDriver;
 
 public class RemoteTestNavigationMock implements WebDriver.Navigation {
   @Override

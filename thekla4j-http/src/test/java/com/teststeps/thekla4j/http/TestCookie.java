@@ -1,16 +1,15 @@
 package com.teststeps.thekla4j.http;
 
-import com.teststeps.thekla4j.http.commons.Cookie;
-import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
-import io.vavr.collection.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
+import io.vavr.collection.List;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class TestCookie {
 
@@ -227,7 +226,8 @@ public class TestCookie {
   @Test
   @DisplayName("Test cookie with domain, path, secure, httpOnly, partitioned, maxAge, sameSite and expires")
   public void cookieWithDomainPathSecureHttpOnlyPartitionedMaxAgeSameSiteAndExpires() {
-    String cookieString = "test=value; Domain=test-steps.de; Path=/; Secure; HttpOnly; Partitioned; Max-Age=100; SameSite=Strict; Expires=Wed, 09-Aug-2023 10:26:52 GMT";
+    String cookieString =
+        "test=value; Domain=test-steps.de; Path=/; Secure; HttpOnly; Partitioned; Max-Age=100; SameSite=Strict; Expires=Wed, 09-Aug-2023 10:26:52 GMT";
 
     Cookie cookie = CookieFunctions.toCookie.apply(cookieString);
 
@@ -365,7 +365,6 @@ public class TestCookie {
     String result = CookieFunctions.toCookieStringList.apply(List.of(specialCharCookie));
     assertEquals("name;=value=", result, "Cookies with special characters should be handled correctly");
   }
-
 
 
 }

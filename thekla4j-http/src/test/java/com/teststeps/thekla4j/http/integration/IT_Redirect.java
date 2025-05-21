@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.http.integration;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.http.core.HttpResult;
@@ -9,13 +12,9 @@ import com.teststeps.thekla4j.http.spp.Request;
 import com.teststeps.thekla4j.http.spp.abilities.UseTheRestApi;
 import com.teststeps.thekla4j.http.spp.activities.Get;
 import io.vavr.control.Either;
+import java.net.URISyntaxException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.net.URISyntaxException;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class IT_Redirect {
 
@@ -32,17 +31,17 @@ public class IT_Redirect {
   public void redirectRequest() throws URISyntaxException, ActivityError {
 
     Actor tester = Actor.named("Tester")
-      .whoCan(UseTheRestApi.with(HcHttpClient.using(
-        HttpOptions.empty())));
+        .whoCan(UseTheRestApi.with(HcHttpClient.using(
+          HttpOptions.empty())));
 
 
     Request request = Request.on("/redirect-to")
-      .withOptions(baseOptions
-        .queryParameter("url", "http://localhost:3001/cookies"));
+        .withOptions(baseOptions
+            .queryParameter("url", "http://localhost:3001/cookies"));
 
     Either<ActivityError, HttpResult> res = tester
-      .attemptsTo(
-        Get.from(request));
+        .attemptsTo(
+          Get.from(request));
 
     assertThat("either is right", res.isRight());
     assertThat("redirected to", res.get().response(), containsString("cookies"));

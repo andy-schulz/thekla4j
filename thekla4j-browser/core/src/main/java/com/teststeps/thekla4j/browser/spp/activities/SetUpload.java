@@ -8,10 +8,9 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import java.nio.file.Path;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-
-import java.nio.file.Path;
 
 /**
  * Set the upload files to the file input
@@ -55,10 +54,10 @@ public class SetUpload {
     protected Either<ActivityError, Void> performAs(Actor actor) {
 
       return BrowseTheWeb.as(actor)
-        .flatMap(browser -> browser.setUploadFiles(absolutFilePaths, targetFileUploadInput))
-        .transform(ActivityError.toEither("Error while trying to set the files %s to upload to the file input: %s"
-          .formatted(absolutFilePaths, targetFileUploadInput)))
-        .map(__ -> null);
+          .flatMap(browser -> browser.setUploadFiles(absolutFilePaths, targetFileUploadInput))
+          .transform(ActivityError.toEither("Error while trying to set the files %s to upload to the file input: %s"
+              .formatted(absolutFilePaths, targetFileUploadInput)))
+          .map(__ -> null);
     }
 
     /**

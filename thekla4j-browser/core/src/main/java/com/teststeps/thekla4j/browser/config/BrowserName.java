@@ -33,6 +33,7 @@ public enum BrowserName {
   SAFARI("Safari");
 
   private final String name;
+
   BrowserName(String name) {
     this.name = name;
   }

@@ -24,12 +24,13 @@ public class Map<T, R> extends Interaction<T, R> {
   @Override
   protected Either<ActivityError, R> performAs(Actor actor, T result) {
     return mapper.apply(result)
-                 .toEither()
-                 .mapLeft(ActivityError::of);
+        .toEither()
+        .mapLeft(ActivityError::of);
   }
 
   /**
    * Create a new Map activity
+   * 
    * @param mapper the function to apply to the result of the interaction
    */
   protected Map(Function1<T, Try<R>> mapper) {
@@ -39,6 +40,7 @@ public class Map<T, R> extends Interaction<T, R> {
 
   /**
    * Create a new Map activity
+   * 
    * @param mapper the function to apply to the result of the interaction
    * @param reason the reason for the activity
    */

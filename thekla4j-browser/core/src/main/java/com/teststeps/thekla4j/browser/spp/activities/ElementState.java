@@ -10,10 +10,9 @@ import com.teststeps.thekla4j.core.base.activities.SupplierTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-
-import java.util.function.Function;
 
 /**
  * Get the state of an element (visibility, enabled / disabled)
@@ -29,8 +28,8 @@ public class ElementState extends SupplierTask<State> {
   protected Either<ActivityError, State> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.getState(element))
-      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
+        .flatMap(b -> b.getState(element))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
   /**
@@ -44,54 +43,57 @@ public class ElementState extends SupplierTask<State> {
   }
 
   /**
-   * Check if the element is visible param checkForTrue - true if the element should be visible, false if it should not be visible return - a
+   * Check if the element is visible param checkForTrue - true if the element should be visible, false if it should not
+   * be visible return - a
    * SeeAssertion function that checks if the element is visible
    */
   public static Function<Boolean, SeeAssertion<State>> visible =
-    checkForTrue -> state -> {
-      String expectedMessage = checkForTrue ? "" : "not ";
-      String actualMessage = checkForTrue ? "not " : "";
+      checkForTrue -> state -> {
+        String expectedMessage = checkForTrue ? "" : "not ";
+        String actualMessage = checkForTrue ? "not " : "";
 
-      if (state.isVisible() == checkForTrue) {
-        return Either.right(null);
-      } else {
-        return Either.left(
-          ActivityError.of(String.format("%s should %sbe visible, but it is %svisible", state.element(), expectedMessage, actualMessage)));
-      }
-    };
+        if (state.isVisible() == checkForTrue) {
+          return Either.right(null);
+        } else {
+          return Either.left(
+            ActivityError.of(String.format("%s should %sbe visible, but it is %svisible", state.element(), expectedMessage, actualMessage)));
+        }
+      };
 
 
   /**
-   * Check if the element is enabled param checkForTrue - true if the element should be enabled, false if it should be disabled return - a
+   * Check if the element is enabled param checkForTrue - true if the element should be enabled, false if it should be
+   * disabled return - a
    * SeeAssertion function that checks if the element is enabled
    */
   public static Function<Boolean, SeeAssertion<State>> enabled =
-    checkForTrue -> state -> {
-      String expectedMessage = checkForTrue ? "" : "not ";
-      String actualMessage = checkForTrue ? "not " : "";
+      checkForTrue -> state -> {
+        String expectedMessage = checkForTrue ? "" : "not ";
+        String actualMessage = checkForTrue ? "not " : "";
 
-      if (state.isEnabled() == checkForTrue) {
-        return Either.right(null);
-      } else {
-        return Either.left(
-          ActivityError.of(String.format("%s should %sbe enabled, but it is %senabled", state.element(), expectedMessage, actualMessage)));
-      }
-    };
+        if (state.isEnabled() == checkForTrue) {
+          return Either.right(null);
+        } else {
+          return Either.left(
+            ActivityError.of(String.format("%s should %sbe enabled, but it is %senabled", state.element(), expectedMessage, actualMessage)));
+        }
+      };
 
   /**
-   * Check if the element is present in the DOM param checkForTrue - true if the element should be present, false if it should not be present return -
+   * Check if the element is present in the DOM param checkForTrue - true if the element should be present, false if it
+   * should not be present return -
    * a SeeAssertion function that checks if the element is present
    */
   public static Function<Boolean, SeeAssertion<State>> present =
-    checkForTrue -> state -> {
-      String expectedMessage = checkForTrue ? "" : "not ";
-      String actualMessage = checkForTrue ? "not " : "";
+      checkForTrue -> state -> {
+        String expectedMessage = checkForTrue ? "" : "not ";
+        String actualMessage = checkForTrue ? "not " : "";
 
-      if (state.isEnabled() == checkForTrue) {
-        return Either.right(null);
-      } else {
-        return Either.left(
-          ActivityError.of(String.format("%s should %sbe present in DOM, but it is %spresent", state.element(), expectedMessage, actualMessage)));
-      }
-    };
+        if (state.isEnabled() == checkForTrue) {
+          return Either.right(null);
+        } else {
+          return Either.left(
+            ActivityError.of(String.format("%s should %sbe present in DOM, but it is %spresent", state.element(), expectedMessage, actualMessage)));
+        }
+      };
 }

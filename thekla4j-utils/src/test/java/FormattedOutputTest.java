@@ -1,8 +1,8 @@
-import com.teststeps.thekla4j.utils.terminal.FormattedOutput;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import com.teststeps.thekla4j.utils.terminal.FormattedOutput;
+import org.junit.jupiter.api.Test;
 
 public class FormattedOutputTest {
 

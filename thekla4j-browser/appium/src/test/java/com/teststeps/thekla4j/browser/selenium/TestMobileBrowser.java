@@ -1,5 +1,15 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Move;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
@@ -17,6 +27,11 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,22 +45,6 @@ import org.mockito.Spy;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestMobileBrowser {
 
@@ -87,7 +86,7 @@ public class TestMobileBrowser {
     when(driverMock.switchTo()).thenReturn(webDriverTargetLocatorMock);
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(mobileBrowserMock));
+        .whoCan(BrowseTheWeb.with(mobileBrowserMock));
 
   }
 
@@ -224,10 +223,11 @@ public class TestMobileBrowser {
     org.openqa.selenium.Cookie cookie1 = new org.openqa.selenium.Cookie("testCookie1", "testCookieValue");
     org.openqa.selenium.Cookie cookie2 = new org.openqa.selenium.Cookie("testCookie2", "testCookieValue");
     org.openqa.selenium.Cookie cookie3 = new org.openqa.selenium.Cookie("testCookie3", "testCookieValue");
-    when(webDriverOptionsMock.getCookies()).thenReturn( Set.of(cookie1, cookie2, cookie3));
+    when(webDriverOptionsMock.getCookies()).thenReturn(Set.of(cookie1, cookie2, cookie3));
 
-    io.vavr.collection.List<Cookie> cookies =  GetAllCookies.fromBrowser().runAs(actor)
-      .getOrElseThrow(() -> new RuntimeException("cant get cookies"));
+    io.vavr.collection.List<Cookie> cookies = GetAllCookies.fromBrowser()
+        .runAs(actor)
+        .getOrElseThrow(() -> new RuntimeException("cant get cookies"));
 
     verify(mobileBrowserMock).getAllCookies();
     verify(webDriverOptionsMock).getCookies();
@@ -269,8 +269,9 @@ public class TestMobileBrowser {
     File screenShotDummy = new File("screenShotDummyPath");
     when(driverMock.getScreenshotAs(any())).thenReturn(screenShotDummy);
 
-    File screenshot = TakeScreenshot.ofPage().runAs(actor)
-      .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
+    File screenshot = TakeScreenshot.ofPage()
+        .runAs(actor)
+        .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
 
     verify(mobileBrowserMock).takeScreenShot();
     verify(driverMock).getScreenshotAs(any());
@@ -284,8 +285,9 @@ public class TestMobileBrowser {
     File screenShotDummy = new File("elementScreenshotDummy");
     when(webElementMock.getScreenshotAs(any())).thenReturn(screenShotDummy);
 
-    File screenshot = TakeScreenshot.ofElement(element).runAs(actor)
-      .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
+    File screenshot = TakeScreenshot.ofElement(element)
+        .runAs(actor)
+        .getOrElseThrow(() -> new RuntimeException("cant take screenshot"));
 
     verify(mobileBrowserMock).takeScreenShotOfElement(element);
     verify(webElementMock).getScreenshotAs(any());
@@ -296,7 +298,7 @@ public class TestMobileBrowser {
   @Test
   public void testDrawShape() throws ActivityError {
 
-    Shape shape = Shape.startingAt(StartPoint.on(1,1))
+    Shape shape = Shape.startingAt(StartPoint.on(1, 1))
         .moveTo(Move.right(10));
 
     Draw.shape(shape).on(element).runAs(actor);
@@ -309,8 +311,8 @@ public class TestMobileBrowser {
   @Test
   public void testDrawShapes() throws ActivityError {
 
-    Shape shape = Shape.startingAt(StartPoint.on(1,1))
-      .moveTo(Move.right(10));
+    Shape shape = Shape.startingAt(StartPoint.on(1, 1))
+        .moveTo(Move.right(10));
 
     Draw.shapes(shape, shape).on(element).runAs(actor);
 

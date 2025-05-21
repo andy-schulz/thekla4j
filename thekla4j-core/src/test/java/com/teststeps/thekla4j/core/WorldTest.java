@@ -1,15 +1,14 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.core.activities.Sleep;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.ActorsWorld;
+import java.time.Duration;
 import lombok.*;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class WorldTest {
 
@@ -19,11 +18,11 @@ public class WorldTest {
     Actor actor = Actor.named("tester")
         .withWorld(TestData.empty());
 
-    DataRetriever<Actor, TestData> world = a -> (TestData)a.getWorld();
+    DataRetriever<Actor, TestData> world = a -> (TestData) a.getWorld();
 
     actor
         .attemptsTo_(
-            Sleep.<User>forA(Duration.ofSeconds(1)))
+          Sleep.<User>forA(Duration.ofSeconds(1)))
         .using(User.empty().withUserName("MyUser"))
         .peek(user -> world.of(actor).setUser(user));
 
@@ -45,7 +44,7 @@ public class WorldTest {
 
     public static TestData empty() {
       return new TestData(
-          null);
+                          null);
     }
   }
 
@@ -58,9 +57,8 @@ public class WorldTest {
 
     public static User empty() {
       return new User(
-          "",
-          ""
-      );
+                      "",
+                      "");
     }
   }
 }

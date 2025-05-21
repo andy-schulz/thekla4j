@@ -1,5 +1,9 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
@@ -10,10 +14,6 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 public class IT_AbilityDumpTest {
   private Actor actor;
@@ -39,7 +39,7 @@ public class IT_AbilityDumpTest {
     String sessionId = browser.getSessionId().getOrElseThrow((e) -> new RuntimeException(e));
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(browser));
+        .whoCan(BrowseTheWeb.with(browser));
 
 
     actor.attemptsTo$(

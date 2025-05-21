@@ -1,8 +1,8 @@
-import com.teststeps.thekla4j.utils.url.UrlHelper;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+
+import com.teststeps.thekla4j.utils.url.UrlHelper;
+import org.junit.jupiter.api.Test;
 
 public class UrlTest {
 

@@ -33,8 +33,8 @@ public class Enter extends BasicInteraction {
     }
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.enterTextInto(text, element, clearField))
-      .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
+        .flatMap(b -> b.enterTextInto(text, element, clearField))
+        .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
   }
 
   /**

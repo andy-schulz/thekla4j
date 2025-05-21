@@ -3,8 +3,8 @@ package com.teststeps.thekla4j.core.activities;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.activities.Task;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.error.ActivityTimeOutError;
@@ -13,12 +13,11 @@ import io.vavr.Function1;
 import io.vavr.Function7;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 
 /**
  * Retry the task for as long as the timeout and retry every delay
@@ -44,11 +43,7 @@ public class Retry<I, O> extends Task<I, O> {
   @Called(name = "reason")
   private String reason;
 
-  private final Function7<Instant, Duration, Duration,
-        Function0<Either<ActivityError, O>>,
-        AttemptsWith<O, Either<ActivityError, Boolean>>,
-        Either<ActivityError, O>, String,
-        Either<ActivityError, O>> repeat =
+  private final Function7<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, AttemptsWith<O, Either<ActivityError, Boolean>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
       (ends, timeWaiting, pause, activityFunction, untilFunc, intermediateResult, taskName) -> {
 
         Function1<Either<ActivityError, O>, Function<Void, Either<ActivityError, O>>> repeatAgain =
@@ -56,15 +51,16 @@ public class Retry<I, O> extends Task<I, O> {
 
         if (ends.compareTo(Instant.now()) < 0) {
           return intermediateResult
-            .mapLeft(x -> ActivityTimeOutError.of(
-              String.format("Retrying task %s timed out after %s seconds with Error: \n\t %s",
-                taskName, timeWaiting.getSeconds(), x.getMessage())))
-            .flatMap(r -> Either.left(
-              ActivityTimeOutError.of(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s\n", taskName, timeWaiting.getSeconds(), r, reason))));
+              .mapLeft(x -> ActivityTimeOutError.of(
+                String.format("Retrying task %s timed out after %s seconds with Error: \n\t %s",
+                  taskName, timeWaiting.getSeconds(), x.getMessage())))
+              .flatMap(r -> Either.left(
+                ActivityTimeOutError.of(String.format("Retrying task %s timed out after %s seconds with result:\n\t %s \n\t message: %s\n", taskName,
+                  timeWaiting.getSeconds(), r, reason))));
         }
 
 
-        if(intermediateResult.isRight()) {
+        if (intermediateResult.isRight()) {
           Either<ActivityError, Boolean> untilBefore = untilFunc.using(intermediateResult.get());
 
           if (untilBefore.isRight() && untilBefore.get()) {
@@ -74,7 +70,7 @@ public class Retry<I, O> extends Task<I, O> {
 
         Either<ActivityError, O> actRes = activityFunction.apply();
 
-        if(actRes.isLeft()) {
+        if (actRes.isLeft()) {
           return Try.run(() -> Thread.sleep(pauseBetweenRetries.toMillis()))
               .toEither()
               .mapLeft(ActivityError::of)
@@ -84,14 +80,14 @@ public class Retry<I, O> extends Task<I, O> {
 
         Either<ActivityError, Boolean> untilResult = untilFunc.using(actRes.get());
 
-        if(untilResult.isRight() && untilResult.get()) {
+        if (untilResult.isRight() && untilResult.get()) {
           return actRes;
         } else {
 
           return Try.run(() -> Thread.sleep(pauseBetweenRetries.toMillis()))
-            .toEither()
-            .mapLeft(ActivityError::of)
-            .flatMap(repeatAgain.apply(actRes));
+              .toEither()
+              .mapLeft(ActivityError::of)
+              .flatMap(repeatAgain.apply(actRes));
         }
       };
 
@@ -102,10 +98,10 @@ public class Retry<I, O> extends Task<I, O> {
     Instant end = start.plusSeconds(forAsLongAs.getSeconds());
 
     return repeat.apply(end, forAsLongAs, pauseBetweenRetries,
-                        () -> actor.attemptsTo_(activity).using(result),
-                        actor.attemptsTo_(untilActivity),
-                        Either.left(ActivityError.of(new Throwable("not evaluated"))),
-                        activity.getClass().getSimpleName());
+      () -> actor.attemptsTo_(activity).using(result),
+      actor.attemptsTo_(untilActivity),
+      Either.left(ActivityError.of(new Throwable("not evaluated"))),
+      activity.getClass().getSimpleName());
   }
 
 
@@ -113,20 +109,21 @@ public class Retry<I, O> extends Task<I, O> {
    * Create a retry task
    *
    * @param task - the task to retry
-   * @param <K> - the input type
-   * @param <P> - the output type
+   * @param <K>  - the input type
+   * @param <P>  - the output type
    * @return - the retry task
    */
   public static <K, P> Retry<K, P> task(Activity<K, P> task) {
     return new Retry<>(task,
-        Duration.ofSeconds(5),
-        Duration.ofSeconds(1),
-        PredicateTask.of(o -> false), "until predicate not set 'Retry.task(TASK).until(PREDICATE)'");
+                       Duration.ofSeconds(5),
+                       Duration.ofSeconds(1),
+                       PredicateTask.of(o -> false), "until predicate not set 'Retry.task(TASK).until(PREDICATE)'");
   }
 
   /**
    * add the predicate to check if the task should be retried
-   * @param until - the predicate to check if the task should be retried
+   * 
+   * @param until  - the predicate to check if the task should be retried
    * @param reason - description of the retry task, will be added to the log
    * @return - the retry task
    *
@@ -139,8 +136,9 @@ public class Retry<I, O> extends Task<I, O> {
 
   /**
    * add a task which is executed to check if the task should be retried
+   * 
    * @param untilTask - the task to check if the task should be retried
-   * @param reason - description of the retry task, will be added to the log
+   * @param reason    - description of the retry task, will be added to the log
    * @return - the retry task
    *
    */
@@ -152,6 +150,7 @@ public class Retry<I, O> extends Task<I, O> {
 
   /**
    * set the duration for how long the task should be retried
+   * 
    * @param forAsLongAs - the duration for how long the task should be retried
    * @return - the retry task
    */
@@ -162,6 +161,7 @@ public class Retry<I, O> extends Task<I, O> {
 
   /**
    * set the duration between retries
+   * 
    * @param retry - the duration between retries
    * @return - the retry task
    */

@@ -7,9 +7,8 @@ import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
 import java.time.Duration;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Pause all activities for a given duration
@@ -27,7 +26,6 @@ public class Sleep<T> extends Interaction<T, T> {
 
   @Called(name = "reason")
   private String reason = "";
-
 
 
   /**

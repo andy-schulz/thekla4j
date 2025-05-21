@@ -3,9 +3,8 @@ package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.core.locator.Locator;
 import io.vavr.collection.List;
-import lombok.With;
-
 import java.time.Duration;
+import lombok.With;
 
 /**
  * A frame for an element
@@ -15,19 +14,21 @@ import java.time.Duration;
  */
 @With
 public record Frame(
-  /**
-   * the locators of the frame
-   * @param locators - the locators of the frame
-   * @return - the locators of the frame
-   */
-  List<Locator> locators,
+                    /**
+                     * the locators of the frame
+                     * 
+                     * @param locators - the locators of the frame
+                     * @return - the locators of the frame
+                     */
+                    List<Locator> locators,
 
-  /**
-   * the timeout of the frame
-   * @param timeout - the timeout of the frame
-   * @return - the timeout of the frame
-   */
-  Duration timeout
+                    /**
+                     * the timeout of the frame
+                     * 
+                     * @param timeout - the timeout of the frame
+                     * @return - the timeout of the frame
+                     */
+                    Duration timeout
 ) {
 
   /**
@@ -57,8 +58,8 @@ public record Frame(
    */
   private String locatorString(Frame frame) {
     return frame.locators
-      .map(Locator::locatorString)
-      .mkString(" > ");
+        .map(Locator::locatorString)
+        .mkString(" > ");
   }
 
   /**

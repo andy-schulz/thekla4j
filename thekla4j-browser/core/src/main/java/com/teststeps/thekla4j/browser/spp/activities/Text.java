@@ -26,8 +26,8 @@ public class Text extends SupplierTask<String> {
   protected Either<ActivityError, String> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.textOf(element))
-      .toEither(ActivityError.of("could not get text from element " + element));
+        .flatMap(b -> b.textOf(element))
+        .toEither(ActivityError.of("could not get text from element " + element));
   }
 
   /**
@@ -53,8 +53,8 @@ public class Text extends SupplierTask<String> {
     @Override
     protected Either<ActivityError, List<String>> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .flatMap(b -> b.textOfAll(element))
-        .toEither(ActivityError.of("could not get text from elements " + element));
+          .flatMap(b -> b.textOfAll(element))
+          .toEither(ActivityError.of("could not get text from elements " + element));
     }
   }
 }

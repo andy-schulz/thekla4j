@@ -5,12 +5,12 @@ package com.teststeps.thekla4j.core.base.errors;
  */
 public class DoesNotHaveLogAnnotation extends StacktraceGenerator {
 
-    /**
-     * Create a new DoesNotHaveLogAnnotation
-     *
-     * @param message - the message of the error
-     */
-    public DoesNotHaveLogAnnotation(String message) {
-        super(message);
-    }
+  /**
+   * Create a new DoesNotHaveLogAnnotation
+   *
+   * @param message - the message of the error
+   */
+  public DoesNotHaveLogAnnotation(String message) {
+    super(message);
+  }
 }

@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.TABLE;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
@@ -9,14 +12,10 @@ import com.teststeps.thekla4j.browser.spp.activities.Text;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.TABLE;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 public class IT_TextTest {
 
@@ -39,17 +38,17 @@ public class IT_TextTest {
   public void testElement() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element tableColumn = Element.found(By.xpath("//*[contains(@data-test-id, 'rowId_')]"));
 
     actor.attemptsTo(
 
-        Navigate.to(TABLE),
+      Navigate.to(TABLE),
 
-        Text.ofAll(tableColumn))
+      Text.ofAll(tableColumn))
 
-      .peek(System.out::println)
-      .getOrElseThrow(Function.identity());
+        .peek(System.out::println)
+        .getOrElseThrow(Function.identity());
   }
 }

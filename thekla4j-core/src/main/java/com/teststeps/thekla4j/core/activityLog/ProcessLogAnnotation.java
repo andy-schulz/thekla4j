@@ -1,14 +1,20 @@
 package com.teststeps.thekla4j.core.activityLog;
 
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+
 import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.CalledList;
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
-import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.errors.DetectedNullObject;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHave;
+import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function1;
 import io.vavr.Function2;
@@ -18,16 +24,9 @@ import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-
-import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
-import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This class is used to process the annotations of an activity and create a log description
@@ -142,12 +141,11 @@ public class ProcessLogAnnotation<P1, R1> {
     TASK_LOG logType = flowAnT == null ? interactionAnT.log() : flowAnT.log();
 
     return Try.of(() -> createLogDescription(
-            flowAnT != null ?
-                flowAnT.value() :
-                interactionAnT.value(),
-            clazz,
-            this.parameter
-                                            ))
+      flowAnT != null ?
+          flowAnT.value() :
+          interactionAnT.value(),
+      clazz,
+      this.parameter))
         .map(desc -> new ActivityLogData(desc, flowAnT != null ?
             ActivityLogEntryType.Task :
             ActivityLogEntryType.Interaction, logType));
@@ -158,9 +156,8 @@ public class ProcessLogAnnotation<P1, R1> {
    * filter annotations to Called and Called List
    */
   private final Function1<List<Annotation>, List<Annotation>> filterAnnotations =
-      list -> list.filter(annotation ->
-          annotation instanceof CalledList ||
-              annotation instanceof Called);
+      list -> list.filter(annotation -> annotation instanceof CalledList ||
+          annotation instanceof Called);
 
   /**
    * construct a tuple with field value and field annotations
@@ -194,7 +191,7 @@ public class ProcessLogAnnotation<P1, R1> {
           .map(t -> t.map2(List::of))
           // only Called and CalledList annotations are of interest
           .map(t -> t.map2(filterAnnotations))
-        .map(t -> t.map1(o -> o.map(r -> (Object) r)));
+          .map(t -> t.map1(o -> o.map(r -> (Object) r)));
 
 
   private final Function2<Class<?>, String, Try<Field>> getFieldByName =
@@ -206,18 +203,17 @@ public class ProcessLogAnnotation<P1, R1> {
    * get the value of fieldName from object (by reflection)
    */
   private final Function1<Class<?>, Function2<Option<Object>, String, Option<Object>>> getAttribute =
-      clazz -> (obj, fieldName) ->
-          obj.map(Object::getClass)
-              .flatMap(clz -> Try
-                  // don't try to find a field for fieldName "" in the object, just return the object
-                  .of(() -> fieldName.isEmpty() ?
-                      obj.get() :
-                      getFieldByName.apply(clz, fieldName)
-                          .mapTry(f -> f.get(obj.get()))
-                          .get())
-                  .onFailure(ex -> log.error("Error in {} -> {} in object of type {}", clazz.getSimpleName(),ex, clz.getSimpleName()))
-                  // toOption is used so that I can use flatMap
-                  .toOption());
+      clazz -> (obj, fieldName) -> obj.map(Object::getClass)
+          .flatMap(clz -> Try
+              // don't try to find a field for fieldName "" in the object, just return the object
+              .of(() -> fieldName.isEmpty() ?
+                  obj.get() :
+                  getFieldByName.apply(clz, fieldName)
+                      .mapTry(f -> f.get(obj.get()))
+                      .get())
+              .onFailure(ex -> log.error("Error in {} -> {} in object of type {}", clazz.getSimpleName(), ex, clz.getSimpleName()))
+              // toOption is used so that I can use flatMap
+              .toOption());
 
 
   private final Function1<CalledList, List<Called>> processAnnotationList =
@@ -259,9 +255,8 @@ public class ProcessLogAnnotation<P1, R1> {
           // check if multiple Called Annotations are applied
           .map(tuple -> tuple
               .map2(annotation -> Match(annotation).of(
-                  Case($(a -> a instanceof CalledList), a -> processAnnotationList.apply((CalledList) a)),
-                  Case($(a -> a instanceof Called), a -> List.of((Called) a))
-                                                      )))
+                Case($(a -> a instanceof CalledList), a -> processAnnotationList.apply((CalledList) a)),
+                Case($(a -> a instanceof Called), a -> List.of((Called) a)))))
           // flatten the annotation list again
           .flatMap(t -> t.apply((t1, t2) -> t2.map(a -> Tuple.of(t1, a))))
           // get the replacements from parameter

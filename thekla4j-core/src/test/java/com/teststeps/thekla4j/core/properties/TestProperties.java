@@ -1,13 +1,12 @@
 package com.teststeps.thekla4j.core.properties;
 
+import static com.teststeps.thekla4j.core.properties.TempFolderUtil.tempDir;
+
 import io.vavr.Function0;
 import io.vavr.control.Option;
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static com.teststeps.thekla4j.core.properties.TempFolderUtil.tempDir;
+import org.junit.jupiter.api.Test;
 
 public class TestProperties {
 

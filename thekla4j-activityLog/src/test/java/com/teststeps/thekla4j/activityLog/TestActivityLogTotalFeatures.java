@@ -1,12 +1,11 @@
 package com.teststeps.thekla4j.activityLog;
 
 import com.teststeps.thekla4j.activityLog.annotations.TASK_LOG;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestActivityLogTotalFeatures {
 
@@ -18,49 +17,44 @@ public class TestActivityLogTotalFeatures {
 
 
     grandParent = new ActivityLogEntry(
-      "Step",
-      "step description",
-      ActivityLogEntryType.Task,
-      ActivityStatus.passed,
-      TASK_LOG.FULL_LOG,
-      null
-    );
+                                       "Step",
+                                       "step description",
+                                       ActivityLogEntryType.Task,
+                                       ActivityStatus.passed,
+                                       TASK_LOG.FULL_LOG,
+                                       null);
 
     parent1 = new ActivityLogEntry(
-      "TaskONE",
-      "TaskONE description",
-      ActivityLogEntryType.Task,
-      ActivityStatus.passed,
-      TASK_LOG.FULL_LOG,
-      grandParent
-    );
+                                   "TaskONE",
+                                   "TaskONE description",
+                                   ActivityLogEntryType.Task,
+                                   ActivityStatus.passed,
+                                   TASK_LOG.FULL_LOG,
+                                   grandParent);
 
     parent2 = new ActivityLogEntry(
-      "TaskTWO",
-      "TaskTWO description",
-      ActivityLogEntryType.Task,
-      ActivityStatus.passed,
-      TASK_LOG.FULL_LOG,
-      grandParent
-    );
+                                   "TaskTWO",
+                                   "TaskTWO description",
+                                   ActivityLogEntryType.Task,
+                                   ActivityStatus.passed,
+                                   TASK_LOG.FULL_LOG,
+                                   grandParent);
 
     child1 = new ActivityLogEntry(
-      "TaskONE-Child",
-      "TaskONE-Child description",
-      ActivityLogEntryType.Interaction,
-      ActivityStatus.passed,
-      TASK_LOG.DEFAULT,
-      parent1
-    );
+                                  "TaskONE-Child",
+                                  "TaskONE-Child description",
+                                  ActivityLogEntryType.Interaction,
+                                  ActivityStatus.passed,
+                                  TASK_LOG.DEFAULT,
+                                  parent1);
 
     child2 = new ActivityLogEntry(
-      "TaskTWO-Child",
-      "TaskTWO-Child description",
-      ActivityLogEntryType.Interaction,
-      ActivityStatus.passed,
-      TASK_LOG.DEFAULT,
-      parent2
-    );
+                                  "TaskTWO-Child",
+                                  "TaskTWO-Child description",
+                                  ActivityLogEntryType.Interaction,
+                                  ActivityStatus.passed,
+                                  TASK_LOG.DEFAULT,
+                                  parent2);
 
   }
 

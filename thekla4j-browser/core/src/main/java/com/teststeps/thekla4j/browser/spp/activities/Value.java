@@ -24,8 +24,8 @@ public class Value extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.valueOf(element))
-      .toEither(ActivityError.of("could not get value from element " + element));
+        .flatMap(b -> b.valueOf(element))
+        .toEither(ActivityError.of("could not get value from element " + element));
   }
 
   /**

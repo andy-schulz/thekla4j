@@ -1,6 +1,5 @@
 package com.teststeps.thekla4j.core.data;
 
-import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 

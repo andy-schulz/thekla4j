@@ -61,11 +61,10 @@ public class HcHttpResult implements HttpResult {
 
   public String toString(int indent) {
 //    return JSON.logOf(this).replace("\n", "\t".repeat(indent) + "\n");
-        return
-            "ResponseBody: " + this.response + "\n" +
-            "StatusCode: " + this.statusCode + "\n" +
-            "Response: " + this.response  + "\n" +
-            "Headers: " + this.headers + "\n" +
-            "Cookies: " + this.cookies + "\n";
+    return "ResponseBody: " + this.response + "\n" +
+        "StatusCode: " + this.statusCode + "\n" +
+        "Response: " + this.response + "\n" +
+        "Headers: " + this.headers + "\n" +
+        "Cookies: " + this.cookies + "\n";
   }
 }

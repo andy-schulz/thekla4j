@@ -5,14 +5,13 @@ import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import com.teststeps.thekla4j.core.data.UserDataClass;
 import com.teststeps.thekla4j.core.data.UserDataRecord;
 import io.vavr.control.Either;
 
 @Workflow("task with user data name: '@{userName}'")
 public class TaskWithRecordData extends Task<Void, String> {
 
-  @Called(name ="userName", value = "name")
+  @Called(name = "userName", value = "name")
   private final UserDataRecord userData = UserDataRecord.standard();
 //
 //  @Called(name ="userName", value = "name")

@@ -24,8 +24,8 @@ public class GetCookie extends SupplierTask<Cookie> {
   @Override
   protected Either<ActivityError, Cookie> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> b.getCookie(cookieName))
-      .transform(ActivityError.toEither(String.format("Error while getting cookie '%s' from browser", cookieName)));
+        .flatMap(b -> b.getCookie(cookieName))
+        .transform(ActivityError.toEither(String.format("Error while getting cookie '%s' from browser", cookieName)));
   }
 
   /**

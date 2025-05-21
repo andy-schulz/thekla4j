@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
@@ -10,11 +15,6 @@ import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTypeInteraction {
 
@@ -97,7 +97,7 @@ public class TestTypeInteraction {
   public void runBasicSupplierTaskWithRunMethodAsPerformer() throws ActivityError {
     Actor actor = Actor.named("TestActor");
 
-    Integer result = InteractionTask.start().runAs(Performer.of(actor),3);
+    Integer result = InteractionTask.start().runAs(Performer.of(actor), 3);
 
     assertThat("result is correct", result, equalTo(3));
 

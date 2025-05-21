@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMES;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
@@ -14,15 +17,11 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.time.Duration;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMES;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 public class IT_FrameTest {
   private Actor actor;
@@ -43,12 +42,12 @@ public class IT_FrameTest {
   public void waitForElementInFrameToBeEnabled() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Frame frame = Frame.found(By.css("#iframe"));
 
     Element frameClientButton = frame.elementFound(By.css("div > #stateSwitchingButton"))
-      .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
+        .wait(UntilElement.isEnabled().forAsLongAs(Duration.ofSeconds(10)));
 
     Element header = Element.found(By.css(".headerElement"));
     Element frameHeader = frame.elementFound(By.css(".headerElement"));
@@ -56,16 +55,16 @@ public class IT_FrameTest {
 
     actor.attemptsTo(
 
-        Navigate.to(FRAMES),
+      Navigate.to(FRAMES),
 
-        Click.on(frameClientButton),
+      Click.on(frameClientButton),
 
-        See.ifThe(Text.of(header))
+      See.ifThe(Text.of(header))
           .is(Expected.to.equal("none")),
 
-        See.ifThe(Text.of(frameHeader))
+      See.ifThe(Text.of(frameHeader))
           .is(Expected.to.equal("Clicked on Button: Enabled Button")))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 }

@@ -19,8 +19,8 @@ public class RefreshCurrentBrowser extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::refresh)
-      .transform(ActivityError.toEither("Error while refreshing the browser"));
+        .flatMap(Browser::refresh)
+        .transform(ActivityError.toEither("Error while refreshing the browser"));
   }
 
   /**

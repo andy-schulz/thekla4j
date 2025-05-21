@@ -51,7 +51,7 @@ public class SeleniumConfigList {
   /**
    * Add a new SeleniumConfig to the list
    *
-   * @param key - the key of the Selenium configuration
+   * @param key   - the key of the Selenium configuration
    * @param value - the Selenium configuration
    */
   @JsonAnySetter
@@ -84,8 +84,8 @@ public class SeleniumConfigList {
 
   public SeleniumConfigList withDefaultConfig(Option<String> configName) {
     return configName
-      .map(name ->  new SeleniumConfigList(name, seleniumConfigs))
-      .getOrElse(this);
+        .map(name -> new SeleniumConfigList(name, seleniumConfigs))
+        .getOrElse(this);
   }
 
 }

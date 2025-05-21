@@ -19,8 +19,8 @@ public class DeleteAllCookies extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::deleteAllCookies)
-      .transform(ActivityError.toEither("Error while deleting all cookies from browser"));
+        .flatMap(Browser::deleteAllCookies)
+        .transform(ActivityError.toEither("Error while deleting all cookies from browser"));
   }
 
   /**

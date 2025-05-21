@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.errors.DetectedNullObject;
@@ -9,11 +14,6 @@ import com.teststeps.thekla4j.core.tasks.AddNumberToInitialNumberOne;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestActorAttemptsToMethods {
 
@@ -74,8 +74,8 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1))
-      .using(1);
+      AddNumber.of(1))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -86,9 +86,9 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -99,10 +99,10 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -113,11 +113,11 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -128,12 +128,12 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));
@@ -144,13 +144,13 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(22));
@@ -161,14 +161,14 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(29));
@@ -179,15 +179,15 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(37));
@@ -198,16 +198,16 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(46));
@@ -218,17 +218,17 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9),
-        AddNumber.of(10))
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9),
+      AddNumber.of(10))
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(56));
@@ -239,7 +239,7 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1));
+      AddNumberToInitialNumberOne.of(1));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -250,8 +250,8 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -262,9 +262,9 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -275,10 +275,10 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -289,11 +289,11 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));
@@ -304,12 +304,12 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(22));
@@ -320,13 +320,13 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(29));
@@ -337,14 +337,14 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(37));
@@ -355,15 +355,15 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(46));
@@ -374,16 +374,16 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9),
-        AddNumber.of(10));
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9),
+      AddNumber.of(10));
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(56));
@@ -394,9 +394,9 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
+      AddNumber.of(1),
       "Group", "group description")
-      .using(1);
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -417,10 +417,10 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
+      AddNumber.of(1),
+      AddNumber.of(2),
       "Group", "group description")
-      .using(1);
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -445,11 +445,11 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
       "Group", "group description")
-      .using(1);
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -478,12 +478,12 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
       "Group", "group description")
-      .using(1);
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -517,13 +517,13 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));
@@ -561,14 +561,14 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(22));
@@ -610,15 +610,15 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(29));
@@ -664,16 +664,16 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(37));
@@ -723,17 +723,17 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(46));
@@ -787,18 +787,18 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$_(
-        AddNumber.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        AddNumber.of(6),
-        AddNumber.of(7),
-        AddNumber.of(8),
-        AddNumber.of(9),
-        AddNumber.of(10),
-        "Group", "group description")
-      .using(1);
+      AddNumber.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      AddNumber.of(6),
+      AddNumber.of(7),
+      AddNumber.of(8),
+      AddNumber.of(9),
+      AddNumber.of(10),
+      "Group", "group description")
+        .using(1);
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(56));
@@ -856,8 +856,8 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$(
-        AddNumberToInitialNumberOne.of(1),
-        "Group", "group description");
+      AddNumberToInitialNumberOne.of(1),
+      "Group", "group description");
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(2));
@@ -878,9 +878,9 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        "Group", "group description");
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      "Group", "group description");
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(4));
@@ -907,10 +907,10 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        "Group", "group description");
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      "Group", "group description");
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(7));
@@ -939,11 +939,11 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        "Group", "group description");
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      "Group", "group description");
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(11));
@@ -976,12 +976,12 @@ public class TestActorAttemptsToMethods {
     Actor actor = Actor.named("Test Actor");
 
     Either<ActivityError, Integer> number = actor.attemptsTo$(
-        AddNumberToInitialNumberOne.of(1),
-        AddNumber.of(2),
-        AddNumber.of(3),
-        AddNumber.of(4),
-        AddNumber.of(5),
-        "Group", "group description");
+      AddNumberToInitialNumberOne.of(1),
+      AddNumber.of(2),
+      AddNumber.of(3),
+      AddNumber.of(4),
+      AddNumber.of(5),
+      "Group", "group description");
 
     assertThat("task execution is successful", number.isRight(), equalTo(true));
     assertThat("output is as expected", number.get(), equalTo(16));

@@ -49,8 +49,8 @@ public class SwitchToBrowser {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .flatMap(browser -> browser.switchToBrowserByTitle(title))
-        .transform(ActivityError.toEither("Error while switching to browser by title"));
+          .flatMap(browser -> browser.switchToBrowserByTitle(title))
+          .transform(ActivityError.toEither("Error while switching to browser by title"));
     }
   }
 
@@ -65,8 +65,8 @@ public class SwitchToBrowser {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .flatMap(browser -> browser.switchToBrowserByIndex(index))
-        .transform(ActivityError.toEither("Error while switching to browser by index"));
+          .flatMap(browser -> browser.switchToBrowserByIndex(index))
+          .transform(ActivityError.toEither("Error while switching to browser by index"));
     }
   }
 }

@@ -1,10 +1,10 @@
 package com.teststeps.thekla4j.core.properties;
 
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_PATH;
+
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.NonNull;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.function.Supplier;
-
-import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_PATH;
+import lombok.NonNull;
 
 public class TempFolderUtil {
 
@@ -38,15 +37,13 @@ public class TempFolderUtil {
     return dateTime.format(formatter);
   }
 
-  static Supplier<Path> baseTempPath = () ->
-    Files.exists(gradleDir) ?
+  static Supplier<Path> baseTempPath = () -> Files.exists(gradleDir) ?
       gradleDir.resolve("thekla4j") :
       Files.exists(mavenDir) ?
-        mavenDir.resolve("thekla4j") :
-        Path.of(System.getProperty("java.io.tmpdir")).resolve("thekla4j");
+          mavenDir.resolve("thekla4j") :
+          Path.of(System.getProperty("java.io.tmpdir")).resolve("thekla4j");
 
-  static Supplier<Option<String>> baseTempDir = () ->
-    Option.of(baseTempPath.get())
+  static Supplier<Option<String>> baseTempDir = () -> Option.of(baseTempPath.get())
       .map(Path::toString);
 
 
@@ -55,7 +52,7 @@ public class TempFolderUtil {
    */
   static Supplier<Option<String>> tempDir = () ->
 
-    Option.of(baseTempPath.get())
+  Option.of(baseTempPath.get())
       .map(p -> p.resolve(nowString() + "_" + TempFolderUtil.shortUUID.get()).toString());
 
   /**
@@ -65,7 +62,7 @@ public class TempFolderUtil {
    */
   public static Path directory(Path path) {
     return Try.of(() -> Files.createDirectories(path))
-      .getOrElseThrow(e -> new RuntimeException("Could not create download directory " + path, e));
+        .getOrElseThrow(e -> new RuntimeException("Could not create download directory " + path, e));
   }
 
   /**
@@ -99,10 +96,10 @@ public class TempFolderUtil {
     String uuid = UUID.randomUUID().toString().replace("-", "");
 
     return List.range(0, 8)
-      .map(__ -> Math.random() * 31)
-      .map(Double::intValue)
-      .map(i -> uuid.subSequence(i, i + 1))
-      .map(CharSequence::toString)
-      .foldLeft("", (s, i) -> s + i);
+        .map(__ -> Math.random() * 31)
+        .map(Double::intValue)
+        .map(i -> uuid.subSequence(i, i + 1))
+        .map(CharSequence::toString)
+        .foldLeft("", (s, i) -> s + i);
   };
 }

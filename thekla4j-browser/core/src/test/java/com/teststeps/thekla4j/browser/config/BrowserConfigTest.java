@@ -1,20 +1,19 @@
 package com.teststeps.thekla4j.browser.config;
 
-import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
-import com.teststeps.thekla4j.utils.yaml.YAML;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-
 import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
 import static com.teststeps.thekla4j.browser.config.ConfigFunctions.parseBrowserConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
+import com.teststeps.thekla4j.utils.yaml.YAML;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import java.io.IOException;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 @Log4j2(topic = "BrowserConfig")
 public class BrowserConfigTest {
@@ -39,63 +38,70 @@ public class BrowserConfigTest {
   public void loadBrowserConfigFile() throws IOException {
 
     String config = """
-        defaultConfig: Firefox1
-      
-        Firefox1:
-          platformName: OS X
-          osVersion: 10.15
-          browserName: Chrome
-          browserVersion: 80
-          chromeOptions:
-            headless: true
-            args:
-              - --disable-gpu
-              - --no-sandbox
-      """;
+          defaultConfig: Firefox1
 
-    BrowserConfigList browserConfigList = YAML.jParse(BrowserConfigList.class).apply(config).getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
+          Firefox1:
+            platformName: OS X
+            osVersion: 10.15
+            browserName: Chrome
+            browserVersion: 80
+            chromeOptions:
+              headless: true
+              args:
+                - --disable-gpu
+                - --no-sandbox
+        """;
+
+    BrowserConfigList browserConfigList = YAML.jParse(BrowserConfigList.class)
+        .apply(config)
+        .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
 
     assertThat("check default config", browserConfigList.defaultConfig(), equalTo("Firefox1"));
 
-    BrowserConfig browserConfig = browserConfigList.browserConfigs().get("Firefox1")
-      .getOrElseThrow(() -> new IllegalArgumentException("Cant find default browser config 'Firefox1' in config file"));
+    BrowserConfig browserConfig = browserConfigList.browserConfigs()
+        .get("Firefox1")
+        .getOrElseThrow(() -> new IllegalArgumentException("Cant find default browser config 'Firefox1' in config file"));
 
     assertThat("check OS type", browserConfig.platformName().toString(), equalTo("MAC"));
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
     assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
-    assertThat("check ChromeOptions", browserConfig.chromeOptions().toString(), equalTo("ChromeOptions{binary='null', headless=true, args=[--disable-gpu, --no-sandbox], debugOptions='null'}"));
+    assertThat("check ChromeOptions", browserConfig.chromeOptions().toString(), equalTo(
+      "ChromeOptions{binary='null', headless=true, args=[--disable-gpu, --no-sandbox], debugOptions='null'}"));
   }
 
   @Test
   public void loadMultipleBrowserConfigs() throws IOException {
 
     String config = """
-        defaultConfig: Browser2
-      
-        Browser1:
-          platformName: OS X
-          osVersion: 10.15
-          browserName: Chrome
-          browserVersion: 80
-          chromeOptions:
-            headless: true
-            args:
-              - --disable-gpu
-              - --no-sandbox
-        Browser2:
-          platformName: Windows
-          osVersion: 10
-          browserName: Edge
-          browserVersion: 81
-      """;
+          defaultConfig: Browser2
 
-    BrowserConfigList browserConfigList = YAML.jParse(BrowserConfigList.class).apply(config).getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
+          Browser1:
+            platformName: OS X
+            osVersion: 10.15
+            browserName: Chrome
+            browserVersion: 80
+            chromeOptions:
+              headless: true
+              args:
+                - --disable-gpu
+                - --no-sandbox
+          Browser2:
+            platformName: Windows
+            osVersion: 10
+            browserName: Edge
+            browserVersion: 81
+        """;
+
+    BrowserConfigList browserConfigList = YAML.jParse(BrowserConfigList.class)
+        .apply(config)
+        .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
 
     assertThat("check default config", browserConfigList.defaultConfig(), equalTo("Browser2"));
 
-    BrowserConfig browserConfig = browserConfigList.browserConfigs().get("Browser2")
-      .getOrElseThrow(() -> new IllegalArgumentException("Cant find default browser config 'Firefox1' in config file"));
+    BrowserConfig browserConfig = browserConfigList.browserConfigs()
+        .get("Browser2")
+        .getOrElseThrow(() -> new IllegalArgumentException("Cant find default browser config 'Firefox1' in config file"));
 
     assertThat("check OS type", browserConfig.platformName().getName(), equalTo("Windows"));
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10"));
@@ -106,31 +112,31 @@ public class BrowserConfigTest {
   @Test
   public void testConfigWithSameNameThrowsError() {
     String config = """
-        defaultConfig: Browser2
-      
-        Browser1:
-          platformName: OS X
-          osVersion: 10.15
-          browserName: Chrome
-          browserVersion: 80
-          chromeOptions:
-            headless: true
-            args:
-              - --disable-gpu
-              - --no-sandbox
-      
-        Browser2:
-          platformName: Windows
-          osVersion: 10
-          browserName: Edge
-          browserVersion: 81
-      
-        Browser2:
-          platformName: Linux
-          osVersion: 22
-          browserName: Firefox
-          browserVersion: 100
-      """;
+          defaultConfig: Browser2
+
+          Browser1:
+            platformName: OS X
+            osVersion: 10.15
+            browserName: Chrome
+            browserVersion: 80
+            chromeOptions:
+              headless: true
+              args:
+                - --disable-gpu
+                - --no-sandbox
+
+          Browser2:
+            platformName: Windows
+            osVersion: 10
+            browserName: Edge
+            browserVersion: 81
+
+          Browser2:
+            platformName: Linux
+            osVersion: 22
+            browserName: Firefox
+            browserVersion: 100
+        """;
 
     Try<BrowserConfigList> browserConfigList = YAML.jParse(config, BrowserConfigList.class);
 
@@ -143,13 +149,15 @@ public class BrowserConfigTest {
   public void loadSimpleBrowserConfigFile() throws IOException {
 
     String config = """
-        platformName: OS X
-        osVersion: 10.15
-        browserName: Chrome
-        browserVersion: 80
-      """;
+          platformName: OS X
+          osVersion: 10.15
+          browserName: Chrome
+          browserVersion: 80
+        """;
 
-    BrowserConfig browserConfig = YAML.jParse(BrowserConfig.class).apply(config).getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
+    BrowserConfig browserConfig = YAML.jParse(BrowserConfig.class)
+        .apply(config)
+        .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
 
     assertThat("check OS type", browserConfig.platformName().toString(), equalTo("MAC"));
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
@@ -161,17 +169,17 @@ public class BrowserConfigTest {
   @Test
   public void loadBrowserConfigBySystemValue() {
     String config = """
-        defaultConfig: doesNotExist
-      
-        osx:
-          platformName: OS X
-          browserName: Chrome
-      
-        windows:
-          platformName: Windows
-          browserName: Edge
-          browserVersion: 81
-      """;
+          defaultConfig: doesNotExist
+
+          osx:
+            platformName: OS X
+            browserName: Chrome
+
+          windows:
+            platformName: Windows
+            browserName: Edge
+            browserVersion: 81
+        """;
 
     System.setProperty("thekla4j.browser.config", "windows");
 
@@ -180,7 +188,7 @@ public class BrowserConfigTest {
 
 
     Try<Option<BrowserConfig>> browserConfig = configList.map(loadDefaultBrowserConfig)
-      .onFailure(e -> log.error("Error loading SeleniumConfig", e));
+        .onFailure(e -> log.error("Error loading SeleniumConfig", e));
 
     assertThat("retrieving seleniumConfig is success", browserConfig.isSuccess());
     assertThat("seleniumConfig is defined", browserConfig.get().isDefined());
@@ -193,30 +201,30 @@ public class BrowserConfigTest {
   public void printBrowserConfigHelp() {
 
     String expectedHelp = """
-      browserConfigName:
-        browserName: BrowserName < chrome | firefox | edge | safari >
-        browserVersion: String, <optional>
-        platformName: OperatingSystem, < windows | linux | mac >
-        osVersion: String, <optional>
-        deviceName: String, <optional, mandatory for mobile devices>
-        enableFileUpload: Boolean, <optional, default: false>
-        enableFileDownload: Boolean, <optional, default: false>
-        chromeOptions: ChromeOptions, <optional>
-          binary: "/path/to/binary" # the path to the binary
-          headless: true/false # if the browser should be headless
-          args: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"]
-          debug: # chrome debugging options
-            debuggerAddress: "localhost:9222"
-            downloadPath: "absolute/path/to/downloads"
-      
-        firefoxOptions: # FirefoxOptions, <optional>
-          args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
-      
-        video: # VideoConfig, <optional>
-          record: true / false
-          relativePath: "path/to/video"
-          filePrefix: "FilePrefix"
-      """;
+        browserConfigName:
+          browserName: BrowserName < chrome | firefox | edge | safari >
+          browserVersion: String, <optional>
+          platformName: OperatingSystem, < windows | linux | mac >
+          osVersion: String, <optional>
+          deviceName: String, <optional, mandatory for mobile devices>
+          enableFileUpload: Boolean, <optional, default: false>
+          enableFileDownload: Boolean, <optional, default: false>
+          chromeOptions: ChromeOptions, <optional>
+            binary: "/path/to/binary" # the path to the binary
+            headless: true/false # if the browser should be headless
+            args: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"]
+            debug: # chrome debugging options
+              debuggerAddress: "localhost:9222"
+              downloadPath: "absolute/path/to/downloads"
+
+          firefoxOptions: # FirefoxOptions, <optional>
+            args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
+
+          video: # VideoConfig, <optional>
+            record: true / false
+            relativePath: "path/to/video"
+            filePrefix: "FilePrefix"
+        """;
     String help = BrowserConfig.help();
 
     assertThat("help is printed", help.trim().strip(), equalTo(expectedHelp.trim().strip()));

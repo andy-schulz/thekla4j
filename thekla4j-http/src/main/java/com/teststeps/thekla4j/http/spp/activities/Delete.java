@@ -7,11 +7,11 @@ import com.teststeps.thekla4j.http.spp.Request;
 @Action("DELETE from resource: '@{resource}' with options: @{options}")
 public class Delete extends RequestInteraction<Delete> {
 
-    public static Delete from(Request request) {
-        return new Delete(request);
-    }
+  public static Delete from(Request request) {
+    return new Delete(request);
+  }
 
-    private Delete(Request request) {
-        super(request, HttpRequest::delete);
-    }
+  private Delete(Request request) {
+    super(request, HttpRequest::delete);
+  }
 }

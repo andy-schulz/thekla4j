@@ -5,12 +5,12 @@ package com.teststeps.thekla4j.core.base.errors;
  */
 public class DoesNotHaveTheAbility extends StacktraceGenerator {
 
-    /**
-     * Create a new DoesNotHaveTheAbility
-     *
-     * @param message - the message of the error
-     */
-    public DoesNotHaveTheAbility(String message) {
-        super(message);
-    }
+  /**
+   * Create a new DoesNotHaveTheAbility
+   *
+   * @param message - the message of the error
+   */
+  public DoesNotHaveTheAbility(String message) {
+    super(message);
+  }
 }

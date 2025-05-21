@@ -16,12 +16,13 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
 
 
   @Override
-  final protected Either<ActivityError, RT> perform(@NonNull Actor actor, Void result){
+  final protected Either<ActivityError, RT> perform(@NonNull Actor actor, Void result) {
     return performAs(actor);
   }
 
   /**
    * return the name of the task
+   * 
    * @return the name of the task
    */
   @Override
@@ -61,8 +62,8 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
   /**
    * run the task as the given actor
    *
-   * @param actor the actor to run the task as
-   * @param group the group name used in the log file
+   * @param actor       the actor to run the task as
+   * @param group       the group name used in the log file
    * @param description the description used in the log file
    * @return the result of the task
    */
@@ -83,8 +84,8 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
   /**
    * run the task as the given performer
    *
-   * @param performer the actor to run the task as
-   * @param group the group name used in the log file
+   * @param performer   the actor to run the task as
+   * @param group       the group name used in the log file
    * @param description the description used in the log file
    * @return the result of the task
    * @throws ActivityError if the task fails

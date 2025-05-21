@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
+import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -15,19 +21,12 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
-import static com.teststeps.thekla4j.browser.spp.activities.ElementState.visible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class IT_KeyActionTest {
 
@@ -49,7 +48,7 @@ public class IT_KeyActionTest {
   public void testKeyPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     String url = FRAMEWORKTESTER;
 
@@ -57,22 +56,22 @@ public class IT_KeyActionTest {
 
 
     actor.attemptsTo(
-        Navigate.to(url),
+      Navigate.to(url),
 
-        DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER),
+      DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER),
 
-        See.ifThe(ElementState.of(clientButton))
+      See.ifThe(ElementState.of(clientButton))
           .is(Expected.to.be(visible))
           .forAsLongAs(Duration.ofSeconds(5)))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 
   @Test
   public void testKeyPressSequence() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     String url = FRAMEWORKTESTER;
 
@@ -80,22 +79,22 @@ public class IT_KeyActionTest {
 
 
     actor.attemptsTo(
-        Navigate.to(url),
-        Click.on(nameField),
-        DoKey.press("1234"),
+      Navigate.to(url),
+      Click.on(nameField),
+      DoKey.press("1234"),
 
-        See.ifThe(Value.of(nameField))
+      See.ifThe(Value.of(nameField))
           .is(Expected.to.equal("1234"))
           .forAsLongAs(Duration.ofSeconds(5)))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 
   @Test
   public void testKeyPressSequenceAfterSequence() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     String url = FRAMEWORKTESTER;
 
@@ -103,22 +102,22 @@ public class IT_KeyActionTest {
 
 
     actor.attemptsTo(
-        Navigate.to(url),
-        Click.on(nameField),
-        DoKey.press("1234").thenPress("56"),
+      Navigate.to(url),
+      Click.on(nameField),
+      DoKey.press("1234").thenPress("56"),
 
-        See.ifThe(Value.of(nameField))
+      See.ifThe(Value.of(nameField))
           .is(Expected.to.equal("123456"))
           .forAsLongAs(Duration.ofSeconds(5)))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 
   @Test
   public void testKeyPressSequenceAfterSequenceWithPause() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     String url = FRAMEWORKTESTER;
 
@@ -128,17 +127,17 @@ public class IT_KeyActionTest {
     Instant start = Instant.now();
 
     actor.attemptsTo(
-        Navigate.to(url),
-        Click.on(nameField),
-        DoKey.press("1234")
+      Navigate.to(url),
+      Click.on(nameField),
+      DoKey.press("1234")
           .thenPause(Duration.ofSeconds(10))
           .thenPress("56"),
 
-        See.ifThe(Value.of(nameField))
+      See.ifThe(Value.of(nameField))
           .is(Expected.to.equal("123456"))
           .forAsLongAs(Duration.ofSeconds(5)))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     assertThat("Pause duration is correct",
       Duration.between(start, Instant.now()).toMillis(),
@@ -149,7 +148,7 @@ public class IT_KeyActionTest {
   public void testMultipleKeyPressActions() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(Selenium.browser()));
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     String url = FRAMEWORKTESTER;
 
@@ -157,17 +156,17 @@ public class IT_KeyActionTest {
 
 
     actor.attemptsTo(
-        Navigate.to(url),
+      Navigate.to(url),
 
-        DoKey.press(Key.TAB),
-        DoKey.press(Key.TAB),
-        DoKey.press(Key.TAB),
-        DoKey.press(Key.ENTER),
+      DoKey.press(Key.TAB),
+      DoKey.press(Key.TAB),
+      DoKey.press(Key.TAB),
+      DoKey.press(Key.ENTER),
 
-        See.ifThe(ElementState.of(clientButton))
+      See.ifThe(ElementState.of(clientButton))
           .is(Expected.to.be(visible))
           .forAsLongAs(Duration.ofSeconds(5)))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
   }
 }

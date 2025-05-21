@@ -1,7 +1,6 @@
 package com.teststeps.thekla4j.utils.terminal;
 
 import io.vavr.Function2;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,13 +31,14 @@ public class FormattedOutput {
 
 
   private static final Function2<String, String, String> addColorMultiline =
-    (text, color) -> Stream.of(text.split("\n")).map(t -> color + t + ANSI_RESET)
-      .collect(Collectors.joining("\n"));
+      (text, color) -> Stream.of(text.split("\n"))
+          .map(t -> color + t + ANSI_RESET)
+          .collect(Collectors.joining("\n"));
 
   /**
    * Add color BLACK to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String BLACK(String text) {
@@ -48,7 +48,7 @@ public class FormattedOutput {
   /**
    * Add color RED to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String RED(String text) {
@@ -58,7 +58,7 @@ public class FormattedOutput {
   /**
    * Add color GREEN to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String GREEN(String text) {
@@ -68,7 +68,7 @@ public class FormattedOutput {
   /**
    * Add color YELLOW to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String YELLOW(String text) {
@@ -78,7 +78,7 @@ public class FormattedOutput {
   /**
    * Add color BLUE to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String BLUE(String text) {
@@ -88,7 +88,7 @@ public class FormattedOutput {
   /**
    * Add color PURPLE to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String PURPLE(String text) {
@@ -98,7 +98,7 @@ public class FormattedOutput {
   /**
    * Add color CYAN to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String CYAN(String text) {
@@ -108,7 +108,7 @@ public class FormattedOutput {
   /**
    * Add color WHITE to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String WHITE(String text) {
@@ -118,7 +118,7 @@ public class FormattedOutput {
   /**
    * make the text BOLD
    *
-   * @param text  text to format
+   * @param text text to format
    * @return formatted text
    */
   public static String BOLD(String text) {
@@ -128,7 +128,7 @@ public class FormattedOutput {
   /**
    * make the text ITALIC
    *
-   * @param text  text to format
+   * @param text text to format
    * @return formatted text
    */
   public static String ITALIC(String text) {
@@ -138,7 +138,7 @@ public class FormattedOutput {
   /**
    * make the text UNDERLINE
    *
-   * @param text  text to format
+   * @param text text to format
    * @return formatted text
    */
   public static String UNDERLINE(String text) {
@@ -148,7 +148,7 @@ public class FormattedOutput {
   /**
    * Add color BLACK_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String BLACK_BG(String text) {
@@ -158,7 +158,7 @@ public class FormattedOutput {
   /**
    * Add color RED_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String RED_BG(String text) {
@@ -168,7 +168,7 @@ public class FormattedOutput {
   /**
    * Add color GREEN_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String GREEN_BG(String text) {
@@ -178,7 +178,7 @@ public class FormattedOutput {
   /**
    * Add color YELLOW_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String YELLOW_BG(String text) {
@@ -188,7 +188,7 @@ public class FormattedOutput {
   /**
    * Add color BLUE_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String BLUE_BG(String text) {
@@ -198,7 +198,7 @@ public class FormattedOutput {
   /**
    * Add color PURPLE_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String PURPLE_BG(String text) {
@@ -208,7 +208,7 @@ public class FormattedOutput {
   /**
    * Add color CYAN_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String CYAN_BG(String text) {
@@ -218,7 +218,7 @@ public class FormattedOutput {
   /**
    * Add color WHITE_BACKGROUND to the text
    *
-   * @param text  text to color
+   * @param text text to color
    * @return colored text
    */
   public static String WHITE_BG(String text) {

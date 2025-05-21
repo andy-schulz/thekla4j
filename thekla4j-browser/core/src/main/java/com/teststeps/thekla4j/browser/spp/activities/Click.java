@@ -29,10 +29,10 @@ public class Click extends BasicInteraction {
   protected Either<ActivityError, Void> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
-      .flatMap(b -> position.isEmpty() ? b.clickOn(element) : b.clickOnPositionInsideElement(element, position.get()))
-      .onSuccess(__ -> log.info("Clicked on element: {}{}", element,
-        position.map(p -> String.format(" at position: %s", p)).getOrElse("")))
-      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
+        .flatMap(b -> position.isEmpty() ? b.clickOn(element) : b.clickOnPositionInsideElement(element, position.get()))
+        .onSuccess(__ -> log.info("Clicked on element: {}{}", element,
+          position.map(p -> String.format(" at position: %s", p)).getOrElse("")))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
   /**
@@ -52,8 +52,8 @@ public class Click extends BasicInteraction {
    * @param y - the y coordinate
    * @return - a new Click activity
    */
-    public Click atPosition(int x, int y) {
-    this.position = Option.of(StartPoint.on(x,y));
+  public Click atPosition(int x, int y) {
+    this.position = Option.of(StartPoint.on(x, y));
     return this;
   }
 

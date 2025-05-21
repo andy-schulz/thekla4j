@@ -15,7 +15,7 @@ public class AddNumber extends Task<Integer, Integer> {
 
   @Override
   protected Either<ActivityError, Integer> performAs(
-    Actor actor, @Called(name = "givenNumber") Integer result) {
+                                                     Actor actor, @Called(name = "givenNumber") Integer result) {
     return Either.right(result + number);
   }
 

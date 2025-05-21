@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.http.integration;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.http.commons.Cookie;
@@ -10,14 +13,10 @@ import com.teststeps.thekla4j.http.spp.Request;
 import com.teststeps.thekla4j.http.spp.abilities.UseTheRestApi;
 import com.teststeps.thekla4j.http.spp.activities.Post;
 import io.vavr.collection.List;
+import java.util.function.Function;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Function;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 @Log4j2(topic = "GetTest")
 public class IT_Post {
@@ -54,10 +53,9 @@ public class IT_Post {
         .withOptions(HttpOptions.empty().cookies(List.of(replacedCookie)));
 
     tester.attemptsTo(
-            Post.to(postRequest).options(opts))
+      Post.to(postRequest).options(opts))
         .peek(r -> assertThat("request used Cookies", r.response(),
-            containsString("\"Cookie\": \"JSESSION=DSKDNFKDDFJKNVJVN;JSESSION2=1231234523465235656\"")
-        ))
+          containsString("\"Cookie\": \"JSESSION=DSKDNFKDDFJKNVJVN;JSESSION2=1231234523465235656\"")))
         .getOrElseThrow(Function.identity());
   }
 

@@ -15,7 +15,7 @@ public abstract class Activity<PT, RT> {
   /**
    * Perform the activity as the given actor
    *
-   * @param actor the actor to perform the activity as
+   * @param actor  the actor to perform the activity as
    * @param result the input to the activity
    * @return the result of the activity
    */

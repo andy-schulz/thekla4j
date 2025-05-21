@@ -20,6 +20,7 @@ public class FailingTaskWithTwoAttachOnError extends Task<Void, String> {
 
   @AttachOnError(name = "secondAttachOnError", type = LogAttachmentType.TEXT_PLAIN)
   private String secondAttachOnError;
+
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, Void result) {
 

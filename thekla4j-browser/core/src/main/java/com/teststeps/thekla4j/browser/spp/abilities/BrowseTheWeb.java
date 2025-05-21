@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.spp.abilities;
 
+import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.takeScreenshot;
+
 import com.teststeps.thekla4j.activityLog.data.LogAttachment;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
@@ -9,8 +11,6 @@ import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
 import io.vavr.collection.List;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
-
-import static com.teststeps.thekla4j.browser.core.helper.ScreenshotFunctions.takeScreenshot;
 
 /**
  * BrowseTheWeb Ability
@@ -47,7 +47,7 @@ public class BrowseTheWeb implements Ability {
   @Override
   public void destroy() {
     browser.quit()
-      .onFailure(log::error);
+        .onFailure(log::error);
   }
 
   /**
@@ -59,12 +59,11 @@ public class BrowseTheWeb implements Ability {
   public List<NodeAttachment> abilityLogDump() {
 
     return takeScreenshot(browser)
-      .map(screenshot ->
-        new LogAttachment("screenshot", screenshot.getAbsolutePath(), LogAttachmentType.IMAGE_PNG))
-      .map(List::<NodeAttachment>of)
-      .peekLeft(log::error)
-      .getOrElseGet(x -> List.of(
-        new LogAttachment("screenshotError", x.getMessage(), LogAttachmentType.TEXT_PLAIN)));
+        .map(screenshot -> new LogAttachment("screenshot", screenshot.getAbsolutePath(), LogAttachmentType.IMAGE_PNG))
+        .map(List::<NodeAttachment>of)
+        .peekLeft(log::error)
+        .getOrElseGet(x -> List.of(
+          new LogAttachment("screenshotError", x.getMessage(), LogAttachmentType.TEXT_PLAIN)));
   }
 
   private BrowseTheWeb(Browser browser) {

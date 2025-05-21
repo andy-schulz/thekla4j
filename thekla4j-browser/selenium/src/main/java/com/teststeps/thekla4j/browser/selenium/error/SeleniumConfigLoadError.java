@@ -38,7 +38,7 @@ public class SeleniumConfigLoadError extends Throwable {
    * Create a new SeleniumConfigLoadError
    *
    * @param message - the message
-   * @param cause - the cause
+   * @param cause   - the cause
    * @return - the SeleniumConfigLoadError
    */
   public static SeleniumConfigLoadError with(String message, Throwable cause) {

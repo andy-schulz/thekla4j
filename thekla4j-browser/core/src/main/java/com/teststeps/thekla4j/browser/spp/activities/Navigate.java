@@ -28,9 +28,9 @@ public class Navigate extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .peek(browser -> log.info("Navigating to {}", url))
-      .flatMap(browser -> browser.navigateTo(url))
-      .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage() + " while navigating to " + url)));
+        .peek(browser -> log.info("Navigating to {}", url))
+        .flatMap(browser -> browser.navigateTo(url))
+        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage() + " while navigating to " + url)));
   }
 
   /**
@@ -66,9 +66,9 @@ public class Navigate extends BasicInteraction {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .peek(browser -> log.info("Navigating back"))
-        .flatMap(Browser::navigateBack)
-        .transform(ActivityError.toEither("Error while navigating back"));
+          .peek(browser -> log.info("Navigating back"))
+          .flatMap(Browser::navigateBack)
+          .transform(ActivityError.toEither("Error while navigating back"));
     }
   }
 
@@ -77,9 +77,9 @@ public class Navigate extends BasicInteraction {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .peek(browser -> log.info("Navigating forward"))
-        .flatMap(Browser::navigateForward)
-        .transform(ActivityError.toEither("Error while navigating forward"));
+          .peek(browser -> log.info("Navigating forward"))
+          .flatMap(Browser::navigateForward)
+          .transform(ActivityError.toEither("Error while navigating forward"));
     }
   }
 }

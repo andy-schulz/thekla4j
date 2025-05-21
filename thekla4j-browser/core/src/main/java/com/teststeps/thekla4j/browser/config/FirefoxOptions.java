@@ -4,10 +4,11 @@ import java.util.List;
 
 /**
  * The options for the Firefox browser
+ * 
  * @param args - the arguments for the browser
  */
 public record FirefoxOptions(
-  List<String> args) {
+                             List<String> args) {
 
   /**
    * get a string representation of the firefox options
@@ -15,13 +16,13 @@ public record FirefoxOptions(
   @Override
   public String toString() {
     return "FirefoxOptions{" +
-      "args=" + args +
-      '}';
+        "args=" + args +
+        '}';
   }
 
   public static String help() {
     return """
-      args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
-      """;
+        args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
+        """;
   }
 }

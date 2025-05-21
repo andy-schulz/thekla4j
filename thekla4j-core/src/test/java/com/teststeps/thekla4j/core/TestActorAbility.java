@@ -1,5 +1,12 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.errors.DoesNotHaveTheAbility;
@@ -9,13 +16,6 @@ import com.teststeps.thekla4j.core.data.SomeAbility;
 import io.vavr.collection.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class TestActorAbility {
 
@@ -76,7 +76,8 @@ public class TestActorAbility {
     assertThat("check actor has second ability", retrievedSecondAbility, equalTo(secondAbility));
   }
 
-  @Test void actorHasMultipleAbilitiesAddedInOneCall() {
+  @Test
+  void actorHasMultipleAbilitiesAddedInOneCall() {
     Actor actor = Actor.named("actor");
 
     FirstAbility firstAbility = new FirstAbility();
@@ -133,7 +134,6 @@ public class TestActorAbility {
 
     assertThat(thrown.getMessage(), startsWith("Actor actor does not have the ability SomeAbility"));
   }
-
 
 
   static class FirstAbility implements Ability {

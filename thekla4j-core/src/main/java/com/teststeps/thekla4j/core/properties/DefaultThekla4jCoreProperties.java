@@ -1,12 +1,12 @@
 package com.teststeps.thekla4j.core.properties;
 
-import com.teststeps.thekla4j.commons.properties.PropertyElement;
-import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
-import io.vavr.control.Option;
-
 import static com.teststeps.thekla4j.core.properties.DefaultThekla4jFunctions.helpText;
 import static com.teststeps.thekla4j.core.properties.TempFolderUtil.baseTempDir;
 import static com.teststeps.thekla4j.core.properties.TempFolderUtil.tempDir;
+
+import com.teststeps.thekla4j.commons.properties.PropertyElement;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
+import io.vavr.control.Option;
 
 public enum DefaultThekla4jCoreProperties implements DefaultThekla4jProperties {
 
@@ -32,7 +32,7 @@ public enum DefaultThekla4jCoreProperties implements DefaultThekla4jProperties {
   @Override
   public String value() {
     return Thekla4jProperty.of(property)
-      .getOrElseThrow(() -> new RuntimeException("Property not found: " + property.name() + ". Its a framework problem."));
+        .getOrElseThrow(() -> new RuntimeException("Property not found: " + property.name() + ". Its a framework problem."));
   }
 
   /**

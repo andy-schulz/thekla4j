@@ -25,7 +25,7 @@ public class API {
    * create a map task that applies the given mapper function to the input and passes the given reason to the task
    * the reason is used in the activity log to describe the task
    *
-   * @param mapper  the mapper function
+   * @param mapper the mapper function
    * @param reason the description what the task is intended to do
    * @return the map task
    * @param <T> the input type
@@ -36,7 +36,8 @@ public class API {
   }
 
   /**
-   * create a map task that applies the given mapper function to the input, the mapper function returns a Try which is converted to an Either
+   * create a map task that applies the given mapper function to the input, the mapper function returns a Try which is
+   * converted to an Either
    * when the task is executed and fails, the error is logged in the activity log
    *
    * @param mapper the mapper function
@@ -49,7 +50,8 @@ public class API {
   }
 
   /**
-   * create a map task that applies the given mapper function to the input, the mapper function returns a Try which is converted to an Either
+   * create a map task that applies the given mapper function to the input, the mapper function returns a Try which is
+   * converted to an Either
    * when the task is executed and fails, the error is logged in the activity log
    * the reason is used in the activity log to describe the task
    *
@@ -71,7 +73,7 @@ public class API {
    * @param <T> the input type
    * @param <R> the output type
    */
-  public static <T,R> Activity<T,R> run(Function1<T, Activity<Void,R>> runner) {
+  public static <T, R> Activity<T, R> run(Function1<T, Activity<Void, R>> runner) {
     return new Run<>(runner);
   }
 

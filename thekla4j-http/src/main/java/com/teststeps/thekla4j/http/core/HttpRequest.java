@@ -7,16 +7,16 @@ import io.vavr.control.Either;
 
 public interface HttpRequest {
 
-    Either<Throwable, HttpResult> get();
+  Either<Throwable, HttpResult> get();
 
-    Either<Throwable, HttpResult> post();
+  Either<Throwable, HttpResult> post();
 
   Either<Throwable, HttpResult> postFile(List<FilePart> fileParts, List<Part> parts);
 
   Either<Throwable, HttpResult> patch();
 
-    Either<Throwable, HttpResult> put();
+  Either<Throwable, HttpResult> put();
 
-    Either<Throwable, HttpResult> delete();
+  Either<Throwable, HttpResult> delete();
 
 }

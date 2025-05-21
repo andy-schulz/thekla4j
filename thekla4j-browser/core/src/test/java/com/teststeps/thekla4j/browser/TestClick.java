@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.browser;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
@@ -14,11 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TestClick {
 
@@ -38,7 +38,7 @@ public class TestClick {
 
   @AfterEach
   public void tearDown() throws InterruptedException {
-   // actor.cleansStage();
+    // actor.cleansStage();
     Thread.sleep(10);
   }
 
@@ -56,20 +56,20 @@ public class TestClick {
   }
 
   @Test
-  public void  clickOnElementPosition() throws ActivityError {
+  public void clickOnElementPosition() throws ActivityError {
 
-    StartPoint point = StartPoint.on(7,7);
+    StartPoint point = StartPoint.on(7, 7);
 
     when(chromeMock.clickOnPositionInsideElement(any(Element.class), any(StartPoint.class)))
-      .thenReturn(Try.of(() -> null));
+        .thenReturn(Try.of(() -> null));
 
-    Click.on(element).atPosition(7,7).runAs(actor);
+    Click.on(element).atPosition(7, 7).runAs(actor);
 
     verify(chromeMock, times(0))
-      .clickOn(element);
+        .clickOn(element);
 
     verify(chromeMock, times(1))
-      .clickOnPositionInsideElement(element, point);
+        .clickOnPositionInsideElement(element, point);
 
   }
 }

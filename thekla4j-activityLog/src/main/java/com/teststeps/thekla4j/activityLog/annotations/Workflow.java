@@ -13,17 +13,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Workflow {
-    /**
-     * the description of the workflow
-     * @return the description of the workflow
-     */
-    String value();
+  /**
+   * the description of the workflow
+   * 
+   * @return the description of the workflow
+   */
+  String value();
 
-    /**
-     * the log level of the workflow
-     * setting the log level to NO_LOG will prevent the workflow from being logged
-     * @return the log level of the workflow
-     */
-    TASK_LOG log() default TASK_LOG.DEFAULT;
+  /**
+   * the log level of the workflow
+   * setting the log level to NO_LOG will prevent the workflow from being logged
+   * 
+   * @return the log level of the workflow
+   */
+  TASK_LOG log() default TASK_LOG.DEFAULT;
 
 }

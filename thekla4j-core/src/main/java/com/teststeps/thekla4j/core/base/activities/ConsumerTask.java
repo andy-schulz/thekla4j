@@ -74,8 +74,8 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
   /**
    * run the task as the given actor
    *
-   * @param actor       the actor to run the task as
-   * @param input       the input to the task
+   * @param actor the actor to run the task as
+   * @param input the input to the task
    *
    * @return log annotator adding group and description to the log
    */
@@ -86,7 +86,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
   /**
    * run the task as the given actor
    *
-   * @param actor       the actor to run the task as
+   * @param actor the actor to run the task as
    */
   final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, Void>>> runAs$(Actor actor) {
     return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
@@ -130,7 +130,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    * run the task as the given actor
    *
    * @param performer the actor to run the task as
-   * @param input the input to the task
+   * @param input     the input to the task
    *
    * @return log annotator adding group and description to the log
    */

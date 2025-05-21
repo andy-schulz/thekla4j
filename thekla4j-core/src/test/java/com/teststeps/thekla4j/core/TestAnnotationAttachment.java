@@ -1,18 +1,17 @@
 package com.teststeps.thekla4j.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.activityLog.TheklaActivityLog;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.data.FailingTaskWithNullAttachOnError;
 import com.teststeps.thekla4j.core.data.FailingTaskWithSingleAttachOnError;
 import com.teststeps.thekla4j.core.data.FailingTaskWithTwoAttachOnError;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class TestAnnotationAttachment {
 
@@ -33,7 +32,7 @@ public class TestAnnotationAttachment {
 
     actor.attemptsTo(
 
-            FailingTaskWithSingleAttachOnError.setString("This is a failing task"))
+      FailingTaskWithSingleAttachOnError.setString("This is a failing task"))
 
         .peekLeft(System.out::println);
 
@@ -55,7 +54,7 @@ public class TestAnnotationAttachment {
     actor = Actor.named("Test Actor");
 
     actor.attemptsTo(
-            FailingTaskWithTwoAttachOnError.setString("This is a second failing task"))
+      FailingTaskWithTwoAttachOnError.setString("This is a second failing task"))
         .peekLeft(System.out::println);
 
     TheklaActivityLog activityLogEntry = actor.activityLog;
@@ -75,12 +74,12 @@ public class TestAnnotationAttachment {
 
   }
 
-  @Test void testNullAttachOnError() {
+  @Test
+  void testNullAttachOnError() {
     actor = Actor.named("Test Actor");
 
     actor.attemptsTo(
-            FailingTaskWithNullAttachOnError.setString("This is a failing task")
-        );
+      FailingTaskWithNullAttachOnError.setString("This is a failing task"));
 
     TheklaActivityLog activityLogEntry = actor.activityLog;
 

@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.data;
 
+import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
+
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -9,8 +11,6 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 
 @Workflow("Ui Test Task")
 public class UiTest extends Task<Void, Void> {

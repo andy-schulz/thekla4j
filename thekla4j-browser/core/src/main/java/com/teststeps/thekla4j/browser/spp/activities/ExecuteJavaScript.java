@@ -33,14 +33,14 @@ public class ExecuteJavaScript extends SupplierTask<Object> {
 
     if (element.isEmpty())
       return BrowseTheWeb.as(actor)
-        .flatMap(b -> b.executeJavaScript(script))
-        .onSuccess(__ -> log.info("JS script executed: {}", script))
-        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
+          .flatMap(b -> b.executeJavaScript(script))
+          .onSuccess(__ -> log.info("JS script executed: {}", script))
+          .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
     else
       return BrowseTheWeb.as(actor)
-        .flatMap(b -> b.executeJavaScript(script, element.get()))
-        .onSuccess(__ -> log.info("JS script executed: {} on element {}", script, element.get()))
-        .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
+          .flatMap(b -> b.executeJavaScript(script, element.get()))
+          .onSuccess(__ -> log.info("JS script executed: {} on element {}", script, element.get()))
+          .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
   /**

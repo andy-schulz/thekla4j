@@ -16,8 +16,8 @@ public class SupplyString extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return throwError ?
-      Either.left(ActivityError.of("Error thrown")) :
-      Either.right("Hello World");
+        Either.left(ActivityError.of("Error thrown")) :
+        Either.right("Hello World");
   }
 
 

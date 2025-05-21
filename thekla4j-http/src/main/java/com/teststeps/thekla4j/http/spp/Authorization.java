@@ -18,6 +18,7 @@ public enum Authorization implements HttpHeaderValue {
     this.value = value;
     return this;
   }
+
   private Authorization(Function<String, String> f) {
     this.headerFunc = f;
   }

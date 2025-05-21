@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.browserstack.tasks;
 
+import static com.teststeps.thekla4j.core.activities.API.map;
+
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.browser.spp.activities.ExecuteJavaScript;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -11,8 +13,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.With;
 import lombok.extern.log4j.Log4j2;
-
-import static com.teststeps.thekla4j.core.activities.API.map;
 
 /**
  * Set the status of the current Browserstack session to failed
@@ -38,13 +38,13 @@ public class SetBrowserstackStatus extends BasicInteraction {
 
     if (!failsOnError) {
       return actor.attemptsTo(
-          ExecuteJavaScript.onBrowser(sessionScript),
-            map(__ -> null),
-          ExecuteJavaScript.onBrowser(statusScript))
-        .fold(x -> {
-          log.error("Failed to set Browserstack status: {}", x.getMessage());
-          return Either.right(null);
-        }, __ -> Either.right(null));
+        ExecuteJavaScript.onBrowser(sessionScript),
+        map(__ -> null),
+        ExecuteJavaScript.onBrowser(statusScript))
+          .fold(x -> {
+            log.error("Failed to set Browserstack status: {}", x.getMessage());
+            return Either.right(null);
+          }, __ -> Either.right(null));
     } else {
       return actor.attemptsTo(
         ExecuteJavaScript.onBrowser(sessionScript),
@@ -59,15 +59,15 @@ public class SetBrowserstackStatus extends BasicInteraction {
    * Set the status to failed
    *
    * @param sessionName - the name of the session
-   * @param reason - the reason for the failure
+   * @param reason      - the reason for the failure
    *
    * @return the activity
    */
   public static SetBrowserstackStatus ofTestCaseToFailed(String sessionName, String reason) {
     return new SetBrowserstackStatus(
-      Executor.setSessionStatus(Arguments.failed(reason)),
-      Executor.setSessionName(Arguments.named(sessionName)),
-      false);
+                                     Executor.setSessionStatus(Arguments.failed(reason)),
+                                     Executor.setSessionName(Arguments.named(sessionName)),
+                                     false);
   }
 
   /**
@@ -78,9 +78,9 @@ public class SetBrowserstackStatus extends BasicInteraction {
    */
   public static SetBrowserstackStatus ofTestCaseToPassed(String sessionName) {
     return new SetBrowserstackStatus(
-      Executor.setSessionStatus(Arguments.passed()),
-      Executor.setSessionName(Arguments.named(sessionName)),
-      false);
+                                     Executor.setSessionStatus(Arguments.passed()),
+                                     Executor.setSessionName(Arguments.named(sessionName)),
+                                     false);
   }
 
   /**

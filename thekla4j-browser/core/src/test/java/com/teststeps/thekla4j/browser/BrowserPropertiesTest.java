@@ -1,10 +1,5 @@
 package com.teststeps.thekla4j.browser;
 
-import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
-import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_VERTICAL;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.HIGHLIGHT_ELEMENTS;
@@ -16,6 +11,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
+
+import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 
 public class BrowserPropertiesTest {
@@ -59,20 +59,20 @@ public class BrowserPropertiesTest {
     String helpText = DefaultThekla4jBrowserProperties.help();
     System.out.println(helpText);
     String expectedHelpText =
-      """
-        thekla4j.browser.highlightElements: Possible values: true, false (default: true)
-        thekla4j.browser.slowDownExecution: Possible values: true, false (default: false)
-        thekla4j.browser.slowDownTimeInSeconds: Time in seconds to slow down the execution (default: 1)
-        thekla4j.browser.autoScroll.enabled: Possible values: true, false (default: false)
-        thekla4j.browser.autoScroll.vertical: Possible values: top, center, bottom (default: center)
-        thekla4j.browser.screenshot.relativePath: Relative project path to store the screenshots (default: )
-        thekla4j.browser.screenshot.absolutePath: Absolute path to store the screenshots (default:
-        """.strip();
+        """
+            thekla4j.browser.highlightElements: Possible values: true, false (default: true)
+            thekla4j.browser.slowDownExecution: Possible values: true, false (default: false)
+            thekla4j.browser.slowDownTimeInSeconds: Time in seconds to slow down the execution (default: 1)
+            thekla4j.browser.autoScroll.enabled: Possible values: true, false (default: false)
+            thekla4j.browser.autoScroll.vertical: Possible values: top, center, bottom (default: center)
+            thekla4j.browser.screenshot.relativePath: Relative project path to store the screenshots (default: )
+            thekla4j.browser.screenshot.absolutePath: Absolute path to store the screenshots (default:
+            """.strip();
 
     String endText =
-      """
-        thekla4j.browser.config: The browser configuration to use (default: None)
-        """.strip();
+        """
+            thekla4j.browser.config: The browser configuration to use (default: None)
+            """.strip();
 
     assertThat("help text is correct", helpText, startsWith(expectedHelpText));
     assertThat("help text is correct", helpText, endsWith(endText));

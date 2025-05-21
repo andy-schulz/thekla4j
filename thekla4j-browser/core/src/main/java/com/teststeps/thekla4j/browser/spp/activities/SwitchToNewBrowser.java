@@ -39,8 +39,8 @@ public class SwitchToNewBrowser {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .flatMap(Browser::switchToNewBrowserTab)
-        .transform(ActivityError.toEither("Error while creating new browser tab"));
+          .flatMap(Browser::switchToNewBrowserTab)
+          .transform(ActivityError.toEither("Error while creating new browser tab"));
     }
   }
 
@@ -49,8 +49,8 @@ public class SwitchToNewBrowser {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-        .flatMap(Browser::switchToNewBrowserWindow)
-        .transform(ActivityError.toEither("Error while creating new browser window"));
+          .flatMap(Browser::switchToNewBrowserWindow)
+          .transform(ActivityError.toEither("Error while creating new browser window"));
     }
   }
 }

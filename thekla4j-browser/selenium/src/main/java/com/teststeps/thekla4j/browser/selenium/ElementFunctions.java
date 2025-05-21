@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
+import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
+
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
@@ -16,12 +19,6 @@ import io.vavr.Function6;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.HasDownloads;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,9 +28,11 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
-
-import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
-import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.HasDownloads;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Functions to interact with elements
@@ -48,30 +47,31 @@ class ElementFunctions {
   static Try<WebElement> findElement(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
 
     return retryUntil.apply(
-        ElementFunctions.locateElement.apply(driver),
-        locateElement.apply(driver).apply(element),
-        element,
-        Instant.now(),
-        Duration.ofMillis(0))
-      .map(highlightElement.apply(driver, highlightContext, element.highlight()))
-      .flatMap(scrollIntoView.apply(driver));
+      ElementFunctions.locateElement.apply(driver),
+      locateElement.apply(driver).apply(element),
+      element,
+      Instant.now(),
+      Duration.ofMillis(0))
+        .map(highlightElement.apply(driver, highlightContext, element.highlight()))
+        .flatMap(scrollIntoView.apply(driver));
   }
 
   static Try<WebElement> findElementOnFirstTry(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
 
-    return locateElement.apply(driver).apply(element)
-      .map(highlightElement.apply(driver, highlightContext, element.highlight()));
+    return locateElement.apply(driver)
+        .apply(element)
+        .map(highlightElement.apply(driver, highlightContext, element.highlight()));
   }
 
   static Try<WebElement> findElement(RemoteWebDriver driver, Element element) {
 
     return retryUntil.apply(
-        ElementFunctions.locateElement.apply(driver),
-        locateElement.apply(driver).apply(element),
-        element,
-        Instant.now(),
-        Duration.ofMillis(0))
-      .flatMap(scrollIntoView.apply(driver));
+      ElementFunctions.locateElement.apply(driver),
+      locateElement.apply(driver).apply(element),
+      element,
+      Instant.now(),
+      Duration.ofMillis(0))
+        .flatMap(scrollIntoView.apply(driver));
   }
 
   static Try<WebElement> findElementWithoutScrolling(RemoteWebDriver driver, Element element) {
@@ -92,359 +92,347 @@ class ElementFunctions {
       element,
       Instant.now(),
       Duration.ofMillis(0))
-      .flatMap(__ -> locateElements.apply(driver).apply(element));
+        .flatMap(__ -> locateElements.apply(driver).apply(element));
   }
 
   private static final Function1<RemoteWebDriver, Function1<Element, Try<WebElement>>> locateElement =
-    drvr -> element ->
-      Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()))
-        .mapTry(l -> l.getOrElseThrow(() -> ElementNotFoundError.of("Could not find " + element)));
+      drvr -> element -> Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()))
+          .mapTry(l -> l.getOrElseThrow(() -> ElementNotFoundError.of("Could not find " + element)));
 
 
   private static final Function1<RemoteWebDriver, Function1<Element, Try<List<WebElement>>>> locateElements =
-    drvr -> element ->
-      Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()));
+      drvr -> element -> Try.of(() -> ElementFunctions.getElements.apply(drvr, element.locators()));
 
   private static final Function5<Function1<Element, Try<WebElement>>, Try<WebElement>, Element, Instant, Duration, Try<WebElement>> retryUntil =
-    (elementFinder, webElement, element, start, waitFor) -> {
+      (elementFinder, webElement, element, start, waitFor) -> {
 
-      Try.run(() -> Thread.sleep(waitFor.toMillis()))
-        .onFailure(log::error)
-        .getOrElseThrow(() -> new RuntimeException("Error while waiting for next iteration"));
+        Try.run(() -> Thread.sleep(waitFor.toMillis()))
+            .onFailure(log::error)
+            .getOrElseThrow(() -> new RuntimeException("Error while waiting for next iteration"));
 
-      Duration waitForNextIteration = Duration.ofMillis(500);
+        Duration waitForNextIteration = Duration.ofMillis(500);
 
-      Duration timeout = element.waiter().timeout();
+        Duration timeout = element.waiter().timeout();
 
-      log.debug("Retrying to find element: {}", element);
+        log.debug("Retrying to find element: {}", element);
 
-      if (Instant.now().isAfter(start.plus(timeout))) {
-        return webElement;
-      }
+        if (Instant.now().isAfter(start.plus(timeout))) {
+          return webElement;
+        }
 
-      if (webElement.isFailure()) {
-        return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration);
-      }
+        if (webElement.isFailure()) {
+          return ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration);
+        }
 
-      return webElement
-        .flatMap(SeleniumElementStatus.forElement(element)::check)
-        .onFailure(status -> log.error("Error on {} ElementStatusCheck status: {}", element.waiter().type(), status))
-        .onSuccess(status -> log.debug("Element {} status: {}", element.waiter().type(), status))
-        .flatMap(elemStatus ->
-          elemStatus ?
-            webElement :
-            ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration))
-        .transform(tr -> tr.isSuccess() ? tr :
-          ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration));
-    };
+        return webElement
+            .flatMap(SeleniumElementStatus.forElement(element)::check)
+            .onFailure(status -> log.error("Error on {} ElementStatusCheck status: {}", element.waiter().type(), status))
+            .onSuccess(status -> log.debug("Element {} status: {}", element.waiter().type(), status))
+            .flatMap(elemStatus -> elemStatus ?
+                webElement :
+                ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration))
+            .transform(tr -> tr.isSuccess() ? tr :
+                ElementFunctions.retryUntil.apply(elementFinder, elementFinder.apply(element), element, start, waitForNextIteration));
+      };
 
   static final Function2<RemoteWebDriver, List<Locator>, List<WebElement>> getElements =
-    (driver, locators) ->
-      locators.length() == 1 ?
+      (driver, locators) -> locators.length() == 1 ?
 
-        ElementFunctions.findElementsFromDriver.apply(driver, locators.head()) :
+          ElementFunctions.findElementsFromDriver.apply(driver, locators.head()) :
 
-        locators.tail().foldLeft(
-          ElementFunctions.findElementsFromDriver.apply(driver, locators.head()),
-          ElementFunctions.findElementsFromWebElementList);
+          locators.tail()
+              .foldLeft(
+                ElementFunctions.findElementsFromDriver.apply(driver, locators.head()),
+                ElementFunctions.findElementsFromWebElementList);
 
   private static final BiFunction<List<WebElement>, Locator, List<WebElement>> findElementsFromWebElementList =
-    (webElements, locator) -> webElements.flatMap(ElementFunctions.findElementsOfWebElement.apply(locator));
+      (webElements, locator) -> webElements.flatMap(ElementFunctions.findElementsOfWebElement.apply(locator));
 
 
   private static final Function2<Locator, WebElement, List<WebElement>> findElementsOfWebElement =
-    (locator, webElement) -> List.ofAll(webElement.findElements(LocatorResolver.resolve(locator)));
+      (locator, webElement) -> List.ofAll(webElement.findElements(LocatorResolver.resolve(locator)));
 
   private static final BiFunction<RemoteWebDriver, Locator, List<WebElement>> findElementsFromDriver =
-    (driver, locator) -> List.ofAll(driver.findElements(LocatorResolver.resolve(locator)));
+      (driver, locator) -> List.ofAll(driver.findElements(LocatorResolver.resolve(locator)));
 
 
   final static Function2<RemoteWebDriver, String, Try<Void>> navigateTo =
-    (driver, url) -> Try.run(() -> driver.navigate().to(url));
+      (driver, url) -> Try.run(() -> driver.navigate().to(url));
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clickOnElement =
-    (driver, hlx, element) -> findElement(driver, hlx, element)
-      .flatMapTry(elem -> Try.run(elem::click))
-      .onFailure(log::error)
-      .map(x -> null);
+      (driver, hlx, element) -> findElement(driver, hlx, element)
+          .flatMapTry(elem -> Try.run(elem::click))
+          .onFailure(log::error)
+          .map(x -> null);
 
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> doubleClickOnElement =
-    (driver, hlx, element) -> findElement(driver, hlx, element)
-      .flatMap(elem -> Try.of(() -> new Actions(driver))
-        .map(actions -> actions.doubleClick(elem))
-        .peek(Actions::perform))
-      .onFailure(log::error)
-      .map(x -> null);
+      (driver, hlx, element) -> findElement(driver, hlx, element)
+          .flatMap(elem -> Try.of(() -> new Actions(driver))
+              .map(actions -> actions.doubleClick(elem))
+              .peek(Actions::perform))
+          .onFailure(log::error)
+          .map(x -> null);
 
 
   final static Function5<RemoteWebDriver, HighlightContext, Element, String, Boolean, Try<Void>> enterTextIntoElement =
-    (driver, hlx, element, text, clearField) -> findElement(driver, hlx, element)
-      .peek(webElement -> {
-        if (clearField) {
-          webElement.clear();
-        }
-      })
-      .peek(webElement -> webElement.sendKeys(text))
-      .onFailure(log::error)
-      .map(x -> null);
+      (driver, hlx, element, text, clearField) -> findElement(driver, hlx, element)
+          .peek(webElement -> {
+            if (clearField) {
+              webElement.clear();
+            }
+          })
+          .peek(webElement -> webElement.sendKeys(text))
+          .onFailure(log::error)
+          .map(x -> null);
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Void>> clearElement =
-    (driver, hlx, element) -> findElement(driver, hlx, element)
-      .peek(WebElement::clear)
-      .onFailure(log::error)
-      .map(x -> null);
+      (driver, hlx, element) -> findElement(driver, hlx, element)
+          .peek(WebElement::clear)
+          .onFailure(log::error)
+          .map(x -> null);
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getTextFromElement =
-    (driver, hlx, element) ->
-      findElement(driver, hlx, element)
-        .map(WebElement::getText)
-        .onFailure(log::error);
+      (driver, hlx, element) -> findElement(driver, hlx, element)
+          .map(WebElement::getText)
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, Element, Try<List<String>>> getTextFromElements =
-    (driver, element) ->
-      findElementsWithoutScrolling(driver, element)
-        .map(l -> l.map(WebElement::getText))
-        .onFailure(log::error);
+      (driver, element) -> findElementsWithoutScrolling(driver, element)
+          .map(l -> l.map(WebElement::getText))
+          .onFailure(log::error);
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getValueOfElement =
-    (driver, hlx, element) ->
-      findElement(driver, hlx, element)
-        .map(webElement -> webElement.getAttribute("value"))
-        .onFailure(log::error);
+      (driver, hlx, element) -> findElement(driver, hlx, element)
+          .map(webElement -> webElement.getAttribute("value"))
+          .onFailure(log::error);
 
 
   final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getAttributeFromElement =
-    (driver, hlx, element, attribute) ->
-      findElement(driver, hlx, element)
-        .map(webElement -> webElement.getAttribute(attribute))
-        .onFailure(log::error);
+      (driver, hlx, element, attribute) -> findElement(driver, hlx, element)
+          .map(webElement -> webElement.getAttribute(attribute))
+          .onFailure(log::error);
 
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<State>> getElementState =
-    (driver, hlx, element) ->
-      findElementOnFirstTry(driver, hlx, element)
-        .map(webElement ->
-          State.of(element)
-            .withIsPresent(true)
-            .withIsEnabled(webElement.isEnabled())
-            .withIsVisible(webElement.isDisplayed()))
-        .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
+      (driver, hlx, element) -> findElementOnFirstTry(driver, hlx, element)
+          .map(webElement -> State.of(element)
+              .withIsPresent(true)
+              .withIsEnabled(webElement.isEnabled())
+              .withIsVisible(webElement.isDisplayed()))
+          .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
   final static Function1<RemoteWebDriver, Try<String>> getTitle =
-    driver -> Try.of(driver::getTitle)
-      .onFailure(log::error);
+      driver -> Try.of(driver::getTitle)
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<String>> getUrl =
-    driver -> Try.of(driver::getCurrentUrl)
-      .onFailure(log::error);
+      driver -> Try.of(driver::getCurrentUrl)
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
-    (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))
-      .map(c -> Cookie.of(c.getName(), c.getValue()))
-      .onFailure(log::error);
+      (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))
+          .map(c -> Cookie.of(c.getName(), c.getValue()))
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<List<Cookie>>> getAllCookies =
-    (driver) -> Try.of(() -> driver.manage().getCookies())
-      .map(List::ofAll)
-      .map(c -> c.map(c1 -> Cookie.of(c1.getName(), c1.getValue())))
-      .onFailure(log::error);
+      (driver) -> Try.of(() -> driver.manage().getCookies())
+          .map(List::ofAll)
+          .map(c -> c.map(c1 -> Cookie.of(c1.getName(), c1.getValue())))
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, Cookie, Try<Void>> addCookie =
-    (driver, cookie) -> Try.run(() -> driver.manage().addCookie(
-        new org.openqa.selenium.Cookie
-          .Builder(cookie.name(), cookie.value())
-          .domain(cookie.domain())
-          .expiresOn(Option.of(cookie.expires())
-            .map(d -> d.toInstant(ZoneOffset.UTC))
-            .map(Date::from)
-            .getOrNull())
-          .isHttpOnly(cookie.httpOnly())
-          .isSecure(cookie.secure())
-          .sameSite(cookie.sameSite())
-          .path(cookie.path())
-          .build()))
-      .onFailure(log::error);
+      (driver, cookie) -> Try.run(() -> driver.manage()
+          .addCookie(
+            new org.openqa.selenium.Cookie.Builder(cookie.name(), cookie.value())
+                .domain(cookie.domain())
+                .expiresOn(Option.of(cookie.expires())
+                    .map(d -> d.toInstant(ZoneOffset.UTC))
+                    .map(Date::from)
+                    .getOrNull())
+                .isHttpOnly(cookie.httpOnly())
+                .isSecure(cookie.secure())
+                .sameSite(cookie.sameSite())
+                .path(cookie.path())
+                .build()))
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, String, Try<Void>> deleteCookie =
-    (driver, name) -> Try.run(() -> driver.manage().deleteCookieNamed(name))
-      .onFailure(log::error);
+      (driver, name) -> Try.run(() -> driver.manage().deleteCookieNamed(name))
+          .onFailure(log::error);
 
   // deleteAllCookies
   final static Function1<RemoteWebDriver, Try<Void>> deleteAllCookies =
-    (driver) -> Try.run(() -> driver.manage().deleteAllCookies())
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.manage().deleteAllCookies())
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<File>> takeScreenShot =
-    (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
-      .onFailure(log::error);
+      (driver) -> Try.of(() -> driver.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, Element, Try<File>> takeScreenShotOfElement =
-    (driver, element) -> findElement(driver, element)
-      .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
-      .onFailure(log::error);
+      (driver, element) -> findElement(driver, element)
+          .map(webElement -> webElement.getScreenshotAs(org.openqa.selenium.OutputType.FILE))
+          .onFailure(log::error);
 
   final static Function2<RemoteWebDriver, String, Try<Object>> executeJavaScript =
-    (driver, script) -> Try.of(() -> driver.executeScript(script))
-      .onFailure(log::error);
+      (driver, script) -> Try.of(() -> driver.executeScript(script))
+          .onFailure(log::error);
 
   final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Object>> executeJavaScriptOnElement =
-    (driver, hlx, script, element) -> findElementWithoutScrolling(driver, element)
-      .flatMap(webElement -> Try.of(() -> driver.executeScript(script, webElement)))
-      .onFailure(log::error);
+      (driver, hlx, script, element) -> findElementWithoutScrolling(driver, element)
+          .flatMap(webElement -> Try.of(() -> driver.executeScript(script, webElement)))
+          .onFailure(log::error);
 
   /**
    * Switch to a browser tab by index
    */
   final static Function2<RemoteWebDriver, Integer, Try<Void>> switchToBrowserByIndex =
-    (driver, index) ->
-      Try.of(() -> driver.getWindowHandles().toArray(new String[0]))
+      (driver, index) -> Try.of(() -> driver.getWindowHandles().toArray(new String[0]))
 
-        .flatMap(handles -> handles.length > index ?
-          Try.of(() -> handles[index]) :
-          Try.failure(new IndexOutOfBoundsException("No browser with index " + index + " found")))
+          .flatMap(handles -> handles.length > index ?
+              Try.of(() -> handles[index]) :
+              Try.failure(new IndexOutOfBoundsException("No browser with index " + index + " found")))
 
-        .map(handle -> driver.switchTo().window(handle))
-        .onFailure(log::error)
-        .map(__ -> null);
+          .map(handle -> driver.switchTo().window(handle))
+          .onFailure(log::error)
+          .map(__ -> null);
 
   /**
    * Switch to a browser tab by title
    */
   final static Function2<RemoteWebDriver, String, Try<Void>> switchToBrowserByTitle =
-    (driver, title) ->
-      Try.of(() -> driver.getWindowHandles()
+      (driver, title) -> Try.of(() -> driver.getWindowHandles()
           .stream()
           .filter(handle -> driver.switchTo().window(handle).getTitle().equals(title))
           .findFirst()
           .orElseThrow(() -> new IllegalArgumentException("No browser with title " + title + " found")))
-        .map(handle -> driver.switchTo().window(handle))
-        .onFailure(log::error)
-        .map(__ -> null);
+          .map(handle -> driver.switchTo().window(handle))
+          .onFailure(log::error)
+          .map(__ -> null);
 
   /**
    * Switch to a new browser tab
    */
   final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserTab =
-    (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.TAB))
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.TAB))
+          .onFailure(log::error);
 
   /**
    * Switch to a new browser window
    */
   final static Function1<RemoteWebDriver, Try<Void>> switchToNewBrowserWindow =
-    (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.WINDOW))
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.switchTo().newWindow(org.openqa.selenium.WindowType.WINDOW))
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<Integer>> numberOfOpenTabsAndWindows =
-    (driver) -> Try.of(() -> driver.getWindowHandles().size())
-      .onFailure(log::error);
+      (driver) -> Try.of(() -> driver.getWindowHandles().size())
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<Void>> refresh =
-    (driver) -> Try.run(() -> driver.navigate().refresh())
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.navigate().refresh())
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<Void>> navigateBack =
-    (driver) -> Try.run(() -> driver.navigate().back())
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.navigate().back())
+          .onFailure(log::error);
 
   final static Function1<RemoteWebDriver, Try<Void>> navigateForward =
-    (driver) -> Try.run(() -> driver.navigate().forward())
-      .onFailure(log::error);
+      (driver) -> Try.run(() -> driver.navigate().forward())
+          .onFailure(log::error);
 
   final static Function3<RemoteWebDriver, List<String>, Element, Try<Void>> setUploadFilesTo =
-    (driver, filePaths, element) -> findElement(driver, element)
-      .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString(",")))
-        .onFailure(log::error))
-      .map(x -> null);
+      (driver, filePaths, element) -> findElement(driver, element)
+          .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString(",")))
+              .onFailure(log::error))
+          .map(x -> null);
 
   final static Function5<HasDownloads, Path, String, Duration, Duration, Try<File>> getRemoteDownloadedFile =
-    (driver, tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(
+      (driver, tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(
         driver,
         tempDir,
         fileName,
         0L,
         Instant.now().plusSeconds(timeout.getSeconds()),
         waitBetweenRetries)
-      .map(fileExists -> tempDir.resolve(fileName).toFile());
+          .map(fileExists -> tempDir.resolve(fileName).toFile());
 
   final static Function4<Path, String, Duration, Duration, Try<File>> getLocalDownloadedFile =
-    (tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.localFileExistsAndFinishedDownloading.apply(
+      (tempDir, fileName, timeout, waitBetweenRetries) -> ElementFunctions.localFileExistsAndFinishedDownloading.apply(
         tempDir,
         fileName,
         0L,
         Instant.now().plusSeconds(timeout.getSeconds()),
         waitBetweenRetries)
-      .map(fileExists -> tempDir.resolve(fileName).toFile());
+          .map(fileExists -> tempDir.resolve(fileName).toFile());
 
   final static Function6<HasDownloads, Path, String, Long, Instant, Duration, Try<File>> remoteFileExistsAndFinishedDownloading =
-    (driver, tempDir, fileName, fileSize, end, waitBetweenTrys) -> Try.run(() -> Thread.sleep(waitBetweenTrys.toMillis()))
-      .flatMap(__ -> {
-        if (Instant.now().isAfter(end)) {
-          return Try.failure(new TimeoutException("File download timed out"));
-        }
+      (driver, tempDir, fileName, fileSize, end, waitBetweenTrys) -> Try.run(() -> Thread.sleep(waitBetweenTrys.toMillis()))
+          .flatMap(__ -> {
+            if (Instant.now().isAfter(end)) {
+              return Try.failure(new TimeoutException("File download timed out"));
+            }
 
-        List<String> files = List.ofAll(driver.getDownloadableFiles());
+            List<String> files = List.ofAll(driver.getDownloadableFiles());
 
-        if (!files.contains(fileName)) {
-          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
-        }
+            if (!files.contains(fileName)) {
+              return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+            }
 
-        Try<Void> downloadRemote = Try.run(() ->
-        {
-          Files.deleteIfExists(tempDir.resolve(fileName));
-          driver.downloadFile(fileName, tempDir);
-        });
+            Try<Void> downloadRemote = Try.run(() -> {
+              Files.deleteIfExists(tempDir.resolve(fileName));
+              driver.downloadFile(fileName, tempDir);
+            });
 
-        if (downloadRemote.isFailure()) {
-          log.debug("Download failed with error: {}", downloadRemote.getCause().getMessage());
-          log.debug("Failed to download file from remote site: {}, retrying ...", fileName);
-          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
-        }
+            if (downloadRemote.isFailure()) {
+              log.debug("Download failed with error: {}", downloadRemote.getCause().getMessage());
+              log.debug("Failed to download file from remote site: {}, retrying ...", fileName);
+              return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+            }
 
-        File file = tempDir.resolve(fileName).toFile();
+            File file = tempDir.resolve(fileName).toFile();
 
-        if (!file.exists()) {
-          log.debug("Downloaded File {} does not yet exist, retrying ...", fileName);
-          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
-        }
+            if (!file.exists()) {
+              log.debug("Downloaded File {} does not yet exist, retrying ...", fileName);
+              return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, fileSize, end, waitBetweenTrys);
+            }
 
-        if (!fileSize.equals(file.length())) {
-          return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, file.length(), end, waitBetweenTrys);
-        }
+            if (!fileSize.equals(file.length())) {
+              return ElementFunctions.remoteFileExistsAndFinishedDownloading.apply(driver, tempDir, fileName, file.length(), end, waitBetweenTrys);
+            }
 
-        return Try.success(file);
+            return Try.success(file);
 
-      })
-      .onFailure(log::error);
+          })
+          .onFailure(log::error);
 
   final static Function5<Path, String, Long, Instant, Duration, Try<File>> localFileExistsAndFinishedDownloading =
-    (downloadPath, fileName, fileSize, end, waitBetweenTrys) ->
+      (downloadPath, fileName, fileSize, end, waitBetweenTrys) ->
 
       io.vavr.control.Try.run(() -> Thread.sleep(waitBetweenTrys.toMillis()))
-        .flatMap(__ -> {
+          .flatMap(__ -> {
 
-          if (Instant.now().isAfter(end)) {
-            log.error("File download timed out");
-            return Try.failure(new TimeoutException("File download timed out"));
-          }
+            if (Instant.now().isAfter(end)) {
+              log.error("File download timed out");
+              return Try.failure(new TimeoutException("File download timed out"));
+            }
 
-          File file = downloadPath.resolve(fileName).toFile();
+            File file = downloadPath.resolve(fileName).toFile();
 
-          if (!file.exists()) {
-            log.debug("Downloaded File {} does not yet exist in {}, retrying ...", fileName, downloadPath);
-            return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, fileSize, end, waitBetweenTrys);
-          }
+            if (!file.exists()) {
+              log.debug("Downloaded File {} does not yet exist in {}, retrying ...", fileName, downloadPath);
+              return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, fileSize, end, waitBetweenTrys);
+            }
 
-          if (!fileSize.equals(file.length())) {
-            log.debug("Downloaded File {} is not yet finished downloading. Last file size: {}, current file size: {}, retrying ...", fileName,
-              fileSize, file.length());
-            return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, file.length(), end, waitBetweenTrys);
-          }
+            if (!fileSize.equals(file.length())) {
+              log.debug("Downloaded File {} is not yet finished downloading. Last file size: {}, current file size: {}, retrying ...", fileName,
+                fileSize, file.length());
+              return ElementFunctions.localFileExistsAndFinishedDownloading.apply(downloadPath, fileName, file.length(), end, waitBetweenTrys);
+            }
 
-          return Try.success(file);
+            return Try.success(file);
 
-        })
-        .onFailure(log::error);
+          })
+          .onFailure(log::error);
 
 }

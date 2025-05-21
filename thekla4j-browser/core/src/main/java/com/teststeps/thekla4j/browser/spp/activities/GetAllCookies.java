@@ -21,8 +21,8 @@ public class GetAllCookies extends SupplierTask<List<Cookie>> {
   @Override
   protected Either<ActivityError, List<Cookie>> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-      .flatMap(Browser::getAllCookies)
-      .transform(ActivityError.toEither("Error while getting all cookies from browser"));
+        .flatMap(Browser::getAllCookies)
+        .transform(ActivityError.toEither("Error while getting all cookies from browser"));
   }
 
 

@@ -1,10 +1,15 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
-
-import java.util.function.Function;
-
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class TestKeyAction {
 
@@ -49,13 +48,13 @@ public class TestKeyAction {
   public void testKeyPressOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER))
+      DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
 
     verify(chromeMock, times(1)).executeKeyActions(any());
@@ -68,13 +67,13 @@ public class TestKeyAction {
   public void testKeyDownOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.pressAndHold(Key.TAB, Key.ENTER))
+      DoKey.pressAndHold(Key.TAB, Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
 
     verify(actions, times(1)).keyDown(Keys.TAB);
@@ -86,13 +85,13 @@ public class TestKeyAction {
   public void testKeyUpOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.release(Key.TAB, Key.ENTER))
+      DoKey.release(Key.TAB, Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
 
     verify(actions, times(1)).keyUp(Keys.TAB);
@@ -103,14 +102,14 @@ public class TestKeyAction {
   public void testPressAndHoldThenRelease() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.pressAndHold(Key.TAB, Key.ENTER)
+      DoKey.pressAndHold(Key.TAB, Key.ENTER)
           .thenRelease(Key.TAB, Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(actions, times(1)).keyDown(Keys.TAB);
     verify(actions, times(1)).keyDown(Keys.ENTER);
@@ -122,14 +121,14 @@ public class TestKeyAction {
   public void testPressAndThenPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.press(Key.TAB)
+      DoKey.press(Key.TAB)
           .thenPress(Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(actions, times(1)).sendKeys(Keys.TAB);
     verify(actions, times(1)).sendKeys(Keys.ENTER);
@@ -139,14 +138,14 @@ public class TestKeyAction {
   public void testPressAndHoldThenPressAndHold() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-      .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(chromeMock));
 
     actor.attemptsTo(
 
-        DoKey.pressAndHold(Key.TAB)
+      DoKey.pressAndHold(Key.TAB)
           .thenPressAndHold(Key.ENTER))
 
-      .getOrElseThrow(Function.identity());
+        .getOrElseThrow(Function.identity());
 
     verify(actions, times(1)).keyDown(Keys.TAB);
     verify(actions, times(1)).keyDown(Keys.ENTER);

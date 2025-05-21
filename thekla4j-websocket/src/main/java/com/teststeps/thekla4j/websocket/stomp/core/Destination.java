@@ -6,10 +6,10 @@ import lombok.With;
 
 @With
 public record Destination(
-    String destination,
-    Option<Endpoint> endpoint,
+                          String destination,
+                          Option<Endpoint> endpoint,
 
-    String name
+                          String name
 ) {
 
   public static Destination at(String destination) {

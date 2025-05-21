@@ -1,18 +1,17 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.selenium.Selenium.loadConfigs;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
-import org.junit.jupiter.api.Test;
-
 import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.selenium.Selenium.loadConfigs;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.jupiter.api.Test;
 
 public class TestSeleniumConfig {
   @Test
@@ -21,8 +20,7 @@ public class TestSeleniumConfig {
     Option<String> configToLoad = Option.of("passedByCode");
 
     SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
-      .getOrElseThrow(Function.identity())
-      ._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
+        .getOrElseThrow(Function.identity())._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
 
 
     assertThat("retrieving seleniumConfig is success",
@@ -37,11 +35,10 @@ public class TestSeleniumConfig {
     Option<String> configToLoad = Option.of("passedByCode");
 
     List<Function1<SeleniumConfig, SeleniumConfig>> seleniumConfigUpdate =
-      List.of(c -> c.withRemoteUrl("http://updatedUrl:3333"));
+        List.of(c -> c.withRemoteUrl("http://updatedUrl:3333"));
 
     SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), seleniumConfigUpdate, List.empty())
-      .getOrElseThrow(Function.identity())
-      ._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
+        .getOrElseThrow(Function.identity())._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
 
 
     assertThat("retrieving seleniumConfig is success",
@@ -56,8 +53,7 @@ public class TestSeleniumConfig {
     Option<String> browserConfigToLoad = Option.of("passedByCode");
 
     BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), List.empty())
-      .getOrElseThrow(Function.identity())
-      ._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
+        .getOrElseThrow(Function.identity())._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
 
 
     assertThat("retrieving browser config is success",
@@ -72,11 +68,10 @@ public class TestSeleniumConfig {
     Option<String> browserConfigToLoad = Option.of("passedByCode");
 
     List<Function1<BrowserConfig, BrowserConfig>> browserConfigUpdate =
-      List.of(c -> c.withBrowserVersion("newBrowserVersion"));
+        List.of(c -> c.withBrowserVersion("newBrowserVersion"));
 
     BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), browserConfigUpdate)
-      .getOrElseThrow(Function.identity())
-      ._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
+        .getOrElseThrow(Function.identity())._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
 
 
     assertThat("browser version is set",
@@ -92,8 +87,8 @@ public class TestSeleniumConfig {
     Option<String> seleniumConfigToLoad = Option.of("passedByCode");
 
     Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>> config = loadConfigs.apply(seleniumConfigToLoad, browserConfigToLoad,
-        List.empty(), List.empty())
-      .getOrElseThrow(Function.identity());
+      List.empty(), List.empty())
+        .getOrElseThrow(Function.identity());
 
 
     assertThat("selenium config is set",
@@ -120,7 +115,7 @@ public class TestSeleniumConfig {
     Option<String> configToLoad = Option.of("NONE");
 
     Option<SeleniumConfig> config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
-      .getOrElseThrow(Function.identity())._1;
+        .getOrElseThrow(Function.identity())._1;
 
 
     assertThat("retrieving empty seleniumConfig is success",
