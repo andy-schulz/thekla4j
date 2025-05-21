@@ -1,6 +1,7 @@
 plugins {
     id 'com.teststeps.java-conventions'
     id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
 }
 
 tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }

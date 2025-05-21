@@ -1,0 +1,24 @@
+plugins {
+  id "java"
+  id "com.diffplug.spotless"
+}
+
+tasks.register("installLocalGitHook", Copy) {
+  group = "_sp-help"
+  from new File(rootProject.rootDir, 'scripts/git/pre-commit')
+  into { new File(rootProject.rootDir, '.git/hooks')}
+  fileMode 0775
+}
+
+build.dependsOn installLocalGitHook
+build.dependsOn("spotlessCheck")
+
+spotless {
+  java {
+    importOrder()
+    removeUnusedImports()
+
+    eclipse().configFile(project.rootDir.toString() + "/global_resources/code_formatter.xml")
+
+  }
+}

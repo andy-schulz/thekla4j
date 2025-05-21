@@ -1,6 +1,7 @@
 plugins {
     id 'com.teststeps.java-conventions'
     id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
 }
 
 tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
@@ -13,4 +14,21 @@ project.ext {
 
 dependencies {
     implementation project(":thekla4j-commons")
+}
+
+tasks.named("spotlessApply") {
+    dependsOn ':thekla4j-browser:appium:spotlessApply',
+            ':thekla4j-browser:browserstack:spotlessApply',
+            ':thekla4j-browser:core:spotlessApply',
+            ':thekla4j-browser:playwright:spotlessApply',
+            ':thekla4j-browser:selenium:spotlessApply'
+}
+
+
+tasks.named("spotlessCheck") {
+    dependsOn ':thekla4j-browser:appium:spotlessCheck',
+            ':thekla4j-browser:browserstack:spotlessCheck',
+            ':thekla4j-browser:core:spotlessCheck',
+            ':thekla4j-browser:playwright:spotlessCheck',
+            ':thekla4j-browser:selenium:spotlessCheck'
 }
