@@ -29,9 +29,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
 
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
-import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOAD_PREFIX;
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
@@ -503,10 +503,12 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
            download path is not set. Its a framework bug.
         """));
 
+    Path tempDownloadPath = downloadPath.map(TempFolderUtil::directory).get();
+
     if (localExecution) {
-      return getLocalDownloadedFile.apply(downloadPath.map(TempFolderUtil::directory).get(), fileName, timeout, waitBetweenRetries);
+      return getLocalDownloadedFile.apply(tempDownloadPath, fileName, timeout, waitBetweenRetries);
     }
-    return getRemoteDownloadedFile.apply(driver, downloadPath.map(TempFolderUtil::directory).get(), fileName, timeout, waitBetweenRetries);
+    return getRemoteDownloadedFile.apply(driver, tempDownloadPath, fileName, timeout, waitBetweenRetries);
   }
 
   /**

@@ -11,8 +11,10 @@ import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.utils.url.UrlHelper;
+import io.appium.java_client.PullsFiles;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.screenrecording.CanRecordScreen;
@@ -30,9 +32,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Objects;
 
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.selenium.AppiumFunctions.getDownloadedFiles;
 import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_BASE_PATH;
 
 /**
@@ -44,20 +49,25 @@ public class MobileBrowser implements Browser {
   private final HighlightContext highlightContext = new HighlightContext();
   private static final String LOCAL_APPIUM_SERVICE = "http://localhost:4723";
   private final BrowserConfig browserConfig;
+  private Option<Path> downloadPath = Option.none();
 
+  private RemoteWebDriver driver;
   private final SeleniumBrowser seleniumBrowser;
 
   private static Option<AppiumDriverLocalService> service = Option.none();
 
-  private CanRecordScreen screenRecorder;
-
   private MobileBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
     this.browserConfig = browserConfig;
-    this.screenRecorder = (CanRecordScreen) driver;
+    this.driver = driver;
     seleniumBrowser = SeleniumBrowser.local(driver, browserConfig, startupConfig);
 
-    startVideoRecording(driver, browserConfig);
+    startVideoRecording();
+    createDownloadPath();
+  }
 
+  private void createDownloadPath() {
+    if(browserConfig.enableFileDownload() && downloadPath.isEmpty())
+      this.downloadPath = Option.of(TempFolderUtil.newSubTempFolder(DOWNLOAD_PREFIX));
   }
 
   private static Try<RemoteWebDriver> createDriver(OperatingSystem os, String url, DesiredCapabilities caps) {
@@ -82,18 +92,17 @@ public class MobileBrowser implements Browser {
       .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }
 
-  private void startVideoRecording(RemoteWebDriver driver, BrowserConfig browserConfig) {
+  private void startVideoRecording() {
 
     if (isVideoRecordingActive()) {
-      this.screenRecorder = (CanRecordScreen) driver;
-      this.screenRecorder.startRecordingScreen();
+      ((CanRecordScreen) driver).startRecordingScreen();
     }
-
   }
 
   private void stopVideoRecording() {
 
     if (isVideoRecordingActive()) {
+      CanRecordScreen screenRecorder = ((CanRecordScreen) driver);
 
       String video = screenRecorder.stopRecordingScreen();
       byte[] videoData = Base64.getDecoder().decode(video);
@@ -282,6 +291,10 @@ public class MobileBrowser implements Browser {
     Try<Void> quit = seleniumBrowser.quit();
     service.peek(AppiumDriverLocalService::stop);
 
+    downloadPath
+      .map(TempFolderUtil::delete)
+      .map(t -> t.onFailure(log::error));
+
     return quit;
   }
 
@@ -314,6 +327,26 @@ public class MobileBrowser implements Browser {
 
   @Override
   public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
-    return Try.failure(ActivityError.of("Download is not yet supported on mobile devices"));
+
+    if (!browserConfig.enableFileDownload())
+      return Try.failure(new RuntimeException("""
+        File download is not enabled in the browser configuration.
+        Set enableFileDownload to true in the browser configuration to enable file download.
+        {{HELP}}
+        """.replace("{{HELP}}", BrowserConfig.help())));
+
+    if (downloadPath.isEmpty())
+      return Try.failure(new RuntimeException("""
+           download path is not set. Its a framework bug.
+        """));
+
+    if (browserConfig.platformName().equals(OperatingSystem.IOS)) {
+      return Try.failure(ActivityError.of("Download is not yet supported on iOS  devices"));
+    }
+
+    Path tempDownloadPath = downloadPath.map(TempFolderUtil::directory).get();
+
+    return getDownloadedFiles.apply((PullsFiles) driver, tempDownloadPath, fileName, 0L, Instant.now().plus(timeout), waitBetweenRetries);
+
   }
 }

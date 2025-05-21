@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
 
 
 /**

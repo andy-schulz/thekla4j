@@ -12,7 +12,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 
 import java.nio.file.Path;
 
-import static com.teststeps.thekla4j.browser.selenium.CapabilityConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
 
 /**
  * Create a new Firefox browser
