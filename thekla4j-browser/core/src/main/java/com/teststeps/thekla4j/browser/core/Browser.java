@@ -194,7 +194,7 @@ public interface Browser {
    * @param targetFileUploadInput the target file upload input
    * @return a Try containing a Void
    */
-  Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput);
+  Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remoteFilePath);
 
   /**
    * Refresh the browser

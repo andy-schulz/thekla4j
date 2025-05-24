@@ -237,8 +237,8 @@ public class MobileBrowser implements Browser {
   }
 
   @Override
-  public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
-    return seleniumBrowser.setUploadFiles(filePaths, targetFileUploadInput);
+  public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remotePath) {
+    return AppiumFunctions.uploadFiles.apply(driver, remotePath, filePaths, targetFileUploadInput);
   }
 
   @Override

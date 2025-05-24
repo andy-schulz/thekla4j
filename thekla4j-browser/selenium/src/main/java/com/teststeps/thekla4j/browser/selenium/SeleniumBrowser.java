@@ -339,7 +339,16 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput) {
+  public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remoteFilePath) {
+
+    if (remoteFilePath.isDefined()) {
+      log.warn(() -> """
+          Ignoring remote file path: {{REMOTE_FILE_PATH}}
+          Remote file path is not necessary for selenium tests.
+          The current Selenium implementation uses the LocalFileDetector to upload files.
+          """
+          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.get().toString()));
+    }
 
     List<String> files = filePaths.map(Path::toString);
 

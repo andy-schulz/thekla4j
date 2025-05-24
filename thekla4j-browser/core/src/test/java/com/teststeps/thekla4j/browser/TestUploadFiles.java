@@ -12,6 +12,7 @@ import com.teststeps.thekla4j.browser.spp.activities.SetUpload;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -38,12 +39,13 @@ public class TestUploadFiles {
   }
 
   @Test
-  public void testNavigateBack() throws ActivityError {
+  public void testUploadFile() throws ActivityError {
 
     Path testPath = Path.of("src/test/resources/test.txt");
     Element element = Element.found(By.css("testElement"));
 
-    when(chromeMock.setUploadFiles(List.of(testPath), element))
+    when(chromeMock.setUploadFiles(List.of(testPath), element,
+      Option.none()))
         .thenReturn(Try.of(() -> null));
 
     actor = Actor.named("Test Actor")
@@ -55,7 +57,8 @@ public class TestUploadFiles {
 
         .getOrElseThrow(Function.identity());
 
-    verify(chromeMock, times(1)).setUploadFiles(List.of(testPath), element);
+    verify(chromeMock, times(1)).setUploadFiles(List.of(testPath), element,
+      Option.none());
 
   }
 

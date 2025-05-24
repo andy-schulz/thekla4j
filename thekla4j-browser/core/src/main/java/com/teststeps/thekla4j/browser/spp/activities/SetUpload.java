@@ -8,6 +8,7 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import io.vavr.control.Option;
 import java.nio.file.Path;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -48,13 +49,14 @@ public class SetUpload {
 
     private final List<Path> absolutFilePaths;
     private Element targetFileUploadInput;
+    private Option<Path> remoteFilePath = Option.none();
 
 
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
 
       return BrowseTheWeb.as(actor)
-          .flatMap(browser -> browser.setUploadFiles(absolutFilePaths, targetFileUploadInput))
+          .flatMap(browser -> browser.setUploadFiles(absolutFilePaths, targetFileUploadInput, remoteFilePath))
           .transform(ActivityError.toEither("Error while trying to set the files %s to upload to the file input: %s"
               .formatted(absolutFilePaths, targetFileUploadInput)))
           .map(__ -> null);
@@ -77,6 +79,11 @@ public class SetUpload {
      */
     public SetUploadFiles to(Element targetFileUploadInput) {
       this.targetFileUploadInput = targetFileUploadInput;
+      return this;
+    }
+
+    public SetUploadFiles useRemoteFilePath(Path remoteFilePath) {
+      this.remoteFilePath = Option.of(remoteFilePath);
       return this;
     }
   }

@@ -327,7 +327,8 @@ public class TestMobileBrowser {
 
     SetUpload.file(uploadFilePath).to(element).runAs(actor);
 
-    verify(mobileBrowserMock).setUploadFiles(io.vavr.collection.List.of(uploadFilePath), element);
+    verify(mobileBrowserMock).setUploadFiles(io.vavr.collection.List.of(uploadFilePath),
+      element, Option.none());
     verify(webElementMock, times(1)).sendKeys(uploadFilePath.toString());
 
   }
