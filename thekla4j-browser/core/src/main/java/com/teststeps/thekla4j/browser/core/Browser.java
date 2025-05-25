@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.core;
 
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
+import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.http.commons.Cookie;
@@ -108,6 +109,14 @@ public interface Browser {
    * @return a Try containing the state of the element
    */
   Try<State> getState(Element element);
+
+  /**
+   * Get the geometry of a given element
+   *
+   * @param element the element to get the geometry of
+   * @return a Try containing the geometry of the element
+   */
+  Try<Rectangle> getGeometryOfElement(Element element);
 
   /**
    * Get the title of the browser
@@ -299,5 +308,13 @@ public interface Browser {
    */
   Try<Object> executeJavaScript(String script);
 
+  /**
+   * Get the downloaded file
+   *
+   * @param fileName           the name of the file to get
+   * @param timeout            the timeout duration
+   * @param waitBetweenRetries the wait duration between retries
+   * @return a Try containing the downloaded file
+   */
   Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries);
 }

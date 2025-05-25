@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.core.activityLog;
 
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
+import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+
 import com.teststeps.thekla4j.activityLog.ActivityLogEntryType;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
@@ -18,17 +24,10 @@ import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
-
-import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.getFieldValueOfActivity;
-import static com.teststeps.thekla4j.core.activityLog.AnnotationFunctions.makePrivateFieldAccessible;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This class is used to process the annotations of an activity and create a log description

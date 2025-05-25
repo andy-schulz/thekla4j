@@ -1,9 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
-import static com.teststeps.thekla4j.browser.selenium.AppiumFunctions.getDownloadedFiles;
-import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_BASE_PATH;
-
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.config.OperatingSystem;
@@ -12,6 +8,7 @@ import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
+import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -26,6 +23,10 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
@@ -35,9 +36,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Objects;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.selenium.AppiumFunctions.getDownloadedFiles;
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.TEMP_DIR_BASE_PATH;
 
 /**
  * A Browser implementation for mobile devices
@@ -131,51 +133,81 @@ public class MobileBrowser implements Browser {
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateTo(String url) {
     return seleniumBrowser.navigateTo(url);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clickOn(Element element) {
     return seleniumBrowser.clickOn(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clickOnPositionInsideElement(Element element, StartPoint position) {
     return seleniumBrowser.clickOnPositionInsideElement(element, position);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> doubleClickOn(Element element) {
     return Try.failure(ActivityError.of("Double Click is not supported to work on mobile devices"));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return seleniumBrowser.enterTextInto(text, element, clearField);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clear(Element element) {
     return seleniumBrowser.clear(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> textOf(Element element) {
     return seleniumBrowser.textOf(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<List<String>> textOfAll(Element element) {
     return seleniumBrowser.textOfAll(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> valueOf(Element element) {
     return seleniumBrowser.valueOf(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
     return seleniumBrowser.attributeValueOf(attribute, element);
@@ -186,101 +218,169 @@ public class MobileBrowser implements Browser {
     return seleniumBrowser.getState(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Rectangle> getGeometryOfElement(Element element) {
+    return seleniumBrowser.getGeometryOfElement(element);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> title() {
     return seleniumBrowser.title();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> url() {
     return seleniumBrowser.url();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Cookie> getCookie(String name) {
     return seleniumBrowser.getCookie(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<List<Cookie>> getAllCookies() {
     return seleniumBrowser.getAllCookies();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> addCookie(Cookie cookie) {
     return seleniumBrowser.addCookie(cookie);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> deleteCookie(String name) {
     return seleniumBrowser.deleteCookie(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> deleteAllCookies() {
     return seleniumBrowser.deleteAllCookies();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> takeScreenShot() {
     return seleniumBrowser.takeScreenShot();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> takeScreenShotOfElement(Element element) {
     return seleniumBrowser.takeScreenShotOfElement(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> drawShapes(List<Shape> shape, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return seleniumBrowser.drawShapes(shape, element, releaseAndHold, pause);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remotePath) {
     return AppiumFunctions.uploadFiles.apply(driver, remotePath, filePaths, targetFileUploadInput);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> refresh() {
     return seleniumBrowser.refresh();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateBack() {
     return seleniumBrowser.navigateBack();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> navigateForward() {
     return seleniumBrowser.navigateForward();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToNewBrowserTab() {
     return seleniumBrowser.switchToNewBrowserTab();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToNewBrowserWindow() {
     return seleniumBrowser.switchToNewBrowserWindow();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToBrowserByTitle(String browserTitle) {
     return seleniumBrowser.switchToBrowserByTitle(browserTitle);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> switchToBrowserByIndex(int index) {
     return seleniumBrowser.switchToBrowserByIndex(index);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Integer> numberOfOpenTabsAndWindows() {
     return seleniumBrowser.numberOfOpenTabsAndWindows();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> quit() {
 
@@ -296,11 +396,17 @@ public class MobileBrowser implements Browser {
     return quit;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<String> getSessionId() {
     return seleniumBrowser.getSessionId();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Boolean isVideoRecordingActive() {
     return !Objects.isNull(browserConfig.video()) &&
@@ -308,21 +414,33 @@ public class MobileBrowser implements Browser {
         browserConfig.video().record();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> executeKeyActions(List<KeyAction> actions) {
     return seleniumBrowser.executeKeyActions(actions);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Object> executeJavaScript(String script, Element element) {
     return seleniumBrowser.executeJavaScript(script, element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Object> executeJavaScript(String script) {
     return seleniumBrowser.executeJavaScript(script);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
 

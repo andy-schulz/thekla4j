@@ -10,15 +10,14 @@ import io.vavr.Function6;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeoutException;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 @Log4j2(topic = "Appium Functions")
 public class AppiumFunctions {
@@ -68,7 +67,7 @@ public class AppiumFunctions {
 
         log.info(() -> "Pushing file: " + localFilePath.getFileName() + " to device at path: " + devicePath);
         return Try.of(() -> devicePath.resolve(localFilePath.getFileName()).toString())
-          .map(p -> p.replace("\\", "/"))
+            .map(p -> p.replace("\\", "/"))
             .andThenTry(devPath -> driver.pushFile(devPath, localFilePath.toFile()))
             .onFailure(log::error)
             .map(__ -> null);
@@ -83,10 +82,10 @@ public class AppiumFunctions {
         log.info(() -> "Setting default upload path on device to: " + devicePath);
 
         String deviceFiles = files
-          .map(Path::getFileName)
-          .map(devicePath::resolve)
-          .map(p -> p.toString().replace("\\", "/"))
-          .mkString(",");
+            .map(Path::getFileName)
+            .map(devicePath::resolve)
+            .map(p -> p.toString().replace("\\", "/"))
+            .mkString(",");
 
         return files.map(pushFile.apply((PushesFiles) driver, devicePath))
             .transform(LiftTry.fromList())

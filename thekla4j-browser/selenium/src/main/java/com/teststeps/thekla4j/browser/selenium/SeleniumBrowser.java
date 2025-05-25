@@ -1,11 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
-import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
-import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
-
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
@@ -17,6 +11,7 @@ import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
 import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
+import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActionDriver;
@@ -26,13 +21,20 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
+import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
+import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
 @Log4j2(topic = "Browser")
 class SeleniumBrowser implements Browser, BrowserStackExecutor {
@@ -171,6 +173,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clickOnPositionInsideElement(Element element, StartPoint position) {
     return switchFrame(element.frame())
@@ -198,6 +203,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clear(Element element) {
     return switchFrame(element.frame())
@@ -216,6 +224,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<List<String>> textOfAll(Element element) {
 
@@ -251,6 +262,14 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<State> getState(Element element) {
     return switchFrame(element.frame())
         .flatMap(x -> getElementState.apply(driver, highlightContext, element));
+  }
+
+  @Override
+  public Try<Rectangle> getGeometryOfElement(Element element) {
+    return switchFrame(element.frame())
+        .flatMap(x -> getGeometryOfElement.apply(driver, highlightContext, element))
+        .onSuccess(r -> log.info("Element geometry: {} of element: {}", r, element.name()))
+        .map(applyExecutionSlowDown());
   }
 
   /**
@@ -494,6 +513,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .map(applyExecutionSlowDown());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
 
