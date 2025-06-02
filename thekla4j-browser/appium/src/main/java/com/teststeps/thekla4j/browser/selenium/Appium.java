@@ -1,10 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
-
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
@@ -16,9 +11,16 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.Objects;
+import java.util.function.Function;
+
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
 
 /**
  * create appium browser for mobile devices
@@ -36,12 +38,12 @@ public class Appium {
         .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
-  public static AppiumHelper withSeleniumConfig(String seleniumConfigName) {
-    return new AppiumHelper(Option.of(seleniumConfigName), Option.none());
+  public static AppiumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
+    return new AppiumHelper(Option.of(seleniumConfigName).flatMap(Function.identity()), Option.none());
   }
 
-  public static AppiumHelper withBrowserConfig(String browserConfigName) {
-    return new AppiumHelper(Option.none(), Option.of(browserConfigName));
+  public static AppiumHelper withBrowserConfig(Option<String> browserConfigName) {
+    return new AppiumHelper(Option.none(), Option.of(browserConfigName).flatMap(Function.identity()));
   }
 
   /**
@@ -135,12 +137,12 @@ public class Appium {
     private final Option<String> browserConfigName;
 
 
-    public AppiumHelper withSeleniumConfig(String seleniumConfigName) {
-      return new AppiumHelper(Option.of(seleniumConfigName), browserConfigName);
+    public AppiumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
+      return new AppiumHelper(Option.of(seleniumConfigName).flatMap(Function.identity()), browserConfigName);
     }
 
-    public AppiumHelper withBrowserConfig(String browserConfigName) {
-      return new AppiumHelper(seleniumConfigName, Option.of(browserConfigName));
+    public AppiumHelper withBrowserConfig(Option<String> browserConfigName) {
+      return new AppiumHelper(seleniumConfigName, Option.of(browserConfigName).flatMap(Function.identity()));
     }
 
     /**

@@ -1,13 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
@@ -27,6 +19,16 @@ import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.function.Function;
+
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+
 /**
  * Load the Browser from the configuration
  */
@@ -34,18 +36,18 @@ import lombok.extern.log4j.Log4j2;
 public class Selenium {
 
 
-  public static SeleniumHelper usingSeleniumConfig(String seleniumConfigName) {
+  public static SeleniumHelper usingSeleniumConfig(Option<String> seleniumConfigName) {
     return new SeleniumHelper(
-                              Option.of(seleniumConfigName),
+                              Option.of(seleniumConfigName).flatMap(Function.identity()),
                               Option.none(),
                               List.empty(),
                               List.empty());
   }
 
-  public static SeleniumHelper usingBrowserConfig(String browserConfigName) {
+  public static SeleniumHelper usingBrowserConfig(Option<String> browserConfigName) {
     return new SeleniumHelper(
                               Option.none(),
-                              Option.of(browserConfigName),
+                              Option.of(browserConfigName).flatMap(Function.identity()),
                               List.empty(),
                               List.empty());
   }
@@ -208,12 +210,20 @@ public class Selenium {
     private List<Function1<BrowserConfig, BrowserConfig>> browserConfigUpdates;
 
 
-    public SeleniumHelper withSeleniumConfig(String seleniumConfigName) {
-      return new SeleniumHelper(Option.of(seleniumConfigName), browserConfigName, seleniumConfigUpdates, browserConfigUpdates);
+    public SeleniumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
+      return new SeleniumHelper(
+        Option.of(seleniumConfigName).flatMap(Function.identity()),
+        browserConfigName,
+        seleniumConfigUpdates,
+        browserConfigUpdates);
     }
 
-    public SeleniumHelper withBrowserConfig(String browserConfigName) {
-      return new SeleniumHelper(seleniumConfigName, Option.of(browserConfigName), seleniumConfigUpdates, browserConfigUpdates);
+    public SeleniumHelper withBrowserConfig(Option<String> browserConfigName) {
+      return new SeleniumHelper(
+        seleniumConfigName,
+        Option.of(browserConfigName).flatMap(Function.identity()),
+        seleniumConfigUpdates,
+        browserConfigUpdates);
     }
 
     public SeleniumHelper updateBrowserConfig(Function1<BrowserConfig, BrowserConfig> updateBrowserConfig) {
