@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
+import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
+import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
@@ -21,20 +27,13 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
-
-import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
-import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
-import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 @Log4j2(topic = "Browser")
 class SeleniumBrowser implements Browser, BrowserStackExecutor {
@@ -267,7 +266,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Boolean> visibilityOf(Element element) {
     return switchFrame(element.frame())
-      .flatMap(x -> getVisibility.apply(driver, highlightContext, element));
+        .flatMap(x -> getVisibility.apply(driver, highlightContext, element));
   }
 
   @Override

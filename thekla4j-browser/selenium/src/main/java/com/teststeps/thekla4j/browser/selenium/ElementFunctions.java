@@ -1,5 +1,8 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
+import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
+
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
@@ -17,12 +20,6 @@ import io.vavr.Function6;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.HasDownloads;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,9 +29,11 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
-
-import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.highlightElement;
-import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunctions.scrollIntoView;
+import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.HasDownloads;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Functions to interact with elements
@@ -225,9 +224,9 @@ class ElementFunctions {
           .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Boolean>> getVisibility =
-    (driver, hlx, element) -> findElementOnFirstTry(driver, hlx, element)
-      .map(WebElement::isDisplayed)
-      .recover(ElementNotFoundError.class, e -> false);
+      (driver, hlx, element) -> findElementOnFirstTry(driver, hlx, element)
+          .map(WebElement::isDisplayed)
+          .recover(ElementNotFoundError.class, e -> false);
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Rectangle>> getGeometryOfElement =
       (driver, hlx, element) -> findElement(driver, hlx, element)

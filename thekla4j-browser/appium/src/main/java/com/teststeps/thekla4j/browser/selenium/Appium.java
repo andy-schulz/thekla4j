@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
@@ -11,16 +16,10 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 import java.util.Objects;
 import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * create appium browser for mobile devices

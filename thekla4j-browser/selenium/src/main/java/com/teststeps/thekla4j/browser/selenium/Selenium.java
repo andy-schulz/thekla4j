@@ -1,5 +1,13 @@
 package com.teststeps.thekla4j.browser.selenium;
 
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
+import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
@@ -16,18 +24,9 @@ import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
-import java.util.function.Function;
-
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadBrowserConfigList;
-import static com.teststeps.thekla4j.browser.config.ConfigFunctions.loadDefaultBrowserConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
-import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadSeleniumConfig;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
 
 /**
  * Load the Browser from the configuration
@@ -212,18 +211,18 @@ public class Selenium {
 
     public SeleniumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
       return new SeleniumHelper(
-        Option.of(seleniumConfigName).flatMap(Function.identity()),
-        browserConfigName,
-        seleniumConfigUpdates,
-        browserConfigUpdates);
+                                Option.of(seleniumConfigName).flatMap(Function.identity()),
+                                browserConfigName,
+                                seleniumConfigUpdates,
+                                browserConfigUpdates);
     }
 
     public SeleniumHelper withBrowserConfig(Option<String> browserConfigName) {
       return new SeleniumHelper(
-        seleniumConfigName,
-        Option.of(browserConfigName).flatMap(Function.identity()),
-        seleniumConfigUpdates,
-        browserConfigUpdates);
+                                seleniumConfigName,
+                                Option.of(browserConfigName).flatMap(Function.identity()),
+                                seleniumConfigUpdates,
+                                browserConfigUpdates);
     }
 
     public SeleniumHelper updateBrowserConfig(Function1<BrowserConfig, BrowserConfig> updateBrowserConfig) {
