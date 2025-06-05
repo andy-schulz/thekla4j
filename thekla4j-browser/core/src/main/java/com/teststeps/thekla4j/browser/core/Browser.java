@@ -111,6 +111,14 @@ public interface Browser {
   Try<State> getState(Element element);
 
   /**
+   * Check if a given element is visible
+   *
+   * @param element the element to check
+   * @return a Try containing a Boolean indicating whether the element is visible
+   */
+  Try<Boolean> visibilityOf(Element element);
+
+  /**
    * Get the geometry of a given element
    *
    * @param element the element to get the geometry of

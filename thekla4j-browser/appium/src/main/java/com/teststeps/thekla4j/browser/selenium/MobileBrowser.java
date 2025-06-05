@@ -213,9 +213,20 @@ public class MobileBrowser implements Browser {
     return seleniumBrowser.attributeValueOf(attribute, element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<State> getState(Element element) {
     return seleniumBrowser.getState(element);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Boolean> visibilityOf(Element element) {
+    return seleniumBrowser.visibilityOf(element);
   }
 
   /**

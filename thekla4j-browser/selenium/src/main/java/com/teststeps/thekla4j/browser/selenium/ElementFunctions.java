@@ -224,6 +224,11 @@ class ElementFunctions {
               .withIsVisible(webElement.isDisplayed()))
           .recover(ElementNotFoundError.class, e -> State.of(element).withIsPresent(false));
 
+  final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Boolean>> getVisibility =
+    (driver, hlx, element) -> findElementOnFirstTry(driver, hlx, element)
+      .map(WebElement::isDisplayed)
+      .recover(ElementNotFoundError.class, e -> false);
+
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<Rectangle>> getGeometryOfElement =
       (driver, hlx, element) -> findElement(driver, hlx, element)
           .map(WebElement::getRect)

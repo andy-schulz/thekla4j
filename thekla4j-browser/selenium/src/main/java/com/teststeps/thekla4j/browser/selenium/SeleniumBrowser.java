@@ -265,6 +265,12 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   }
 
   @Override
+  public Try<Boolean> visibilityOf(Element element) {
+    return switchFrame(element.frame())
+      .flatMap(x -> getVisibility.apply(driver, highlightContext, element));
+  }
+
+  @Override
   public Try<Rectangle> getGeometryOfElement(Element element) {
     return switchFrame(element.frame())
         .flatMap(x -> getGeometryOfElement.apply(driver, highlightContext, element))
