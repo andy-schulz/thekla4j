@@ -77,6 +77,17 @@ public class API {
     return new Run<>(runner);
   }
 
+  /**
+   * create a task that negates the result of the given activity
+   * 
+   * @param activity the activity to negate
+   * @return the negated activity
+   * @param <T> the input type
+   */
+  public static <T> Activity<T, Boolean> not(Activity<T, Boolean> activity) {
+    return Not.of(activity);
+  }
+
   private API() {
     // prevent instantiation
   }

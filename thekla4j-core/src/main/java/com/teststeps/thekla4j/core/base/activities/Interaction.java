@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
 import java.util.function.Function;
@@ -98,5 +99,27 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    */
   final public RT runAs$(@NonNull Performer performer, PT input, String group, String description) throws ActivityError {
     return performer.attemptsTo$_(this, group, description).using(input);
+  }
+
+  /**
+   * Run the task as the given actor
+   *
+   * @param actor the actor to run the task as
+   * @param input the input to the task
+   * @return the result of the task
+   */
+  final public LogAnnotator<Either<ActivityError, RT>> runAs$(@NonNull Actor actor, PT input) {
+    return (group, description) -> actor.attemptsTo$_(this, group, description).using(input);
+  }
+
+
+  /**
+   * Run the task as the given actor
+   *
+   * @param actor the actor to run the task as
+   * @return the result of the task
+   */
+  final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, RT>>> runAs$(@NonNull Actor actor) {
+    return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
   }
 }

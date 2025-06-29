@@ -16,7 +16,8 @@ public class GeneratorStoreTest {
         "value": "TestValue",
         "details": {
           "key": "value"
-        }
+        },
+        "emptyDetails": {}
       }
       """);
 
@@ -114,6 +115,22 @@ public class GeneratorStoreTest {
     assertThat("retrieving the stored parameter failed with the correct error message",
       retrievalResult.getCause().getMessage(),
       equalTo("Cant get value of attribute: key1. Attribute not found in JSONObject: {\"key\":\"value\"}"));
+  }
+
+  @Test
+  public void accessingNotExistingParentAttributeOfParameter() {
+
+    GeneratorStore generatorStore = GeneratorStore.create()
+      .addGenerator("jsonGenerator", jsonGenerator);
+
+    String generatorString = "jsonGenerator{TestString} => ${TEST}";
+    generatorStore.parseAndExecute(generatorString);
+
+    String retrievalString = "${TEST.emptyDetails.key}";
+    Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
+
+    assertThat("retrieving the stored parameter should fail", retrievalResult.isFailure(), equalTo(true));
+
   }
 
   @Test

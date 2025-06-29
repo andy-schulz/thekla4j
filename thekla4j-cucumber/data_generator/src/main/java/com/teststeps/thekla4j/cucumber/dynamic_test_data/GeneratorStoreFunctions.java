@@ -112,10 +112,11 @@ public class GeneratorStoreFunctions {
       if (jsonObj instanceof JSONObject j) {
         if (j.has(k))
           return j.get(k);
-
+        log.error("Cant get value of attribute: {}. Attribute not found in JSONObject: {}", k, jsonObj);
         throw new IllegalArgumentException("Cant get value of attribute: " + k + ". Attribute not found in JSONObject: " + jsonObj);
       }
 
+      log.error("Cant get value of attribute '{}' from object '{}'. Is not a JSONObject", k, jsonObj);
       throw new IllegalArgumentException("Cant get value of attribute '" + k + "' from object '" + jsonObj + "'. Is not a JSONObject");
 
     });

@@ -10,11 +10,13 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Enter text into an element
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "EnterText")
 @Action("Enter text '@{text}' into @{element}")
 public class Enter extends BasicInteraction {
 
@@ -34,6 +36,7 @@ public class Enter extends BasicInteraction {
 
     return BrowseTheWeb.as(actor)
         .flatMap(b -> b.enterTextInto(text, element, clearField))
+        .onSuccess(__ -> log.info("Enter text: {} into element {}", text, element))
         .transform(ActivityError.toEither("Error while entering text " + text + " into element " + element));
   }
 
