@@ -365,21 +365,47 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remoteFilePath) {
 
-    if (!remoteFilePath.isDefined()) {
-      log.warn(() -> """
-          Ignoring remote file path: {{REMOTE_FILE_PATH}}
-          Remote file path is not necessary for selenium tests.
-          The current Selenium implementation uses the LocalFileDetector to upload files.
+    List<Path> filePathsList = filePaths;
+
+
+    if (localExecution) {
+
+      log.info(() -> """
+          Setting upload files on local machine.
+            Expecting that the files are present on the local machine.
+            Looking for files in the local path: {{FILES}}
+            {{REMOTE_FILE_PATH}}.
           """
-          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.get().toString()));
+          .replace("{{FILES}}", filePaths.mkString(", "))
+          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.map(p -> "Ignoring remote file path: " + p.toString()).getOrElse("")));
+
+    } else if (remoteFilePath.isDefined()) {
+
+
+      filePathsList = filePaths.map(Path::getFileName)
+          .map(fileName -> remoteFilePath.get().resolve(fileName));
+
+      String remoteFilePathString = filePathsList.foldLeft("", (s, i) -> s + i + ", ");
+
+      log.info(() -> """
+          Setting upload files on remote system with remote file path: {{REMOTE_FILE_PATH}}.
+            Expecting that the files are already present on the remote machine.
+            Looking for files in the remote path: {{FILES}}
+          """
+          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.get().toString())
+          .replace("{{FILES}}", remoteFilePathString));
+
+    } else {
+
+      log.info(() -> "Setting upload files with LocalFileDetector: {{FILES}}"
+          .replace("{{FILES}}", filePaths.map(Path::getFileName).mkString(", ")));
     }
 
-    List<String> files = filePaths.map(Path::toString);
-
-    log.info(() -> "Uploading files: {{FILES}}"
-        .replace("{{FILES}}",
-          filePaths.map(Path::getFileName)
-              .foldLeft("", (s, i) -> s + i + ", ")));
+    // WINDOWS can handle both forward slashes and backslashes in file paths
+    // but UNIX based systems (Linux, macOS) can only handle forward slashes
+    // When running on Windows and executing on a remote UNIX based system the slashes need to be converted
+    List<String> files = filePathsList.map(Path::toString)
+        .map(p -> p.replace("\\", "/"));
 
     return switchFrame(targetFileUploadInput.frame())
         .flatMap(x -> setUploadFilesTo.apply(driver, files, targetFileUploadInput))

@@ -82,8 +82,27 @@ public class SetUpload {
       return this;
     }
 
-    public SetUploadFiles useRemoteFilePath(Path remoteFilePath) {
+    /**
+     * set remote file path the file to upload.
+     * The file is expected to be present on the remote server.
+     *
+     * @param remoteFilePath - the remote file path of the file to upload
+     * @return - the task to set the remote file path to upload
+     */
+    public SetUploadFiles remoteFileAt(Path remoteFilePath) {
       this.remoteFilePath = Option.of(remoteFilePath);
+      return this;
+    }
+
+    /**
+     * set remote file path the file to upload.
+     * The file is expected to be present on the remote server.
+     *
+     * @param remoteFilePath - the remote file path of the file to upload
+     * @return - the task to set the remote file path to upload
+     */
+    public SetUploadFiles remoteFileAt(Option<Path> remoteFilePath) {
+      this.remoteFilePath = remoteFilePath;
       return this;
     }
   }
