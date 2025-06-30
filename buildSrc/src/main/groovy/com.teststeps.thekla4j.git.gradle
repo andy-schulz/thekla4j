@@ -4,7 +4,7 @@ plugins {
 }
 
 tasks.register("installLocalGitHook", Copy) {
-  group = "_sp-help"
+  group = "_thekla-help"
   from new File(rootProject.rootDir, 'scripts/git/pre-commit')
   into { new File(rootProject.rootDir, '.git/hooks')}
   filePermissions {
@@ -28,6 +28,10 @@ tasks.register("installLocalGitHook", Copy) {
 
 build.dependsOn installLocalGitHook
 build.dependsOn("spotlessCheck")
+
+configure(spotlessApply) {
+  group = "_thekla-help"
+}
 
 spotless {
   java {
