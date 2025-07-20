@@ -31,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.HasDownloads;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -240,6 +241,43 @@ class ElementFunctions {
   final static Function1<RemoteWebDriver, Try<String>> getUrl =
       driver -> Try.of(driver::getCurrentUrl)
           .onFailure(log::error);
+
+  private static final String scrollElementInArea =
+      """
+          var element = arguments[0];
+          var scrollArea = arguments[1];
+
+          function scrollToElementWithinContainer(elem, scrArea) {
+                if (scrArea && elem) {
+                      scrArea.scroll{{TOP_OR_LEFT}} = elem.offset{{TOP_OR_LEFT}};
+                } else {
+                    console.error('Container or target element not found');
+                }
+            }
+
+          scrollToElementWithinContainer(element, scrollArea);
+          """;
+  private static final String scrollElementToTopOfAreaFunc =
+      scrollElementInArea.replace("{{TOP_OR_LEFT}}", "Top");
+
+  private static final String scrollElementToLeftOfAreaFunc =
+      scrollElementInArea.replace("{{TOP_OR_LEFT}}", "Left");
+
+  final static Function3<RemoteWebDriver, Element, Element, Try<Void>> scrollElementToTopOfArea =
+      (driver, element, area) -> findElementWithoutScrolling(driver, element)
+          .flatMap(webElement -> findElement(driver, area)
+              .flatMapTry(areaElement -> Try.run(() -> ((JavascriptExecutor) driver)
+                  .executeScript(scrollElementToTopOfAreaFunc, webElement, areaElement))))
+          .onFailure(log::error)
+          .map(x -> null);
+
+  final static Function3<RemoteWebDriver, Element, Element, Try<Void>> scrollElementToLeftOfArea =
+      (driver, element, area) -> findElement(driver, element)
+          .flatMap(webElement -> findElement(driver, area)
+              .flatMapTry(areaElement -> Try.run(() -> ((JavascriptExecutor) driver)
+                  .executeScript(scrollElementToLeftOfAreaFunc, webElement, areaElement))))
+          .onFailure(log::error)
+          .map(x -> null);
 
   final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
       (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))

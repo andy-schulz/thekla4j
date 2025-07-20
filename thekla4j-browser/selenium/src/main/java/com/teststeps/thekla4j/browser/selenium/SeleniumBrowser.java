@@ -21,6 +21,7 @@ import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActionDriver;
+import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.Function1;
@@ -263,18 +264,62 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .flatMap(x -> getElementState.apply(driver, highlightContext, element));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Boolean> visibilityOf(Element element) {
     return switchFrame(element.frame())
         .flatMap(x -> getVisibility.apply(driver, highlightContext, element));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Rectangle> getGeometryOfElement(Element element) {
     return switchFrame(element.frame())
         .flatMap(x -> getGeometryOfElement.apply(driver, highlightContext, element))
         .onSuccess(r -> log.info("Element geometry: {} of element: {}", r, element.name()))
         .map(applyExecutionSlowDown());
+  }
+
+  private static final String frameErrorMessage = """
+      Can not scroll element to top of area because the element and the scroll area are in different frames.
+      Please switch to the correct frame before scrolling the element.
+      """;
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea) {
+
+    if (element.frame().isEmpty() && scrollArea.frame().isEmpty() ||
+        element.frame().isDefined() && scrollArea.frame().isDefined() && element.frame().get().equals(scrollArea.frame().get())) {
+
+      return switchFrame(element.frame())
+          .flatMap(__ -> scrollElementToTopOfArea.apply(driver, element, scrollArea));
+    } else {
+      Try.failure(ActivityError.of(frameErrorMessage));
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea) {
+    if (element.frame().isEmpty() && scrollArea.frame().isEmpty() ||
+        element.frame().isDefined() && scrollArea.frame().isDefined() && element.frame().get().equals(scrollArea.frame().get())) {
+
+      return switchFrame(element.frame())
+          .flatMap(__ -> scrollElementToLeftOfArea.apply(driver, element, scrollArea));
+    } else {
+      Try.failure(ActivityError.of(frameErrorMessage));
+    }
+    return null;
   }
 
   /**

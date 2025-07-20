@@ -127,6 +127,23 @@ public interface Browser {
   Try<Rectangle> getGeometryOfElement(Element element);
 
   /**
+   * Scroll the element to the top of a given scroll area.
+   *
+   * @param element the element to scroll
+   * @return a Try containing a Void
+   */
+  Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea);
+
+
+  /**
+   * Scroll the element to the left of a given scroll area.
+   *
+   * @param element the element to scroll
+   * @return a Try containing a Void
+   */
+  Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea);
+
+  /**
    * Get the title of the browser
    *
    * @return a Try containing the title of the browser
