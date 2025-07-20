@@ -21,7 +21,8 @@ public class SpringStompSessionConnectHandler implements StompSessionHandler {
   @Override
   public void afterConnected(@NonNull StompSession session, @NonNull StompHeaders connectedHeaders) {
 
-    log.info(prefix + ": connected");
+    log.info(() -> prefix + ": connected");
+    log.info(() -> "Connect Headers " + connectedHeaders);
     System.out.println(connectedHeaders);
 
     this.future.complete(SpringFunctions.toStompHeaders.apply(connectedHeaders));
