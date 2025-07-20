@@ -24,10 +24,20 @@ public class AssertionNot implements TheklaAssertion {
 
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
-    return p -> Try.run(() -> assertThat(String.format("expect '%s' to not equal '%s'", p, expected),
+    return p -> Try.run(() -> assertThat(String.format("Expect actuel '%s' to NOT equal '%s'", p, expected),
       p, not(equalTo(expected))))
 
-        .peek(r -> log.debug(() -> "Assertion Result: " + r))
+        .peek(r -> log.debug(() -> "Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(ActivityError::of));
+  }
+
+  @Override
+  public <M> SeeAssertion<M> equal(M expected, String reason) {
+    return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect actual %s to NOT equal %s", p, expected),
+      p, not(equalTo(expected))))
+
+        .peek(r -> log.debug(() -> reason + " ->  Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
         .onFailure(log::error)
         .transform(TransformTry.toEither(ActivityError::of));
   }

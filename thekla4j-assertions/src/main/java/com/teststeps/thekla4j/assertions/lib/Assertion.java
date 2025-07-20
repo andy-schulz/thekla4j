@@ -15,7 +15,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Log4j2(topic = "Assertions")
 public class Assertion implements TheklaAssertion {
 
   public final Assertion to = this;
@@ -26,10 +26,21 @@ public class Assertion implements TheklaAssertion {
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
 
-    return p -> Try.run(() -> assertThat(String.format("expect '%s' to equal '%s'", p, expected),
+    return p -> Try.run(() -> assertThat(String.format("Expect '%s' to equal '%s'", p, expected),
       p, equalTo(expected)))
 
-        .peek(r -> log.debug(() -> "Assertion Result: " + r))
+        .peek(r -> log.debug("Expect actual {} to equal {} -> Result: true", p, expected))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(ActivityError::of));
+  }
+
+  @Override
+  public <M> SeeAssertion<M> equal(M expected, String reason) {
+
+    return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect '%s' to equal '%s'", p, expected),
+      p, equalTo(expected)))
+
+        .peek(r -> log.debug("{} -> Expect actual {} to equal {} -> Result: true", reason, p, expected))
         .onFailure(log::error)
         .transform(TransformTry.toEither(ActivityError::of));
   }
