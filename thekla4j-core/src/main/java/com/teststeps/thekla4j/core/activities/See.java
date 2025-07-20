@@ -31,7 +31,7 @@ import lombok.extern.log4j.Log4j2;
  * @param <M> the type of the result
  */
 @Workflow("ask if @{activity} is matching the validations (retry for @{retries} time(s))")
-@Log4j2
+@Log4j2(topic = "SeeActivity")
 public class See<P, M> extends Interaction<P, P> {
 
   @Called(name = "activity")
@@ -73,6 +73,8 @@ public class See<P, M> extends Interaction<P, P> {
    */
   @Override
   protected Either<ActivityError, P> performAs(Actor actor, P passedResult) {
+
+    log.info("Check if activity '{}' matches assertions", activity.getClass().getSimpleName());
 
     Function0<Either<ActivityError, String>> executeActivity =
         () -> actor.attemptsTo_(this.activity, ValidateResult.with(this.matchers2))
