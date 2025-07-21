@@ -300,6 +300,19 @@ class ElementFunctions {
           .onFailure(log::error)
           .map(x -> null);
 
+  private static final String scrollToEndOfAreaFunc =
+      """
+            var element = arguments[0];
+            element.scrollTop = element.scrollHeight
+          """;
+
+  final static Function2<RemoteWebDriver, Element, Try<Void>> scrollToEndOfArea =
+      (driver, area) -> findElement(driver, area)
+          .flatMapTry(areaElement -> Try.run(() -> driver
+              .executeScript(scrollToEndOfAreaFunc, areaElement)))
+          .onFailure(log::error)
+          .map(x -> null);
+
   final static Function2<RemoteWebDriver, String, Try<Cookie>> getCookie =
       (driver, name) -> Try.of(() -> driver.manage().getCookieNamed(name))
           .map(c -> Cookie.of(c.getName(), c.getValue()))

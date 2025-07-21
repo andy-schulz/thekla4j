@@ -47,6 +47,10 @@ public class Scroll extends BasicInteraction {
     return new Scroll(element, null, null);
   }
 
+  public static BasicInteraction toEndOfArea(Element scrollArea) {
+    return new ScrollArea(scrollArea);
+  }
+
   public Scroll toTopOfArea(Element scrollArea) {
     this.scrollArea = scrollArea;
     this.scrollDirection = ScrollDirection.TOP;
@@ -58,6 +62,26 @@ public class Scroll extends BasicInteraction {
     this.scrollDirection = ScrollDirection.LEFT;
     return this;
   }
+
+
+  @AllArgsConstructor
+  @Action("Scroll to end of scrollable area @{scrollArea}")
+  private static class ScrollArea extends BasicInteraction {
+
+    @Called(name = "scrollArea", value = "name")
+    private Element scrollArea;
+
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor) {
+      return BrowseTheWeb.as(actor)
+          .peek(b -> log.info(() -> "Scrolling to end of area '%s'".formatted(scrollArea.name())))
+          .flatMap(browser -> browser.scrollToEndOfScrollableArea(scrollArea))
+          .transform(ActivityError.toEither("Error while scrolling to end of area %s."
+              .formatted(scrollArea.name())))
+          .map(__ -> null);
+    }
+  }
+
 
   private enum ScrollDirection {
     TOP, LEFT

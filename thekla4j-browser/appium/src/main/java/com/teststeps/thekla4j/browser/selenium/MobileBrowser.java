@@ -250,6 +250,11 @@ public class MobileBrowser implements Browser {
   }
 
   @Override
+  public Try<Void> scrollToEndOfScrollableArea(Element scrollArea) {
+    return seleniumBrowser.scrollToEndOfScrollableArea(scrollArea);
+  }
+
+  @Override
   public Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea) {
     return seleniumBrowser.scrollElementToLeftOfArea(element, scrollArea);
   }

@@ -64,4 +64,31 @@ public class IT_ScrollTo {
 
         .getOrElseThrow(Function.identity());
   }
+
+  @Test
+  public void scrollToEndOfArea() throws ActivityError {
+    Thekla4jProperty.resetPropertyCache();
+
+    System.setProperty(DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED.property().name(), "false");
+
+    actor = Actor.named("Test Actor")
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    Element element = Element.found(By.css("#link")).withName("Link Element");
+    Element scrollArea = Element.found(By.css("body > div")).withName("Scroll Area");
+
+    actor.attemptsTo(
+
+      Navigate.to("https://www.selenium.dev/selenium/web/scrolling_tests/page_with_y_overflow_auto.html"),
+
+      See.ifThe(Visibility.of(element))
+          .is(Expected.to.equal(true, "check if element is not visible before scrolling")),
+
+      Scroll.toEndOfArea(scrollArea),
+
+      See.ifThe(Visibility.of(element))
+          .is(Expected.to.equal(true, "check if element is visible after scrolling")))
+
+        .getOrElseThrow(Function.identity());
+  }
 }

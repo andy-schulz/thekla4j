@@ -337,6 +337,16 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    * {@inheritDoc}
    */
   @Override
+  public Try<Void> scrollToEndOfScrollableArea(Element scrollArea) {
+    return switchFrame(scrollArea.frame())
+        .flatMap(__ -> scrollToEndOfArea.apply(driver, scrollArea))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<String> title() {
     return getTitle.apply(driver);
   }

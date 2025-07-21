@@ -144,6 +144,13 @@ public interface Browser {
    */
   Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea);
 
+  /**
+   * Scroll to the end of a scrollable area.
+   *
+   * @param scrollArea the area to scroll
+   * @return a Try containing a Void
+   */
+  Try<Void> scrollToEndOfScrollableArea(Element scrollArea);
 
   /**
    * Scroll the element to the left of a given scroll area.
