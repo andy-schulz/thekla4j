@@ -9,8 +9,8 @@ import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProp
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
-import com.teststeps.thekla4j.browser.spp.activities.ExecuteJavaScript;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.Property;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
@@ -59,13 +59,13 @@ public class IT_ShadowRoot {
 
       Navigate.to("https://www.selenium.dev/selenium/web/shadowRootPage.html"),
 
-      See.ifThe(ExecuteJavaScript.onElement(script, checkBoxShadowRoot))
-          .is(Expected.to.equal(false, "check if checkbox is not checked before clicking")),
+      See.ifThe(Property.named("checked").of(checkBoxShadowRoot))
+          .is(Expected.to.equal("false", "check if checkbox is not checked before clicking")),
 
       Click.on(checkBoxShadowRoot),
 
-      See.ifThe(ExecuteJavaScript.onElement(script, checkBoxShadowRoot))
-          .is(Expected.to.equal(true, "check if checkbox is not checked before clicking")))
+      See.ifThe(Property.named("checked").of(checkBoxShadowRoot))
+          .is(Expected.to.equal("true", "check if checkbox is checked after clicking")))
 
         .getOrElseThrow(Function.identity());
   }

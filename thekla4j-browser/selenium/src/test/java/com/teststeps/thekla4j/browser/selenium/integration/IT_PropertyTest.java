@@ -1,6 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 import com.teststeps.thekla4j.assertions.Expected;
@@ -8,8 +7,8 @@ import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
 import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
-import com.teststeps.thekla4j.browser.spp.activities.Attribute;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
+import com.teststeps.thekla4j.browser.spp.activities.Property;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.activities.See;
@@ -19,7 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class IT_AttributeTest {
+public class IT_PropertyTest {
 
   Actor actor = Actor.named("Test Actor");
   Element header = Element.found(By.css(".headerElement"));
@@ -37,35 +36,13 @@ public class IT_AttributeTest {
   }
 
   @Test
-  public void testElement() throws ActivityError {
-
-    actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(Selenium.browser()));
-
-    Element clientButton = Element.found(By.id("ButtonWithId"));
-
-
-    String url = FRAMEWORKTESTER;
-
-    actor.attemptsTo(
-
-      Navigate.to(url),
-
-      Attribute.named("innerHTML").of(clientButton),
-
-      See.<String>ifResult()
-          .is(Expected.to.equal("Button with id")))
-
-        .getOrElseThrow(Function.identity());
-  }
-
-  @Test
-  public void testDynamicPropertyIsAnAttribute() throws ActivityError {
+  public void testDynamicElementProperty() throws ActivityError {
 
     actor = Actor.named("Test Actor")
         .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
     Element element = Element.found(By.id("d"));
+
 
     String url = "https://www.selenium.dev/selenium/web/userDefinedProperty.html";
 
@@ -73,8 +50,8 @@ public class IT_AttributeTest {
 
       Navigate.to(url),
 
-      See.ifThe(Attribute.named("dynamicProperty").of(element))
-          .is(Expected.to.equal("null")))
+      See.ifThe(Property.named("dynamicProperty").of(element))
+          .is(Expected.to.equal("sampleValue")))
 
         .getOrElseThrow(Function.identity());
   }

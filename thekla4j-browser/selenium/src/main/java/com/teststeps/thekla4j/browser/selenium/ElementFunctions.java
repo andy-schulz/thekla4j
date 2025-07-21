@@ -222,13 +222,18 @@ class ElementFunctions {
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<String>> getValueOfElement =
       (driver, hlx, element) -> findElement(driver, hlx, element)
-          .map(webElement -> webElement.getAttribute("value"))
+          .map(webElement -> String.valueOf(webElement.getDomProperty("value")))
           .onFailure(log::error);
 
 
   final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getAttributeFromElement =
       (driver, hlx, element, attribute) -> findElement(driver, hlx, element)
-          .map(webElement -> webElement.getAttribute(attribute))
+          .map(webElement -> String.valueOf(webElement.getDomAttribute(attribute)))
+          .onFailure(log::error);
+
+  final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getPropertyFromElement =
+      (driver, hlx, element, attribute) -> findElement(driver, hlx, element)
+          .map(webElement -> String.valueOf(webElement.getDomProperty(attribute)))
           .onFailure(log::error);
 
 

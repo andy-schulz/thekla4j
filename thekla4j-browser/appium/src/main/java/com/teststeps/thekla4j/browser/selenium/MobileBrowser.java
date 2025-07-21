@@ -216,6 +216,14 @@ public class MobileBrowser implements Browser {
    * {@inheritDoc}
    */
   @Override
+  public Try<String> propertyValueOf(String attribute, Element element) {
+    return seleniumBrowser.propertyValueOf(attribute, element);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<State> getState(Element element) {
     return seleniumBrowser.getState(element);
   }
@@ -234,6 +242,16 @@ public class MobileBrowser implements Browser {
   @Override
   public Try<Rectangle> getGeometryOfElement(Element element) {
     return seleniumBrowser.getGeometryOfElement(element);
+  }
+
+  @Override
+  public Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea) {
+    return seleniumBrowser.scrollElementToTopOfArea(element, scrollArea);
+  }
+
+  @Override
+  public Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea) {
+    return seleniumBrowser.scrollElementToLeftOfArea(element, scrollArea);
   }
 
   /**

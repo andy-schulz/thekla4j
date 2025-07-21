@@ -10,12 +10,14 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get the content of an attribute of an element
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("get content of attribute '@{attributeName}' of @{element}")
+@Log4j2(topic = "browser")
 public class Attribute extends SupplierTask<String> {
 
   @Called(name = "attributeName")
@@ -26,6 +28,7 @@ public class Attribute extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .peek(__ -> log.debug("getting attribute '{}' of element '{}'", attributeName, element))
         .flatMap(b -> b.attributeValueOf(attributeName, element))
         .toEither(ActivityError.of(String.format("could not get value of attribute '%s' from %s", attributeName, element)));
   }

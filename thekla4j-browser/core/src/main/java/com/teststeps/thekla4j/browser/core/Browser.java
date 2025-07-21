@@ -103,6 +103,16 @@ public interface Browser {
   Try<String> attributeValueOf(String attribute, Element element);
 
   /**
+   * Get the value of a property of a given element
+   *
+   * @param property the property to get the value of
+   * @param element  the element to get the property value of
+   * @return a Try containing the value of the property
+   */
+  Try<String> propertyValueOf(String property, Element element);
+
+
+  /**
    * Get the state of a given element
    *
    * @param element the element to get the state of

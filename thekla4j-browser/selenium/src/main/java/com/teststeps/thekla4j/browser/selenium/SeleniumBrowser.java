@@ -259,6 +259,17 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    * {@inheritDoc}
    */
   @Override
+  public Try<String> propertyValueOf(String attribute, Element element) {
+    return switchFrame(element.frame())
+        .flatMap(x -> getPropertyFromElement.apply(driver, highlightContext, element, attribute))
+        .map(applyExecutionSlowDown());
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<State> getState(Element element) {
     return switchFrame(element.frame())
         .flatMap(x -> getElementState.apply(driver, highlightContext, element));
