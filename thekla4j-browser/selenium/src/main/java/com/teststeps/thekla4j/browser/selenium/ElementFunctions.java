@@ -5,6 +5,8 @@ import static com.teststeps.thekla4j.browser.selenium.element.ElementHelperFunct
 
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.Locator;
+import com.teststeps.thekla4j.browser.core.locator.LocatorType;
+import com.teststeps.thekla4j.browser.core.locator.ShadowRootLocator;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.error.ElementNotFoundError;
 import com.teststeps.thekla4j.browser.selenium.status.SeleniumElementStatus;
@@ -32,6 +34,7 @@ import java.util.function.BiFunction;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.HasDownloads;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -147,8 +150,21 @@ class ElementFunctions {
                 ElementFunctions.findElementsFromDriver.apply(driver, locators.head()),
                 ElementFunctions.findElementsFromWebElementList);
 
+  private static final Function2<ShadowRootLocator, WebElement, List<WebElement>> findWebElementInsideShadowRoot =
+      (shadowRootLocator, shadowHost) -> {
+        SearchContext shadowRoot = shadowHost.getShadowRoot();
+        return List.ofAll(shadowRoot.findElements(LocatorResolver.resolve(shadowRootLocator.elementLocator())));
+      };
+
   private static final BiFunction<List<WebElement>, Locator, List<WebElement>> findElementsFromWebElementList =
-      (webElements, locator) -> webElements.flatMap(ElementFunctions.findElementsOfWebElement.apply(locator));
+      (webElements, locator) -> {
+
+        if (locator.type().equals(LocatorType.SHADOW_ROOT)) {
+          return webElements.flatMap(findWebElementInsideShadowRoot.apply((ShadowRootLocator) locator));
+        }
+
+        return webElements.flatMap(ElementFunctions.findElementsOfWebElement.apply(locator));
+      };
 
 
   private static final Function2<Locator, WebElement, List<WebElement>> findElementsOfWebElement =

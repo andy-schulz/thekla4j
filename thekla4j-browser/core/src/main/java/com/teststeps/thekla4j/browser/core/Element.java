@@ -121,7 +121,7 @@ public record Element(
    * @return a new Element instance
    */
   public Element andThenFound(Locator locator) {
-    return new Element(locators.append(locator), frame, name, highlight, waiter);
+    return new Element(locators.append(locator), frame, "unnamed", highlight, waiter);
   }
 
   /**
@@ -141,5 +141,14 @@ public record Element(
    */
   public Element wait(UntilElement waiter) {
     return new Element(locators, frame, name, highlight, waiter);
+  }
+
+  /**
+   * Create a ShadowRoot for the element
+   *
+   * @return a new ShadowRoot instance
+   */
+  public ShadowRoot shadowRoot() {
+    return new ShadowRoot(this);
   }
 }

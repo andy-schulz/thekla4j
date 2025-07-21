@@ -23,5 +23,11 @@ public enum LocatorType {
   /**
    * A XPATH locator
    */
-  XPATH
+  XPATH,
+
+  /**
+   * A SHADOW ROOT locator
+   */
+  SHADOW_ROOT
+
 }
