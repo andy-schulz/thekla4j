@@ -5,3 +5,4 @@ log.html
 thekla4j-websocket/src/test/
 docs/_site
 **/ignore_tests/**
+**/global_resources/publish/**
