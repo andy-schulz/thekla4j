@@ -460,7 +460,7 @@ class ElementFunctions {
 
   final static Function3<RemoteWebDriver, List<String>, Element, Try<Void>> setUploadFilesTo =
       (driver, filePaths, element) -> findElement(driver, element)
-          .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString(",")))
+          .flatMap(webElement -> Try.run(() -> webElement.sendKeys(filePaths.mkString("\n")))
               .onFailure(log::error))
           .map(x -> null);
 
