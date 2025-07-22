@@ -6,7 +6,9 @@ import com.teststeps.thekla4j.browser.core.locator.Locator;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import lombok.With;
 
 /**
@@ -98,10 +100,12 @@ public record Element(
    *
    * @return a new Element instance
    */
-  public String toString() {
-    return String.format("Element<%s> found By (%s)", name, this.locators
-        .map(Object::toString)
-        .collect(Collectors.joining(" > ")));
+  @Override
+  public @NonNull String toString() {
+    return String.format("Element<%s> found By (%s)", Objects.isNull(name) ? "unnamed" : name,
+      this.locators
+          .map(Object::toString)
+          .collect(Collectors.joining(" -> ")));
   }
 
   /**

@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.core.locator;
 
+import lombok.NonNull;
+
 public record ShadowRootLocator(
                                 String text,
                                 Locator elementLocator
@@ -36,8 +38,8 @@ public record ShadowRootLocator(
    * @return - the string representation of the elementLocator
    */
   @Override
-  public String toString() {
-    return "text=" + this.text;
+  public @NonNull String toString() {
+    return "%s -> %s".formatted(text, elementLocator.toString());
   }
 
 

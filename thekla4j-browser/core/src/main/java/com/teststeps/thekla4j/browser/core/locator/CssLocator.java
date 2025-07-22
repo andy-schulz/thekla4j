@@ -38,6 +38,6 @@ public class CssLocator implements Locator {
    */
   @Override
   public String toString() {
-    return "css=" + this.css;
+    return "css=(" + this.css + ")";
   }
 }

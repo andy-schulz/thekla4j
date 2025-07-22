@@ -38,6 +38,6 @@ public class XpathLocator implements Locator {
    */
   @Override
   public String toString() {
-    return "xpath=" + this.xpath;
+    return "xpath=(" + this.xpath + ")";
   }
 }
