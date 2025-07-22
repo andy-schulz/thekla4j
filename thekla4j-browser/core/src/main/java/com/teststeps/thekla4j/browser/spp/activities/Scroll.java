@@ -8,6 +8,7 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -36,6 +37,8 @@ public class Scroll extends BasicInteraction {
         .flatMap(browser -> switch (scrollDirection) {
           case TOP -> browser.scrollElementToTopOfArea(element, scrollArea);
           case LEFT -> browser.scrollElementToLeftOfArea(element, scrollArea);
+          default -> Try.failure(new Throwable("Unsupported scroll direction: %s to scroll an element"
+              .formatted(scrollDirection)));
         })
 
         .transform(ActivityError.toEither("Error while scrolling element '%s' to %s of area."
@@ -51,6 +54,22 @@ public class Scroll extends BasicInteraction {
     return new ScrollArea(scrollArea);
   }
 
+  public static BasicInteraction areaDown(Element scrollArea) {
+    return ScrollByPixels.of(scrollArea, ScrollDirection.DOWN);
+  }
+
+  public static BasicInteraction areaDown(Element scrollArea, int byPixels) {
+    return ScrollByPixels.of(scrollArea, byPixels, ScrollDirection.DOWN);
+  }
+
+  public static BasicInteraction areaUp(Element scrollArea) {
+    return ScrollByPixels.of(scrollArea, ScrollDirection.UP);
+  }
+
+  public static BasicInteraction areaUp(Element scrollArea, int byPixels) {
+    return ScrollByPixels.of(scrollArea, byPixels, ScrollDirection.UP);
+  }
+
   public Scroll toTopOfArea(Element scrollArea) {
     this.scrollArea = scrollArea;
     this.scrollDirection = ScrollDirection.TOP;
@@ -61,6 +80,50 @@ public class Scroll extends BasicInteraction {
     this.scrollArea = scrollArea;
     this.scrollDirection = ScrollDirection.LEFT;
     return this;
+  }
+
+
+  @AllArgsConstructor
+  @Action("Scroll @{scrollArea} by @{pixels} pixels in direction @{scrollDirection}")
+  private static class ScrollByPixels extends BasicInteraction {
+
+    @Called(name = "scrollArea", value = "name")
+    private Element scrollArea;
+    @Called(name = "pixels")
+    private int pixels;
+    @Called(name = "scrollDirection")
+    private ScrollDirection scrollDirection;
+
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor) {
+      return BrowseTheWeb.as(actor)
+          .peek(b -> log.info(() -> "Scrolling %s by %d pixels in area '%s'".formatted(
+            scrollDirection, pixels, scrollArea.name())))
+
+          .flatMap(browser -> switch (scrollDirection) {
+            case UP -> browser.scrollAreaUpByPixels(scrollArea, pixels);
+            case DOWN -> browser.scrollAreaDownByPixels(scrollArea, pixels);
+            default -> Try.failure(new Throwable("Unsupported scroll direction: %s to scroll an area"
+                .formatted(scrollDirection)));
+          })
+
+          .transform(ActivityError.toEither("Error while scrolling '%s' by %d pixels in area '%s'."
+              .formatted(scrollDirection, pixels, scrollArea.name())))
+          .map(__ -> null);
+    }
+
+    private static ScrollByPixels of(Element scrollArea, ScrollDirection scrollDirection) {
+      return new ScrollByPixels(scrollArea, 100, scrollDirection);
+    }
+
+    private static ScrollByPixels of(Element scrollArea, int pixels, ScrollDirection scrollDirection) {
+      return new ScrollByPixels(scrollArea, pixels, scrollDirection);
+    }
+
+    public ScrollByPixels byPixels(int pixels) {
+      this.pixels = pixels;
+      return this;
+    }
   }
 
 
@@ -84,6 +147,6 @@ public class Scroll extends BasicInteraction {
 
 
   private enum ScrollDirection {
-    TOP, LEFT
+    UP, DOWN, TOP, LEFT, RIGHT
   }
 }

@@ -337,6 +337,27 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    * {@inheritDoc}
    */
   @Override
+  public Try<Void> scrollAreaDownByPixels(Element element, int pixels) {
+
+    return switchFrame(element.frame())
+        .flatMap(__ -> scrollAreaDownByPixels.apply(driver, pixels, element))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> scrollAreaUpByPixels(Element element, int pixels) {
+    return switchFrame(element.frame())
+        .flatMap(__ -> scrollAreaUpByPixels.apply(driver, pixels, element))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<Void> scrollToEndOfScrollableArea(Element scrollArea) {
     return switchFrame(scrollArea.frame())
         .flatMap(__ -> scrollToEndOfArea.apply(driver, scrollArea))
@@ -564,14 +585,34 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .flatMap(KeyActionDriver::perform);
   }
 
+
+  private final Function1<List<Element>, Boolean> elementsHaveTheSameFrame = elements -> {
+
+    if (elements.isEmpty()) {
+      return false;
+    }
+
+    Option<Frame> firstFrame = elements.get(0).frame();
+
+    return elements.forAll(e -> e.frame().equals(firstFrame));
+  };
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public Try<Object> executeJavaScript(String script, Element element) {
-    return switchFrame(element.frame())
-        .flatMap(x -> executeJavaScriptOnElement.apply(driver, highlightContext, script, element))
-        .map(applyExecutionSlowDown());
+  public Try<Object> executeJavaScript(String script, List<Element> elements) {
+
+    if (elementsHaveTheSameFrame.apply(elements)) {
+      return switchFrame(elements.get(0).frame())
+          .flatMap(x -> executeJavaScriptOnElement.apply(driver, highlightContext, script, elements))
+          .map(applyExecutionSlowDown());
+    } else {
+      return Try.failure(ActivityError.of(
+        "Elements are not located within the same frame. Cannot execute JavaScript on multiple elements within different frames."));
+    }
+
+
   }
 
   /**

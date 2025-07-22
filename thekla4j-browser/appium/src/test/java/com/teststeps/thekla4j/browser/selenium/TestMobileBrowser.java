@@ -435,7 +435,7 @@ public class TestMobileBrowser {
 
     ExecuteJavaScript.onElement("alert('Hello World')", element).runAs(actor);
 
-    verify(mobileBrowserMock).executeJavaScript("alert('Hello World')", element);
+    verify(mobileBrowserMock).executeJavaScript("alert('Hello World')", io.vavr.collection.List.of(element));
     verify(driverMock, times(1)).executeScript(anyString(), any());
   }
 

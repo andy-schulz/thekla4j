@@ -244,19 +244,41 @@ public class MobileBrowser implements Browser {
     return seleniumBrowser.getGeometryOfElement(element);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea) {
     return seleniumBrowser.scrollElementToTopOfArea(element, scrollArea);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> scrollToEndOfScrollableArea(Element scrollArea) {
     return seleniumBrowser.scrollToEndOfScrollableArea(scrollArea);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea) {
     return seleniumBrowser.scrollElementToLeftOfArea(element, scrollArea);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> scrollAreaDownByPixels(Element element, int pixels) {
+    return seleniumBrowser.scrollAreaDownByPixels(element, pixels);
+  }
+
+  @Override
+  public Try<Void> scrollAreaUpByPixels(Element element, int pixels) {
+    return seleniumBrowser.scrollAreaUpByPixels(element, pixels);
   }
 
   /**
@@ -459,8 +481,8 @@ public class MobileBrowser implements Browser {
    * {@inheritDoc}
    */
   @Override
-  public Try<Object> executeJavaScript(String script, Element element) {
-    return seleniumBrowser.executeJavaScript(script, element);
+  public Try<Object> executeJavaScript(String script, List<Element> elements) {
+    return seleniumBrowser.executeJavaScript(script, elements);
   }
 
   /**

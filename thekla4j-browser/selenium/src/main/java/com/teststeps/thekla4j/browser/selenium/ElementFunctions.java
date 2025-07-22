@@ -13,12 +13,14 @@ import com.teststeps.thekla4j.browser.selenium.status.SeleniumElementStatus;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.Function4;
 import io.vavr.Function5;
 import io.vavr.Function6;
+import io.vavr.Value;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -302,14 +304,44 @@ class ElementFunctions {
 
   private static final String scrollToEndOfAreaFunc =
       """
-            var element = arguments[0];
-            element.scrollTop = element.scrollHeight
+              var element = arguments[0];
+              element.scrollTop = element.scrollHeight
           """;
 
   final static Function2<RemoteWebDriver, Element, Try<Void>> scrollToEndOfArea =
       (driver, area) -> findElement(driver, area)
           .flatMapTry(areaElement -> Try.run(() -> driver
               .executeScript(scrollToEndOfAreaFunc, areaElement)))
+          .onFailure(log::error)
+          .map(x -> null);
+
+
+  private static final String scrollAreaByPixels =
+      """
+              var element = arguments[0];
+              element.scrollTop {{DOWN_OR_UP}}= {{PIXELS}};
+          """;
+
+  private static final Function1<Integer, String> scrollElementDownByPixelsFunc =
+      pixels -> scrollAreaByPixels.replace("{{DOWN_OR_UP}}", "+")
+          .replace("{{PIXELS}}", String.valueOf(pixels));
+
+  private static final Function1<Integer, String> scrollElementUpByPixelsFunc =
+      pixels -> scrollAreaByPixels.replace("{{DOWN_OR_UP}}", "-")
+          .replace("{{PIXELS}}", String.valueOf(pixels));
+
+
+  final static Function3<RemoteWebDriver, Integer, Element, Try<Void>> scrollAreaDownByPixels =
+      (driver, pixels, area) -> findElement(driver, area)
+          .flatMapTry(areaElement -> Try.run(() -> driver
+              .executeScript(scrollElementDownByPixelsFunc.apply(pixels), areaElement)))
+          .onFailure(log::error)
+          .map(x -> null);
+
+  final static Function3<RemoteWebDriver, Integer, Element, Try<Void>> scrollAreaUpByPixels =
+      (driver, pixels, area) -> findElement(driver, area)
+          .flatMapTry(areaElement -> Try.run(() -> driver
+              .executeScript(scrollElementUpByPixelsFunc.apply(pixels), areaElement)))
           .onFailure(log::error)
           .map(x -> null);
 
@@ -362,9 +394,11 @@ class ElementFunctions {
       (driver, script) -> Try.of(() -> driver.executeScript(script))
           .onFailure(log::error);
 
-  final static Function4<RemoteWebDriver, HighlightContext, String, Element, Try<Object>> executeJavaScriptOnElement =
-      (driver, hlx, script, element) -> findElementWithoutScrolling(driver, element)
-          .flatMap(webElement -> Try.of(() -> driver.executeScript(script, webElement)))
+  final static Function4<RemoteWebDriver, HighlightContext, String, List<Element>, Try<Object>> executeJavaScriptOnElement =
+      (driver, hlx, script, elements) -> elements.map(element -> locateElement.apply(driver).apply(element))
+          .transform(LiftTry.fromList())
+          .map(Value::toJavaArray)
+          .flatMap(webElements -> Try.of(() -> driver.executeScript(script, webElements)))
           .onFailure(log::error);
 
   /**

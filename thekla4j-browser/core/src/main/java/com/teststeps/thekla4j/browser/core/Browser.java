@@ -160,6 +160,26 @@ public interface Browser {
    */
   Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea);
 
+
+  /**
+   * Scroll the element down by the amount of pixels.
+   *
+   * @param element the element to scroll
+   * @param pixels  the number of pixels to scroll down
+   * @return a Try containing a Void
+   */
+  Try<Void> scrollAreaDownByPixels(Element element, int pixels);
+
+
+  /**
+   * Scroll the element up by the amount of pixels.
+   *
+   * @param element the element to scroll
+   * @param pixels  the number of pixels to scroll up
+   * @return a Try containing a Void
+   */
+  Try<Void> scrollAreaUpByPixels(Element element, int pixels);
+
   /**
    * Get the title of the browser
    *
@@ -340,7 +360,7 @@ public interface Browser {
    * @param element the element to execute the script on
    * @return a Try containing the result of the script
    */
-  Try<Object> executeJavaScript(String script, Element element);
+  Try<Object> executeJavaScript(String script, List<Element> element);
 
   /**
    * Execute JavaScript
