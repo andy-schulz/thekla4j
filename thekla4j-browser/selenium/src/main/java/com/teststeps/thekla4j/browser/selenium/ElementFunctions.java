@@ -238,6 +238,31 @@ class ElementFunctions {
           .map(webElement -> String.valueOf(webElement.getDomProperty(attribute)))
           .onFailure(log::error);
 
+  private static final String htmlSource =
+      """
+            var element = arguments[0];
+            return element.{{INNER_OR_OUTER}};
+          """;
+
+  private static final String innerHtmlSource =
+      htmlSource.replace("{{INNER_OR_OUTER}}", "innerHTML");
+  private static final String outerHtmlSource =
+      htmlSource.replace("{{INNER_OR_OUTER}}", "outerHTML");
+
+  final static Function4<RemoteWebDriver, HighlightContext, Element, String, Try<String>> getHtmlSourceOfElement =
+      (driver, hlx, element, attribute) -> findElement(driver, hlx, element)
+          .flatMap(webElement -> switch (attribute.toLowerCase()) {
+            case "innerhtml" -> Try.of(() -> driver.executeScript(innerHtmlSource, webElement));
+            case "outerhtml" -> Try.of(() -> driver.executeScript(outerHtmlSource, webElement));
+            default -> Try.failure(new IllegalArgumentException(
+                                                                """
+                                                                    Unsupported attribute: %s
+                                                                    Supported attributes are: innerHTML or outerHTML.
+                                                                    """.formatted(attribute)));
+          })
+          .map(String::valueOf)
+          .onFailure(log::error);
+
 
   final static Function3<RemoteWebDriver, HighlightContext, Element, Try<State>> getElementState =
       (driver, hlx, element) -> findElementOnFirstTry(driver, hlx, element)

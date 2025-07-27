@@ -251,7 +251,14 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getAttributeFromElement.apply(driver, highlightContext, element, attribute))
+        .flatMap(x -> {
+          // special handling for innerHTML and outerHTML attributes
+          // the new getDomAttribute method returns null for inner and outer HTML
+          if (attribute.equalsIgnoreCase("innerhtml") || attribute.equalsIgnoreCase("outerhtml")) {
+            return getHtmlSourceOfElement.apply(driver, highlightContext, element, attribute);
+          }
+          return getAttributeFromElement.apply(driver, highlightContext, element, attribute);
+        })
         .map(applyExecutionSlowDown());
   }
 

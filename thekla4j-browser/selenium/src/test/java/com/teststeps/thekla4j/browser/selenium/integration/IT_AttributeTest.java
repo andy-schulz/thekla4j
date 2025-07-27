@@ -1,6 +1,5 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
-import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
 import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 import com.teststeps.thekla4j.assertions.Expected;
@@ -42,19 +41,66 @@ public class IT_AttributeTest {
     actor = Actor.named("Test Actor")
         .whoCan(BrowseTheWeb.with(Selenium.browser()));
 
-    Element clientButton = Element.found(By.id("ButtonWithId"));
+    Element normalLink = Element.found(By.id("normal"));
 
-
-    String url = FRAMEWORKTESTER;
+    String url = "https://www.selenium.dev/selenium/web/clicks.html";
 
     actor.attemptsTo(
 
       Navigate.to(url),
 
-      Attribute.named("innerHTML").of(clientButton),
+      Attribute.named("id").of(normalLink),
 
       See.<String>ifResult()
-          .is(Expected.to.equal("Button with id")))
+          .is(Expected.to.equal("normal")))
+
+        .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testInnerHtml() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    Element normalLink = Element.found(By.id("normal"));
+
+
+    String url = "https://www.selenium.dev/selenium/web/clicks.html";
+
+    actor.attemptsTo(
+
+      Navigate.to(url),
+
+      Attribute.named("innerHTML").of(normalLink),
+
+      See.<String>ifResult()
+          .is(Expected.to.equal("I'm a normal link")))
+
+        .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void testOuterHtml() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+        .whoCan(BrowseTheWeb.with(Selenium.browser()));
+
+    Element normalLink = Element.found(By.id("normal"));
+
+
+    String url = "https://www.selenium.dev/selenium/web/clicks.html";
+
+    String expectedOuterHtml = "<a href=\"xhtmlTest.html\" id=\"normal\" style=\";border: 2px solid red;\">I'm a normal link</a>";
+
+    actor.attemptsTo(
+
+      Navigate.to(url),
+
+      Attribute.named("outerHTML").of(normalLink),
+
+      See.<String>ifResult()
+          .is(Expected.to.equal(expectedOuterHtml)))
 
         .getOrElseThrow(Function.identity());
   }
