@@ -13,11 +13,13 @@ import io.vavr.control.Either;
 import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get the state of an element (visibility, enabled / disabled)
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "ElementState")
 @Action("get state (visibility, enabled / disabled) of @{element}")
 public class ElementState extends SupplierTask<State> {
 
@@ -28,6 +30,7 @@ public class ElementState extends SupplierTask<State> {
   protected Either<ActivityError, State> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
+        .onSuccess(b -> log.info(() -> "Getting state of element '%s'".formatted(element.name())))
         .flatMap(b -> b.getState(element))
         .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }

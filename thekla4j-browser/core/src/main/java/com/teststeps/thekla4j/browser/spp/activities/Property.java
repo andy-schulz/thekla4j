@@ -28,7 +28,7 @@ public class Property extends SupplierTask<String> {
   @Override
   protected Either<ActivityError, String> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-        .peek(__ -> log.info("Getting property '{}' of element '{}'", propertyName, element))
+        .onSuccess(__ -> log.info("Getting property '{}' of element '{}'", propertyName, element))
         .flatMap(b -> b.propertyValueOf(propertyName, element))
         .toEither(ActivityError.of(String.format("could not get value of property '%s' from %s", propertyName, element)));
   }

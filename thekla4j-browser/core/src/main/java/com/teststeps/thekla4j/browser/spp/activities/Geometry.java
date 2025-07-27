@@ -10,11 +10,13 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get the geometry of an element (x, y, height, width)
  */
 @AllArgsConstructor
+@Log4j2(topic = "ElementGeometry")
 @Action("get the geometry (x, y, height, width) of element @{element}")
 public class Geometry extends SupplierTask<Rectangle> {
 
@@ -24,6 +26,7 @@ public class Geometry extends SupplierTask<Rectangle> {
   @Override
   protected Either<ActivityError, Rectangle> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info(() -> "Getting geometry of element '%s'".formatted(element.name())))
         .flatMap(b -> b.getGeometryOfElement(element))
         .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }

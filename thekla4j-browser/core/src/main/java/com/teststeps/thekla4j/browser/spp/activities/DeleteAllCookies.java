@@ -9,16 +9,19 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Delete all cookies from the browser
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "DeleteAllCookies")
 @Action("delete all cookies from browser")
 public class DeleteAllCookies extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info("Deleting all cookies from browser"))
         .flatMap(Browser::deleteAllCookies)
         .transform(ActivityError.toEither("Error while deleting all cookies from browser"));
   }

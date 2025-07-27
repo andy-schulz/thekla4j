@@ -28,7 +28,7 @@ public class Navigate extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
-        .peek(browser -> log.info("Navigating to {}", url))
+        .onSuccess(browser -> log.info("Navigating to {}", url))
         .flatMap(browser -> browser.navigateTo(url))
         .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage() + " while navigating to " + url)));
   }

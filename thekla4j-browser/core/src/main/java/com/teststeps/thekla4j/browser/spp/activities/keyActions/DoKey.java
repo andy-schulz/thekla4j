@@ -9,10 +9,12 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import java.time.Duration;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Perform key actions
  */
+@Log4j2(topic = "KeyAction")
 @Action("perform key actions @{actions}")
 public class DoKey extends BasicInteraction {
 
@@ -23,6 +25,7 @@ public class DoKey extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info(() -> "Performing key actions: %s".formatted(actions.mkString(", "))))
         .flatMap(b -> b.executeKeyActions(actions))
         .transform(ActivityError.toEither("Error while executing key actions"))
         .map(__ -> null);

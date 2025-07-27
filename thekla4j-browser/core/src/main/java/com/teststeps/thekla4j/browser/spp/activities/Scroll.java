@@ -97,7 +97,7 @@ public class Scroll extends BasicInteraction {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-          .peek(b -> log.info(() -> "Scrolling %s by %d pixels in area '%s'".formatted(
+          .onSuccess(__ -> log.info(() -> "Scrolling %s by %d pixels in area '%s'".formatted(
             scrollDirection, pixels, scrollArea.name())))
 
           .flatMap(browser -> switch (scrollDirection) {
@@ -137,7 +137,7 @@ public class Scroll extends BasicInteraction {
     @Override
     protected Either<ActivityError, Void> performAs(Actor actor) {
       return BrowseTheWeb.as(actor)
-          .peek(b -> log.info(() -> "Scrolling to end of area '%s'".formatted(scrollArea.name())))
+          .onSuccess(__ -> log.info(() -> "Scrolling to end of area '%s'".formatted(scrollArea.name())))
           .flatMap(browser -> browser.scrollToEndOfScrollableArea(scrollArea))
           .transform(ActivityError.toEither("Error while scrolling to end of area %s."
               .formatted(scrollArea.name())))

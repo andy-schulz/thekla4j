@@ -10,11 +10,13 @@ import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get cookie from browser
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "GetCookie")
 @Action("get cookie '@cookie' from browser")
 public class GetCookie extends SupplierTask<Cookie> {
 
@@ -24,6 +26,7 @@ public class GetCookie extends SupplierTask<Cookie> {
   @Override
   protected Either<ActivityError, Cookie> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info(() -> "Getting cookie '%s' from browser".formatted(cookieName)))
         .flatMap(b -> b.getCookie(cookieName))
         .transform(ActivityError.toEither(String.format("Error while getting cookie '%s' from browser", cookieName)));
   }

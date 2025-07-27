@@ -12,12 +12,14 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 
 /**
  * Add cookies to the browser
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "AddCookie")
 @Action("add cookies '@{cookie}' to browser")
 public class AddCookie extends BasicInteraction {
 
@@ -27,6 +29,7 @@ public class AddCookie extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info(() -> "Adding cookies: %s to browser".formatted(cookies.mkString(", "))))
         .map(b -> cookies.map(b::addCookie))
         .flatMap(LiftTry.fromList())
         .map(List::getOrNull)

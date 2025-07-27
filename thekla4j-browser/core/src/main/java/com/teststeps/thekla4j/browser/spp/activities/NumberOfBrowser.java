@@ -9,16 +9,19 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get number of open browser tabs and windows
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "NumberOfBrowser")
 @Action("get number of open browser tabs and windows")
 public class NumberOfBrowser extends SupplierTask<Integer> {
   @Override
   protected Either<ActivityError, Integer> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info("Getting number of open browser tabs and windows"))
         .flatMap(Browser::numberOfOpenTabsAndWindows)
         .transform(ActivityError.toEither("Error while getting number of browser"));
   }

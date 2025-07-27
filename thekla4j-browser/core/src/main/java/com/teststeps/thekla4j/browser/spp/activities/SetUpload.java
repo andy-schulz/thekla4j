@@ -12,6 +12,7 @@ import io.vavr.control.Option;
 import java.nio.file.Path;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Set the upload files to the file input
@@ -45,6 +46,7 @@ public class SetUpload {
    * Set the upload files to the file input
    */
   @Action("set upload files")
+  @Log4j2(topic = "SetUploadFiles")
   public static class SetUploadFiles extends BasicInteraction {
 
     private final List<Path> absolutFilePaths;
@@ -56,6 +58,8 @@ public class SetUpload {
     protected Either<ActivityError, Void> performAs(Actor actor) {
 
       return BrowseTheWeb.as(actor)
+          .onSuccess(__ -> log.info(() -> "Setting upload files: %s to file input: %s with remote file path: %s"
+              .formatted(absolutFilePaths, targetFileUploadInput, remoteFilePath)))
           .flatMap(browser -> browser.setUploadFiles(absolutFilePaths, targetFileUploadInput, remoteFilePath))
           .transform(ActivityError.toEither("Error while trying to set the files %s to upload to the file input: %s"
               .formatted(absolutFilePaths, targetFileUploadInput)))

@@ -9,11 +9,13 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Interaction to delete a cookie from the browser
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "DeleteCookie")
 @Action("delete cookie '@cookie' from browser")
 public class DeleteCookie extends BasicInteraction {
 
@@ -23,6 +25,7 @@ public class DeleteCookie extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info(() -> "Deleting cookie '%s' from browser".formatted(cookieName)))
         .flatMap(b -> b.deleteCookie(cookieName))
         .transform(ActivityError.toEither(String.format("Error while deleting cookie '%s' from browser", cookieName)));
   }

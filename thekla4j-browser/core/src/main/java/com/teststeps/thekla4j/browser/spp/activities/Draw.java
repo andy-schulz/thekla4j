@@ -14,11 +14,13 @@ import io.vavr.control.Option;
 import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Interaction to draw a shape to an element
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "DrawShape")
 @Action("draw shape @{shape} to @{element}")
 public class Draw extends BasicInteraction {
 
@@ -32,6 +34,7 @@ public class Draw extends BasicInteraction {
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(browser -> log.info(() -> "Drawing shapes to element"))
         .flatMap(browser -> browser.drawShapes(shapes, element, releaseAndHold, pause))
         .transform(ActivityError.toEither("Could not draw shape to element!"));
   }

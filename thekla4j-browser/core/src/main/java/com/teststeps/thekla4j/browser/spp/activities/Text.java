@@ -11,11 +11,13 @@ import io.vavr.collection.List;
 import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Get text from an element
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "Text")
 @Action("get text from @{element}")
 public class Text extends SupplierTask<String> {
 
@@ -26,6 +28,7 @@ public class Text extends SupplierTask<String> {
   protected Either<ActivityError, String> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.info("Getting text from element: {}", element))
         .flatMap(b -> b.textOf(element))
         .toEither(ActivityError.of("could not get text from element " + element));
   }

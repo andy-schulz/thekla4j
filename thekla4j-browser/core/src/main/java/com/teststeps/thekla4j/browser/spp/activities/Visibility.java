@@ -8,9 +8,12 @@ import com.teststeps.thekla4j.core.base.activities.SupplierTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Log4j2(topic = "Visibility")
 @Action("Check Visibility of Element")
 public class Visibility extends SupplierTask<Boolean> {
 
@@ -19,6 +22,7 @@ public class Visibility extends SupplierTask<Boolean> {
   @Override
   protected Either<ActivityError, Boolean> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)
+        .onSuccess(__ -> log.debug("Checking visibility of element: {}", element))
         .flatMap(b -> b.visibilityOf(element))
         .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
