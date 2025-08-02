@@ -52,6 +52,46 @@ public class Move implements PointerMove {
   }
 
   /**
+   * Create a new move in a diagonal direction
+   *
+   * @param offset - the offset to move
+   * @return - a new move in a diagonal direction
+   */
+  public static Move leftUp(Integer offset) {
+    return new Move(offset, Direction.LEFT_UP);
+  }
+
+  /**
+   * Create a new move in a diagonal direction
+   *
+   * @param offset - the offset to move
+   * @return - a new move in a diagonal direction
+   */
+  public static Move rightUp(Integer offset) {
+    return new Move(offset, Direction.RIGHT_UP);
+  }
+
+  /**
+   * Create a new move in a diagonal direction
+   *
+   * @param offset - the offset to move
+   * @return - a new move in a diagonal direction
+   */
+  public static Move leftDown(Integer offset) {
+    return new Move(offset, Direction.LEFT_DOWN);
+  }
+
+  /**
+   * Create a new move in a diagonal direction
+   *
+   * @param offset - the offset to move
+   * @return - a new move in a diagonal direction
+   */
+  public static Move rightDown(Integer offset) {
+    return new Move(offset, Direction.RIGHT_DOWN);
+  }
+
+  /**
    * get the offset of the move
    *
    * @return - the offset of the move

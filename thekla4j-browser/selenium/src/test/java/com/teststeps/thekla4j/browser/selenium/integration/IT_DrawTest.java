@@ -55,6 +55,21 @@ public class IT_DrawTest {
       .moveTo(Move.down(20))
       .moveTo(Move.left(30));
 
+  Shape letterS2 = Shape.startingAt(StartPoint.on(110, 15))
+      .moveTo(Move.up(5))
+      .moveTo(Move.leftUp(5))
+      .moveTo(Move.left(20))
+      .moveTo(Move.leftDown(5))
+      .moveTo(Move.down(10))
+      .moveTo(Move.rightDown(5))
+      .moveTo(Move.right(20))
+      .moveTo(Move.rightDown(5))
+      .moveTo(Move.down(10))
+      .moveTo(Move.leftDown(5))
+      .moveTo(Move.left(20))
+      .moveTo(Move.leftUp(5))
+      .moveTo(Move.up(5));
+
   Shape letterT2 = Shape.startingAt(StartPoint.on(120, 5))
       .moveTo(Move.right(30))
       .moveTo(Move.left(15))
@@ -119,7 +134,7 @@ public class IT_DrawTest {
 
       Draw.shape(letterT).on(canvas),
       Draw.shape(letterE).on(canvas),
-      Draw.shape(letterS).on(canvas),
+      Draw.shape(letterS2).on(canvas),
       Draw.shape(letterT2).on(canvas),
 
       See.ifThe(Text.of(header))

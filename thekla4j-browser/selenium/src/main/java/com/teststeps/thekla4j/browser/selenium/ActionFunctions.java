@@ -124,6 +124,26 @@ class ActionFunctions {
               releaseHoldAndPause.apply(releaseAndHold, pause, actions);
               log.debug("Move right by {}", move.offset());
               break;
+            case LEFT_UP:
+              actions.moveByOffset(-1 * move.offset(), -1 * move.offset());
+              releaseHoldAndPause.apply(releaseAndHold, pause, actions);
+              log.debug("Move left up by {}", move.offset());
+              break;
+            case LEFT_DOWN:
+              actions.moveByOffset(-1 * move.offset(), move.offset());
+              releaseHoldAndPause.apply(releaseAndHold, pause, actions);
+              log.debug("Move left down by {}", move.offset());
+              break;
+            case RIGHT_UP:
+              actions.moveByOffset(move.offset(), -1 * move.offset());
+              releaseHoldAndPause.apply(releaseAndHold, pause, actions);
+              log.debug("Move right up by {}", move.offset());
+              break;
+            case RIGHT_DOWN:
+              actions.moveByOffset(move.offset(), move.offset());
+              releaseHoldAndPause.apply(releaseAndHold, pause, actions);
+              log.debug("Move right down by {}", move.offset());
+              break;
           }
         });
         return actions;

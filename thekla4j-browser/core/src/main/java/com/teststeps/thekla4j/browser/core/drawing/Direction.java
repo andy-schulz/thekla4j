@@ -22,5 +22,25 @@ public enum Direction {
   /**
    * Move right
    */
-  RIGHT
+  RIGHT,
+
+  /**
+   * Move diagonally left down
+   */
+  LEFT_DOWN,
+
+  /**
+   * Move diagonally left up
+   */
+  LEFT_UP,
+
+  /**
+   * Move diagonally right down
+   */
+  RIGHT_DOWN,
+
+  /**
+   * Move diagonally right up
+   */
+  RIGHT_UP
 }
