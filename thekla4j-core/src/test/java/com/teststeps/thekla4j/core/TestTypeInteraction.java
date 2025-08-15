@@ -69,22 +69,45 @@ public class TestTypeInteraction {
   public void runBasicSupplierTaskWithRunMethod() throws ActivityError {
     Actor actor = Actor.named("TestActor");
 
-    Integer result = InteractionTask.start().runAs(actor, 2);
+    Either<ActivityError, Integer> result = InteractionTask.start().runAs(actor, 2);
 
-    assertThat("result is correct", result, equalTo(2));
+    assertThat("result is RIGHT", result.isRight(), equalTo(true));
+    assertThat("result is correct", result.get(), equalTo(2));
 
   }
 
   @Test
-  public void runBasicInteractionWithRunAs$Method() throws ActivityError {
+  public void runBasicInteractionWithRunAs$Method() {
     Actor actor = Actor.named("TestActor");
 
-    Integer result = InteractionTask.start().runAs$(actor, 2, "group", "description");
+    Either<ActivityError, Integer> result = InteractionTask.start().runAs$(actor, 2, "group", "description");
 
     TheklaActivityLog log = actor.activityLog;
     ActivityLogNode rootLog = log.getLogTree();
 
-    assertThat("result is correct", result, equalTo(2));
+    assertThat("result is RIGHT", result.isRight(), equalTo(true));
+    assertThat("result is correct", result.get(), equalTo(2));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("group"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("description"));
+
+    assertThat("group was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).name, equalTo("InteractionTask"));
+    assertThat("description was added to log", rootLog.activityNodes.get(0).activityNodes.get(0).description, equalTo("Interaction Task"));
+  }
+
+  @Test
+  public void runBasicInteractionWithRunAs$WithAnnotate() {
+    Actor actor = Actor.named("TestActor");
+
+    Either<ActivityError, Integer> result = InteractionTask.start()
+        .runAs$(actor, 2)
+        .annotate("group", "description");
+
+    TheklaActivityLog log = actor.activityLog;
+    ActivityLogNode rootLog = log.getLogTree();
+
+    assertThat("result is RIGHT", result.isRight(), equalTo(true));
+    assertThat("result is correct", result.get(), equalTo(2));
 
     assertThat("group was added to log", rootLog.activityNodes.get(0).name, equalTo("group"));
     assertThat("description was added to log", rootLog.activityNodes.get(0).description, equalTo("description"));

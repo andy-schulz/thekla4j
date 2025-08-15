@@ -6,7 +6,6 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
-import java.util.function.Function;
 import lombok.NonNull;
 
 /**
@@ -57,8 +56,8 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    * @return the result of the interaction
    * @throws ActivityError if the interaction fails
    */
-  final public RT runAs(@NonNull Actor actor, PT input) throws ActivityError {
-    return actor.attemptsTo_(this).using(input).getOrElseThrow(Function.identity());
+  final public Either<ActivityError, RT> runAs(@NonNull Actor actor, PT input) {
+    return actor.attemptsTo_(this).using(input);
   }
 
   /**
@@ -71,8 +70,8 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    * @return the result of the interaction
    * @throws ActivityError if the interaction fails
    */
-  final public RT runAs$(@NonNull Actor actor, PT input, String group, String description) throws ActivityError {
-    return actor.attemptsTo$_(this, group, description).using(input).getOrElseThrow(Function.identity());
+  final public Either<ActivityError, RT> runAs$(@NonNull Actor actor, PT input, String group, String description) {
+    return actor.attemptsTo$_(this, group, description).using(input);
   }
 
   /**
