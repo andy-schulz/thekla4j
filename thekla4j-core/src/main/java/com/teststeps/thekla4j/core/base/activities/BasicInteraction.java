@@ -19,8 +19,8 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
 
   /**
    * Returns a string representation of the action
-   * 
-   * @return the name of the action
+   *
+   * @return an Either with the result of the activity or an error
    */
   @Override
   public String toString() {
@@ -40,6 +40,7 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * It is easier to read than using the attemptsTo method of an actor
    * 
    * @param actor the actor to run the activity as
+   * @return an Either with the result of the activity or an error
    */
   final public Either<ActivityError, Void> runAs(@NonNull Actor actor) {
     return actor.attemptsTo(this);
@@ -52,6 +53,7 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * @param actor       the actor to run the activity as
    * @param group       the group name used in the log file
    * @param description the description used in the log file
+   * @return an Either with the result of the activity or an error
    */
   final public Either<ActivityError, Void> runAs$(@NonNull Actor actor, String group, String description) {
     return actor.attemptsTo$(this, group, description);
@@ -88,6 +90,7 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * @param performer   the actor to run the activity as
    * @param group       the group name used in the log file
    * @param description the description used in the log file
+   *
    * @throws ActivityError if the activity fails
    */
   final public void runAs$(@NonNull Performer performer, String group, String description) throws ActivityError {
@@ -100,6 +103,7 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    *
    * @param performer the actor to run the activity as
    * @return a LogAnnotator adding group and description to the log
+   * @throws ActivityError if the activity fails
    */
   final public LogAnnotatorThrows<Void> runAs$(@NonNull Performer performer) throws ActivityError {
     return (group, description) -> performer.attemptsTo$(this, group, description);

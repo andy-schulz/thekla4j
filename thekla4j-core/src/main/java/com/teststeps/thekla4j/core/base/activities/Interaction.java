@@ -54,7 +54,6 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    * @param actor the actor running the interaction
    * @param input the input for the interaction
    * @return the result of the interaction
-   * @throws ActivityError if the interaction fails
    */
   final public Either<ActivityError, RT> runAs(@NonNull Actor actor, PT input) {
     return actor.attemptsTo_(this).using(input);
@@ -68,7 +67,6 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    * @param group       the group name used in the log file
    * @param description the description used in the log file
    * @return the result of the interaction
-   * @throws ActivityError if the interaction fails
    */
   final public Either<ActivityError, RT> runAs$(@NonNull Actor actor, PT input, String group, String description) {
     return actor.attemptsTo$_(this, group, description).using(input);

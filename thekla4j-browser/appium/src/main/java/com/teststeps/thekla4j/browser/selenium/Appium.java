@@ -18,6 +18,7 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.util.Objects;
 import java.util.function.Function;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -37,10 +38,22 @@ public class Appium {
         .getOrElseThrow((e) -> new RuntimeException(e));
   }
 
+  /**
+   * set the default selenium configuration name
+   *
+   * @param seleniumConfigName - the name of the test
+   * @return the Appium Configuration
+   */
   public static AppiumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
     return new AppiumHelper(Option.of(seleniumConfigName).flatMap(Function.identity()), Option.none());
   }
 
+  /**
+   * set the default browser configuration name
+   *
+   * @param browserConfigName - the name of the test
+   * @return the Appium Configuration
+   */
   public static AppiumHelper withBrowserConfig(Option<String> browserConfigName) {
     return new AppiumHelper(Option.none(), Option.of(browserConfigName).flatMap(Function.identity()));
   }
@@ -130,16 +143,33 @@ public class Appium {
     // prevent initialization of utility class
   }
 
-  @AllArgsConstructor
+  /**
+   * Helper class to create Appium browsers with different configurations
+   */
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   public static class AppiumHelper {
+
+
     private final Option<String> seleniumConfigName;
     private final Option<String> browserConfigName;
 
 
+    /**
+     * Create a new Appium configuration selected by the seleniumConfigName
+     *
+     * @param seleniumConfigName - the name of the selenium configuration
+     * @return a new AppiumHelper instance with the given seleniumConfigName
+     */
     public AppiumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
       return new AppiumHelper(Option.of(seleniumConfigName).flatMap(Function.identity()), browserConfigName);
     }
 
+    /**
+     * Create a new Appium configuration selected by the browserConfigName
+     *
+     * @param browserConfigName - the name of the browser configuration
+     * @return a new AppiumHelper instance with the given browserConfigName
+     */
     public AppiumHelper withBrowserConfig(Option<String> browserConfigName) {
       return new AppiumHelper(seleniumConfigName, Option.of(browserConfigName).flatMap(Function.identity()));
     }

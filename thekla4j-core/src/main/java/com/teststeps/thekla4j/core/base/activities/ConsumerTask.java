@@ -36,7 +36,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    *
    * @param actor the actor to perform the task as
    * @param input the input to the task
-   * @return the result of the task
+   * @return an Either with the result of the activity or an error
    */
   protected abstract Either<ActivityError, Void> performAs(Actor actor, PT input);
 
@@ -45,6 +45,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    *
    * @param actor the actor to run the task as
    * @param input the input to the task
+   * @return an Either with the result of the activity or an error
    */
   final public Either<ActivityError, Void> runAs(Actor actor, PT input) {
     return actor.attemptsTo_(this).using(input);
@@ -54,6 +55,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    * run the task as the given actor
    *
    * @param actor the actor to run the task as
+   * @return an AttemptsWith function to pass input to the task
    */
   final public AttemptsWith<PT, Either<ActivityError, Void>> runAs(Actor actor) {
     return actor.attemptsTo_(this);
@@ -66,6 +68,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    * @param input       the input to the task
    * @param group       the group name used in the log file
    * @param description the description used in the log file
+   * @return an Either with the result of the activity or an error
    */
   final public Either<ActivityError, Void> runAs$(Actor actor, PT input, String group, String description) {
     return actor.attemptsTo$_(this, group, description).using(input);
@@ -87,6 +90,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    * run the task as the given actor
    *
    * @param actor the actor to run the task as
+   * @return log annotator adding group and description to the log
    */
   final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, Void>>> runAs$(Actor actor) {
     return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
@@ -108,6 +112,7 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    *
    * @param performer the actor to run the task as
    * @throws ActivityError if the task fails
+   * @return AttemptsWithThrows function to pass input to the task
    */
   final public AttemptsWithThrows<PT, Void> runAs(Performer performer) throws ActivityError {
     return performer.attemptsTo_(this);

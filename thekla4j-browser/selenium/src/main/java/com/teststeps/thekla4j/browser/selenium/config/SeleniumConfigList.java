@@ -7,12 +7,13 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 /**
  * A list of Selenium configurations
  */
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SeleniumConfigList {
   private String defaultConfig;
 
@@ -78,10 +79,32 @@ public class SeleniumConfigList {
     return seleniumConfigs.toJavaMap();
   }
 
+  /**
+   * Add an entry with the key "NONE" to the Selenium configurations
+   * This is used to indicate that no predefined Selenium configuration should be used.
+   * This is useful during local development or testing when you want to run tests without any specific Selenium
+   * configuration.
+   * <p>
+   * e.g. seleniumConfig.yaml
+   * <pre>
+   * ```yaml
+   * defaultConfig: NONE
+   * ...
+   * ```
+   * </pre>
+   *
+   * @return - the Selenium configuration
+   */
   public SeleniumConfigList withNoneValue() {
     return new SeleniumConfigList(this.defaultConfig, seleniumConfigs.put("NONE", null));
   }
 
+  /**
+   * set the default configuration name which shall be loaded at startup
+   *
+   * @param configName - the name of the Selenium configuration
+   * @return - the Selenium configuration
+   */
   public SeleniumConfigList withDefaultConfig(Option<String> configName) {
     return configName
         .map(name -> new SeleniumConfigList(name, seleniumConfigs))

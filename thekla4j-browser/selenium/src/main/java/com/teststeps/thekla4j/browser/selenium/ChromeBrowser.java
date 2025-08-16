@@ -24,8 +24,9 @@ public class ChromeBrowser {
 
   /**
    * Create a new Chrome browser
-   *
-   * @param config - the browser configuration
+   * 
+   * @param startUp - the browser startup configuration
+   * @param config  - the browser configuration
    * @return - the new Chrome browser
    */
   public static Browser with(Option<BrowserStartupConfig> startUp, BrowserConfig config) {
@@ -98,6 +99,7 @@ public class ChromeBrowser {
   /**
    * Create a new Chrome browser without options
    *
+   * @param startUp - the browser startup configuration
    * @return - the new Chrome browser
    */
   public static Browser withoutOptions(Option<BrowserStartupConfig> startUp) {

@@ -25,6 +25,7 @@ import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.util.function.Function;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -35,6 +36,13 @@ import lombok.extern.log4j.Log4j2;
 public class Selenium {
 
 
+  /**
+   * Create a Selenium Helper to manage Selenium and Browser configurations.
+   * Start a browser with the given Selenium configuration name.
+   *
+   * @param seleniumConfigName - the name of the Selenium configuration
+   * @return a new SeleniumHelper instance
+   */
   public static SeleniumHelper usingSeleniumConfig(Option<String> seleniumConfigName) {
     return new SeleniumHelper(
                               Option.of(seleniumConfigName).flatMap(Function.identity()),
@@ -43,6 +51,13 @@ public class Selenium {
                               List.empty());
   }
 
+  /**
+   * Create a Selenium Helper to manage Selenium and Browser configurations.
+   * Start a browser with the given Browser configuration name.
+   *
+   * @param browserConfigName - the name of the Browser configuration
+   * @return a new SeleniumHelper instance
+   */
   public static SeleniumHelper usingBrowserConfig(Option<String> browserConfigName) {
     return new SeleniumHelper(
                               Option.none(),
@@ -51,6 +66,15 @@ public class Selenium {
                               List.empty());
   }
 
+  /**
+   * Create a Selenium Helper to manage Selenium and Browser configurations.
+   * Pass a function which is updating the Selenium Configuration at runtime.
+   * e.g.
+   * add specific capabilities, change the remote URL, etc.
+   *
+   * @param updateSeleniumConfig - a function which updates the Selenium Configuration at runtime
+   * @return a new SeleniumHelper instance
+   */
   public static SeleniumHelper updateSeleniumConfig(Function1<SeleniumConfig, SeleniumConfig> updateSeleniumConfig) {
     return new SeleniumHelper(
                               Option.none(),
@@ -59,6 +83,16 @@ public class Selenium {
                               List.empty());
   }
 
+
+  /**
+   * Create a Selenium Helper to manage Selenium and Browser configurations.
+   * Pass a function which is updating the Browser Configuration at runtime.
+   * e.g.
+   * add change the browser name, platform, version, etc.
+   *
+   * @param updateBrowserConfig - a function which updates the Browser Configuration at runtime
+   * @return a new SeleniumHelper instance
+   */
   public static SeleniumHelper updateBrowserConfig(Function1<BrowserConfig, BrowserConfig> updateBrowserConfig) {
     return new SeleniumHelper(
                               Option.none(),
@@ -200,7 +234,10 @@ public class Selenium {
       };
 
 
-  @AllArgsConstructor
+  /**
+   * A helper class to manage Selenium and Browser configurations
+   */
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   public static class SeleniumHelper {
 
     private Option<String> seleniumConfigName;
@@ -209,6 +246,13 @@ public class Selenium {
     private List<Function1<BrowserConfig, BrowserConfig>> browserConfigUpdates;
 
 
+    /**
+     * Create a new Selenium Instance with the given Selenium configuration.
+     *
+     * @param seleniumConfigName - the name of the Selenium configuration
+     * @return a new SeleniumHelper instance
+     *
+     */
     public SeleniumHelper withSeleniumConfig(Option<String> seleniumConfigName) {
       return new SeleniumHelper(
                                 Option.of(seleniumConfigName).flatMap(Function.identity()),
@@ -217,6 +261,12 @@ public class Selenium {
                                 browserConfigUpdates);
     }
 
+    /**
+     * Create a new Selenium Instance with the given Browser configuration.
+     *
+     * @param browserConfigName - the name of the Browser configuration
+     * @return a new SeleniumHelper instance
+     */
     public SeleniumHelper withBrowserConfig(Option<String> browserConfigName) {
       return new SeleniumHelper(
                                 seleniumConfigName,
@@ -225,10 +275,22 @@ public class Selenium {
                                 browserConfigUpdates);
     }
 
+    /**
+     * Update the Browser configuration with the given function.
+     *
+     * @param updateBrowserConfig - a function which updates the Browser Configuration at runtime
+     * @return a new SeleniumHelper instance with the updated Browser configuration
+     */
     public SeleniumHelper updateBrowserConfig(Function1<BrowserConfig, BrowserConfig> updateBrowserConfig) {
       return new SeleniumHelper(seleniumConfigName, browserConfigName, seleniumConfigUpdates, browserConfigUpdates.append(updateBrowserConfig));
     }
 
+    /**
+     * Update the Selenium configuration with the given function.
+     *
+     * @param updateSeleniumConfig - a function which updates the Selenium Configuration at runtime
+     * @return a new SeleniumHelper instance with the updated Selenium configuration
+     */
     public SeleniumHelper updateSeleniumConfig(Function1<SeleniumConfig, SeleniumConfig> updateSeleniumConfig) {
       return new SeleniumHelper(seleniumConfigName, browserConfigName, seleniumConfigUpdates.append(updateSeleniumConfig), browserConfigUpdates);
     }

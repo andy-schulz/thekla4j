@@ -19,6 +19,9 @@ import java.util.concurrent.TimeoutException;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+/**
+ * Support functions for working with Appium
+ */
 @Log4j2(topic = "Appium Functions")
 public class AppiumFunctions {
 

@@ -21,8 +21,9 @@ class EdgeBrowser {
 
   /**
    * Create a new Edge browser
-   *
-   * @param config - the configuration of the browser
+   * 
+   * @param startUp - the browser startup configuration
+   * @param config  - the configuration of the browser
    * @return - the new Edge browser
    */
   public static Browser with(Option<BrowserStartupConfig> startUp, BrowserConfig config) {
@@ -49,6 +50,7 @@ class EdgeBrowser {
   /**
    * Create a new Edge browser
    *
+   * @param startUp - the browser startup configuration
    * @return - the new Edge browser
    */
   public static Browser withoutOptions(Option<BrowserStartupConfig> startUp) {

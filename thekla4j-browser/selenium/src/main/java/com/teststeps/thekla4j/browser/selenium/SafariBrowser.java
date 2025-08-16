@@ -16,7 +16,8 @@ public class SafariBrowser {
   /**
    * Create a new Safari browser
    * 
-   * @param config - the browser configuration
+   * @param startUp - the browser startup configuration
+   * @param config  - the browser configuration
    * @return - the new Safari browser
    */
   public static Browser with(Option<BrowserStartupConfig> startUp, BrowserConfig config) {
@@ -31,7 +32,8 @@ public class SafariBrowser {
 
   /**
    * Create a new Safari browser without options
-   * 
+   *
+   * @param startUp - the browser startup configuration
    * @return - the new Safari browser
    */
   public static Browser withoutOptions(Option<BrowserStartupConfig> startUp) {
