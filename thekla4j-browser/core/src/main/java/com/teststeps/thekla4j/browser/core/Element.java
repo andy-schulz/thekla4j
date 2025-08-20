@@ -1,8 +1,8 @@
 package com.teststeps.thekla4j.browser.core;
 
-import static com.teststeps.thekla4j.browser.core.status.ElementStatusFunctions.defaultWaiter;
 
 import com.teststeps.thekla4j.browser.core.locator.Locator;
+import com.teststeps.thekla4j.browser.core.status.ElementStatusType;
 import com.teststeps.thekla4j.browser.core.status.UntilElement;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -76,7 +76,7 @@ public record Element(
                        Option.none(),
                        "unnamed",
                        true,
-                       defaultWaiter());
+                       UntilElement.of(ElementStatusType.IS_NOT_STALE));
   }
 
   /**
@@ -92,7 +92,7 @@ public record Element(
                        Option.of(frame),
                        "unnamed",
                        true,
-                       defaultWaiter());
+                       UntilElement.of(ElementStatusType.IS_NOT_STALE));
   }
 
   /**

@@ -20,6 +20,14 @@ public interface DefaultThekla4jProperties {
   String value();
 
   /**
+   * Get the value of the property as an Integer
+   *
+   * @return the value of the property as an Integer
+   */
+  Integer asInteger();
+
+
+  /**
    * Get the value of the property as an option
    *
    * @return the value of the property as an option

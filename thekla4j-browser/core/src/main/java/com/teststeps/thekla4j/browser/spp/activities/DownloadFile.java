@@ -28,7 +28,6 @@ public class DownloadFile extends SupplierTask<File> {
             .onSuccess(b -> log.info(() -> "Downloading file '%s' for as long as %s with polling interval %s"
                 .formatted(fileName, timeout, pollingInterval)))
             .flatMap(browser -> browser.getDownloadedFile(fileName, timeout, pollingInterval)))
-        .peekLeft(System.out::println)
         .flatMap(ActivityError.toEither("Error downloading file: " + fileName));
   }
 

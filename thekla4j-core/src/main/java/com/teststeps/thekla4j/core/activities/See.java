@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.core.activities;
 
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.SEE_WAIT_FACTOR;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
@@ -60,6 +61,10 @@ public class See<P, M> extends Interaction<P, P> {
 
         Case($(), e -> e));
 
+  private Duration timeout() {
+    return duration.multipliedBy(SEE_WAIT_FACTOR.asInteger());
+  }
+
   private See(Activity<P, M> question) {
     this.activity = question;
   }
@@ -81,7 +86,7 @@ public class See<P, M> extends Interaction<P, P> {
             .using(passedResult);
 
     return retryExecutingTaskIfFails.apply(Instant.now()
-        .plusMillis(duration.toMillis()), nextTryIn, executeActivity)
+        .plusMillis(timeout().toMillis()), nextTryIn, executeActivity)
         .map(x -> passedResult);
   }
 

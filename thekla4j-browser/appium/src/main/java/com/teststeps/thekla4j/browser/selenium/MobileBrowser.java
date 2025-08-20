@@ -84,10 +84,8 @@ public class MobileBrowser implements Browser {
   static Try<MobileBrowser> startRemote(String url, DesiredCapabilities caps, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
 
     return createDriver(browserConfig.platformName(), url, caps)
-//    return Try.of(() -> new RemoteWebDriver(new URL(url), caps, false))
         .peek(driver -> log.info("Connecting to: {}", UrlHelper.sanitizeUrl.apply(url).getOrElse("Error reading URL")))
         .peek(driver -> log.info("SessionID: {}", driver.getSessionId()))
-        .peek(d -> System.out.println("SessionID: " + d.getSessionId()))
         .onFailure(log::error)
         .map(d -> new MobileBrowser(d, browserConfig, startupConfig));
   }

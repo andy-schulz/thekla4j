@@ -15,6 +15,7 @@ public class Thekla4jProperty {
   private final static String PROPERTY_FILE = "thekla4j.properties";
 
   private static Function1<PropertyElement, Option<String>> of = TestPropertyHelper._withName.memoized();
+  private static Function1<PropertyElement, Try<Integer>> asInteger = TestPropertyHelper._asInteger.memoized();
 
   /**
    * get the value of the property
@@ -25,8 +26,13 @@ public class Thekla4jProperty {
     return Thekla4jProperty.of.apply(element);
   }
 
+  public static Try<Integer> asInteger(PropertyElement element) {
+    return Thekla4jProperty.asInteger.apply(element);
+  }
+
   public static void resetPropertyCache() {
     Thekla4jProperty.of = TestPropertyHelper._withName.memoized();
+    Thekla4jProperty.asInteger = TestPropertyHelper._asInteger.memoized();
     TestPropertyHelper.resetPropertyFileCache();
   }
 
@@ -117,5 +123,14 @@ public class Thekla4jProperty {
 
       return property.defaultValue();
     };
+
+    /**
+     * get the as Integer property value
+     */
+    static final Function1<PropertyElement, Try<Integer>> _asInteger =
+        property -> _withName.apply(property)
+            .transform(o -> o.isEmpty() ? Try.<String>failure(new Exception("Property not found: " + property.name() +
+                ". Its a framework problem.")) : Try.success(o.get()))
+            .mapTry(Integer::parseInt);
   }
 }

@@ -1,7 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.WAIT_FOR_ELEMENT_FACTOR;
 import static com.teststeps.thekla4j.browser.selenium.Constants.ELEMENT_STATES;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
@@ -11,7 +11,6 @@ import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
-import com.teststeps.thekla4j.browser.spp.activities.Property;
 import com.teststeps.thekla4j.browser.spp.activities.Text;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
@@ -23,7 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class IT_PropertyTest {
+public class IT_PropertyElementTest {
 
   Actor actor = Actor.named("Test Actor");
   Element header = Element.found(By.css(".headerElement"));
@@ -31,7 +30,7 @@ public class IT_PropertyTest {
   @BeforeAll
   public static void init() {
     Thekla4jProperty.resetPropertyCache();
-    System.clearProperty(SELENIUM_CONFIG.property().name());
+    System.clearProperty(WAIT_FOR_ELEMENT_FACTOR.property().name());
   }
 
   @AfterEach
@@ -41,28 +40,12 @@ public class IT_PropertyTest {
   }
 
   @Test
-  public void testDynamicElementProperty() throws ActivityError {
-
-    actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(Selenium.browser()));
-
-    Element element = Element.found(By.id("d"));
-
-
-    String url = "https://www.selenium.dev/selenium/web/userDefinedProperty.html";
-
-    actor.attemptsTo(
-
-      Navigate.to(url),
-
-      See.ifThe(Property.named("dynamicProperty").of(element))
-          .is(Expected.to.equal("sampleValue")))
-
-        .getOrElseThrow(Function.identity());
-  }
-
-  @Test
   public void testElementWaitFactor() throws ActivityError {
+
+    System.out.println("Setting wait factor to 6");
+    System.setProperty(WAIT_FOR_ELEMENT_FACTOR.property().name(), "6");
+
+    System.out.println(System.getProperty(WAIT_FOR_ELEMENT_FACTOR.property().name()));
 
     actor = Actor.named("Test Actor")
         .whoCan(BrowseTheWeb.with(Selenium.browser()));

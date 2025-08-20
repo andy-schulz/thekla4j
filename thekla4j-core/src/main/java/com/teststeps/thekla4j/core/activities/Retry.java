@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.core.activities;
 
+import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.RETRY_WAIT_FACTOR;
+
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.activityLog.annotations.Workflow;
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -42,6 +44,10 @@ public class Retry<I, O> extends Task<I, O> {
 
   @Called(name = "reason")
   private String reason;
+
+  private Duration timeout() {
+    return forAsLongAs.multipliedBy(RETRY_WAIT_FACTOR.asInteger());
+  }
 
   private final Function7<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, AttemptsWith<O, Either<ActivityError, Boolean>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
       (ends, timeWaiting, pause, activityFunction, untilFunc, intermediateResult, taskName) -> {
@@ -95,9 +101,9 @@ public class Retry<I, O> extends Task<I, O> {
   protected Either<ActivityError, O> performAs(Actor actor, I result) {
 
     Instant start = Instant.now();
-    Instant end = start.plusSeconds(forAsLongAs.getSeconds());
+    Instant end = start.plusSeconds(timeout().getSeconds());
 
-    return repeat.apply(end, forAsLongAs, pauseBetweenRetries,
+    return repeat.apply(end, timeout(), pauseBetweenRetries,
       () -> actor.attemptsTo_(activity).using(result),
       actor.attemptsTo_(untilActivity),
       Either.left(ActivityError.of(new Throwable("not evaluated"))),

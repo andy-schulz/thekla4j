@@ -46,6 +46,15 @@ public enum DefaultThekla4jSeleniumProperties implements DefaultThekla4jProperti
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Integer asInteger() {
+    return Thekla4jProperty.asInteger(property)
+        .getOrElseThrow(x -> new RuntimeException("Error getting Integer for property: " + property.name(), x));
+  }
+
+  /**
    * Get the help text for all properties
    *
    * @return the help text for all properties

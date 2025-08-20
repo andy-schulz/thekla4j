@@ -1,5 +1,7 @@
 package com.teststeps.thekla4j.browser.core.status;
 
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.WAIT_FOR_ELEMENT_FACTOR;
+
 import java.time.Duration;
 
 /**
@@ -12,7 +14,6 @@ public record UntilElement(
                            ElementStatusType elementStatusType,
                            Duration duration
 ) {
-
   /**
    * Wait for the element status to be true for the specified duration
    *
@@ -29,7 +30,7 @@ public record UntilElement(
    * @return - the until element status waiter timeout
    */
   public Duration timeout() {
-    return duration;
+    return duration.multipliedBy(WAIT_FOR_ELEMENT_FACTOR.asInteger());
   }
 
   /**

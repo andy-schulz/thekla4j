@@ -54,7 +54,11 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
   /**
    * The browser configuration to use
    */
-  BROWSER_CONFIG(PropertyElement.of("thekla4j.browser.config", Option.none(), "The browser configuration to use"));
+  BROWSER_CONFIG(PropertyElement.of("thekla4j.browser.config", Option.none(), "The browser configuration to use")),
+
+
+  WAIT_FOR_ELEMENT_FACTOR(PropertyElement.of("thekla4j.browser.element.wait.factor", Option.of("1"),
+    "multiplier for the wait time for elements. Default is 1.0, which means no scaling.")),;
 
   final PropertyElement property;
 
@@ -81,6 +85,15 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
   @Override
   public Option<String> optionValue() {
     return Thekla4jProperty.of(property);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Integer asInteger() {
+    return Thekla4jProperty.asInteger(property)
+        .getOrElseThrow(x -> new RuntimeException("Error getting Integer for Property: " + property.name(), x));
   }
 
   /**
