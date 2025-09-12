@@ -12,51 +12,57 @@ import org.openqa.selenium.interactions.Actions;
  */
 class SeleniumKeyActionDriver implements KeyActionDriver {
 
-  private Try<Actions> selActionDriver;
+  private final Try<Actions> selActionDriver;
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public KeyActionDriver keyDown(Key key) {
-    this.selActionDriver = selActionDriver.map(a -> a.keyDown(Keys.valueOf(key.name())));
-    return this;
+  public Try<KeyActionDriver> keyDown(Key key) {
+    return selActionDriver.map(a -> a.keyDown(Keys.valueOf(key.name())))
+        .mapTry(__ -> this);
+//    return this;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public KeyActionDriver keyUp(Key key) {
-    this.selActionDriver = selActionDriver.map(a -> a.keyUp(Keys.valueOf(key.name())));
-    return this;
+  public Try<KeyActionDriver> keyUp(Key key) {
+    return selActionDriver.map(a -> a.keyUp(Keys.valueOf(key.name())))
+        .map(__ -> this);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public KeyActionDriver keyPress(Key key) {
-    this.selActionDriver = selActionDriver.map(a -> a.sendKeys(Keys.valueOf(key.name())));
-    return this;
+  public Try<KeyActionDriver> keyPress(Key key) {
+//    this.selActionDriver = selActionDriver.map(a -> {
+//      a.sendKeys(Keys.valueOf(key.name()));
+//      return a;
+//    });
+
+    return selActionDriver.map(a -> a.sendKeys(Keys.valueOf(key.name())))
+        .map(__ -> this);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public KeyActionDriver keyPress(CharSequence keys) {
-    this.selActionDriver = selActionDriver.map(a -> a.sendKeys(keys));
-    return this;
+  public Try<KeyActionDriver> keyPress(CharSequence keys) {
+    return selActionDriver.map(a -> a.sendKeys(keys))
+        .map(__ -> this);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public KeyActionDriver pause(Duration duration) {
-    this.selActionDriver = selActionDriver.map(a -> a.pause(duration));
-    return this;
+  public Try<KeyActionDriver> pause(Duration duration) {
+    return selActionDriver.map(a -> a.pause(duration))
+        .map(__ -> this);
   }
 
   /**

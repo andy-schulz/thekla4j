@@ -39,10 +39,10 @@ class ActionFunctions {
    * @param shape          - the shape to draw
    * @return - a Try of void
    */
-  protected static Try<Void> drawShape(RemoteWebDriver driver, HighlightContext hlx, Element element, Boolean releaseAndHold, Option<Duration> pause, List<Shape> shape) {
+  protected static Try<Void> drawShape(RemoteWebDriver driver, Actions actions, HighlightContext hlx, Element element, Boolean releaseAndHold, Option<Duration> pause, List<Shape> shape) {
 
     return ElementFunctions.findElement(driver, hlx, element)
-        .map(webElement -> shape.map(s -> drawSingleShape.apply(webElement, releaseAndHold, pause, s, new Actions(driver))))
+        .map(webElement -> shape.map(s -> drawSingleShape.apply(webElement, releaseAndHold, pause, s, actions)))
         .flatMap(LiftTry.fromList())
         .map(__ -> null);
   }
@@ -72,21 +72,26 @@ class ActionFunctions {
 
   private static final Function1<Actions, Try<Actions>> mouseDown =
       actions -> Try.of(actions::clickAndHold)
-          .onSuccess(__ -> log.debug("Mouse down"));
+          .onSuccess(__ -> log.debug("Mouse down"))
+          .map(__ -> actions);
 
   private static final Function1<Actions, Try<Actions>> mouseUp =
       actions -> Try.of(actions::release)
-          .onSuccess(__ -> log.debug("Mouse up"));
+          .onSuccess(__ -> log.debug("Mouse up"))
+          .map(__ -> actions);
+
 
   private static final Function1<Actions, Try<Actions>> click =
       actions -> Try.of(actions::click)
-          .onSuccess(__ -> log.debug("Mouse click"));
+          .onSuccess(__ -> log.debug("Mouse click"))
+          .map(__ -> actions);
 
   private static final Function3<Actions, StartPoint, WebElement, Try<Actions>> moveToStartPoint =
       (actions, startPoint, element) -> Try.of(() -> element.getLocation().moveBy(startPoint.x(), startPoint.y()))
-          .onSuccess(point -> log.debug("Element located at: {}", element.getLocation()))
-          .map(point -> actions.moveToLocation(point.x, point.y))
-          .onSuccess(__ -> log.debug("Move to start point inside element: {}", startPoint));
+          .onSuccess(point -> log.debug("Element located at: x:{}, y:{}", point.getX(), point.getY()))
+          .map(point -> actions.moveToLocation(point.getX(), point.getY()))
+          .onSuccess(__ -> log.debug("Move to start point inside element: {}", startPoint))
+          .map(__ -> actions);
 
 
   private static final Function3<Boolean, Option<Duration>, Actions, Void> releaseHoldAndPause =

@@ -20,12 +20,12 @@ It is independent from the framework you are using like Selenium or Playwright.
 
 Methods:
 
-| type   | method                         | description                                            |
-|--------|--------------------------------|--------------------------------------------------------|
-| static | `Element.found( By locator )`  | Creates a new element with the given locator.          |
-|        | `.called( String name )`       | Creates a new element with the given locator and name. |
-|        | `.wait( UntilElement waiter )` | wait for this element until condition is met           |
-|        | `.andThenFound( By locator )`  | chain multiple locators to find an element             |
+| type   | method                         | description                                                                            |
+|--------|--------------------------------|----------------------------------------------------------------------------------------|
+| static | `Element.found( By locator )`  | Creates a new element with the given locator.                                          |
+|        | `.withName( String name )`     | Sets the name of the element, makes identifying the element easier in case of an error |
+|        | `.wait( UntilElement waiter )` | wait for this element until condition is met                                           |
+|        | `.andThenFound( By locator )`  | chain multiple locators to find an element                                             |
 
 
 Elements are declared using the `Element` class. The declaration consists of a locator and an optional name.

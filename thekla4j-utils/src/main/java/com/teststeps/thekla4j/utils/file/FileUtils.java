@@ -12,11 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
+@Log4j2(topic = "FileUtils")
 public class FileUtils {
 
   public static Function1<String, Try<String>> readStringFromResourceFile =
       file -> Try.of(() -> FileUtils.class.getClassLoader().getResourceAsStream(file))
+          .flatMap(x -> x != null ? Try.success(x) : Try.failure(new RuntimeException("Did not find resource file: " + file)))
+          .onFailure(x -> log.error("Error reading resource file: {}, caused by: {}", file, x.getMessage()))
+          .onSuccess(x -> log.info("Successfully read resource file: {}", file))
           .map(FileUtils::convertStreamToString);
 
 

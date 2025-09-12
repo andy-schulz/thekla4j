@@ -1,16 +1,9 @@
 package com.teststeps.thekla4j.browser;
 
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.AUTO_SCROLL_VERTICAL;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.HIGHLIGHT_ELEMENTS;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SCREENSHOT_ABSOLUTE_PATH;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SCREENSHOT_RELATIVE_PATH;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
-import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
+import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
@@ -57,24 +50,22 @@ public class BrowserPropertiesTest {
   @Test
   public void checkHelpText() {
     String helpText = DefaultThekla4jBrowserProperties.help();
-    System.out.println(helpText);
+
+    // quote the static parts of the expected help text and ignore the absolut screenshot path which is set to user.dir
     String expectedHelpText =
         """
-            thekla4j.browser.highlightElements: Possible values: true, false (default: true)
-            thekla4j.browser.slowDownExecution: Possible values: true, false (default: false)
-            thekla4j.browser.slowDownTimeInSeconds: Time in seconds to slow down the execution (default: 1)
-            thekla4j.browser.autoScroll.enabled: Possible values: true, false (default: false)
-            thekla4j.browser.autoScroll.vertical: Possible values: top, center, bottom (default: center)
-            thekla4j.browser.screenshot.relativePath: Relative project path to store the screenshots (default: )
-            thekla4j.browser.screenshot.absolutePath: Absolute path to store the screenshots (default:
-            """.strip();
+            \\Qthekla4j.browser.autoScroll.enabled:              Possible values: true, false (default: false)
+            thekla4j.browser.autoScroll.vertical:             Possible values: top, center, bottom (default: center)
+            thekla4j.browser.config:                          The browser configuration to use (default: None)
+            thekla4j.browser.element.wait.factor:             multiplier for the wait time for elements. Default is 1.0, which means no scaling. (default: 1)
+            thekla4j.browser.highlightElements:               Possible values: true, false (default: true)
+            thekla4j.browser.screenshot.absolutePath:         Absolute path to store the screenshots (default: \\E.*\\Q)
+            thekla4j.browser.screenshot.relativePath:         Relative project path to store the screenshots (default: )
+            thekla4j.browser.slowDownExecution:               Possible values: true, false (default: false)
+            thekla4j.browser.slowDownTimeInSeconds:           Time in seconds to slow down the execution (default: 1)\\E
+            """
+            .strip();
 
-    String endText =
-        """
-            thekla4j.browser.config: The browser configuration to use (default: None)
-            """.strip();
-
-    assertThat("help text is correct", helpText, startsWith(expectedHelpText));
-    assertThat("help text is correct", helpText, endsWith(endText));
+    assertThat("help text is correct", helpText, matchesPattern(expectedHelpText));
   }
 }

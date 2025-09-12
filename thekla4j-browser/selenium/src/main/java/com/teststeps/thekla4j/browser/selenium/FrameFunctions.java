@@ -64,7 +64,7 @@ class FrameFunctions {
                 FrameFunctions.retryUntil.apply(frameFinder, frameFinder.apply(frame), frame, start, waitForNextIteration));
       };
 
-  protected final static Function2<RemoteWebDriver, Frame, Try<Void>> switchToFrame =
+  protected final static Function2<RemoteWebDriver, Frame, Try<RemoteWebDriver>> switchToFrame =
       (driver, frame) -> {
 
         driver.switchTo().defaultContent();
@@ -73,7 +73,7 @@ class FrameFunctions {
             .onFailure(e -> log.error("Could not find frame: {}", frame, e))
             .map(webElement -> {
               driver.switchTo().frame(webElement);
-              return null;
+              return driver;
             });
       };
 }

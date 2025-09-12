@@ -20,7 +20,7 @@ public class SeleniumConfigList {
   /**
    * the Selenium configurations
    */
-  private Map<String, SeleniumConfig> seleniumConfigs = HashMap.empty();
+  private Map<String, SeleniumGridConfig> seleniumConfigs = HashMap.empty();
 
   /**
    * Get the default configuration
@@ -56,7 +56,7 @@ public class SeleniumConfigList {
    * @param value - the Selenium configuration
    */
   @JsonAnySetter
-  public void seleniumConfigs(String key, SeleniumConfig value) {
+  public void seleniumConfigs(String key, SeleniumGridConfig value) {
     seleniumConfigs = seleniumConfigs.put(key, value);
   }
 
@@ -65,7 +65,7 @@ public class SeleniumConfigList {
    *
    * @return - the Selenium configurations
    */
-  public Map<String, SeleniumConfig> seleniumConfigs() {
+  public Map<String, SeleniumGridConfig> seleniumConfigs() {
     return seleniumConfigs;
   }
 
@@ -75,12 +75,12 @@ public class SeleniumConfigList {
    * @return - the Selenium configurations
    */
   @JsonAnyGetter
-  public java.util.Map<String, SeleniumConfig> getSeleniumConfigs() {
+  public java.util.Map<String, SeleniumGridConfig> getSeleniumConfigs() {
     return seleniumConfigs.toJavaMap();
   }
 
   /**
-   * Add an entry with the key "NONE" to the Selenium configurations
+   * Add an entry with the key "LOCAL" to the Selenium configurations
    * This is used to indicate that no predefined Selenium configuration should be used.
    * This is useful during local development or testing when you want to run tests without any specific Selenium
    * configuration.
@@ -88,15 +88,15 @@ public class SeleniumConfigList {
    * e.g. seleniumConfig.yaml
    * <pre>
    * ```yaml
-   * defaultConfig: NONE
+   * defaultConfig: LOCAL
    * ...
    * ```
    * </pre>
    *
    * @return - the Selenium configuration
    */
-  public SeleniumConfigList withNoneValue() {
-    return new SeleniumConfigList(this.defaultConfig, seleniumConfigs.put("NONE", null));
+  public SeleniumConfigList withLocalValue() {
+    return new SeleniumConfigList(this.defaultConfig, seleniumConfigs.put("LOCAL", null));
   }
 
   /**

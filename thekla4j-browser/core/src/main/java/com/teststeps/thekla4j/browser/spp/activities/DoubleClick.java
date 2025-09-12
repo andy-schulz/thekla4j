@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
 /**
  * Interaction to double-click on an element
  */
-@Log4j2
+@Log4j2(topic = "DoubleClick")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Action("double click on @{element}")
 public class DoubleClick extends BasicInteraction {

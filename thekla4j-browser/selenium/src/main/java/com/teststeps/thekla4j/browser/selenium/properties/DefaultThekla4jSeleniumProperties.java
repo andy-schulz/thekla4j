@@ -17,7 +17,8 @@ public enum DefaultThekla4jSeleniumProperties implements DefaultThekla4jProperti
   /**
    * The browser configuration to use
    */
-  SELENIUM_CONFIG(PropertyElement.of("thekla4j.browser.selenium.config", Option.none(), "The Selenium configuration to use"));
+  SELENIUM_CONFIG(PropertyElement.of("thekla4j.browser.selenium.config", Option.none(), "The Selenium configuration to use")),
+  SELENIUM_BIDI_LOG(PropertyElement.of("thekla4j.browser.selenium.bidi.log", Option.of("false"), "Use WebDriver Bidi to get browser logs"));
 
   final PropertyElement property;
 

@@ -1,30 +1,37 @@
-defaultConfig: localChrome
+defaultConfig: gridFirefox
 
 localChrome:
-  browserName: "Chrome"
+  browserName: "chrome"
   enableFileDownload: true
-  chromeOptions:
-    args:
-      - "disable-search-engine-choice-screen"
+  browserArgs:
+    - "disable-search-engine-choice-screen"
+
+gridChrome:
+  browserName: "chrome"
+  platformName: "Linux"
+  enableFileDownload: true
+  browserArgs:
+    - "disable-search-engine-choice-screen"
+
+gridFirefox:
+  browserName: "firefox"
+  platformName: "Linux"
 
 chromeDebug:
-  browserName: "Chrome"
+  browserName: "chrome"
   enableFileDownload: false
-  chromeOptions:
-    debug:
-      debuggerAddress: "localhost:9222"
-      downloadPath: "download/path"
+  debug:
+    debuggerAddress: "localhost:9222"
+    downloadPath: "download/path"
 
 passedByCode:
-  browserName: "Chrome"
-  chromeOptions:
-    debug:
-      debuggerAddress: "passedByCode"
+  browserName: "chrome"
+  debug:
+    debuggerAddress: "passedByCode"
 
 emulator:
-  browserName: Chrome
+  browserName: chrome
   platformName: Android
   deviceName: MyDevice
-  chromeOptions:
-    args:
-      - "disable-search-engine-choice-screen"
+  browserArgs:
+    - "disable-search-engine-choice-screen"

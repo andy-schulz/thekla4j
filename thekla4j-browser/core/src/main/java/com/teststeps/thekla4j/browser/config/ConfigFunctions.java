@@ -68,8 +68,15 @@ public class ConfigFunctions {
   /**
    * Parse the BrowserConfig from a string
    */
-  static final Function1<Option<String>, Try<Option<BrowserConfigList>>> parseBrowserConfig =
+  public static final Function1<Option<String>, Try<Option<BrowserConfigList>>> parseBrowserConfig =
       browserConfigString -> browserConfigString.map(YAML.jParse(BrowserConfigList.class))
           .transform(LiftTry.fromOption())
-          .onFailure(e -> log.error(() -> "Error parsing BrowserConfig: " + e));
+          .onFailure(e -> log.error(() -> """
+              Error parsing BrowserConfig: {{ERROR_MESSAGE}}
+
+              HELP:
+              {{BROWSERCONFIG_HELP}}
+              """
+              .replace("{{ERROR_MESSAGE}}", e.getMessage())
+              .replace("{{BROWSERCONFIG_HELP}}", BrowserConfig.help())));
 }

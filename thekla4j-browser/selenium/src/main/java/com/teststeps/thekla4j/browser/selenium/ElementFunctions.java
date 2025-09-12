@@ -82,7 +82,6 @@ class ElementFunctions {
   }
 
   static Try<WebElement> findElementWithoutScrolling(RemoteWebDriver driver, Element element) {
-
     return retryUntil.apply(
       ElementFunctions.locateElement.apply(driver),
       locateElement.apply(driver).apply(element),

@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.activityLog;
 
+import static com.teststeps.thekla4j.activityLog.data.StacktraceHtmlFormatter.formatStacktraceAttachment;
 import static io.vavr.API.*;
 
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.activityLog.data.LogAttachmentType;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
+import com.teststeps.thekla4j.activityLog.data.StacktraceAttachment;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -393,6 +395,7 @@ public class LogFormatter {
       Case($(LogAttachmentType.TEXT_PLAIN), () -> formatTextAttachment(attachment.content())),
       Case($(LogAttachmentType.IMAGE_PNG), () -> fileToBase64String(attachment)),
       Case($(LogAttachmentType.IMAGE_BASE64), () -> formatPngBase64FileAttachment(attachment.content())),
+      Case($(LogAttachmentType.STACKTRACE), () -> formatStacktraceAttachment((StacktraceAttachment) attachment)),
       Case($(), () -> "<div class=\"attachment\"><pre>" + attachment.content() + "</pre></div>"));
   }
 
@@ -405,7 +408,7 @@ public class LogFormatter {
    */
   private static String formatTextAttachment(String attachment) {
     return """
-        <div class="attachment">
+        <div class="attachment attachment-block">
             <pre>{$$_ATTACHMENT}</pre>
         </div>
         """.replace("{$$_ATTACHMENT}", attachment);
@@ -419,7 +422,7 @@ public class LogFormatter {
    */
   private static String formatPngBase64FileAttachment(String base64Attachment) {
     return """
-        <div class="attachment">
+        <div class="attachment attachment-block">
             <img src="data:image/png;base64,{$$_BASE64_ATTACHMENT}
             "/>
         </div>

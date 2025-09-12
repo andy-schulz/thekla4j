@@ -1,126 +1,188 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.selenium.Selenium.loadConfigs;
+import static com.teststeps.thekla4j.browser.selenium.SeleniumLoader.addCapabilities;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.loadDefaultSeleniumConfig;
+import static com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigFunctions.parseSeleniumConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfig;
-import io.vavr.Function1;
-import io.vavr.Tuple2;
-import io.vavr.collection.List;
+import com.teststeps.thekla4j.browser.selenium.config.SeleniumConfigList;
+import com.teststeps.thekla4j.browser.selenium.config.SeleniumGridConfig;
+import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
-import java.util.function.Function;
+import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
+@Log4j2
 public class TestSeleniumConfig {
+
+  @BeforeEach
+  public void reset() {
+    Thekla4jProperty.resetPropertyCache();
+  }
+
   @Test
-  public void loadSeleniumConfigSetByPassedVariable() throws Throwable {
+  public void loadSeleniumConfig() {
 
-    Option<String> configToLoad = Option.of("passedByCode");
+    String config = """
+          defaultConfig: local
 
-    SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
-        .getOrElseThrow(Function.identity())._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            capabilities:
+              se:
+                testName: "Selenium Test"
+                recordVideo: true
+        """;
 
 
-    assertThat("retrieving seleniumConfig is success",
-      config.remoteUrl(),
-      equalTo("http://passedByCode:1234"));
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
+
+    assertThat("parsing is a success", configList.isSuccess());
+    assertThat("option is not empty", configList.get().isDefined());
+
+    SeleniumConfigList seleniumConfigList = configList.get().get();
+
+    assertThat("check default config", seleniumConfigList.defaultConfig(), equalTo("local"));
+    assertThat("has one config element", seleniumConfigList.seleniumConfigs().size(), equalTo(1));
+
+    SeleniumGridConfig seleniumGridConfig = seleniumConfigList.seleniumConfigs()
+        .get("local")
+        .getOrElseThrow(() -> new IllegalArgumentException("Cant find default selenium config 'local' in config file"));
+
+    assertThat("check remote url", seleniumGridConfig.remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
+
+    assertThat("check capability se exists", seleniumGridConfig.capabilities().get("se").isDefined());
+    assertThat("check capability bStack has 2 elements", seleniumGridConfig.capabilities().get("se").get().size(), equalTo(2));
 
   }
 
   @Test
-  public void updateSeleniumConfig() throws Throwable {
+  public void loadSeleniumConfigWithEmptyAppiumCapabilities() {
 
-    Option<String> configToLoad = Option.of("passedByCode");
+    String config = """
+          defaultConfig: local
 
-    List<Function1<SeleniumConfig, SeleniumConfig>> seleniumConfigUpdate =
-        List.of(c -> c.withRemoteUrl("http://updatedUrl:3333"));
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            capabilities:
+              appium:
+        """;
 
-    SeleniumConfig config = loadConfigs.apply(configToLoad, Option.none(), seleniumConfigUpdate, List.empty())
-        .getOrElseThrow(Function.identity())._1.getOrElseThrow(() -> new RuntimeException("cant get SeleniumConfig"));
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
 
+    assertThat("parsing list ", configList.isSuccess());
 
-    assertThat("retrieving seleniumConfig is success",
-      config.remoteUrl(),
-      equalTo("http://updatedUrl:3333"));
+    SeleniumGridConfig seleniumGridConfig = configList.get().get().seleniumConfigs().get("local").get();
 
-  }
+    Try<MutableCapabilities> caps = addCapabilities.apply(Option.of(seleniumGridConfig), new DesiredCapabilities());
 
-  @Test
-  public void loadBrowserConfigSetByPassedVariable() throws Throwable {
-
-    Option<String> browserConfigToLoad = Option.of("passedByCode");
-
-    BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), List.empty())
-        .getOrElseThrow(Function.identity())._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
-
-
-    assertThat("retrieving browser config is success",
-      config.chromeOptions().debug().debuggerAddress(),
-      equalTo("passedByCode"));
+    assertThat("capabilities are empty", caps.get().asMap().isEmpty());
 
   }
 
   @Test
-  public void updateBrowserConfig() throws Throwable {
+  public void loadSeleniumConfigWithEmptyCapabilities() {
 
-    Option<String> browserConfigToLoad = Option.of("passedByCode");
+    String config = """
+          defaultConfig: local
 
-    List<Function1<BrowserConfig, BrowserConfig>> browserConfigUpdate =
-        List.of(c -> c.withBrowserVersion("newBrowserVersion"));
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+            capabilities:
+        """;
 
-    BrowserConfig config = loadConfigs.apply(Option.none(), browserConfigToLoad, List.empty(), browserConfigUpdate)
-        .getOrElseThrow(Function.identity())._2.getOrElseThrow(() -> new RuntimeException("cant get BrowserConfig"));
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
 
+    assertThat("parsing list ", configList.isSuccess());
 
-    assertThat("browser version is set",
-      config.browserVersion(),
-      equalTo("newBrowserVersion"));
+    SeleniumGridConfig seleniumGridConfig = configList.get().get().seleniumConfigs().get("local").get();
 
-  }
+    Try<MutableCapabilities> caps = addCapabilities.apply(Option.of(seleniumGridConfig), new DesiredCapabilities());
 
-  @Test
-  public void loadBrowserAndSeleniumConfigSetByPassedVariable() throws Throwable {
-
-    Option<String> browserConfigToLoad = Option.of("passedByCode");
-    Option<String> seleniumConfigToLoad = Option.of("passedByCode");
-
-    Tuple2<Option<SeleniumConfig>, Option<BrowserConfig>> config = loadConfigs.apply(seleniumConfigToLoad, browserConfigToLoad,
-      List.empty(), List.empty())
-        .getOrElseThrow(Function.identity());
-
-
-    assertThat("selenium config is set",
-      config._1.isDefined(),
-      equalTo(true));
-
-    assertThat("retrieving seleniumConfig is success",
-      config._1.get().remoteUrl(),
-      equalTo("http://passedByCode:1234"));
-
-    assertThat("browser config is set",
-      config._2.isDefined(),
-      equalTo(true));
-
-    assertThat("retrieving selenium config is success",
-      config._2.get().chromeOptions().debug().debuggerAddress(),
-      equalTo("passedByCode"));
+    assertThat("capabilities are empty", caps.get().asMap().isEmpty());
 
   }
 
   @Test
-  public void loadSeleniumConfigOfNone() throws Throwable {
+  public void loadSeleniumConfigWithMissingCapabilities() {
 
-    Option<String> configToLoad = Option.of("NONE");
+    String config = """
+          defaultConfig: local
 
-    Option<SeleniumConfig> config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
-        .getOrElseThrow(Function.identity())._1;
+          local:
+            remoteUrl: "http://localhost:4444/wd/hub"
+        """;
 
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error loading SeleniumConfig", e));
 
-    assertThat("retrieving empty seleniumConfig is success",
-      config.isEmpty(),
-      equalTo(true));
+    assertThat("parsing list ", configList.isSuccess());
+
+    SeleniumGridConfig seleniumGridConfig = configList.get().get().seleniumConfigs().get("local").get();
+
+    Try<MutableCapabilities> caps = addCapabilities.apply(Option.of(seleniumGridConfig), new DesiredCapabilities());
+
+    assertThat("capabilities are empty", caps.get().asMap().isEmpty());
 
   }
+
+  @Test
+  public void loadSeleniumConfigSetBySystemEnvironment() {
+
+    System.setProperty("thekla4j.browser.selenium.config", "setBySystem");
+
+    String config = """
+          defaultConfig: unknown
+
+          setBySystem:
+            remoteUrl: "http://localhost:4444/wd/hub"
+        """;
+
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error parsing SeleniumConfigList", e));
+
+
+    Try<Option<SeleniumGridConfig>> seleniumConfig = configList.map(loadDefaultSeleniumConfig)
+        .onFailure(e -> log.error("Error loading SeleniumConfig", e));
+
+    assertThat("retrieving seleniumConfig is success", seleniumConfig.isSuccess());
+    assertThat("seleniumConfig is defined", seleniumConfig.get().isDefined());
+
+    assertThat("remote url is set", seleniumConfig.get().get().remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
+
+  }
+
+  @Test
+  public void loadingLocalConfig() {
+
+
+    String config = """
+          defaultConfig: LOCAL
+
+          setBySystem:
+            remoteUrl: "http://localhost:4444/wd/hub"
+        """;
+
+    Try<Option<SeleniumConfigList>> configList = parseSeleniumConfig.apply(Option.of(config));
+    configList.onFailure(e -> log.error("Error parsing SeleniumConfigList", e));
+
+
+    Try<Option<SeleniumGridConfig>> seleniumConfig = configList.map(loadDefaultSeleniumConfig)
+        .onFailure(e -> log.error("Error loading SeleniumConfig", e));
+
+//    assertThat("retrieving seleniumConfig is success", seleniumConfig.isSuccess());
+//    assertThat("seleniumConfig is defined", seleniumConfig.get().isDefined());
+//
+//    assertThat("remote url is set", seleniumConfig.get().get().remoteUrl(), equalTo("http://localhost:4444/wd/hub"));
+
+  }
+
 }

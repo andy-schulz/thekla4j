@@ -1,22 +1,20 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static com.teststeps.thekla4j.browser.core.folder.DirectoryConstants.DOWNLOAD_PREFIX;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_EXECUTION;
 import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties.SLOW_DOWN_TIME;
 import static com.teststeps.thekla4j.browser.selenium.ElementFunctions.*;
 import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFrame;
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
-import com.teststeps.thekla4j.browser.core.BrowserStackExecutor;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
-import com.teststeps.thekla4j.browser.selenium.config.BrowsersStackOptions;
-import com.teststeps.thekla4j.browser.selenium.config.SeleniumOptions;
+import com.teststeps.thekla4j.browser.core.logListener.BrowserLog;
+import com.teststeps.thekla4j.browser.core.logListener.LogEntry;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
+import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
@@ -32,81 +30,46 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
+import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @Log4j2(topic = "Browser")
-class SeleniumBrowser implements Browser, BrowserStackExecutor {
+public class SeleniumBrowser implements Browser, BrowserLog {
 
-  private final RemoteWebDriver driver;
+  private final DriverLoader driverLoader;
   private final HighlightContext highlightContext = new HighlightContext();
-  private final Option<SeleniumOptions> options;
-  private Option<BrowsersStackOptions> bsOptions = Option.none();
   private Option<Frame> currentFrame = Option.none();
-  private Option<Path> downloadPath = Option.none();
   private final BrowserConfig browserConfig;
-  private final Boolean localExecution;
+  private Boolean browserDisposed = false;
 
+  private Option<SeleniumKeyActionDriver> seleniumKeyActionDriver = Option.none();
 
-  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, SeleniumOptions seleniumOptions, Option<BrowserStartupConfig> startupConfig) {
-    this.driver = driver;
-    this.options = Option.of(seleniumOptions);
+  public SeleniumBrowser(DriverLoader loader, BrowserConfig browserConfig) {
+    this.driverLoader = loader;
     this.browserConfig = browserConfig;
+  }
 
-    if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
-      this.driver.manage().window().maximize();
+  public static SeleniumBrowser load(DriverLoader loader, BrowserConfig browserConfig) {
+    return new SeleniumBrowser(loader, browserConfig);
+  }
+
+  private Try<SeleniumKeyActionDriver> seleniumKeyActionDriver() {
+    if (seleniumKeyActionDriver.isEmpty()) {
+
+      Try<SeleniumKeyActionDriver> actionDriver = driverLoader.actions()
+          .map(SeleniumKeyActionDriver::new);
+
+      if (actionDriver.isFailure())
+        return actionDriver;
+
+      seleniumKeyActionDriver = Option.of(actionDriver.get());
+
     }
 
-    this.localExecution = false;
-
-    createDownloadPath(browserConfig);
+    return Try.success(seleniumKeyActionDriver.get());
   }
 
-  private SeleniumBrowser(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig, Option<Path> downloadPath) {
-    this.driver = driver;
-    this.options = Option.of(SeleniumOptions.empty());
-    this.browserConfig = browserConfig;
-
-    if (!Objects.isNull(startupConfig) && startupConfig.map(BrowserStartupConfig::maximizeWindow).getOrElse(false)) {
-      this.driver.manage().window().maximize();
-    }
-
-    this.localExecution = true;
-
-    if (downloadPath.isEmpty()) {
-      createDownloadPath(browserConfig);
-    } else {
-      this.downloadPath = downloadPath;
-    }
-  }
-
-  protected static SeleniumBrowser local(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig) {
-    return new SeleniumBrowser(driver, browserConfig, startupConfig, Option.none());
-  }
-
-  protected static SeleniumBrowser debug(RemoteWebDriver driver, BrowserConfig browserConfig, Option<BrowserStartupConfig> startupConfig, Option<Path> downloadPath) {
-    return new SeleniumBrowser(driver, browserConfig, startupConfig, downloadPath);
-  }
-
-  protected static SeleniumBrowser grid(RemoteWebDriver driver, BrowserConfig browserConfig, SeleniumOptions seleniumOptions, Option<BrowserStartupConfig> startupConfig) {
-    return new SeleniumBrowser(driver, browserConfig, seleniumOptions, startupConfig);
-  }
-
-  protected SeleniumBrowser withDownloadPath(Option<Path> downloadPath) {
-    this.downloadPath = downloadPath;
-    return this;
-  }
-
-  private void createDownloadPath(BrowserConfig browserConfig) {
-    if (browserConfig.enableFileDownload() && downloadPath.isEmpty())
-      this.downloadPath = Option.of(TempFolderUtil.newSubTempFolder(DOWNLOAD_PREFIX));
-  }
-
-  protected SeleniumBrowser withBrowserStackOptions(BrowsersStackOptions bsOptions) {
-    this.bsOptions = Option.of(bsOptions);
-    return this;
-  }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
 
@@ -122,21 +85,20 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     };
   }
 
-  protected Try<Void> switchFrame(Option<Frame> frame) {
+  protected Try<RemoteWebDriver> switchFrame(Option<Frame> frame) {
 
     if ((currentFrame.isEmpty() && frame.isEmpty())) {
-      return Try.success(null);
+      return driverLoader.driver();
     }
 
     if (currentFrame.isDefined() && frame.isEmpty()) {
       currentFrame = Option.none();
-      switchToDefaultContent();
-      return Try.success(null);
+      return switchToDefaultContent();
     }
 
 
     if (currentFrame.isDefined() && frame.isDefined() && currentFrame.get().equals(frame.get())) {
-      return Try.success(null);
+      return driverLoader.driver();
     }
 
     // current frame is empty and incoming frame is defined
@@ -146,12 +108,17 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
   }
 
-  protected void switchToDefaultContent() {
-    driver.switchTo().defaultContent();
+  protected Try<RemoteWebDriver> switchToDefaultContent() {
+    return driverLoader.driver()
+        .map(d -> {
+          d.switchTo().defaultContent();
+          return d;
+        });
   }
 
-  protected Try<Void> switchToFrame(Frame frame) {
-    return switchToFrame.apply(driver, frame);
+  protected Try<RemoteWebDriver> switchToFrame(Frame frame) {
+    return driverLoader.driver()
+        .flatMap(d -> switchToFrame.apply(d, frame));
   }
 
   /**
@@ -159,7 +126,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> navigateTo(String url) {
-    return navigateTo.apply(driver, url)
+    return driverLoader.driver()
+        .flatMap(d -> navigateTo.apply(d, url))
         .map(applyExecutionSlowDown());
   }
 
@@ -169,7 +137,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> clickOn(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> clickOnElement.apply(driver, highlightContext, element))
+        .flatMap(d -> clickOnElement.apply(d, highlightContext, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -179,7 +147,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> clickOnPositionInsideElement(Element element, StartPoint position) {
     return switchFrame(element.frame())
-        .flatMap(x -> ActionFunctions.clickOnPositionInsideElement(driver, highlightContext, element, position))
+        .flatMap(d -> ActionFunctions.clickOnPositionInsideElement(d, highlightContext, element, position))
         .map(applyExecutionSlowDown());
   }
 
@@ -189,7 +157,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> doubleClickOn(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> doubleClickOnElement.apply(driver, highlightContext, element))
+        .flatMap(d -> doubleClickOnElement.apply(d, highlightContext, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -199,7 +167,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return switchFrame(element.frame())
-        .flatMap(x -> enterTextIntoElement.apply(driver, highlightContext, element, text, clearField))
+        .flatMap(d -> enterTextIntoElement.apply(d, highlightContext, element, text, clearField))
         .map(applyExecutionSlowDown());
   }
 
@@ -209,7 +177,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> clear(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> clearElement.apply(driver, highlightContext, element))
+        .flatMap(d -> clearElement.apply(d, highlightContext, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -220,7 +188,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<String> textOf(Element element) {
 
     return switchFrame(element.frame())
-        .flatMap(x -> getTextFromElement.apply(driver, highlightContext, element))
+        .flatMap(d -> getTextFromElement.apply(d, highlightContext, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -231,7 +199,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<List<String>> textOfAll(Element element) {
 
     return switchFrame(element.frame())
-        .flatMap(x -> getTextFromElements.apply(driver, element))
+        .flatMap(d -> getTextFromElements.apply(d, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -241,7 +209,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<String> valueOf(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getValueOfElement.apply(driver, highlightContext, element))
+        .flatMap(d -> getValueOfElement.apply(d, highlightContext, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -251,13 +219,13 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<String> attributeValueOf(String attribute, Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> {
+        .flatMap(d -> {
           // special handling for innerHTML and outerHTML attributes
           // the new getDomAttribute method returns null for inner and outer HTML
           if (attribute.equalsIgnoreCase("innerhtml") || attribute.equalsIgnoreCase("outerhtml")) {
-            return getHtmlSourceOfElement.apply(driver, highlightContext, element, attribute);
+            return getHtmlSourceOfElement.apply(d, highlightContext, element, attribute);
           }
-          return getAttributeFromElement.apply(driver, highlightContext, element, attribute);
+          return getAttributeFromElement.apply(d, highlightContext, element, attribute);
         })
         .map(applyExecutionSlowDown());
   }
@@ -268,7 +236,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<String> propertyValueOf(String attribute, Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getPropertyFromElement.apply(driver, highlightContext, element, attribute))
+        .flatMap(d -> getPropertyFromElement.apply(d, highlightContext, element, attribute))
         .map(applyExecutionSlowDown());
   }
 
@@ -279,7 +247,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<State> getState(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getElementState.apply(driver, highlightContext, element));
+        .flatMap(d -> getElementState.apply(d, highlightContext, element));
   }
 
   /**
@@ -288,7 +256,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Boolean> visibilityOf(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getVisibility.apply(driver, highlightContext, element));
+        .flatMap(d -> getVisibility.apply(d, highlightContext, element));
   }
 
   /**
@@ -297,7 +265,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Rectangle> getGeometryOfElement(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> getGeometryOfElement.apply(driver, highlightContext, element))
+        .flatMap(d -> getGeometryOfElement.apply(d, highlightContext, element))
         .onSuccess(r -> log.info("Element geometry: {} of element: {}", r, element.name()))
         .map(applyExecutionSlowDown());
   }
@@ -317,7 +285,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         element.frame().isDefined() && scrollArea.frame().isDefined() && element.frame().get().equals(scrollArea.frame().get())) {
 
       return switchFrame(element.frame())
-          .flatMap(__ -> scrollElementToTopOfArea.apply(driver, element, scrollArea));
+          .flatMap(d -> scrollElementToTopOfArea.apply(d, element, scrollArea));
     } else {
       Try.failure(ActivityError.of(frameErrorMessage));
     }
@@ -333,7 +301,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         element.frame().isDefined() && scrollArea.frame().isDefined() && element.frame().get().equals(scrollArea.frame().get())) {
 
       return switchFrame(element.frame())
-          .flatMap(__ -> scrollElementToLeftOfArea.apply(driver, element, scrollArea));
+          .flatMap(d -> scrollElementToLeftOfArea.apply(d, element, scrollArea));
     } else {
       Try.failure(ActivityError.of(frameErrorMessage));
     }
@@ -347,7 +315,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   public Try<Void> scrollAreaDownByPixels(Element element, int pixels) {
 
     return switchFrame(element.frame())
-        .flatMap(__ -> scrollAreaDownByPixels.apply(driver, pixels, element))
+        .flatMap(d -> scrollAreaDownByPixels.apply(d, pixels, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -357,7 +325,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> scrollAreaUpByPixels(Element element, int pixels) {
     return switchFrame(element.frame())
-        .flatMap(__ -> scrollAreaUpByPixels.apply(driver, pixels, element))
+        .flatMap(d -> scrollAreaUpByPixels.apply(d, pixels, element))
         .map(applyExecutionSlowDown());
   }
 
@@ -367,7 +335,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> scrollToEndOfScrollableArea(Element scrollArea) {
     return switchFrame(scrollArea.frame())
-        .flatMap(__ -> scrollToEndOfArea.apply(driver, scrollArea))
+        .flatMap(d -> scrollToEndOfArea.apply(d, scrollArea))
         .map(applyExecutionSlowDown());
   }
 
@@ -376,7 +344,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<String> title() {
-    return getTitle.apply(driver);
+    return driverLoader.driver()
+        .flatMap(getTitle::apply);
   }
 
   /**
@@ -384,7 +353,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<String> url() {
-    return getUrl.apply(driver);
+    return driverLoader.driver()
+        .flatMap(getUrl::apply);
   }
 
   /**
@@ -392,7 +362,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Cookie> getCookie(String name) {
-    return getCookie.apply(driver, name);
+    return driverLoader.driver()
+        .flatMap(d -> getCookie.apply(d, name));
   }
 
   /**
@@ -400,7 +371,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<List<Cookie>> getAllCookies() {
-    return getAllCookies.apply(driver);
+    return driverLoader.driver()
+        .flatMap(getAllCookies::apply);
   }
 
   /**
@@ -408,7 +380,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> addCookie(Cookie cookie) {
-    return addCookie.apply(driver, cookie);
+    return driverLoader.driver()
+        .flatMap(d -> addCookie.apply(d, cookie));
   }
 
   /**
@@ -416,7 +389,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> deleteCookie(String name) {
-    return deleteCookie.apply(driver, name);
+    return driverLoader.driver()
+        .flatMap(d -> deleteCookie.apply(d, name));
   }
 
   /**
@@ -424,7 +398,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> deleteAllCookies() {
-    return deleteAllCookies.apply(driver);
+    return driverLoader.driver()
+        .flatMap(deleteAllCookies::apply);
   }
 
   /**
@@ -432,7 +407,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<File> takeScreenShot() {
-    return takeScreenShot.apply(driver);
+    return driverLoader.driver()
+        .flatMap(takeScreenShot::apply);
   }
 
   /**
@@ -441,7 +417,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<File> takeScreenShotOfElement(Element element) {
     return switchFrame(element.frame())
-        .flatMap(x -> takeScreenShotOfElement.apply(driver, element));
+        .flatMap(d -> takeScreenShotOfElement.apply(d, element));
   }
 
   /**
@@ -450,7 +426,9 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
   @Override
   public Try<Void> drawShapes(List<Shape> shapes, Element element, Boolean releaseAndHold, Option<Duration> pause) {
     return switchFrame(element.frame())
-        .flatMap(x -> ActionFunctions.drawShape(driver, highlightContext, element, releaseAndHold, pause, shapes));
+        .flatMap(d -> driverLoader.actions()
+            .flatMap(
+              actions -> ActionFunctions.drawShape(d, actions, highlightContext, element, releaseAndHold, pause, shapes)));
   }
 
   /**
@@ -462,16 +440,17 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
     List<Path> filePathsList = filePaths;
 
 
-    if (localExecution) {
+    if (driverLoader.isLocalExecution()) {
 
       log.info(() -> """
           Setting upload files on local machine.
             Expecting that the files are present on the local machine.
             Looking for files in the local path: {{FILES}}
-            {{REMOTE_FILE_PATH}}.
+            {{REMOTE_FILE_PATH}}
           """
           .replace("{{FILES}}", filePaths.mkString(", "))
-          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.map(p -> "Ignoring remote file path: " + p.toString()).getOrElse("")));
+          .replace("{{REMOTE_FILE_PATH}}", remoteFilePath.map(p -> "Ignoring remote file path: " + p.toString())
+              .getOrElse("")));
 
     } else if (remoteFilePath.isDefined()) {
 
@@ -502,7 +481,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
         .map(p -> p.replace("\\", "/"));
 
     return switchFrame(targetFileUploadInput.frame())
-        .flatMap(x -> setUploadFilesTo.apply(driver, files, targetFileUploadInput))
+        .flatMap(d -> setUploadFilesTo.apply(d, files, targetFileUploadInput))
         .map(applyExecutionSlowDown());
 
   }
@@ -512,7 +491,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> switchToNewBrowserTab() {
-    return switchToNewBrowserTab.apply(driver);
+    return driverLoader.driver()
+        .flatMap(switchToNewBrowserTab::apply);
   }
 
   /**
@@ -520,7 +500,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> switchToNewBrowserWindow() {
-    return switchToNewBrowserWindow.apply(driver);
+    return driverLoader.driver()
+        .flatMap(switchToNewBrowserWindow::apply);
   }
 
   /**
@@ -528,7 +509,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> switchToBrowserByTitle(String browserTitle) {
-    return switchToBrowserByTitle.apply(driver, browserTitle);
+    return driverLoader.driver()
+        .flatMap(d -> switchToBrowserByTitle.apply(d, browserTitle));
   }
 
   /**
@@ -536,7 +518,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> switchToBrowserByIndex(int index) {
-    return switchToBrowserByIndex.apply(driver, index);
+    return driverLoader.driver()
+        .flatMap(d -> switchToBrowserByIndex.apply(d, index));
   }
 
   /**
@@ -544,7 +527,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Integer> numberOfOpenTabsAndWindows() {
-    return numberOfOpenTabsAndWindows.apply(driver);
+    return driverLoader.driver()
+        .flatMap(numberOfOpenTabsAndWindows::apply);
   }
 
   /**
@@ -552,16 +536,16 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> quit() {
-    Option.of(driver)
-        .toTry()
-        .mapTry(d -> Try.run(d::quit))
+
+    if (browserDisposed)
+      return Try.success(null);
+
+    driverLoader.driver()
+        .flatMapTry(d -> Try.run(d::quit))
         .onFailure(log::error);
+    browserDisposed = true;
 
     highlightContext.release();
-
-    downloadPath
-        .map(TempFolderUtil::delete)
-        .map(t -> t.onFailure(log::error));
 
     return Try.success(null);
   }
@@ -571,7 +555,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<String> getSessionId() {
-    return Try.of(() -> driver.getSessionId().toString());
+    return driverLoader.driver()
+        .map(d -> d.getSessionId().toString());
   }
 
   /**
@@ -579,7 +564,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Boolean isVideoRecordingActive() {
-    return options.map(SeleniumOptions::recordVideo).getOrElse(false);
+    return driverLoader.isVideoRecordingActive();
   }
 
   /**
@@ -587,7 +572,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> executeKeyActions(List<KeyAction> actions) {
-    return Try.of(() -> new SeleniumKeyActionDriver(new Actions(driver)))
+    return seleniumKeyActionDriver()
         .peek(actionDriver -> actions.forEach(a -> a.performKeyAction(actionDriver)))
         .flatMap(KeyActionDriver::perform);
   }
@@ -612,7 +597,7 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
 
     if (elementsHaveTheSameFrame.apply(elements)) {
       return switchFrame(elements.get(0).frame())
-          .flatMap(x -> executeJavaScriptOnElement.apply(driver, highlightContext, script, elements))
+          .flatMap(d -> executeJavaScriptOnElement.apply(d, highlightContext, script, elements))
           .map(applyExecutionSlowDown());
     } else {
       return Try.failure(ActivityError.of(
@@ -627,7 +612,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Object> executeJavaScript(String script) {
-    return executeJavaScript.apply(driver, script)
+    return driverLoader.driver()
+        .flatMap(d -> executeJavaScript.apply(d, script))
         .map(applyExecutionSlowDown());
   }
 
@@ -636,7 +622,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> refresh() {
-    return refresh.apply(driver)
+    return driverLoader.driver()
+        .flatMap(refresh::apply)
         .map(applyExecutionSlowDown());
   }
 
@@ -645,7 +632,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> navigateBack() {
-    return navigateBack.apply(driver)
+    return driverLoader.driver()
+        .flatMap(navigateBack::apply)
         .map(applyExecutionSlowDown());
   }
 
@@ -654,7 +642,8 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
    */
   @Override
   public Try<Void> navigateForward() {
-    return navigateForward.apply(driver)
+    return driverLoader.driver()
+        .flatMap(navigateForward::apply)
         .map(applyExecutionSlowDown());
   }
 
@@ -671,25 +660,50 @@ class SeleniumBrowser implements Browser, BrowserStackExecutor {
           {{HELP}}
           """.replace("{{HELP}}", BrowserConfig.help())));
 
-    if (downloadPath.isEmpty())
+    if (Objects.isNull(driverLoader.downloadPath()) || driverLoader.downloadPath().isEmpty())
       return Try.failure(new RuntimeException("""
              download path is not set. Its a framework bug.
           """));
 
-    Path tempDownloadPath = downloadPath.map(TempFolderUtil::directory).get();
+    log.info(() -> """
+        Trying to download a file on a Selenium Grid.
+        Make sure your selenium grid is started with the following options:
+            --enable-managed-downloads true
+        """);
 
-    if (localExecution) {
+    Path tempDownloadPath = driverLoader.downloadPath().map(TempFolderUtil::directory).get();
+
+    if (driverLoader.isLocalExecution()) {
       return getLocalDownloadedFile.apply(tempDownloadPath, fileName, timeout, waitBetweenRetries);
     }
-    return getRemoteDownloadedFile.apply(driver, tempDownloadPath, fileName, timeout, waitBetweenRetries);
+    return driverLoader.driver()
+        .flatMap(d -> getRemoteDownloadedFile.apply(d, tempDownloadPath, fileName, timeout, waitBetweenRetries));
+  }
+
+  @Override
+  public Try<Void> initBrowserLog() {
+    return driverLoader.activateBrowserLog();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Boolean executesOnBrowserStack() {
-    return bsOptions.isDefined();
+  @Synchronized
+  public Try<Void> clearLogEntries() {
+    return driverLoader.logManager().flatMap(LogManager::clearLogEntries);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<List<LogEntry>> getLogEntries() {
+    return driverLoader.logManager().map(LogManager::logEntries);
+  }
+
+  @Override
+  public Try<Void> cleanUp() {
+    return driverLoader.logManager().flatMap(LogManager::cleanUp);
+  }
 }

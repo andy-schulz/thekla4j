@@ -26,6 +26,15 @@ public interface DefaultThekla4jProperties {
    */
   Integer asInteger();
 
+  /**
+   * Get the value of the property as a Boolean
+   *
+   * @return the value of the property as a Boolean
+   */
+  default boolean asBoolean() {
+    return optionValue().map(Boolean::parseBoolean).getOrElse(false);
+  };
+
 
   /**
    * Get the value of the property as an option

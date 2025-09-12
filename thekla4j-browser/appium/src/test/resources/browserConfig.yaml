@@ -1,27 +1,25 @@
 defaultConfig: emulator
 
 pixel:
-  browserName: Chrome
+  browserName: chrome
   platformName: Android
   deviceName: MyDevice
-  chromeOptions:
-    args:
-      - "disable-search-engine-choice-screen"
+  browserArgs:
+    - "disable-search-engine-choice-screen"
 
 galaxy:
-  browserName: Firefox
+  browserName: firefox
   platformName: Android
   deviceName: Galaxy S10
-  chromeOptions:
-    args:
-      - "disable-search-engine-choice-screen"
+  browserArgs:
+    - "disable-search-engine-choice-screen"
 
 emulator:
-  browserName: Chrome
+  browserName: chrome
   platformName: Android
   deviceName: MyDevice
-  chromeOptions:
-    args:
-      - "disable-search-engine-choice-screen"
+  enableFileDownload: true
+  browserArgs:
+    - "disable-search-engine-choice-screen"
   video:
     record: true

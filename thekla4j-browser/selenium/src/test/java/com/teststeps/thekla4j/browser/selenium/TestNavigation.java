@@ -13,7 +13,7 @@ import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.RefreshCurrentBrowser;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.control.Option;
+import io.vavr.control.Try;
 import java.net.URL;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
@@ -60,10 +60,13 @@ public class TestNavigation {
 
   private Actor actor;
 
-  SeleniumBrowser chromeMock;
+  SeleniumBrowser browser;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   RemoteWebDriver driverMock;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  SeleniumLoader loader;
 
   @Mock
   RemoteTestNavigation navigationMock;
@@ -76,11 +79,9 @@ public class TestNavigation {
   public void init() {
     MockitoAnnotations.openMocks(this);
 
-    chromeMock = SeleniumBrowser.local(driverMock,
-      BrowserConfig.of(BrowserName.CHROME),
-      Option.none());
+    browser = SeleniumBrowser.load(loader, BrowserConfig.of(BrowserName.CHROME));
 
-
+    when(loader.driver()).thenReturn(Try.success(driverMock));
     when(driverMock.navigate()).thenReturn(navigationMock);
   }
 
@@ -95,7 +96,7 @@ public class TestNavigation {
     String url = "theUrl";
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     when(driverMock.navigate()).thenReturn(navigationMock);
 
@@ -116,7 +117,7 @@ public class TestNavigation {
   public void testNavigateBack() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
       Navigate.back())
@@ -130,7 +131,7 @@ public class TestNavigation {
   public void testNavigateForward() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
       Navigate.forward())
@@ -144,7 +145,7 @@ public class TestNavigation {
   public void testRefresh() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 

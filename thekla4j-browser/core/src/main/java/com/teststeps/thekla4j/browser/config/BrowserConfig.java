@@ -1,20 +1,25 @@
 package com.teststeps.thekla4j.browser.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teststeps.thekla4j.utils.yaml.YAML;
-import java.util.Objects;
+import io.vavr.collection.List;
 import lombok.With;
 
 /**
  * Configuration for the browser
- * 
- * @param browserName    - the name of the browser e.g. chrome, firefox
- * @param browserVersion - the version of the browser
- * @param platformName   - the name of the platform e.g. windows, linux
- * @param osVersion      - the version of the platform
- * @param deviceName     - the name of the device, only for mobile devices
- * @param chromeOptions  - the chrome options
- * @param firefoxOptions - the firefox options
- * @param video          - the video options
+ *
+ * @param browserName        - the name of the browser e.g. chrome, firefox
+ * @param browserVersion     - the version of the browser
+ * @param platformName       - the name of the platform e.g. windows, linux
+ * @param osVersion          - the version of the platform
+ * @param deviceName         - the name of the device, only for mobile devices
+ * @param enableFileUpload   - enable file upload
+ * @param enableFileDownload - enable file download
+ * @param binary             - the path to the browser binary
+ * @param headless           - if the browser should be headless
+ * @param browserArgs        - the arguments for the browser
+ * @param debug              - the chrome debugging options
+ * @param video              - the video options
  *
  */
 @With
@@ -22,7 +27,7 @@ public record BrowserConfig(
 
                             /**
                              * the name of the browser e.g. chrome, firefox
-                             * 
+                             *
                              * @param browserName - the name of the browser
                              * @return - the name of the browser
                              */
@@ -30,7 +35,7 @@ public record BrowserConfig(
 
                             /**
                              * the version of the browser
-                             * 
+                             *
                              * @param browserVersion - the version of the browser
                              * @return - the version of the browser
                              */
@@ -38,7 +43,7 @@ public record BrowserConfig(
 
                             /**
                              * the name of the platform e.g. windows, linux
-                             * 
+                             *
                              * @param platformName - the name of the platform
                              * @return - the name of the platform
                              */
@@ -46,7 +51,7 @@ public record BrowserConfig(
 
                             /**
                              * the version of the platform
-                             * 
+                             *
                              * @param osVersion - the version of the platform
                              * @return - the version of the platform
                              */
@@ -54,7 +59,7 @@ public record BrowserConfig(
 
                             /**
                              * the name of the device, only for mobile devices
-                             * 
+                             *
                              * @param deviceName - the name of the device
                              * @return - the name of the device
                              */
@@ -62,47 +67,66 @@ public record BrowserConfig(
 
                             /**
                              * enable file upload
-                             * 
+                             *
                              * @param enableFileUpload - enable file upload
                              * @return - enable file upload
                              */
-                            Boolean enableFileUpload,
+                            boolean enableFileUpload,
 
                             /**
                              * enable file download
-                             * 
+                             *
                              * @param enableFileDownload - enable file download
                              * @return - enable file download
                              */
-                            Boolean enableFileDownload,
+                            boolean enableFileDownload,
 
                             /**
-                             * the chrome options
-                             * 
-                             * @param chromeOptions - the chrome options
-                             * @return - the chrome options
+                             * the path to the browser binary
+                             *
+                             * @param binary - the path to the browser binary
+                             * @return - the path to the browser binary
                              */
-                            ChromeOptions chromeOptions,
+                            @JsonIgnore String binary,
 
                             /**
-                             * the firefox options
-                             * 
-                             * @param firefoxOptions - the firefox options
-                             * @return - the firefox options
+                             * if the browser should be headless
+                             *
+                             * @param headless - if the browser should be headless
+                             * @return - if the browser should be headless
                              */
-                            FirefoxOptions firefoxOptions,
+
+                            boolean headless,
+
+                            /**
+                             * the arguments for the browser
+                             *
+                             * @param browserArgs - the arguments for the browser
+                             * @return - the arguments for the browser
+                             */
+                            List<String> browserArgs,
+
+                            /**
+                             * the debugging options
+                             *
+                             * @param debug - the browser debugging options
+                             * @return - the browser debugging options
+                             */
+                            DebugOptions debug,
 
                             /**
                              * the video options
-                             * 
+                             *
                              * @param video - the video options
                              * @return - the video options
                              */
-                            VideoConfig video) {
+                            VideoConfig video
+) {
+
 
   /**
    * Create a BrowserConfig object with the given browser name
-   * 
+   *
    * @param browserName - the name of the browser
    * @return a BrowserConfig object
    */
@@ -116,13 +140,15 @@ public record BrowserConfig(
                              false,
                              false,
                              null,
+                             false,
+                             List.empty(),
                              null,
                              null);
   }
 
   /**
    * returns a printable yaml string of the object
-   * 
+   *
    * @return a yaml string
    */
   @Override
@@ -141,33 +167,38 @@ public record BrowserConfig(
           deviceName: String, <optional, mandatory for mobile devices>
           enableFileUpload: Boolean, <optional, default: false>
           enableFileDownload: Boolean, <optional, default: false>
-          chromeOptions: ChromeOptions, <optional>
-        {{CHROME_OPTIONS}}
-          firefoxOptions: # FirefoxOptions, <optional>
-        {{FIREFOX_OPTIONS}}
+          binary: "/path/to/binary" # the path to the binary, <optional>
+          headless: true/false # if the browser should be headless, <optional>
+          browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
+
+          debug: # chrome debugging options, <optional>
+        {{DEBUG_OPTIONS}}
           video: # VideoConfig, <optional>
         {{VIDEO_OPTIONS}}
         """
-        .replace("{{CHROME_OPTIONS}}", ChromeOptions.help().trim().indent(4))
-        .replace("{{FIREFOX_OPTIONS}}", FirefoxOptions.help().trim().indent(4))
+        .replace("{{DEBUG_OPTIONS}}", DebugOptions.help().indent(4))
         .replace("{{VIDEO_OPTIONS}}", VideoConfig.help().indent(4));
   }
 
   public BrowserConfig() {
-    this(BrowserName.CHROME, null, null, null, null, false, false, null, null, null);
+    this(BrowserName.CHROME, null, null, null, null, false, false, null, false, List.empty(), null, null);
   }
 
   public BrowserConfig(
-                       BrowserName browserName, String browserVersion, OperatingSystem platformName, String osVersion, String deviceName, Boolean enableFileUpload, Boolean enableFileDownload, ChromeOptions chromeOptions, FirefoxOptions firefoxOptions, VideoConfig video) {
+                       BrowserName browserName, String browserVersion, OperatingSystem platformName, String osVersion, String deviceName, boolean enableFileUpload, boolean enableFileDownload, String binary, boolean headless, List<String> browserArgs, DebugOptions debug, VideoConfig video
+  ) {
+
     this.browserName = browserName;
     this.browserVersion = browserVersion;
     this.platformName = platformName;
     this.osVersion = osVersion;
     this.deviceName = deviceName;
-    this.enableFileUpload = Objects.requireNonNullElse(enableFileUpload, false);
-    this.enableFileDownload = Objects.requireNonNullElse(enableFileDownload, false);
-    this.chromeOptions = chromeOptions;
-    this.firefoxOptions = firefoxOptions;
+    this.enableFileUpload = enableFileUpload;
+    this.enableFileDownload = enableFileDownload;
+    this.binary = binary;
+    this.headless = headless;
+    this.browserArgs = browserArgs == null ? List.empty() : browserArgs;
+    this.debug = debug;
     this.video = video;
   }
 }

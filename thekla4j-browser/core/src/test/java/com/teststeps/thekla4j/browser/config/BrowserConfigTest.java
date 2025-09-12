@@ -45,11 +45,10 @@ public class BrowserConfigTest {
             osVersion: 10.15
             browserName: Chrome
             browserVersion: 80
-            chromeOptions:
-              headless: true
-              args:
-                - --disable-gpu
-                - --no-sandbox
+            headless: true
+            browserArgs:
+              - --disable-gpu
+              - --no-sandbox
         """;
 
     BrowserConfigList browserConfigList = YAML.jParse(BrowserConfigList.class)
@@ -66,8 +65,9 @@ public class BrowserConfigTest {
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
     assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
-    assertThat("check ChromeOptions", browserConfig.chromeOptions().toString(), equalTo(
-      "ChromeOptions{binary='null', headless=true, args=[--disable-gpu, --no-sandbox], debugOptions='null'}"));
+    assertThat("check headless", browserConfig.headless(), equalTo(true));
+    assertThat("check browser args", browserConfig.browserArgs().mkString(", "), equalTo("--disable-gpu, --no-sandbox"));
+
   }
 
   @Test
@@ -81,11 +81,10 @@ public class BrowserConfigTest {
             osVersion: 10.15
             browserName: Chrome
             browserVersion: 80
-            chromeOptions:
-              headless: true
-              args:
-                - --disable-gpu
-                - --no-sandbox
+            headless: true
+            browserArgs:
+              - --disable-gpu
+              - --no-sandbox
           Browser2:
             platformName: Windows
             osVersion: 10
@@ -107,6 +106,8 @@ public class BrowserConfigTest {
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10"));
     assertThat("check browser name", browserConfig.browserName().getName(), equalTo("Edge"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("81"));
+    assertThat("check headless", browserConfig.headless(), equalTo(false));
+    assertThat("check browser args", browserConfig.browserArgs().isEmpty(), equalTo(true));
   }
 
   @Test
@@ -119,11 +120,10 @@ public class BrowserConfigTest {
             osVersion: 10.15
             browserName: Chrome
             browserVersion: 80
-            chromeOptions:
-              headless: true
-              args:
-                - --disable-gpu
-                - --no-sandbox
+            headless: true
+            browserArgs:
+              - --disable-gpu
+              - --no-sandbox
 
           Browser2:
             platformName: Windows
@@ -163,7 +163,8 @@ public class BrowserConfigTest {
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
     assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
-    assertThat("check ChromeOptions", browserConfig.chromeOptions(), equalTo(null));
+    assertThat("check headless", browserConfig.headless(), equalTo(false));
+    assertThat("check browser args", browserConfig.browserArgs().isEmpty(), equalTo(true));
   }
 
   @Test
@@ -209,16 +210,13 @@ public class BrowserConfigTest {
           deviceName: String, <optional, mandatory for mobile devices>
           enableFileUpload: Boolean, <optional, default: false>
           enableFileDownload: Boolean, <optional, default: false>
-          chromeOptions: ChromeOptions, <optional>
-            binary: "/path/to/binary" # the path to the binary
-            headless: true/false # if the browser should be headless
-            args: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"]
-            debug: # chrome debugging options
-              debuggerAddress: "localhost:9222"
-              downloadPath: "absolute/path/to/downloads"
+          binary: "/path/to/binary" # the path to the binary, <optional>
+          headless: true/false # if the browser should be headless, <optional>
+          browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
 
-          firefoxOptions: # FirefoxOptions, <optional>
-            args: [] # browser arguments - Example: ["--headless", "--disable-gpu"]
+          debug: # chrome debugging options, <optional>
+            debuggerAddress: "localhost:9222"
+            downloadPath: "absolute/path/to/downloads"
 
           video: # VideoConfig, <optional>
             record: true / false

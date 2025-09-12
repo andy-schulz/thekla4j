@@ -246,3 +246,45 @@ pre {
 .legend #toggleTimeSpan {
     margin-right: 10px;
 }
+
+/* Stacktrace block formatting */
+.attachment-block {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+.stacktrace-text {
+    color: #154ccc;
+    font-weight: bold;
+}
+
+.stacktrace-level-error {
+    color: #d32f2f;
+    font-weight: bold;
+}
+.stacktrace-level-warning {
+    color: #fbc02d;
+    font-weight: bold;
+}
+.stacktrace-level-info {
+    color: #1976d2;
+    font-weight: bold;
+}
+.stacktrace-level-debug {
+    color: #616161;
+    font-weight: bold;
+}
+.stacktrace-level-log {
+    color: #388e3c;
+    font-weight: bold;
+}
+.stacktrace-level-other {
+    color: #757575;
+    font-weight: bold;
+}

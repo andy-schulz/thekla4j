@@ -10,27 +10,27 @@ public enum BrowserName {
   /**
    * The browser is Chrome
    */
-  CHROME("Chrome"),
+  CHROME("chrome"),
 
   /**
    * The browser is Chromium
    */
-  CHROMIUM("Chromium"),
+  CHROMIUM("chromium"),
 
   /**
    * The browser is Firefox
    */
-  FIREFOX("Firefox"),
+  FIREFOX("firefox"),
 
   /**
    * The browser is Edge
    */
-  EDGE("Edge"),
+  EDGE("edge"),
 
   /**
    * The browser is Safari
    */
-  SAFARI("Safari");
+  SAFARI("safari");
 
   private final String name;
 
@@ -45,6 +45,11 @@ public enum BrowserName {
    */
   @JsonValue
   public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
     return name;
   }
 }

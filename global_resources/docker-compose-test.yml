@@ -1,0 +1,53 @@
+services:
+
+  node-docker:
+    image: selenium/node-docker:4.35.0
+    volumes:
+      - /home/selenium/assets:/opt/selenium/assets
+      - ./config.toml:/opt/selenium/docker.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_OPTS=--enable-managed-downloads true --log-level FINE
+      - SE_NODE_CONNECTION_LIMIT_PER_SESSION=1000
+      - SE_NODE_GRID_URL=http://localhost:4444
+#    ports:
+#      - "5901:5900"
+#      - "7901:7900"
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#      - "localhost:host-gateway"
+
+  chrome:
+    image: selenium/node-chrome:136.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_OPTS=--service-configuration stereotype={"browserName":"chrome","networkname:applicationName":"node_2"}}
+      - SE_NODE_CONNECTION_LIMIT_PER_SESSION=1000
+      - SE_NODE_GRID_URL=http://localhost:4444
+    ports:
+      - "5901:5900"
+      - "7901:7900"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "localhost:host-gateway"
+
+  selenium-hub:
+    image: selenium/hub:4.35.0
+    container_name: selenium-hub
+    environment:
+      - SE_OPTS=--log-level CONFIG
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"

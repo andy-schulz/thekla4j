@@ -14,7 +14,7 @@ public interface KeyActionDriver {
    * @param key - the key to press
    * @return - the key actions object
    */
-  KeyActionDriver keyDown(Key key);
+  Try<KeyActionDriver> keyDown(Key key);
 
   /**
    * schedule the up key action
@@ -22,7 +22,7 @@ public interface KeyActionDriver {
    * @param key - the key to release
    * @return - the key actions object
    */
-  KeyActionDriver keyUp(Key key);
+  Try<KeyActionDriver> keyUp(Key key);
 
   /**
    * schedule the press key action
@@ -30,7 +30,7 @@ public interface KeyActionDriver {
    * @param key - the key to press
    * @return - the key actions object
    */
-  KeyActionDriver keyPress(Key key);
+  Try<KeyActionDriver> keyPress(Key key);
 
   /**
    * schedule the press key sequence action
@@ -38,7 +38,7 @@ public interface KeyActionDriver {
    * @param sequence - the keys to press
    * @return - the key actions object
    */
-  KeyActionDriver keyPress(CharSequence sequence);
+  Try<KeyActionDriver> keyPress(CharSequence sequence);
 
   /**
    * schedule the pause action
@@ -46,7 +46,7 @@ public interface KeyActionDriver {
    * @param duration - the duration to pause
    * @return - the key actions driver
    */
-  KeyActionDriver pause(Duration duration);
+  Try<KeyActionDriver> pause(Duration duration);
 
 
   /**

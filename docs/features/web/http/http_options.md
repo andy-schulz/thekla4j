@@ -110,12 +110,13 @@ If the Option is NONE, the header will not be added to the request.
 To set multiple headers for the HTTP request, use the headers method.
 
 ```java
-  HashMap<String, String> headers = new HashMap<>();
-    headers.put("Content-Type", "application/json");
-    headers.put("Accept", "application/json");
+import java.util.Map;
+import java.util.HashMap;
+  Map<String, String> headers = new HashMap<>();
+  headers.put("Content-Type","application/json");
+  headers.put("Accept","application/json");
 
-HttpOptions options = HttpOptions.empty()
-  .headers(headers);
+  HttpOptions options = HttpOptions.empty().headers(headers);
 ```
 
 ## Adding Cookies
@@ -153,7 +154,16 @@ If the Option is NONE, the query parameter will not be added to the request URL.
 
 To specify path parameters for the request URL, use the pathParameter method.
 
+The Request has to contain the path parameter in the format `:pathParameterName`
+
+e.g.
 ```java
+Request req = Request.of("/path/:pathParameterName/to/resource");
+```
+
+```java
+
+Request req = Request.of("/path/:key/to/resource");
 HttpOptions options = HttpOptions.empty()
   .pathParameter("key", "value");
 
@@ -180,7 +190,7 @@ HttpOptions options = HttpOptions.empty()
   .formParameter("key", formParameterValue);
 ```
 
-If the Option is NONE, the form parameter will not be added to the request.
+If the parameterValue is Option.none(), the form parameter will not be added to the request.
 
 ## Setting the Port
 
@@ -256,8 +266,9 @@ HttpOptions mergedOptions = HttpOptions.empty()
     .baseUrl("https://another-example.com")
     .mergeOnTopOf(options);
 
-// mergedOptions will have the base URL "https://another-example.com" and the header "Content-Type: application/json"
 ```
+mergedOptions will have the base URL "https://another-example.com" and the header "Content-Type: application/json"
+
 
 
 

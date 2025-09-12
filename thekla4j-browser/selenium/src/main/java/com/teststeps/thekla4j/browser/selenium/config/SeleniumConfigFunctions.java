@@ -7,15 +7,9 @@ import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import com.teststeps.thekla4j.utils.yaml.YAML;
 import io.vavr.Function0;
 import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.Tuple;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Functions to work with SeleniumConfig
@@ -23,7 +17,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 @Log4j2(topic = "SeleniumConfig")
 public class SeleniumConfigFunctions {
 
-  private static final String SELENIUM_CONFIG_FILE = "seleniumConfig.yaml";
+  private static final String SELENIUM_CONFIG_FILE = "seleniumGridConfig.yaml";
 
   private SeleniumConfigFunctions() {
     // prevent instantiation of utility class
@@ -44,7 +38,7 @@ public class SeleniumConfigFunctions {
   /**
    * Parse the SeleniumConfig from a string
    */
-  static final Function1<Option<String>, Try<Option<SeleniumConfigList>>> parseSeleniumConfig =
+  public static final Function1<Option<String>, Try<Option<SeleniumConfigList>>> parseSeleniumConfig =
       seleniumConfigString -> seleniumConfigString.map(YAML.jParse(SeleniumConfigList.class))
           .transform(LiftTry.fromOption())
           .onFailure(e -> log.error(() -> "Error parsing SeleniumConfig: " + e));
@@ -54,11 +48,11 @@ public class SeleniumConfigFunctions {
   /**
    * Load the default SeleniumConfig from the configuration object
    */
-  public static final Function1<Option<SeleniumConfigList>, Option<SeleniumConfig>> loadDefaultSeleniumConfig =
+  public static final Function1<Option<SeleniumConfigList>, Option<SeleniumGridConfig>> loadDefaultSeleniumConfig =
       (seleniumConfigList) ->
 
       seleniumConfigList
-          .map(SeleniumConfigList::withNoneValue)
+          .map(SeleniumConfigList::withLocalValue)
           .map(scl -> scl.seleniumConfigs()
               .get(configName.apply(scl.defaultConfig()))
               .getOrElseThrow(() -> new IllegalArgumentException(
@@ -67,37 +61,18 @@ public class SeleniumConfigFunctions {
 
                                                                      $$CONFIG_FILE$$
 
-                                                                     Please specify a default selenium config in the seleniumConfig.yaml file like:
+                                                                     Please specify a default selenium config in the seleniumGridConfig.yaml file like:
 
                                                                      defaultConfig: mySeleniumConfig
 
                                                                      mySeleniumConfig:
                                                                        remoteUrl: http://localhost:4444/wd/hub
                                                                      ...
-                                                                     """.replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
+                                                                     """
+                                                                     .replace("$$DEFAULT_CONFIG$$", scl.defaultConfig())
                                                                      .replace("$$CONFIG_FILE$$", seleniumConfigList.map(YAML::jStringify)
                                                                          .getOrElse("No Config found")))))
           .flatMap(Option::of); // convert Option(null) to Option.none()
 
-
-  /**
-   * Create a capability map with the prefix as key and the value as value
-   */
-  public static final Function1<Map<String, Map<String, String>>, Map<String, String>> createCapabilityMapWithPrefix =
-      capabilityMap -> Objects.isNull(capabilityMap) ? HashMap.empty() :
-          capabilityMap.map((prefix, valueMap) -> Objects.isNull(valueMap) ? Tuple.of(prefix, HashMap.<String, String>empty()) :
-              Tuple.of(prefix, valueMap.map((key, value) -> Tuple.of(prefix + ":" + key, value))))
-              .foldLeft(HashMap.empty(), (acc, tuple) -> acc.merge(tuple._2, (v1, v2) -> v2));
-
-
-  /**
-   * Add the capabilities of the capability map to the DesiredCapabilities
-   */
-  public static final Function2<SeleniumConfig, DesiredCapabilities, Try<DesiredCapabilities>> addCapabilities =
-      (seleniumConfig, desiredCapabilities) -> Try.of(() -> createCapabilityMapWithPrefix.apply(seleniumConfig.capabilities())
-          .foldLeft(desiredCapabilities, (caps, entry) -> {
-            caps.setCapability(entry._1, entry._2);
-            return caps;
-          }));
 
 }

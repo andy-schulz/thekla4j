@@ -15,7 +15,9 @@ public class DefaultThekla4jFunctions {
    */
   public static Function<DefaultThekla4jProperties[], String> helpText = (properties) -> List.of(properties)
       .map(DefaultThekla4jProperties::property)
-      .map(property -> property.name() + ": " + property.helpText() + " (default: " + property.defaultValue().getOrElse("None") + ")")
+      .sortBy(PropertyElement::name)
+      .map(property -> String.format("%-50s", property.name() + ": ") + property.helpText() + " (default: " + property.defaultValue()
+          .getOrElse("None") + ")")
       .mkString("\n");
 
   /**

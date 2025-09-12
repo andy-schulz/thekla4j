@@ -107,6 +107,7 @@ public class Thekla4jProperty {
      * get the property value
      */
     static final Function1<PropertyElement, Option<String>> _withName = property -> {
+
       Try<String> system = TestPropertyHelper.loadSystemProperty.apply(property.name());
 
       if (system.isSuccess())

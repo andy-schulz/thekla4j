@@ -3,10 +3,7 @@ package com.teststeps.thekla4j.browser.selenium;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.io.File;
 import java.time.Duration;
@@ -29,25 +26,31 @@ public class TestDownloadFile {
     String expectedErrorMessage = """
         File download is not enabled in the browser configuration.
         Set enableFileDownload to true in the browser configuration to enable file download.
-        browser config yaml:
+        browserConfigName:
+          browserName: BrowserName < chrome | firefox | edge | safari >
+          browserVersion: String, <optional>
+          platformName: OperatingSystem, < windows | linux | mac >
+          osVersion: String, <optional>
+          deviceName: String, <optional, mandatory for mobile devices>
+          enableFileUpload: Boolean, <optional, default: false>
+          enableFileDownload: Boolean, <optional, default: false>
+          binary: "/path/to/binary" # the path to the binary, <optional>
+          headless: true/false # if the browser should be headless, <optional>
+          browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
 
-        browserName: BrowserName < chrome | firefox | edge | safari >
-        browserVersion: String, <optional>
-        platformName: OperatingSystem, < windows | linux | mac >
-        osVersion: String, <optional>
-        deviceName: String, <optional, mandatory for mobile devices>
-        enableFileUpload: Boolean, <optional, default: false>
-        enableFileDownload: Boolean, <optional, default: false>
-        chromeOptions: ChromeOptions, <optional>
-        firefoxOptions: FirefoxOptions, <optional>
+          debug: # chrome debugging options, <optional>
+            debuggerAddress: "localhost:9222"
+            downloadPath: "absolute/path/to/downloads"
+
+          video: # VideoConfig, <optional>
+            record: true / false
+            relativePath: "path/to/video"
+            filePrefix: "FilePrefix"
+
 
         """;
 
-    BrowserConfig config = BrowserConfig
-        .of(BrowserName.CHROME)
-        .withEnableFileDownload(false);
-
-    browser = ChromeBrowser.with(Option.none(), config);
+    browser = Selenium.localChrome();
 
     Try<File> file = browser.getDownloadedFile("test.txt", Duration.ofSeconds(10), Duration.ofSeconds(1));
 

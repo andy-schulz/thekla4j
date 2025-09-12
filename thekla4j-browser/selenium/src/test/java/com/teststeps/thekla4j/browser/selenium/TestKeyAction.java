@@ -1,14 +1,14 @@
 package com.teststeps.thekla4j.browser.selenium;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
+import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.DoKey;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.Key;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import io.vavr.control.Try;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class TestKeyAction {
 
@@ -25,17 +26,28 @@ public class TestKeyAction {
   private Actor actor;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  SeleniumBrowser chromeMock;
+  SeleniumLoader loader;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  RemoteWebDriver driverMock;
 
   @Mock(answer = Answers.RETURNS_SELF)
   Actions actions;
 
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  BrowserConfig browserConfig;
+
+  private SeleniumBrowser browser;
 
   @BeforeEach
   public void init() {
     MockitoAnnotations.openMocks(this);
-//    when(chromeMock.executeKeyActions(any()))
-//      .thenReturn(Try.of(() -> null));
+
+    when(loader.driver()).thenReturn(Try.success(driverMock));
+    when(loader.actions()).thenReturn(Try.success(actions));
+    when(actions.sendKeys(any())).thenReturn(actions);
+
+    browser = new SeleniumBrowser(loader, browserConfig);
   }
 
   @AfterEach
@@ -48,16 +60,12 @@ public class TestKeyAction {
   public void testKeyPressOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
-
       DoKey.press(Key.TAB, Key.TAB, Key.TAB, Key.ENTER))
-
         .getOrElseThrow(Function.identity());
 
-
-    verify(chromeMock, times(1)).executeKeyActions(any());
     verify(actions, times(3)).sendKeys(Keys.TAB);
     verify(actions, times(1)).sendKeys(Keys.ENTER);
   }
@@ -67,7 +75,7 @@ public class TestKeyAction {
   public void testKeyDownOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 
@@ -85,7 +93,7 @@ public class TestKeyAction {
   public void testKeyUpOnTaskCreate() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 
@@ -102,7 +110,7 @@ public class TestKeyAction {
   public void testPressAndHoldThenRelease() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 
@@ -121,7 +129,7 @@ public class TestKeyAction {
   public void testPressAndThenPress() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 
@@ -138,7 +146,7 @@ public class TestKeyAction {
   public void testPressAndHoldThenPressAndHold() throws ActivityError {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeMock));
+        .whoCan(BrowseTheWeb.with(browser));
 
     actor.attemptsTo(
 

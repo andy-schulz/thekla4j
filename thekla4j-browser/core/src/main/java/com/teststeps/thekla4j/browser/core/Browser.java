@@ -379,4 +379,5 @@ public interface Browser {
    * @return a Try containing the downloaded file
    */
   Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries);
+
 }
