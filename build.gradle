@@ -1,0 +1,43 @@
+// Task: gitReleaseNotes
+// Aufrufbeispiel:
+//   gradlew gitReleaseNotes -PtagRange=v1.7.0..HEAD
+// Standard: v1.7.0..HEAD
+// Gibt Format: <SHORT_HASH>: <Commit Message>
+
+tasks.register("gitReleaseNotes") {
+    group = "_thekla-help"
+    description = "Print git log for a given tag/commit range using -PtagRange (default v1.7.0..HEAD)."
+    doLast {
+
+        if(!project.hasProperty("tagRange")) {
+//            println "\u001B[31mNo -PtagRange given, e.g. v1.7.0..HEAD\u001B[0m"
+            System.err.println("No -PtagRange given, e.g. gradlew gitReleaseNotes -PtagRange=v1.7.0..HEAD")
+            return
+        }
+
+        def range = project.findProperty("tagRange") ?: "v1.7.0..HEAD"
+        println "Collecting git release notes for range: ${range}"
+        def stdout = new ByteArrayOutputStream()
+        def stderr = new ByteArrayOutputStream()
+        def cmd = ["git", "--no-pager", "log", range, "--pretty=format:%h: %s"]
+        def execResult = exec {
+            commandLine cmd
+            standardOutput = stdout
+            errorOutput = stderr
+            ignoreExitValue = true
+        }
+        if (execResult.exitValue != 0) {
+            println "git log failed (exit=${execResult.exitValue})."
+            println stderr.toString("UTF-8")
+        } else {
+            // Sort commit messages alphabetically
+            def lines = stdout.toString("UTF-8").split('\n')
+            def sortedLines = lines.sort { line ->
+                // Extract commit message (everything after "hash: ")
+                def colonIndex = line.indexOf(': ')
+                return colonIndex > 0 ? line.substring(colonIndex + 2) : line
+            }
+            sortedLines.each { println it }
+        }
+    }
+}
