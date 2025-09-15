@@ -21,7 +21,7 @@ public class TestBrowserConfig {
           Browser1:
             platformName: Android
             osVersion: 10.15
-            browserName: Chrome
+            browserName: chrome
             browserVersion: 80
         """;
 
@@ -40,7 +40,7 @@ public class TestBrowserConfig {
           Browser1:
             platformName: Windows
             osVersion: 10.15
-            browserName: Chrome
+            browserName: chrome
             browserVersion: 80
         """;
 
@@ -63,7 +63,7 @@ public class TestBrowserConfig {
           Browser1:
             platformName: iOS
             osVersion: 10.15
-            browserName: Safari
+            browserName: safari
             browserVersion: 80
         """;
 
@@ -84,7 +84,7 @@ public class TestBrowserConfig {
 
           Browser1:
             osVersion: 10.15
-            browserName: Safari
+            browserName: safari
             browserVersion: 80
         """;
 

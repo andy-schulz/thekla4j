@@ -18,29 +18,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class TestMobileBrowserBuilder {
 
-
-  @InjectMocks
-  MobileBrowserFunctions mobileBrowserBuilder;
-
   @Mock
   MobileBrowser browser;
-
-  @Mock
-  RemoteWebDriver driver;
 
   private static final String browserStringConfig = """
         defaultConfig: Browser1
 
         Browser1:
-          browserName: Safari
+          browserName: safari
           platformName: Android
           deviceName: Pixel 3
       """;
@@ -50,8 +41,6 @@ public class TestMobileBrowserBuilder {
 
       local:
         remoteUrl: "http://localhost:4444/wd/hub"
-        setLocalFileDetector: false
-
       """;
 
   private static BrowserConfig standardBrowserConfig;
@@ -144,7 +133,7 @@ public class TestMobileBrowserBuilder {
         Mobile Browser Config is not complete. Please provide the following capabilities:\s
           browserName: "<BROWSER NAME>"
           deviceName: "MyDevice"
-          platformName: "Android"
+          platformName: "Android" or "iOS"
         """));
   }
 
@@ -163,7 +152,7 @@ public class TestMobileBrowserBuilder {
         Mobile Browser Config is not complete. Please provide the following capabilities:\s
           browserName: "<BROWSER NAME>"
           deviceName: "MyDevice"
-          platformName: "Android"
+          platformName: "Android" or "iOS"
         """));
   }
 
@@ -182,7 +171,7 @@ public class TestMobileBrowserBuilder {
         Mobile Browser Config is not complete. Please provide the following capabilities:\s
           browserName: "<BROWSER NAME>"
           deviceName: "MyDevice"
-          platformName: "Android"
+          platformName: "Android" or "iOS"
         """));
   }
 

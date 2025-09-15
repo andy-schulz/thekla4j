@@ -98,6 +98,7 @@ public class TestMobileBrowser {
     when(loaderMock.isLocalExecution()).thenReturn(true);
     when(loaderMock.downloadPath()).thenReturn(Option.none());
     when(loaderMock.actions()).thenReturn(Try.success(actions));
+    when(loaderMock.stopVideoRecording()).thenReturn(Try.success(null));
 
     when(driverMock.findElements(any(org.openqa.selenium.By.class))).thenReturn(List.of(webElementMock));
     when(driverMock.findElement(any(org.openqa.selenium.By.class))).thenReturn(webElementMock);

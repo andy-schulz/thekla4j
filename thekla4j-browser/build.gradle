@@ -9,7 +9,7 @@ tasks.withType(PublishToMavenLocal).configureEach { it.enabled = false }
 
 project.ext {
     seleniumVersion = '4.35.0'
-    appiumVersion = '9.4.0'
+    appiumVersion = '10.0.0'
 }
 
 dependencies {

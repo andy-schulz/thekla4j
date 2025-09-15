@@ -8,7 +8,6 @@ import static com.teststeps.thekla4j.utils.object.ObjectUtils.isNullSafe;
 import static io.appium.java_client.internal.CapabilityHelpers.APPIUM_PREFIX;
 
 import com.teststeps.thekla4j.browser.appium.config.AppiumConfig;
-import com.teststeps.thekla4j.browser.appium.logListener.AppiumLogManager;
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
@@ -166,9 +165,7 @@ public class AppiumLoader implements DriverLoader {
     if (!Objects.isNull(logManager)) {
       return logManager;
     } else {
-      String message = "Log Listener for Appium initialized.";
-      log.info(() -> message);
-      this.logManager = driver.map(AppiumLogManager::init);
+      this.logManager = driver().flatMap(initLogManager);
       return logManager;
     }
   }
@@ -210,6 +207,9 @@ public class AppiumLoader implements DriverLoader {
           .map(dr -> driverUpdates.foldLeft(dr, (drv, update) -> update.apply(drv)));
 
     }
+
+    if (shallListenToBrowserLogs) logManager();
+
     return driver;
   }
 

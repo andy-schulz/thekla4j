@@ -444,7 +444,7 @@ public class MobileBrowser implements Browser, BrowserLog {
 
   @Override
   public Try<Void> initBrowserLog() {
-    return appiumLoader.initLogListener();
+    return appiumLoader.activateBrowserLog();
   }
 
   @Override
