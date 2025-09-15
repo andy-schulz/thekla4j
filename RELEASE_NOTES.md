@@ -1,3 +1,31 @@
+# Release Notes
+
+## Table of Contents
+
+- [Release Notes v2.0.1](#release-notes-v201)
+- [Release Notes v2.0.0](#release-notes-v200)
+- [Release Notes v1.7.0](#release-notes-v170)
+
+---
+
+# Release Notes v2.0.1
+
+## Overview
+Version 2.0.1 is a patch release that addresses a critical bug in WebDriver log retrieval and includes documentation improvements and build enhancements.
+
+## Bug Fixes
+- **WebDriver Log Retrieval**: Fixed augmenter bug when using WebDriver log retrieval functionality (c4406ca)
+
+## Improvements
+- **Documentation**: Updated documentation structure for better organization and clarity (45adbe0)
+- **Build System**: Added release notes document and Gradle task for automated release note generation (0c417bc)
+
+## Technical Details
+- This patch release maintains full compatibility with v2.0.0
+- The log retrieval fix ensures proper functionality when using browser logging capabilities when using a grid
+
+---
+
 # Release Notes v2.0.0
 
 ## Overview
@@ -215,5 +243,3 @@ This release focuses on enhanced activity logging, screenshot capabilities, vide
 - Enhanced video recording capabilities require proper Selenium grid configuration
 - File upload operations now support both local and remote file systems
 - Activity logging now includes precise timing information for performance analysis
-
-
