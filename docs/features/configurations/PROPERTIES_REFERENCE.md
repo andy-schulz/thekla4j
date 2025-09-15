@@ -1,13 +1,13 @@
 ---
-title: Properties Reference
-parent: PROPERTIES
+title: Properties
 layout: default
-nav_order: 1
+has_children: false
+nav_order: 2000
 ---
 
 # Thekla4j Properties Reference
 
-This document provides a comprehensive reference for all available properties in the Thekla4j framework. Properties can
+This page provides a comprehensive reference for all available properties in the Thekla4j framework. Properties can
 be set via system properties or configuration files.
 
 ## How to Set Properties

@@ -1,8 +1,10 @@
 ---
-title: Browser Configuration Reference
-parent: CONFIGURATIONS
+title: Config
+parent: Browser
+grand_parent: Web
 layout: default
-nav_order: 1
+has_children: false
+nav_order: 1240
 ---
 
 # Browser Configuration Reference
