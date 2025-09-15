@@ -10,13 +10,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestSeleniumProperties {
 
-  @AfterEach
-  public void cleanUp() {
+  @BeforeEach
+  public void init() {
+    Thekla4jProperty.resetPropertyCache();
+    System.clearProperty(SELENIUM_CONFIG.property().name());
+    System.clearProperty(SELENIUM_BIDI_LOG.property().name());
+  }
+
+  @AfterAll
+  public static void cleanUp() {
     Thekla4jProperty.resetPropertyCache();
     System.clearProperty(SELENIUM_CONFIG.property().name());
     System.clearProperty(SELENIUM_BIDI_LOG.property().name());
@@ -34,8 +42,7 @@ public class TestSeleniumProperties {
 
   @Test
   public void testSeleniumConfig() {
-    RuntimeException exception = assertThrows(RuntimeException.class,
-      SELENIUM_CONFIG::value);
+    RuntimeException exception = assertThrows(RuntimeException.class, SELENIUM_CONFIG::value);
 
     Option<String> value = SELENIUM_CONFIG.optionValue();
 

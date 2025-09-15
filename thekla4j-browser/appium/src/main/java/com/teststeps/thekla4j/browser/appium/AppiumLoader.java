@@ -44,6 +44,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
@@ -132,7 +133,8 @@ public class AppiumLoader implements DriverLoader {
         o.setCapability("webSocketUrl", true);
         return o;
       });
-      this.initLogManager = d -> Try.of(() -> BidiLogManager.init(d));
+      this.initLogManager = drv -> Try.of(() -> (RemoteWebDriver) new Augmenter().augment(drv))
+          .map(d -> BidiLogManager.init(d));
     } else {
 
       if (!browserConfig.browserName().equals(BrowserName.CHROME)) {

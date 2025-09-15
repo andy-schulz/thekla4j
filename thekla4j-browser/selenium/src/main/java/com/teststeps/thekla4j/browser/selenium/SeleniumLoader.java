@@ -130,7 +130,8 @@ public class SeleniumLoader implements DriverLoader {
         o.setCapability("webSocketUrl", true);
         return o;
       });
-      this.initLogManager = d -> Try.of(() -> BidiLogManager.init(d));
+      this.initLogManager = drv -> Try.of(() -> (RemoteWebDriver) new Augmenter().augment(drv))
+          .map(d -> BidiLogManager.init(d));
     } else {
 
       if (!browserConfig.browserName().equals(BrowserName.CHROME)) {
@@ -187,8 +188,7 @@ public class SeleniumLoader implements DriverLoader {
         driver = loadOptions()
             .flatMap(createDriver.apply(seleniumConfig.get().remoteUrl()))
             .onSuccess(x -> log.info("Starting remote browser: {} on selenium grid: {}",
-              browserConfig.browserName(), seleniumConfig.get().remoteUrl()))
-            .map(d -> (RemoteWebDriver) new Augmenter().augment(d));
+              browserConfig.browserName(), seleniumConfig.get().remoteUrl()));
       }
     }
     driver = driver

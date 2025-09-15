@@ -110,9 +110,9 @@ public class TestBrowserConfig {
   }
 
   @Test
-  public void loadSeleniumConfigOfNone() throws Throwable {
+  public void loadSeleniumConfigOfLOCAL() throws Throwable {
 
-    Option<String> configToLoad = Option.of("NONE");
+    Option<String> configToLoad = Option.of("LOCAL");
 
     Option<SeleniumGridConfig> config = loadConfigs.apply(configToLoad, Option.none(), List.empty(), List.empty())
         .getOrElseThrow(Function.identity())._1;
