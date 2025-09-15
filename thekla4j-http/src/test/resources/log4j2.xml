@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration package="log4j.test" status="ERROR">
+
+    <CustomLevels>
+        <CustomLevel name="FEATURE" intLevel="397"/>
+        <CustomLevel name="SCENARIO" intLevel="398"/>
+        <CustomLevel name="STEP" intLevel="399"/>
+    </CustomLevels>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%highlight{%d [%-30c] %-5level: %msg%n%throwable}{FEATURE=Bold magenta, SCENARIO=Bold magenta, STEP=Bold Bright magenta, FATAL=bright red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}"
+                    disableAnsi="false"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="log4j.test.Log4jTest" level="error">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>
