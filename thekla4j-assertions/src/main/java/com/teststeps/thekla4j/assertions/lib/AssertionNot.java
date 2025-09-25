@@ -6,7 +6,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.assertions.error.AssertionError;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.API;
 import io.vavr.Tuple;
@@ -24,12 +24,12 @@ public class AssertionNot implements TheklaAssertion {
 
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
-    return p -> Try.run(() -> assertThat(String.format("Expect actuel '%s' to NOT equal '%s'", p, expected),
+    return p -> Try.run(() -> assertThat(String.format("Expect actual '%s' to NOT equal '%s'", p, expected),
       p, not(equalTo(expected))))
 
         .peek(r -> log.debug(() -> "Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(ActivityError::of));
+        .transform(TransformTry.toEither(AssertionError::of));
   }
 
   @Override
@@ -39,7 +39,7 @@ public class AssertionNot implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> reason + " ->  Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(ActivityError::of));
+        .transform(TransformTry.toEither(AssertionError::of));
   }
 
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
@@ -50,25 +50,25 @@ public class AssertionNot implements TheklaAssertion {
   public <M4> Tuple2<String, SeeAssertion<M4>> pass(Predicate<M4> expected, String reason) {
 
     API.Match.Case<? extends Throwable, ? extends Throwable> caseVar =
-        Case($(), ex -> new ActivityError(String.format(ex.getClass().getSimpleName() + " was thrown executing predicate '%s' \nMessage: %s", reason,
+        Case($(), ex -> AssertionError.of(String.format(ex.getClass().getSimpleName() + " was thrown executing predicate '%s' \nMessage: %s", reason,
           ex.getMessage())));
 
     return Tuple.of(reason, p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate '%s' to fail on \n%s", reason, p), res)))
-        .transform(TransformTry.toEither(ActivityError::of)));
+        .transform(TransformTry.toEither(AssertionError::of)));
   }
 
   @Override
   public <M4> SeeAssertion<M4> pass(Predicate<M4> expected) {
 
     API.Match.Case<? extends Throwable, ? extends Throwable> caseVar =
-        Case($(), ex -> new ActivityError(ex.getClass().getSimpleName() + " was thrown executing unspecified predicate \nMessage: " + ex
+        Case($(), ex -> AssertionError.of(ex.getClass().getSimpleName() + " was thrown executing unspecified predicate \nMessage: " + ex
             .getMessage()));
 
     return p -> Try.of(() -> !expected.test(p))
         .mapFailure(caseVar)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate to fail on \n%s", p), res)))
-        .transform(TransformTry.toEither(ActivityError::of));
+        .transform(TransformTry.toEither(AssertionError::of));
   }
 }

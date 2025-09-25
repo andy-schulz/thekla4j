@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.core.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
+import com.teststeps.thekla4j.assertions.error.AssertionError;
 import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
@@ -28,11 +29,12 @@ class ValidateResult<M> extends Interaction<M, String> {
         .map(t -> t._2.getLeft().getMessage())
         .collect(Collectors.joining("\n"));
 
+
     if (error.isEmpty()) {
       String success = matcher.keySet().foldLeft("", (acc, key) -> acc + key + ": true \n");
       return Either.right(success);
     } else {
-      return Either.left(ActivityError.of("\n" + error + "\n"));
+      return Either.left(AssertionError.of("\n" + error + "\n"));
     }
   }
 

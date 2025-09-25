@@ -1,9 +1,9 @@
 package com.teststeps.thekla4j.assertions.lib;
 
-import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.assertions.error.AssertionError;
 import io.vavr.control.Either;
 
 @FunctionalInterface
 public interface SeeAssertion<T1> {
-  Either<ActivityError, Void> affirm(T1 actual);
+  Either<AssertionError, Void> affirm(T1 actual);
 }

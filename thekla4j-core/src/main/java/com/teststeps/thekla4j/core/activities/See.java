@@ -1,9 +1,6 @@
 package com.teststeps.thekla4j.core.activities;
 
 import static com.teststeps.thekla4j.core.properties.DefaultThekla4jCoreProperties.SEE_WAIT_FACTOR;
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import com.teststeps.thekla4j.activityLog.annotations.Called;
@@ -17,6 +14,7 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function0;
 import io.vavr.Function3;
 import io.vavr.Tuple2;
+import io.vavr.Value;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
@@ -47,19 +45,18 @@ public class See<P, M> extends Interaction<P, P> {
   private Duration nextTryIn = Duration.of(1, SECONDS);
 
   private final Function3<Instant, Duration, Function0<Either<ActivityError, String>>, Either<ActivityError, String>> retryExecutingTaskIfFails =
-      (endTry, next, askQuestion) -> Match(askQuestion.apply()).of(
+      (endTry, next, validateResult) -> {
+        Either<ActivityError, String> validation = validateResult.apply();
 
-        Case($(e -> e.isLeft() &&
-            Instant.now()
-                .plusMillis(next.toMillis())
-                .isBefore(endTry)),
-          // Wait before trying to ask the question again
-          () -> Try.run(() -> Thread.sleep(next.toMillis()))
+        if (validation.isLeft() && Instant.now().plusMillis(next.toMillis()).isBefore(endTry)) {
+          return Try.run(() -> Thread.sleep(next.toMillis()))
               .toEither()
               .mapLeft(ActivityError::of)
-              .flatMap(x -> this.retryExecutingTaskIfFails.apply(endTry, next, askQuestion))),
+              .flatMap(x -> this.retryExecutingTaskIfFails.apply(endTry, next, validateResult));
+        }
 
-        Case($(), e -> e));
+        return validation;
+      };
 
   private Duration timeout() {
     return duration.multipliedBy(SEE_WAIT_FACTOR.asInteger());
@@ -82,7 +79,9 @@ public class See<P, M> extends Interaction<P, P> {
     log.info("Check if activity '{}' matches assertions", activity.getClass().getSimpleName());
 
     Function0<Either<ActivityError, String>> executeActivity =
-        () -> actor.attemptsTo_(this.activity, ValidateResult.with(this.matchers2))
+        () -> actor.attemptsTo_(
+          this.activity,
+          ValidateResult.with(this.matchers2))
             .using(passedResult);
 
     return retryExecutingTaskIfFails.apply(Instant.now()

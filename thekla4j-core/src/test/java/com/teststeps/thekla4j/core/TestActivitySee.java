@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.startsWith;
 import com.teststeps.thekla4j.activityLog.ActivityStatus;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.assertions.Expected;
+import com.teststeps.thekla4j.assertions.error.AssertionError;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
@@ -110,7 +111,7 @@ public class TestActivitySee {
     assertThat("first element of See has a description", log.activityNodes.get(0).activityNodes.get(1).description, equalTo(
       "verify all assertion on See activity"));
     assertThat("first element of See has out message", log.activityNodes.get(0).activityNodes.get(1).output, equalTo(
-      "com.teststeps.thekla4j.commons.error.ActivityError: \nexpect predicate 'predicate one' to pass on \nTestData\n"));
+      "com.teststeps.thekla4j.assertions.error.AssertionError: \nexpect predicate 'predicate one' to pass on \nTestData\n"));
     assertThat("first element of See is failed", log.activityNodes.get(0).activityNodes.get(1).status, equalTo(ActivityStatus.failed));
   }
 
@@ -129,6 +130,9 @@ public class TestActivitySee {
           .is(Expected.to.pass(testForTestData, "predicate three")));
 
     assertThat("Either is left", result.isLeft());
+
+    assertThat("Is AssertionError", result.getLeft() instanceof AssertionError);
+
     assertThat("Error message is correct", result.getLeft().getMessage(), equalTo("\nexpect predicate 'predicate one' to pass on \nTestData\n"));
 
     ActivityLogNode log = tester.activityLog.getLogTree();
@@ -206,7 +210,7 @@ public class TestActivitySee {
   }
 
   @Test
-  public void testListAssertion() {
+  public void failAtExpectationLevel() {
     Actor tester = Actor.named("Tester");
 
     Either<ActivityError, List<String>> val = tester.attemptsTo_(
@@ -216,6 +220,7 @@ public class TestActivitySee {
 
     ActivityLogNode log = tester.activityLog.getLogTree();
 
+    System.out.println("Validation result " + val.getLeft().getMessage());
 
     assertThat("Either should be left", val.isLeft());
 
@@ -225,7 +230,7 @@ public class TestActivitySee {
       "ask if result of last activity is matching the validations (retry for PT0S time(s))"));
 
     assertThat("Error should be predicate one", log.activityNodes.get(0).activityNodes.get(1).output,
-      equalTo("com.teststeps.thekla4j.commons.error.ActivityError: \nexpect predicate 'predicate one' to pass on \nList(test)\n"));
+      equalTo("com.teststeps.thekla4j.assertions.error.AssertionError: \nexpect predicate 'predicate one' to pass on \nList(test)\n"));
 
 
   }
