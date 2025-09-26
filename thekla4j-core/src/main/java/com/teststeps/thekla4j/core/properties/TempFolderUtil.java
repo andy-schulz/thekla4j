@@ -17,6 +17,9 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.NonNull;
 
+/**
+ * Utility class to create and delete temporary folders
+ */
 public class TempFolderUtil {
 
 
@@ -24,6 +27,12 @@ public class TempFolderUtil {
   private static final Path gradleDir = userDir.resolve("build");
   private static final Path mavenDir = userDir.resolve("target");
 
+  /**
+   * Create a new subfolder in the temp folder with a given prefix
+   *
+   * @param prefix - the prefix for the subfolder
+   * @return - the path to the new subfolder
+   */
   public static Path newSubTempFolder(String prefix) {
     return Path.of(TEMP_DIR_PATH.value()).resolve(prefix + "_" + shortUUID.get());
   }
@@ -58,6 +67,7 @@ public class TempFolderUtil {
   /**
    * Create the temporary folder
    *
+   * @param path - the path of the temporary folder to create
    * @return - the path to the temporary folder
    */
   public static Path directory(Path path) {
@@ -68,6 +78,7 @@ public class TempFolderUtil {
   /**
    * Delete the temporary folder
    *
+   * @param path - the path of the temporary folder to delete
    * @return - a Try of Void
    */
   public static Try<Void> delete(Path path) {
@@ -91,6 +102,9 @@ public class TempFolderUtil {
     }));
   }
 
+  /**
+   * Generate a short UUID string
+   */
   protected static final Supplier<String> shortUUID = () -> {
 
     String uuid = UUID.randomUUID().toString().replace("-", "");

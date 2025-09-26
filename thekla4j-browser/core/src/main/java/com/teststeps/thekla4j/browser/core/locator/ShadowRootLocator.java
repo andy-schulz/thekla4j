@@ -2,6 +2,12 @@ package com.teststeps.thekla4j.browser.core.locator;
 
 import lombok.NonNull;
 
+/**
+ * Locator for Shadow DOM roots.
+ *
+ * @param text           - the text representation of the locator
+ * @param elementLocator - the locator for the shadow root element
+ */
 public record ShadowRootLocator(
                                 String text,
                                 Locator elementLocator
@@ -11,6 +17,7 @@ public record ShadowRootLocator(
    * Creates a new ShadowRootLocator with the given elementLocator.
    *
    * @param locator - the elementLocator for the shadow root
+   * @return a new ShadowRootLocator instance
    */
   public static ShadowRootLocator of(Locator locator) {
     return new ShadowRootLocator("shadow-root", locator);

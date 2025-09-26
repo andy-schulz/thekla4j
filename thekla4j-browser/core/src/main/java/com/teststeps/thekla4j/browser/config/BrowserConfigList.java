@@ -104,6 +104,12 @@ public class BrowserConfigList {
   }
 
 
+  /**
+   * Set the default configuration if not already set
+   *
+   * @param defaultConfigName - the default configuration name
+   * @return - the BrowserConfigList with the default configuration set
+   */
   public BrowserConfigList withDefaultConfig(Option<String> defaultConfigName) {
     return defaultConfigName
         .map(name -> new BrowserConfigList(name, browserConfigs))

@@ -34,6 +34,9 @@ import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+/**
+ * Selenium based browser implementation
+ */
 @Log4j2(topic = "Browser")
 public class SeleniumBrowser implements Browser, BrowserLog {
 
@@ -45,14 +48,28 @@ public class SeleniumBrowser implements Browser, BrowserLog {
 
   private Option<SeleniumKeyActionDriver> seleniumKeyActionDriver = Option.none();
 
+  /**
+   * Create a new SeleniumBrowser instance
+   *
+   * @param loader        - the driver loader to use
+   * @param browserConfig - the browser configuration to use
+   */
   public SeleniumBrowser(DriverLoader loader, BrowserConfig browserConfig) {
     this.driverLoader = loader;
     this.browserConfig = browserConfig;
   }
 
+  /**
+   * Load a new SeleniumBrowser instance
+   *
+   * @param loader        - the driver loader to use
+   * @param browserConfig - the browser configuration to use
+   * @return - a new SeleniumBrowser instance
+   */
   public static SeleniumBrowser load(DriverLoader loader, BrowserConfig browserConfig) {
     return new SeleniumBrowser(loader, browserConfig);
   }
+
 
   private Try<SeleniumKeyActionDriver> seleniumKeyActionDriver() {
     if (seleniumKeyActionDriver.isEmpty()) {
@@ -85,6 +102,12 @@ public class SeleniumBrowser implements Browser, BrowserLog {
     };
   }
 
+  /**
+   * Switch to the given frame if needed
+   *
+   * @param frame - the frame to switch to
+   * @return - the driver in the correct frame context
+   */
   protected Try<RemoteWebDriver> switchFrame(Option<Frame> frame) {
 
     if ((currentFrame.isEmpty() && frame.isEmpty())) {
@@ -108,6 +131,11 @@ public class SeleniumBrowser implements Browser, BrowserLog {
 
   }
 
+  /**
+   * Switch to the default content of the browser
+   *
+   * @return - the driver in the default content context
+   */
   protected Try<RemoteWebDriver> switchToDefaultContent() {
     return driverLoader.driver()
         .map(d -> {
@@ -116,6 +144,12 @@ public class SeleniumBrowser implements Browser, BrowserLog {
         });
   }
 
+  /**
+   * Switch to the given frame
+   *
+   * @param frame - the frame to switch to
+   * @return - the driver in the correct frame context
+   */
   protected Try<RemoteWebDriver> switchToFrame(Frame frame) {
     return driverLoader.driver()
         .flatMap(d -> switchToFrame.apply(d, frame));

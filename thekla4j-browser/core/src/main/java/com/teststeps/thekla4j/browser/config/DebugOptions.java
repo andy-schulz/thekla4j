@@ -1,5 +1,11 @@
 package com.teststeps.thekla4j.browser.config;
 
+/**
+ * Configuration options for debugging the browser.
+ *
+ * @param debuggerAddress - the address of the debugger
+ * @param downloadPath    - the path to the download folder
+ */
 public record DebugOptions(
 
                            /**
@@ -19,6 +25,11 @@ public record DebugOptions(
                            String downloadPath
 ) {
 
+  /**
+   * Returns a help string with example configuration options.
+   *
+   * @return a help string with example configuration options
+   */
   public static String help() {
     return """
         debuggerAddress: "localhost:9222"

@@ -14,7 +14,13 @@ import lombok.NonNull;
  */
 public abstract class SupplierTask<RT> extends Activity<Void, RT> {
 
-
+  /**
+   * perform the task as the given actor
+   *
+   * @param actor  the actor to perform the task as
+   * @param result the result of the previous activity (not used)
+   * @return the result of the task
+   */
   @Override
   final protected Either<ActivityError, RT> perform(@NonNull Actor actor, Void result) {
     return performAs(actor);

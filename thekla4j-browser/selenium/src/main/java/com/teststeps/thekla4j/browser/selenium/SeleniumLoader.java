@@ -57,11 +57,16 @@ public class SeleniumLoader implements DriverLoader {
   Try<RemoteWebDriver> driver = null;
   Try<LogManager> logManager = null;
 
+  /** Configuration for the browser to be used */
   protected BrowserConfig browserConfig;
+  /** Optional configuration for Selenium Grid */
   protected final Option<SeleniumGridConfig> seleniumConfig;
+  /** Optional configuration for browser startup parameters */
   protected final Option<BrowserStartupConfig> startupConfig;
 
+  /** List of functions to update the RemoteWebDriver after its creation */
   protected List<Function1<RemoteWebDriver, RemoteWebDriver>> driverUpdates = List.empty();
+  /** List of functions to update the MutableCapabilities before creating the WebDriver */
   protected List<Function1<MutableCapabilities, MutableCapabilities>> optionUpdates = List.empty();
 
   private Function1<RemoteWebDriver, Try<LogManager>> initLogManager =
@@ -69,6 +74,7 @@ public class SeleniumLoader implements DriverLoader {
 
   private boolean shallListenToBrowserLogs = false;
 
+  /** Path to the download directory if file download is enabled */
   protected Option<Path> downloadPath = Option.none();
 
   SeleniumLoader(BrowserConfig browserConfig, Option<SeleniumGridConfig> seleniumGridConfig, Option<BrowserStartupConfig> startupConfig) {
@@ -78,6 +84,14 @@ public class SeleniumLoader implements DriverLoader {
 
   }
 
+  /**
+   * Create a new instance of SeleniumLoader with the provided configurations.
+   *
+   * @param browserConfig      - the configuration for the browser
+   * @param seleniumGridConfig - optional configuration for Selenium Grid
+   * @param startupConfig      - optional configuration for browser startup parameters
+   * @return a new instance of SeleniumLoader
+   */
   public static SeleniumLoader of(BrowserConfig browserConfig, Option<SeleniumGridConfig> seleniumGridConfig, Option<BrowserStartupConfig> startupConfig) {
     return new SeleniumLoader(browserConfig, seleniumGridConfig, startupConfig);
   }
@@ -218,6 +232,11 @@ public class SeleniumLoader implements DriverLoader {
     this.driverUpdates = driverUpdates.append(driverUpdate);
   }
 
+  /**
+   * tear down the driver and reset the startup parameters
+   *
+   * @return - the Try of the RemoteWebDriver that was torn down
+   */
   public Try<RemoteWebDriver> tearDown() {
     return driver().map(drv -> {
       setStartUpParameters();
@@ -226,10 +245,18 @@ public class SeleniumLoader implements DriverLoader {
   }
 
 
+  /**
+   * Create a RemoteWebDriver instance based on the provided remote URL and capabilities.
+   */
   protected final Function2<String, Capabilities, Try<RemoteWebDriver>> createDriver =
       (remoteUrl, capabilities) -> Try.of(() -> new URL(remoteUrl))
           .map(url -> new RemoteWebDriver(url, capabilities));
 
+  /**
+   * Load and configure the browser options based on the BrowserConfig and SeleniumGridConfig.
+   *
+   * @return a Try containing the configured MutableCapabilities
+   */
   protected Try<MutableCapabilities> loadOptions() {
     return createBrowserOptions(browserConfig.browserName())
         .map(setBrowserVersion)
@@ -249,6 +276,9 @@ public class SeleniumLoader implements DriverLoader {
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isVideoRecordingActive() {
     boolean browserConfigActive = !isNullSafe(() -> browserConfig.video().record()) && browserConfig.video().record();
@@ -259,6 +289,9 @@ public class SeleniumLoader implements DriverLoader {
     return browserConfigActive || gridConfigActive;
   }
 
+  /**
+   * Set startup parameters such as maximizing the window based on the BrowserStartupConfig.
+   */
   protected void setStartUpParameters() {
 
     if (startupConfig.isDefined()) {
@@ -272,6 +305,12 @@ public class SeleniumLoader implements DriverLoader {
     }
   }
 
+  /**
+   * Create browser-specific options based on the provided BrowserName.
+   *
+   * @param browserName the name of the browser
+   * @return a Try containing the created AbstractDriverOptions
+   */
   protected Try<AbstractDriverOptions<?>> createBrowserOptions(BrowserName browserName) {
 
     return switch (browserName) {

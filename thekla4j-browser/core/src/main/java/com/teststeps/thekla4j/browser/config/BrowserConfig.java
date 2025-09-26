@@ -157,6 +157,11 @@ public record BrowserConfig(
   }
 
 
+  /**
+   * Help string for the BrowserConfig
+   *
+   * @return a help string
+   */
   public static String help() {
     return """
         browserConfigName:
@@ -180,10 +185,29 @@ public record BrowserConfig(
         .replace("{{VIDEO_OPTIONS}}", VideoConfig.help().indent(4));
   }
 
+  /**
+   * Create a default BrowserConfig object with Chrome as browser
+   */
   public BrowserConfig() {
     this(BrowserName.CHROME, null, null, null, null, false, false, null, false, List.empty(), null, null);
   }
 
+  /**
+   * Full constructor for the BrowserConfig
+   *
+   * @param browserName        - the name of the browser
+   * @param browserVersion     - the version of the browser
+   * @param platformName       - the name of the platform
+   * @param osVersion          - the version of the platform
+   * @param deviceName         - the name of the device
+   * @param enableFileUpload   - enable file upload
+   * @param enableFileDownload - enable file download
+   * @param binary             - the path to the browser binary
+   * @param headless           - if the browser should be headless
+   * @param browserArgs        - the arguments for the browser
+   * @param debug              - the debugging options
+   * @param video              - the video options
+   */
   public BrowserConfig(
                        BrowserName browserName, String browserVersion, OperatingSystem platformName, String osVersion, String deviceName, boolean enableFileUpload, boolean enableFileDownload, String binary, boolean headless, List<String> browserArgs, DebugOptions debug, VideoConfig video
   ) {

@@ -9,12 +9,21 @@ import org.openqa.selenium.bidi.log.GenericLogEntry;
 import org.openqa.selenium.bidi.module.LogInspector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+/**
+ * LogManager implementation for Selenium WebDriver that captures browser log entries using BiDi protocol.
+ */
 @Log4j2(topic = "SeleniumLogManager")
 public class BidiLogManager implements LogManager {
 
   private final LogInspector logInspector;
   private final List<LogEntry> logEntries = new ArrayList<>();
 
+  /**
+   * Factory method to create a BidiLogManager instance.
+   *
+   * @param driver the RemoteWebDriver instance
+   * @return a new BidiLogManager instance
+   */
   public static BidiLogManager init(RemoteWebDriver driver) {
     return new BidiLogManager(new LogInspector(driver));
   }
@@ -33,16 +42,25 @@ public class BidiLogManager implements LogManager {
     log.debug("New browser log entry received: {} ", e.toString().indent(4));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public io.vavr.collection.List<LogEntry> logEntries() {
     return io.vavr.collection.List.ofAll(logEntries);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> clearLogEntries() {
     return Try.run(logEntries::clear);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> cleanUp() {
 

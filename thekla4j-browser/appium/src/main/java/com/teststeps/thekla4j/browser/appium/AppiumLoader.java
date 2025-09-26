@@ -56,25 +56,45 @@ public class AppiumLoader implements DriverLoader {
   Try<RemoteWebDriver> driver = null;
   Try<LogManager> logManager = null;
 
+  /** Configuration */
   protected BrowserConfig browserConfig;
+  /** Appium Configuration */
   protected Option<AppiumConfig> appiumConfig;
+  /** Browser startup configuration */
   protected final Option<BrowserStartupConfig> startupConfig;
 
+  /** Updates for driver after initialization */
   protected List<Function1<RemoteWebDriver, RemoteWebDriver>> driverUpdates = List.empty();
+  /** Updates for options before driver initialization */
   protected List<Function1<MutableCapabilities, MutableCapabilities>> optionUpdates = List.empty();
-
+  /** The AppiumOptions used to create the driver */
   protected Option<Path> downloadPath = Option.none();
 
   private Function1<RemoteWebDriver, Try<LogManager>> initLogManager = d -> Try.failure(new IllegalStateException(
                                                                                                                   "Appium LogManager not initialized"));
   private boolean shallListenToBrowserLogs = false;
 
+  /**
+   * Constructor for AppiumLoader
+   *
+   * @param browserConfig the browser configuration
+   * @param appiumConfig  the Appium configuration
+   * @param startupConfig the browser startup configuration
+   */
   public AppiumLoader(BrowserConfig browserConfig, Option<AppiumConfig> appiumConfig, Option<BrowserStartupConfig> startupConfig) {
     this.browserConfig = browserConfig;
     this.appiumConfig = appiumConfig;
     this.startupConfig = startupConfig;
   }
 
+  /**
+   * Factory method to create an AppiumLoader instance.
+   *
+   * @param browserConfig the browser configuration
+   * @param appiumConfig  the Appium configuration
+   * @param startupConfig the browser startup configuration
+   * @return a new AppiumLoader instance
+   */
   public static AppiumLoader of(BrowserConfig browserConfig, Option<AppiumConfig> appiumConfig, Option<BrowserStartupConfig> startupConfig) {
     return new AppiumLoader(browserConfig, appiumConfig, startupConfig);
   }
@@ -104,6 +124,9 @@ public class AppiumLoader implements DriverLoader {
     return driver().map(Actions::new);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<Void> activateBrowserLog() {
 
@@ -162,6 +185,9 @@ public class AppiumLoader implements DriverLoader {
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Try<LogManager> logManager() {
     if (!Objects.isNull(logManager)) {
@@ -215,6 +241,12 @@ public class AppiumLoader implements DriverLoader {
     return driver;
   }
 
+  /**
+   * Create the AppiumOptions with the given browser name or use Chrome as default
+   *
+   * @param browserName the browser name
+   * @return the AppiumOptions
+   */
   protected Try<AppiumOptions> createBrowserOptions(BrowserName browserName) {
     if (browserName == null) {
       String infoMessage = "Browser name is not set in BrowserConfig. Using default browser CHROME.";
@@ -401,6 +433,9 @@ public class AppiumLoader implements DriverLoader {
         .map(setOptionUpdates.apply(optionUpdates));
   }
 
+  /**
+   * Set the startup parameters like window size
+   */
   protected void setStartUpParameters() {
     if (startupConfig.isDefined()) {
 
@@ -412,11 +447,19 @@ public class AppiumLoader implements DriverLoader {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isVideoRecordingActive() {
     return !isNullSafe(() -> browserConfig.video().record()) && browserConfig.video().record();
   }
 
+  /**
+   * stop the video recording and store the video in a temp folder
+   *
+   * @return Try{Void}
+   */
   public Try<Void> stopVideoRecording() {
 
     if (isVideoRecordingActive()) {

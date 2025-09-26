@@ -8,15 +8,29 @@ import com.teststeps.thekla4j.commons.properties.PropertyElement;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 
+/**
+ * Default properties for thekla4j core module
+ */
 public enum DefaultThekla4jCoreProperties implements DefaultThekla4jProperties {
 
   /**
-   * s
-   * absolute path to the used temp directory
+   * absolute path to the unique temp directory (UUID)
    */
-  TEMP_DIR_PATH(PropertyElement.of("thekla4j.tempDir.path", tempDir.get(), "temp directory path")),
-  TEMP_DIR_BASE_PATH(PropertyElement.of("thekla4j.tempDir.base.path", baseTempDir.get(), "temp directory path")),
+  TEMP_DIR_PATH(PropertyElement.of("thekla4j.tempDir.path", tempDir.get(), "unique temp directory path (UUID)")),
+
+  /**
+   * absolute path to the base temp directory
+   */
+  TEMP_DIR_BASE_PATH(PropertyElement.of("thekla4j.tempDir.base.path", baseTempDir.get(), "base temp directory path")),
+
+  /**
+   * wait factor for see activity
+   */
   SEE_WAIT_FACTOR(PropertyElement.of("thekla4j.core.see.wait.factor", Option.of("1"), "wait factor for see activity")),
+
+  /**
+   * wait factor for retry activity
+   */
   RETRY_WAIT_FACTOR(PropertyElement.of("thekla4j.core.retry.wait.factor", Option.of("1"), "wait factor for retry activity"));
 
   final PropertyElement property;

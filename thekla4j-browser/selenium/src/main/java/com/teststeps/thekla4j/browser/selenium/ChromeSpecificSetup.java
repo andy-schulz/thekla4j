@@ -7,8 +7,14 @@ import java.util.HashMap;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 
+/**
+ * Utility class for Chrome-specific setup in Selenium WebDriver.
+ */
 public class ChromeSpecificSetup {
 
+  /**
+   * Sets the file download directory for ChromeOptions.
+   */
   public static final Function2<Path, ChromeOptions, ChromeOptions> setFileDownloadDir = (downloadPath, options) -> {
     HashMap<String, Object> prefs = new HashMap<>();
 

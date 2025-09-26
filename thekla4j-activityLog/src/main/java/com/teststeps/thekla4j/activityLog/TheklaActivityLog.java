@@ -105,6 +105,11 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     this.rootActivityLogEntry.appendVideoAttachment(videoAttachment);
   }
 
+  /**
+   * append attachment to root node
+   *
+   * @param attachment - the attachment
+   */
   public void appendAttachmentsToRootNode(NodeAttachment attachment) {
     this.rootActivityLogEntry.appendAttachment(attachment);
   }
@@ -260,6 +265,11 @@ public class TheklaActivityLog implements ActivityLog, Serializable {
     return getFailedNodeAttachment(failedNode.head());
   }
 
+  /**
+   * get the attachments of the last failed activity
+   *
+   * @return the attachments of the last failed activity
+   */
   public List<NodeAttachment> getLastLogAttachments() {
     return getFailedNodeAttachment(this.rootActivityLogEntry.getLogTree());
   }

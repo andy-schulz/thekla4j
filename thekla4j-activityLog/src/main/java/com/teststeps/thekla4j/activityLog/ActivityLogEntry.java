@@ -136,6 +136,12 @@ public class ActivityLogEntry implements Serializable {
     return this.activityStatus;
   }
 
+  /**
+   * set the end time of the activity
+   *
+   * @param end the end time of the activity
+   * @return the current activity log entry
+   */
   public ActivityLogEntry setEndTime(LocalDateTime end) {
     this.end = end;
     return this;

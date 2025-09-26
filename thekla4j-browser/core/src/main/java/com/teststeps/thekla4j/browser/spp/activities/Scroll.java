@@ -9,10 +9,14 @@ import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-@AllArgsConstructor
+/**
+ * Scroll an element to the top or left of a scrollable area
+ */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2(topic = "ScrollElement")
 @Action("Scroll Element @{element} to @{direction} of Area @{scrollArea}")
 public class Scroll extends BasicInteraction {
@@ -24,6 +28,12 @@ public class Scroll extends BasicInteraction {
   @Called(name = "direction")
   private ScrollDirection scrollDirection;
 
+  /**
+   * perform the scroll action
+   * 
+   * @param actor - the actor performing the action
+   * @return - Either an ActivityError or null if successful
+   */
   @Override
   protected Either<ActivityError, Void> performAs(Actor actor) {
     if (scrollArea == null) {
@@ -46,36 +56,86 @@ public class Scroll extends BasicInteraction {
         .map(__ -> null);
   }
 
+  /**
+   * create a new Scroll activity for an element
+   * 
+   * @param element - the element to scroll
+   * @return - a new Scroll activity
+   */
   public static Scroll element(Element element) {
     return new Scroll(element, null, null);
   }
 
+  /**
+   * create a new Scroll activity to scroll to the end of a scrollable area
+   * 
+   * @param scrollArea - the scrollable area to scroll to the end of
+   * @return - a new Scroll activity
+   */
   public static BasicInteraction toEndOfArea(Element scrollArea) {
     return new ScrollArea(scrollArea);
   }
 
+  /**
+   * Scroll the given area up or down by a number of pixels (default 100)
+   * 
+   * @param scrollArea - the scrollable area to scroll
+   * @return the ScrollByPixels interaction
+   */
   public static BasicInteraction areaDown(Element scrollArea) {
     return ScrollByPixels.of(scrollArea, ScrollDirection.DOWN);
   }
 
+  /**
+   * Scroll the given area up or down by a number of pixels (default 100)
+   * 
+   * @param scrollArea - the scrollable area to scroll
+   * @param byPixels   - the number of pixels to scroll by
+   * @return the ScrollByPixels interaction
+   */
   public static BasicInteraction areaDown(Element scrollArea, int byPixels) {
     return ScrollByPixels.of(scrollArea, byPixels, ScrollDirection.DOWN);
   }
 
+  /**
+   * Scroll the given area up or down by a number of pixels (default 100)
+   * 
+   * @param scrollArea - the scrollable area to scroll
+   * @return the ScrollByPixels interaction
+   */
   public static BasicInteraction areaUp(Element scrollArea) {
     return ScrollByPixels.of(scrollArea, ScrollDirection.UP);
   }
 
+  /**
+   * Scroll the given area up or down by a number of pixels (default 100)
+   * 
+   * @param scrollArea - the scrollable area to scroll
+   * @param byPixels   - the number of pixels to scroll by
+   * @return the ScrollByPixels interaction
+   */
   public static BasicInteraction areaUp(Element scrollArea, int byPixels) {
     return ScrollByPixels.of(scrollArea, byPixels, ScrollDirection.UP);
   }
 
+  /**
+   * set the scroll area to scroll to top
+   *
+   * @param scrollArea - the scrollable area to scroll
+   * @return - the Scroll interaction
+   */
   public Scroll toTopOfArea(Element scrollArea) {
     this.scrollArea = scrollArea;
     this.scrollDirection = ScrollDirection.TOP;
     return this;
   }
 
+  /**
+   * set the scroll area to scroll to left
+   *
+   * @param scrollArea - the scrollable area to scroll
+   * @return - the Scroll interaction
+   */
   public Scroll toLeftOfArea(Element scrollArea) {
     this.scrollArea = scrollArea;
     this.scrollDirection = ScrollDirection.LEFT;
@@ -83,7 +143,7 @@ public class Scroll extends BasicInteraction {
   }
 
 
-  @AllArgsConstructor
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   @Action("Scroll @{scrollArea} by @{pixels} pixels in direction @{scrollDirection}")
   private static class ScrollByPixels extends BasicInteraction {
 
@@ -127,7 +187,7 @@ public class Scroll extends BasicInteraction {
   }
 
 
-  @AllArgsConstructor
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
   @Action("Scroll to end of scrollable area @{scrollArea}")
   private static class ScrollArea extends BasicInteraction {
 

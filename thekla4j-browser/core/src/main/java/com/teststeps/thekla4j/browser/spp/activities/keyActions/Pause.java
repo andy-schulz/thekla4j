@@ -2,6 +2,13 @@ package com.teststeps.thekla4j.browser.spp.activities.keyActions;
 
 import java.time.Duration;
 
+/**
+ * Pause action for key sequences.
+ * <p>
+ * This class represents a pause action that can be used in a sequence of key actions.
+ * It implements the {@link KeyAction} interface and allows for pausing the execution
+ * of key actions for a specified duration.
+ */
 public class Pause implements KeyAction {
 
   private final Duration duration;

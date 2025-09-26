@@ -27,6 +27,13 @@ public record SeleniumGridConfig(
                                  Map<String, Map<String, String>> capabilities
 ) {
 
+  /**
+   * Create a default SeleniumGridConfig with the given remoteUrl and empty capabilities
+   *
+   * @param remoteUrl the remote url for the selenium grid server
+   * @return a default SeleniumGridConfig
+   */
+
   public static SeleniumGridConfig of(String remoteUrl) {
     return new SeleniumGridConfig(
                                   remoteUrl,

@@ -73,6 +73,12 @@ public class DoKey extends BasicInteraction {
     return new DoKey(List.of(keys).map(Up::new));
   }
 
+  /**
+   * Pauses for the given duration
+   *
+   * @param duration the duration to pause
+   * @return the DoKeys task
+   */
   public DoKey thenPause(Duration duration) {
     this.actions = actions.append(new Pause(duration));
     return this;

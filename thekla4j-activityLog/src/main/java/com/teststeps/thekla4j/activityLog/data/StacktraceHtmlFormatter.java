@@ -1,6 +1,16 @@
 package com.teststeps.thekla4j.activityLog.data;
 
+/**
+ * Formats a StacktraceAttachment to HTML
+ */
 public class StacktraceHtmlFormatter {
+
+  /**
+   * Formats a StacktraceAttachment to HTML
+   *
+   * @param attachment the StacktraceAttachment to format
+   * @return the formatted HTML string
+   */
   public static String formatStacktraceAttachment(StacktraceAttachment attachment) {
     if (attachment == null) return "";
     String level = attachment.logLevel();

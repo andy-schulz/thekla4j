@@ -9,13 +9,14 @@ import com.teststeps.thekla4j.core.base.activities.SupplierTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.utils.vavr.TransformTry;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
  * Get the geometry of an element (x, y, height, width)
  */
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2(topic = "ElementGeometry")
 @Action("get the geometry (x, y, height, width) of element @{element}")
 public class Geometry extends SupplierTask<Rectangle> {
@@ -23,6 +24,12 @@ public class Geometry extends SupplierTask<Rectangle> {
   @Called(name = "element", value = "name")
   private final Element element;
 
+  /**
+   * perform the geometry retrieval action
+   *
+   * @param actor - the actor performing the action
+   * @return - Either an ActivityError or the Rectangle representing the geometry of the element
+   */
   @Override
   protected Either<ActivityError, Rectangle> performAs(Actor actor) {
     return BrowseTheWeb.as(actor)

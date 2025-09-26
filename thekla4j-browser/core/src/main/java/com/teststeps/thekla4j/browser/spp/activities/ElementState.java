@@ -2,6 +2,7 @@ package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
+import com.teststeps.thekla4j.assertions.error.AssertionError;
 import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
@@ -59,7 +60,7 @@ public class ElementState extends SupplierTask<State> {
           return Either.right(null);
         } else {
           return Either.left(
-            ActivityError.of(String.format("%s should %sbe visible, but it is %svisible", state.element(), expectedMessage, actualMessage)));
+            AssertionError.of(String.format("%s should %sbe visible, but it is %svisible", state.element(), expectedMessage, actualMessage)));
         }
       };
 
@@ -78,7 +79,7 @@ public class ElementState extends SupplierTask<State> {
           return Either.right(null);
         } else {
           return Either.left(
-            ActivityError.of(String.format("%s should %sbe enabled, but it is %senabled", state.element(), expectedMessage, actualMessage)));
+            AssertionError.of(String.format("%s should %sbe enabled, but it is %senabled", state.element(), expectedMessage, actualMessage)));
         }
       };
 
@@ -96,7 +97,7 @@ public class ElementState extends SupplierTask<State> {
           return Either.right(null);
         } else {
           return Either.left(
-            ActivityError.of(String.format("%s should %sbe present in DOM, but it is %spresent", state.element(), expectedMessage, actualMessage)));
+            AssertionError.of(String.format("%s should %sbe present in DOM, but it is %spresent", state.element(), expectedMessage, actualMessage)));
         }
       };
 }

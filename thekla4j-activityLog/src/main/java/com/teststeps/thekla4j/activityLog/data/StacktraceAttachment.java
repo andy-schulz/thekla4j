@@ -5,7 +5,11 @@ import io.vavr.collection.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * A stacktrace attachment to be added to the activity log
+ */
 public record StacktraceAttachment(
+
                                    String time,
                                    String name,
                                    String content,
@@ -16,6 +20,18 @@ public record StacktraceAttachment(
                                    String text,
                                    List<LogStackFrameAttachment> frames
 ) implements NodeAttachment {
+
+  /**
+   * Creates a new stacktrace attachment
+   * 
+   * @param time    the time of the log entry
+   * @param name    the name of the attachment
+   * @param level   the log level
+   * @param logType the type of the log
+   * @param text    the log message
+   * @param frames  the stack frames
+   * @return the stacktrace attachment
+   */
 
   public static StacktraceAttachment of(LocalDateTime time, String name, String level, String logType, String text, List<LogStackFrameAttachment> frames) {
 

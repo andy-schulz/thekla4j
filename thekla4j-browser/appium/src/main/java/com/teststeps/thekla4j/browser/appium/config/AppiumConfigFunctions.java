@@ -13,6 +13,9 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Utility functions for loading and manipulating Appium configurations.
+ */
 @Log4j2(topic = "Appium Config")
 public class AppiumConfigFunctions {
   private static final String APPIUM_CONFIG_FILE = "appiumConfig.yaml";
@@ -43,10 +46,16 @@ public class AppiumConfigFunctions {
   private static final Function1<String, String> configName = (defaultName) -> SELENIUM_CONFIG.optionValue().getOrElse(defaultName);
 
 
+  /**
+   * Apply a list of updates to an optional BrowserConfig
+   */
   public static final Function1<List<Function1<BrowserConfig, BrowserConfig>>, Function1<Option<BrowserConfig>, Option<BrowserConfig>>> applyBrowserConfigUpdates =
       updates -> confOption -> confOption.map(
         conf -> updates.foldLeft(conf, (c, u) -> u.apply(c)));
 
+  /**
+   * Apply a list of updates to an optional AppiumConfig
+   */
   public static final Function1<List<Function1<AppiumConfig, AppiumConfig>>, Function1<Option<AppiumConfig>, Option<AppiumConfig>>> applyAppiumConfigUpdates =
       updates -> confOption -> confOption.map(
         conf -> updates.foldLeft(conf, (c, u) -> u.apply(c)));

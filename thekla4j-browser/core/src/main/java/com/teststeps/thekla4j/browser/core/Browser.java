@@ -139,7 +139,8 @@ public interface Browser {
   /**
    * Scroll the element to the top of a given scroll area.
    *
-   * @param element the element to scroll
+   * @param element    the element to scroll
+   * @param scrollArea the area to scroll
    * @return a Try containing a Void
    */
   Try<Void> scrollElementToTopOfArea(Element element, Element scrollArea);
@@ -155,7 +156,8 @@ public interface Browser {
   /**
    * Scroll the element to the left of a given scroll area.
    *
-   * @param element the element to scroll
+   * @param element    the element to scroll
+   * @param scrollArea the area to scroll
    * @return a Try containing a Void
    */
   Try<Void> scrollElementToLeftOfArea(Element element, Element scrollArea);
@@ -263,6 +265,7 @@ public interface Browser {
    *
    * @param filePaths             the file paths to upload
    * @param targetFileUploadInput the target file upload input
+   * @param remoteFilePath        the remote file path to upload to
    * @return a Try containing a Void
    */
   Try<Void> setUploadFiles(List<Path> filePaths, Element targetFileUploadInput, Option<Path> remoteFilePath);
@@ -349,6 +352,7 @@ public interface Browser {
   /**
    * Execute key actions
    *
+   * @param keyActions the key actions to execute
    * @return a Try containing the key actions
    */
   Try<Void> executeKeyActions(List<KeyAction> keyActions);

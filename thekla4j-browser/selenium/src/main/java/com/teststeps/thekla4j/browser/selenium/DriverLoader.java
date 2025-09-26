@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+/**
+ * Interface for loading and managing WebDriver instances.
+ */
 public interface DriverLoader {
 
   /**

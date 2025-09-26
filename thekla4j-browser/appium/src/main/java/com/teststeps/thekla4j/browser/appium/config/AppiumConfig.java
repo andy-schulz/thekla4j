@@ -27,6 +27,12 @@ public record AppiumConfig(
                             */
                            Map<String, Map<String, String>> capabilities
 ) {
+  /**
+   * Constructor for AppiumConfig.
+   *
+   * @param remoteUrl    the remote URL of the Appium server
+   * @param capabilities the capabilities for the Appium session
+   */
   @JsonCreator
   public AppiumConfig(
                       @JsonProperty("remoteUrl") String remoteUrl, @JsonProperty("capabilities") Map<String, Map<String, String>> capabilities) {
@@ -34,6 +40,12 @@ public record AppiumConfig(
     this.capabilities = capabilities == null ? HashMap.empty() : capabilities;
   }
 
+  /**
+   * Factory method to create an AppiumConfig instance with the specified remote URL and empty capabilities.
+   *
+   * @param remoteUrl the remote URL of the Appium server
+   * @return a new AppiumConfig instance
+   */
   public static AppiumConfig of(String remoteUrl) {
     return new AppiumConfig(remoteUrl, HashMap.empty());
   }

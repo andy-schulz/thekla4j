@@ -3,6 +3,9 @@ package com.teststeps.thekla4j.core.properties;
 import com.teststeps.thekla4j.commons.properties.PropertyElement;
 import io.vavr.control.Option;
 
+/**
+ * Interface for default thekla4j properties
+ */
 public interface DefaultThekla4jProperties {
 
   /**

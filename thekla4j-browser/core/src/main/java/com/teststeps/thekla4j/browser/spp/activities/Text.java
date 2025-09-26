@@ -43,6 +43,12 @@ public class Text extends SupplierTask<String> {
     return new Text(element);
   }
 
+  /**
+   * Create a task to get text from all elements matching the given element locator
+   *
+   * @param element - the elements to get text from
+   * @return - the task to get text from all elements matching the given element
+   */
   public static SupplierTask<List<String>> ofAll(Element element) {
     return new TextAll(element);
   }

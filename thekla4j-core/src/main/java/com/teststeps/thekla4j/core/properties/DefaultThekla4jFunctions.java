@@ -7,6 +7,10 @@ import java.util.function.Function;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+
+/**
+ * Basic helper Functions utility class for thekla4j
+ */
 public class DefaultThekla4jFunctions {
 
 

@@ -57,6 +57,9 @@ public enum DefaultThekla4jBrowserProperties implements DefaultThekla4jPropertie
   BROWSER_CONFIG(PropertyElement.of("thekla4j.browser.config", Option.none(), "The browser configuration to use")),
 
 
+  /**
+   * Multiplier for the wait time for elements. Default is 1.0, which means no scaling.
+   */
   WAIT_FOR_ELEMENT_FACTOR(PropertyElement.of("thekla4j.browser.element.wait.factor", Option.of("1"),
     "multiplier for the wait time for elements. Default is 1.0, which means no scaling.")),;
 

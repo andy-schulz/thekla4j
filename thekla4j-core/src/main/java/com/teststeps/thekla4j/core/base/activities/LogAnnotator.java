@@ -1,5 +1,10 @@
 package com.teststeps.thekla4j.core.base.activities;
 
+/**
+ * annotate activities with additional log messages
+ *
+ * @param <R> the type of the result
+ */
 @FunctionalInterface
 public interface LogAnnotator<R> {
   /**

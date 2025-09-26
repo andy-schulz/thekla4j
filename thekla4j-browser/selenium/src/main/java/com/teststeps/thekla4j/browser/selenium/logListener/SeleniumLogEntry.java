@@ -13,13 +13,26 @@ import java.util.List;
 import java.util.logging.Level;
 import org.openqa.selenium.bidi.log.GenericLogEntry;
 
+/**
+ * Implementation of the LogEntry interface representing a log entry from Selenium WebDriver.
+ */
 public class SeleniumLogEntry implements LogEntry {
-  public OffsetDateTime timestamp;
-  public LogLevel level;
-  public LogType type;
-  public String text;
-  public List<StackFrame> stacktrace;
 
+  private final OffsetDateTime timestamp;
+  private final LogLevel level;
+  private final LogType type;
+  private final String text;
+  private final List<StackFrame> stacktrace;
+
+  /**
+   * Constructor for SeleniumLogEntry.
+   *
+   * @param timestamp  the timestamp of the log entry
+   * @param level      the log level
+   * @param type       the log type
+   * @param text       the log message
+   * @param stacktrace the stack trace associated with the log entry
+   */
   public SeleniumLogEntry(OffsetDateTime timestamp, LogLevel level, LogType type, String text, List<StackFrame> stacktrace) {
     this.timestamp = timestamp;
     this.level = level;
@@ -28,8 +41,14 @@ public class SeleniumLogEntry implements LogEntry {
     this.stacktrace = stacktrace;
   }
 
+  /**
+   * Factory method to create a LogEntry instance from a GenericLogEntry.
+   *
+   * @param entry the GenericLogEntry instance
+   * @return a new LogEntry instance
+   */
   public static LogEntry of(GenericLogEntry entry) {
-    OffsetDateTime timestamp = OffsetDateTime.ofInstant(Instant.ofEpochMilli(entry.getTimestamp()), ZoneId.systemDefault());
+    OffsetDateTime timestamp = java.time.OffsetDateTime.ofInstant(Instant.ofEpochMilli(entry.getTimestamp()), ZoneId.systemDefault());
 
     LogLevel level = LogLevel.fromString(entry.getLevel() != null ? entry.getLevel().toString() : null);
 
@@ -53,8 +72,14 @@ public class SeleniumLogEntry implements LogEntry {
     return new SeleniumLogEntry(timestamp, level, type, text, stacktrace);
   }
 
+  /**
+   * Factory method to create a LogEntry instance from a selenium LogEntry.
+   *
+   * @param entry the selenium LogEntry instance
+   * @return a new LogEntry instance
+   */
   public static LogEntry of(org.openqa.selenium.logging.LogEntry entry) {
-    OffsetDateTime timestamp = OffsetDateTime.ofInstant(
+    OffsetDateTime timestamp = java.time.OffsetDateTime.ofInstant(
       Instant.ofEpochMilli(entry.getTimestamp()),
       ZoneId.systemDefault());
     LogLevel level = fromJavaUtilLoggingLevel(entry.getLevel());
@@ -64,31 +89,52 @@ public class SeleniumLogEntry implements LogEntry {
     return new SeleniumLogEntry(timestamp, level, type, text, stacktrace);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public OffsetDateTime getTimestamp() {
     return timestamp;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public LogLevel getLevel() {
     return level != null ? level : null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public LogType getType() {
     return type;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getText() {
     return text;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<StackFrame> getStacktrace() {
     return stacktrace;
   }
 
+  /**
+   * Converts a java.util.logging.Level to a LogLevel.
+   *
+   * @param level the java.util.logging.Level
+   * @return the corresponding LogLevel
+   */
   public static LogLevel fromJavaUtilLoggingLevel(Level level) {
     if (level == null) return LogLevel.OTHER;
     return switch (level.toString()) {
@@ -101,6 +147,9 @@ public class SeleniumLogEntry implements LogEntry {
     };
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
