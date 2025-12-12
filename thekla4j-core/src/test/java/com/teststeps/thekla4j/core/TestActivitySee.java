@@ -17,6 +17,7 @@ import com.teststeps.thekla4j.core.tasks.TaskSucceeding;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Predicate;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -397,6 +398,28 @@ public class TestActivitySee {
 
     assertThat("sub entry 5 should be a ValidateResult action", log.activityNodes.get(0).activityNodes.get(6).name, equalTo("ValidateResult"));
     assertThat("sub entry 5 is a passed activity", log.activityNodes.get(0).activityNodes.get(6).status, equalTo(ActivityStatus.passed));
+  }
+
+  @Test
+  public void failingAfterTenSeconds() {
+
+    Actor tester = Actor.named("Tester");
+
+    Instant start = Instant.now();
+
+    Either<ActivityError, Void> val =
+        tester.attemptsTo(
+          See.ifThe(TaskSucceeding.after(20).waitBetween(Duration.ofSeconds(2)))
+              .forAsLongAs(Duration.ofSeconds(10))
+              .is(Expected.to.pass(x -> x > 50, "fails as 20 can never be reached")));
+
+    Instant end = Instant.now();
+
+    assertThat("Either should be failed", val.isLeft());
+    Duration duration = Duration.between(start, end);
+    log.info("Duration was: {}", duration);
+    assertThat("Duration should be at least 10 seconds", duration.toSeconds() >= 9);
+    assertThat("Duration should be less than 15 seconds", duration.toSeconds() < 12);
   }
 
 }

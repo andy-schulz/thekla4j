@@ -9,6 +9,7 @@ import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.tasks.CountingTask;
 import com.teststeps.thekla4j.core.tasks.StaticStringTask;
 import com.teststeps.thekla4j.core.tasks.T_V2V_Failing;
+import com.teststeps.thekla4j.core.tasks.TaskSucceeding;
 import com.teststeps.thekla4j.core.tasks.WaitUntil;
 import io.vavr.control.Either;
 import java.time.Duration;
@@ -184,4 +185,29 @@ public class TestActivityRetry {
     assertThat("check retry succeeds with correct result", result.getLeft().getMessage(),
       equalTo("Retrying task CountingTask timed out after 1 seconds with result:\n\t 4 \n\t message: wait until called for 100 times\n"));
   }
+
+  @Test
+  void failRetryWithTimeout() {
+    Actor tester = Actor.named("Tester");
+
+    Instant start = Instant.now();
+
+    Either<ActivityError, Integer> result = tester.attemptsTo(
+      Retry.task(TaskSucceeding.after(20).waitBetween(Duration.ofSeconds(2)))
+          .until(__ -> true, "wait until called for 100 times")
+          .forAsLongAs(Duration.ofSeconds(10))
+          .every(Duration.ofMillis(1)));
+
+    Instant end = Instant.now();
+    long duration = Duration.between(start, end).toSeconds();
+
+    assertThat("check retry fails within 10 seconds", duration, Matchers.lessThan(12L));
+
+
+    assertThat("check retry fails", result.isLeft(), equalTo(true));
+    assertThat("check retry succeeds with correct result", result.getLeft().getMessage(),
+      equalTo("Retrying task CountingTask timed out after 1 seconds with result:\n\t 4 \n\t message: wait until called for 100 times\n"));
+  }
+
+
 }

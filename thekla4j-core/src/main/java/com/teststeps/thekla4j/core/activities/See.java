@@ -59,7 +59,7 @@ public class See<P, M> extends Interaction<P, P> {
       };
 
   private Duration timeout() {
-    return duration.multipliedBy(SEE_WAIT_FACTOR.asInteger());
+    return duration;
   }
 
   private See(Activity<P, M> question) {
@@ -153,6 +153,17 @@ public class See<P, M> extends Interaction<P, P> {
    * @return the See activity
    */
   public See<P, M> forAsLongAs(Duration duration) {
+
+    if (SEE_WAIT_FACTOR.asInteger() > 1) {
+
+      log.warn("Thekla4j property '{}' is set to {}. This will increase the retry timeout from {} to {} seconds",
+        SEE_WAIT_FACTOR.property().name(), SEE_WAIT_FACTOR.asInteger(), duration.getSeconds(), duration.multipliedBy(SEE_WAIT_FACTOR.asInteger())
+            .getSeconds());
+
+      this.duration = duration.multipliedBy(SEE_WAIT_FACTOR.asInteger());
+      return this;
+    }
+
     this.duration = duration;
     return this;
   }

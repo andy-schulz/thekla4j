@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Retry the task for as long as the timeout and retry every delay
@@ -27,6 +28,7 @@ import lombok.AllArgsConstructor;
  * @param <I> - the input type
  * @param <O> - the output type
  */
+@Log4j2(topic = "Retry activity")
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Workflow("retry (@{reason}) executing task for as long as @{timeout} and retry every @{delay}")
 public class Retry<I, O> extends Task<I, O> {
@@ -46,7 +48,7 @@ public class Retry<I, O> extends Task<I, O> {
   private String reason;
 
   private Duration timeout() {
-    return forAsLongAs.multipliedBy(RETRY_WAIT_FACTOR.asInteger());
+    return forAsLongAs;
   }
 
   private final Function7<Instant, Duration, Duration, Function0<Either<ActivityError, O>>, AttemptsWith<O, Either<ActivityError, Boolean>>, Either<ActivityError, O>, String, Either<ActivityError, O>> repeat =
@@ -161,7 +163,15 @@ public class Retry<I, O> extends Task<I, O> {
    * @return - the retry task
    */
   public Retry<I, O> forAsLongAs(Duration forAsLongAs) {
-    this.forAsLongAs = forAsLongAs;
+
+    if (RETRY_WAIT_FACTOR.asInteger() > 1) {
+      log.warn("Thekla4j property '{}' is set to {}. This will increase the retry timeout from {} to {} seconds",
+        RETRY_WAIT_FACTOR.property().name(), RETRY_WAIT_FACTOR.asInteger(), forAsLongAs.getSeconds(), forAsLongAs.multipliedBy(RETRY_WAIT_FACTOR
+            .asInteger()).getSeconds());
+      this.forAsLongAs = forAsLongAs.multipliedBy(RETRY_WAIT_FACTOR.asInteger());
+    } else {
+      this.forAsLongAs = forAsLongAs;
+    }
     return this;
   }
 
