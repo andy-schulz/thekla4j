@@ -197,6 +197,15 @@ public interface Browser {
   Try<String> url();
 
   /**
+   * Count the number of elements found by given element locator
+   *
+   * @param element the element locator to count
+   * @return a Try containing the number of elements found
+   */
+  Try<Integer> countElements(Element element);
+
+
+  /**
    * Get a cookie by name
    *
    * @param name the name of the cookie to get

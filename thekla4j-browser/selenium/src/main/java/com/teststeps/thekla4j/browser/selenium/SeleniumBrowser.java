@@ -391,6 +391,12 @@ public class SeleniumBrowser implements Browser, BrowserLog {
         .flatMap(getUrl::apply);
   }
 
+  @Override
+  public Try<Integer> countElements(Element element) {
+    return driverLoader.driver()
+        .flatMap(d -> countElements.apply(d, element));
+  }
+
   /**
    * {@inheritDoc}
    */

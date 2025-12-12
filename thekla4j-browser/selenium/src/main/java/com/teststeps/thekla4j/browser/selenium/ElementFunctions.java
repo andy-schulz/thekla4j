@@ -289,6 +289,11 @@ class ElementFunctions {
       driver -> Try.of(driver::getCurrentUrl)
           .onFailure(log::error);
 
+  final static Function2<RemoteWebDriver, Element, Try<Integer>> countElements =
+      (driver, element) -> findElementsWithoutScrolling(driver, element)
+          .map(List::size)
+          .onFailure(log::error);
+
   private static final String scrollElementInArea =
       """
           var element = arguments[0];
