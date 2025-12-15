@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.http.integration;
+package com.teststeps.thekla4j.http.integration.huc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,6 +37,21 @@ public class IT_Get {
         .peek(r -> assertThat("cookie value", r.cookies().get(0).value(), equalTo("testValue")))
         .peek(r -> assertThat("cookie path", r.cookies().get(0).path(), equalTo("/")))
         .peek(r -> assertThat("cookie domain", r.cookies().get(0).domain(), equalTo("test-step.de/")))
+        .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void checkHeadersInGetResponse() throws ActivityError {
+    Actor tester = Actor.named("Tester")
+        .whoCan(UseTheRestApi.with(HcHttpClient.using(HttpOptions.empty())));
+
+    Request httpBin = Request.on(httpBinHost + "/response-headers?Test-Header=HeaderValue");
+
+    tester.attemptsTo(
+      Get.from(httpBin))
+        .peek(r -> assertThat("test header exists:", r.headers().get("Test-Header").isDefined(), equalTo(true)))
+        .peek(r -> assertThat("number of header values", r.headers().get("Test-Header").get().size(), equalTo(1)))
+        .peek(r -> assertThat("header value", r.headers().get("Test-Header").get().head(), equalTo("HeaderValue")))
         .getOrElseThrow(Function.identity());
   }
 }

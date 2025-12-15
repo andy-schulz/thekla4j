@@ -95,7 +95,7 @@ HttpOptions options = HttpOptions.empty()
         Cookie.of("csrfToken", "token456")
     ));
 
-HttpClient client = HcHttpClient.using(options);
+HttpClient client = JavaNetHttpClient.using(options);
 ```
 
 ## Parsing Cookies from Strings

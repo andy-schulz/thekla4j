@@ -14,6 +14,7 @@ import com.teststeps.thekla4j.http.spp.HttpHeaderType;
 import com.teststeps.thekla4j.http.spp.HttpHeaderValue;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import io.vavr.control.Option;
+import java.time.Duration;
 import java.util.HashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -283,15 +284,25 @@ public class TestHttpOption {
   @DisplayName("Test default response timeout")
   void testDefaultResponseTimeout() {
     HttpOptions options = HttpOptions.empty();
-    assertEquals(60000, options.getResponseTimeout(), "responseTimeout should be set to 30000");
+    assertEquals(Duration.ofSeconds(60), options.getResponseTimeout(), "responseTimeout should be set to 30000");
   }
 
   @Test
-  @DisplayName("Test setting responseTimeout")
+  @DisplayName("Test setting responseTimeout as int")
   void testSetResponseTimeout() {
-    int expectedTimeout = 5000;
-    HttpOptions options = HttpOptions.empty().responseTimeout(expectedTimeout);
-    assertEquals(expectedTimeout, options.getResponseTimeout(), "responseTimeout should be set to 5000");
+    Duration expectedTimeout = Duration.ofSeconds(5);
+
+    HttpOptions options = HttpOptions.empty().responseTimeout(5000);
+    assertEquals(expectedTimeout, options.getResponseTimeout(), "responseTimeout should be set to 5s");
+  }
+
+  @Test
+  @DisplayName("Test setting responseTimeout as Duration")
+  void testSetResponseTimeoutAsDuration() {
+    Duration expectedTimeout = Duration.ofSeconds(5);
+
+    HttpOptions options = HttpOptions.empty().responseTimeout(Duration.ofSeconds(5));
+    assertEquals(expectedTimeout, options.getResponseTimeout(), "responseTimeout should be set to 5s");
   }
 
   @Test

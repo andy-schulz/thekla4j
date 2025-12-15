@@ -2,10 +2,12 @@ package com.teststeps.thekla4j.http.httpConn;
 
 import com.teststeps.thekla4j.http.core.HttpClient;
 import com.teststeps.thekla4j.http.core.HttpRequest;
+import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import java.util.function.Function;
 
 public class HcHttpClient implements HttpClient {
 
@@ -16,13 +18,15 @@ public class HcHttpClient implements HttpClient {
   }
 
   @Override
-  public Either<Throwable, HttpRequest> request(Request request, HttpOptions activityOptions) {
+  public Either<Throwable, HttpResult> send(Request request, HttpOptions activityOptions, Function<HttpRequest, Either<Throwable, HttpResult>> requestMethod) {
 
     return Try.of(() -> HcHttpRequest.on(request.resource)
         .doing(request.description)
-        .using(activityOptions.mergeOnTopOf(request.options)
+        .using(activityOptions
+            .mergeOnTopOf(request.options)
             .mergeOnTopOf(this.clientHttpOptions)))
-        .toEither();
+        .toEither()
+        .flatMap(requestMethod);
   }
 
   @Override

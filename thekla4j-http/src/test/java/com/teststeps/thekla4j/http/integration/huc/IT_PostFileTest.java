@@ -1,4 +1,4 @@
-package com.teststeps.thekla4j.http.integration;
+package com.teststeps.thekla4j.http.integration.huc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;

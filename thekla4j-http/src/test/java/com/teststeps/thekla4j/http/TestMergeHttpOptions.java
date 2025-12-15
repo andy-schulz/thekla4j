@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.teststeps.thekla4j.http.spp.HttpOptions;
+import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -111,38 +112,38 @@ public class TestMergeHttpOptions {
   @Test
   @DisplayName("Test merge custom response timeout on default response timeout")
   public void testMergeHttpOptionsOfResponseTimeout() {
-    int customTimeout = 5000;
+    Duration customTimeout = Duration.ofSeconds(5);
     HttpOptions timeoutOptions = HttpOptions.empty().responseTimeout(customTimeout);
     HttpOptions defaultOptions = HttpOptions.empty();
 
     HttpOptions mergedOptions = timeoutOptions.mergeOnTopOf(defaultOptions);
 
-    assertThat("responseTimeout is set to default", mergedOptions.getResponseTimeout(), equalTo(customTimeout));
+    assertThat("responseTimeout is set to default", mergedOptions.getResponseTimeout(), equalTo(Duration.ofSeconds(5)));
   }
 
   @Test
   @DisplayName("Test merge default timeout on custom timeout")
   public void testMergeHttpOptionsOfResponseTimeout1() {
-    int customTimeout = 5000;
+    Duration customTimeout = Duration.ofSeconds(5);
     HttpOptions timeoutOptions = HttpOptions.empty().responseTimeout(customTimeout);
     HttpOptions defaultOptions = HttpOptions.empty();
 
     HttpOptions mergedOptions = defaultOptions.mergeOnTopOf(timeoutOptions);
 
-    assertThat("responseTimeout is set", mergedOptions.getResponseTimeout(), equalTo(customTimeout));
+    assertThat("responseTimeout is set", mergedOptions.getResponseTimeout(), equalTo(Duration.ofSeconds(5)));
   }
 
   @Test
-  @DisplayName("merge customt timeout on top of custom timeout")
+  @DisplayName("merge custom timeout on top of custom timeout")
   public void testMergeHttpOptionsOfResponseTimeout2() {
-    int customTimeout1 = 5000;
-    int customTimeout2 = 10000;
+    Duration customTimeout1 = Duration.ofSeconds(5);
+    Duration customTimeout2 = Duration.ofSeconds(10);
     HttpOptions timeoutOptions1 = HttpOptions.empty().responseTimeout(customTimeout1);
     HttpOptions timeoutOptions2 = HttpOptions.empty().responseTimeout(customTimeout2);
 
     HttpOptions mergedOptions = timeoutOptions2.mergeOnTopOf(timeoutOptions1);
 
-    assertThat("responseTimeout is set", mergedOptions.getResponseTimeout(), equalTo(customTimeout2));
+    assertThat("responseTimeout is set", mergedOptions.getResponseTimeout(), equalTo(Duration.ofSeconds(10)));
   }
 
   @Test

@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import lombok.NonNull;
 
 public class HttpOptions {
 
-  public final int DEFAULT_TIMEOUT = 60000;
+  public final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
   public final boolean DEFAULT_FOLLOW_REDIRECTS = true;
   public final boolean DEFAULT_DISABLE_SSL_CERTIFICATE_VALIDATION = false;
 
@@ -33,15 +34,15 @@ public class HttpOptions {
    * Default timeout to receive a response from server. Overwrite this value for long running requests where needed,
    * calling responseTimeout() setter
    */
-  private int responseTimeout = 0;
+  private Duration responseTimeout = Duration.ZERO;
 
   /**
    * Getters
    * 
    * @return int value of responseTimeout
    */
-  public int getResponseTimeout() {
-    return responseTimeout <= 0 ? DEFAULT_TIMEOUT : responseTimeout;
+  public Duration getResponseTimeout() {
+    return responseTimeout == Duration.ZERO ? DEFAULT_TIMEOUT : responseTimeout;
   }
 
   /**
@@ -168,6 +169,11 @@ public class HttpOptions {
         .setFollowRedirects(followRedirects);
   }
 
+  public HttpOptions responseTimeout(Duration timeOut) {
+    return getNewRestOptions()
+        .setResponseTimeout(timeOut);
+  }
+
   public HttpOptions responseTimeout(int timeOut) {
     return getNewRestOptions()
         .setResponseTimeout(timeOut);
@@ -198,7 +204,7 @@ public class HttpOptions {
     }
 
 
-    if (this.responseTimeout > 0) {
+    if (this.responseTimeout != Duration.ZERO) {
       clone.setResponseTimeout(this.responseTimeout);
     }
 
@@ -274,7 +280,12 @@ public class HttpOptions {
     return this;
   }
 
-  private HttpOptions setResponseTimeout(int timeOut) {
+  private HttpOptions setResponseTimeout(int timeOutInMillis) {
+    this.responseTimeout = Duration.ofMillis(timeOutInMillis);
+    return this;
+  }
+
+  private HttpOptions setResponseTimeout(Duration timeOut) {
     this.responseTimeout = timeOut;
     return this;
   }
@@ -314,7 +325,7 @@ public class HttpOptions {
   }
 
   private HttpOptions(
-                      Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> pathParameters, Map<String, String> formParameters, String baseUrl, int port, String body, Boolean disableSSLCertificateValidation, int responseTimeout, Boolean followRedirects
+                      Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> pathParameters, Map<String, String> formParameters, String baseUrl, int port, String body, Boolean disableSSLCertificateValidation, Duration responseTimeout, Boolean followRedirects
   ) {
     // clone fields of request
 

@@ -14,6 +14,7 @@ import com.teststeps.thekla4j.http.spp.multipart.FilePart;
 import com.teststeps.thekla4j.http.spp.multipart.Part;
 import io.vavr.Function1;
 import io.vavr.Function3;
+import io.vavr.NotImplementedError;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
@@ -199,7 +200,7 @@ public class HcHttpRequest implements HttpRequest {
 
   @Override
   public Either<Throwable, HttpResult> patch() {
-    return null;
+    return Either.left(new NotImplementedError("PATCH method is not implemented in HcHttpClient. Please use the JavaNetHttpClient implementation."));
   }
 
   @Override
@@ -378,7 +379,7 @@ public class HcHttpRequest implements HttpRequest {
     this.connection = this.init(resource, opts)
         .getOrElseThrow(ex -> new Exception(ex.toString(), ex));
 //                .onSuccess(con -> this.connection = con);
-    this.connection.setReadTimeout(opts.getResponseTimeout());
+    this.connection.setReadTimeout((int) opts.getResponseTimeout().toMillis());
     this.opts = opts;
   }
 }

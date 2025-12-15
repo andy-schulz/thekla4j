@@ -10,13 +10,37 @@ nav_order: 1500
 
 ## Using Abilities
 
-To interact with REST APIs, an actor needs to have the `UseTheRestApi` ability. An HTTP client is passed as a parameter to the ability, which handles the HTTP communication. Currently, there is an Apache HttpComponents-based client available (`HcHttpClient`).
+To interact with REST APIs, an actor needs to have the `UseTheRestApi` ability. An HTTP client is passed as a parameter to the ability, which handles the HTTP communication. 
+Currently, there are two implementations available:
+
+- `HcHttpClient` - based on HttpURLConnection
+- `JavaNetHttpClient` - based on Java 11+ HttpClient
+
+```java
+HttpClient httpClient = HcHttpClient.using(
+    HttpOptions.empty()
+        .baseUrl("https://api.example.com")
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json")
+);
+```
+
+```java
+HttpClient httpClient = JavaNetHttpClient.using(
+    HttpOptions.empty()
+        .baseUrl("https://api.example.com")
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json")
+);
+```
+
+Calling a simple GET witht he ``JavaNetHttpClient``
 
 ```java
 Actor actor = Actor.named("ApiTester");
 
 // Create HTTP client with base configuration
-HttpClient httpClient = HcHttpClient.using(
+HttpClient httpClient = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl("https://api.example.com")
         .header("Content-Type", "application/json")
@@ -32,7 +56,7 @@ actor.attemptsTo(
 );
 ```
 
-Any HTTP client has to implement the `HttpClient` interface:
+Any new HTTP client has to implement the `HttpClient` interface:
 
 ```java
 com.teststeps.thekla4j.http.core.HttpClient
@@ -158,10 +182,10 @@ actor.attemptsTo(Get.from(request));
 
 ```java
 // Basic client
-HttpClient client = HcHttpClient.using(HttpOptions.empty());
+HttpClient client = JavaNetHttpClient.using(HttpOptions.empty());
 
 // Client with base configuration
-HttpClient client = HcHttpClient.using(
+HttpClient client = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl("https://api.example.com")
         .header("User-Agent", "Thekla4j-HTTP-Client/1.0")
@@ -170,7 +194,7 @@ HttpClient client = HcHttpClient.using(
 );
 
 // Client for specific environment
-HttpClient stagingClient = HcHttpClient.using(
+HttpClient stagingClient = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl("https://staging-api.example.com")
         .header("Authorization", "Bearer staging-token")
@@ -188,7 +212,7 @@ HTTP options are merged in the following order (later options override earlier o
 
 ```java
 // Client level (base configuration)
-HttpClient client = HcHttpClient.using(
+HttpClient client = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl("https://api.example.com")
         .header("Accept", "application/json")
@@ -296,7 +320,7 @@ actor.attemptsTo(
 Set common configuration at the client level:
 
 ```java
-HttpClient apiClient = HcHttpClient.using(
+HttpClient apiClient = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl(System.getProperty("api.base.url", "https://api.example.com"))
         .header("User-Agent", "MyApp-Tests/1.0")
@@ -324,7 +348,7 @@ String baseUrl = System.getProperty("test.environment", "staging").equals("produ
     ? "https://api.example.com" 
     : "https://staging-api.example.com";
 
-HttpClient client = HcHttpClient.using(
+HttpClient client = JavaNetHttpClient.using(
     HttpOptions.empty()
         .baseUrl(baseUrl)
         .disableSSLCertificateValidation(!isProduction)

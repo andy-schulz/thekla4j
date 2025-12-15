@@ -5,11 +5,13 @@ import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
 import com.teststeps.thekla4j.http.core.HttpClient;
 import com.teststeps.thekla4j.http.core.HttpRequest;
+import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import java.util.function.Function;
 
 public class UseTheRestApi implements Ability {
 
@@ -23,8 +25,8 @@ public class UseTheRestApi implements Ability {
     return new UseTheRestApi(httpClient);
   }
 
-  public Either<Throwable, HttpRequest> send(Request spe, HttpOptions activityOptions) {
-    return this.httpClient.request(spe, activityOptions);
+  public Either<Throwable, HttpResult> send(Request spe, HttpOptions activityOptions, Function<HttpRequest, Either<Throwable, HttpResult>> method) {
+    return this.httpClient.send(spe, activityOptions, method);
   }
 
   private UseTheRestApi(HttpClient httpClient) {
