@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.core.base.activities;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.activities.Retry;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
@@ -152,5 +153,14 @@ public abstract class ConsumerTask<PT> extends Activity<PT, Void> {
    */
   final public LogAnnotatorThrows<AttemptsWithThrows<PT, Void>> runAs$(Performer performer) {
     return (group, description) -> input -> performer.attemptsTo$_(this, group, description).using(input);
+  }
+
+  /**
+   * Retry the task for 5 seconds
+   *
+   * @return a Retry task
+   */
+  final public Retry<PT, Void> retry() {
+    return Retry.task(this).until(r -> true, "retry consumer " + this.getClass().getSimpleName());
   }
 }

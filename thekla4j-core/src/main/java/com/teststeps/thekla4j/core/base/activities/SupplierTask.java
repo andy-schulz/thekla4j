@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.core.base.activities;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.activities.Retry;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
+import java.util.function.Predicate;
 import lombok.NonNull;
 
 /**
@@ -109,5 +111,16 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    */
   final public LogAnnotatorThrows<RT> runAs$(Performer performer) throws ActivityError {
     return (group, description) -> performer.attemptsTo$(this, group, description);
+  }
+
+  /**
+   * Create a retry for this supplier task
+   *
+   * @param predicate - the predicate to check if the task should be retried
+   * @return - the retry task
+   */
+  final public Retry<Void, RT> retry(Predicate<RT> predicate) {
+    return Retry.task(this)
+        .until(predicate, "retry supplier task " + this.getClass().getSimpleName() + " until predicate is met");
   }
 }

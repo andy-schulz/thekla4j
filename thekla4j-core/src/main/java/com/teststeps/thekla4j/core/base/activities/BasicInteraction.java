@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.core.base.activities;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.activities.Retry;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
@@ -109,5 +110,13 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
     return (group, description) -> performer.attemptsTo$(this, group, description);
   }
 
-
+  /**
+   * Retry the activity for 5 seconds
+   *
+   * @return a Retry task
+   */
+  public Retry<Void, Void> retry() {
+    return Retry.task(this)
+        .until(r -> true, "retry " + this.getClass().getSimpleName());
+  }
 }
