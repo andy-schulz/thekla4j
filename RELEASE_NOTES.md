@@ -2,9 +2,39 @@
 
 ## Table of Contents
 
+- [Release Notes v2.1.0](#release-notes-v210)
 - [Release Notes v2.0.1](#release-notes-v201)
 - [Release Notes v2.0.0](#release-notes-v200)
 - [Release Notes v1.7.0](#release-notes-v170)
+
+---
+
+# Release Notes v2.1.0
+
+## Overview
+Version 2.1.0 introduces a unified retry mechanism for all task types, enhancing stability for flaky interactions. It also brings a new Java HttpClient implementation, a new Count task for browser interactions, and various improvements to assertions and documentation.
+
+## New Features
+- **Retry Mechanism**: Implemented a fluent `retry()` API for all task types (`BasicInteraction`, `ConsumerTask`, `SupplierTask`, `Task`) (2e4eb98).
+    - `BasicInteraction` & `ConsumerTask`: Retries until the task succeeds (no exception/error).
+    - `SupplierTask` & `Task`: Retries until a provided `Predicate` is met.
+    - Configurable timeout and polling interval.
+    - **Wait Factor**: Implemented wait factor for Retry and See activity (5828645).
+- **Browser Capabilities**:
+    - **Count Task**: Implement Count task to count the number of elements found on a page (8412bf6).
+- **HTTP Module**:
+    - **Java HttpClient**: Implement new Java HttpClient implementation (558ca5e).
+- **Assertions**:
+    - **AssertionError**: Return AssertionError in assertion lib (738fba5).
+
+## Bug Fixes
+- **Mobile Browser**: Fix compile issues in MobileBrowser.java (a756104).
+
+## Documentation
+- **Browser Activities**: Updated documentation for all browser interactions to include the new `retry()` method usage (b3f2809).
+- **Property Interaction**: Added detailed documentation for the `Property` interaction, clarifying the distinction between HTML Attributes and DOM Properties.
+- **Core Features**: Updated `CORE.md` with examples and explanations of the new retry capabilities.
+- **Code Documentation**: Added code documentation and Javadoc to classes (57998e6, 0cbb84c).
 
 ---
 
