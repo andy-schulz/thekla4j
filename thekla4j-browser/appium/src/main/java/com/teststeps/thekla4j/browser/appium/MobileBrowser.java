@@ -225,6 +225,14 @@ public class MobileBrowser implements Browser, BrowserLog {
    * {@inheritDoc}
    */
   @Override
+  public Try<Integer> countElements(Element element) {
+    return seleniumBrowser.countElements(element);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<Cookie> getCookie(String name) {
     return seleniumBrowser.getCookie(name);
   }
