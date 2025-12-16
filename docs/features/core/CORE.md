@@ -178,10 +178,82 @@ class UploadAFile implements BasicInteraction {
 A ConsumerTask is a task that consumes an input and performs an action without returning a result.
 Example: Logging a message, updating a database record.
 
+```java
+class WriteSystemLog extends ConsumerTask<String> {
+  
+    SystemLog log = new SystemLog();
+  
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor, String message) {
+      
+        if(log.isWritable()){
+            log.write(message);
+            return Either.right(null);
+        }
+        
+        return Either.left(new ActivityError("System log is not writable"));
+        
+    }
+
+    public static LogMessage ofIncomingMessage() {
+        return new LogMessage();
+    }
+}
+```
 
 #### SupplierTask
 A SupplierTask is a task that supplies a result without requiring any input.
 Example: Generating a random number, fetching the current date and time.
+
+```java
+class GetCurrentTime extends SupplierTask<Long> {
+    @Override
+    protected Either<ActivityError, Long> performAs(Actor actor) {
+        // Return the current time
+        return Either.right(System.currentTimeMillis());
+    }
+
+    public static GetCurrentTime now() {
+        return new GetCurrentTime();
+    }
+}
+```
+
+### Retrying Interactions
+
+All task types support a `retry()` mechanism, but the signature differs slightly depending on whether the task returns a value or not.
+
+#### BasicInteraction and ConsumerTask
+For tasks that do not return a value (`BasicInteraction` and `ConsumerTask`), the `retry()` method takes no arguments. The task is retried until it succeeds (i.e., does not return an error) or the timeout is reached.
+
+```java
+// BasicInteraction
+actor.attemptsTo(
+    Click.on(SubmitButton).retry()
+);
+
+// ConsumerTask
+actor.attemptsTo(
+    WriteSystemLog.ofIncomingMessage().retry()
+);
+```
+
+#### SupplierTask and Task
+For tasks that return a value (`SupplierTask` and `Task`), the `retry()` method requires a `Predicate` to determine if the result is acceptable. The task is retried until the predicate returns `true` or the timeout is reached.
+
+```java
+// SupplierTask
+actor.attemptsTo(
+    GetCurrentTime.now().retry(time -> time > expectedTime)
+);
+
+// Task
+actor.attemptsTo(
+    Authorize.toBackend(url).retry(token -> token != null && !token.isEmpty())
+);
+```
+
+The default retry duration is 5 seconds for all task types. You can customize the duration using `.forAsLongAs(Duration)` on the returned `Retry` object.
 
 ## Task Execution
 

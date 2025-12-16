@@ -25,6 +25,7 @@ The following activities are currently implemented to interact with a browser.
 | [Title](#title)                         | Returns the page title                                  |
 | [Url](#url)                             | Returns the page url                                    |
 | [Attribute](#attribute)                 | Get the attribute value of an element                   |
+| [Property](#property)                   | Get the property value of an element                    |
 | [Value](#value)                         | Get the value of the "value"-attribute of an element    |
 | [ElementState](#elementstate)           | Get the state of an element (present, visible, enabled) |
 | [Text](#test)                           | Get the text of an element                              |
@@ -62,9 +63,10 @@ ___
 
 Methods:
 
-| type   | name             | description                 |
-|--------|------------------|-----------------------------|
-| static | ``to( String )`` | Navigates to the given URL. |
+| type      | name             | description                           |
+|-----------|------------------|---------------------------------------|
+| static    | ``to( String )`` | Navigates to the given URL.           |
+| inherited | ``retry()``      | Retries navigation until it succeeds. |
 
 Returns:
 
@@ -98,9 +100,10 @@ ___
 
 Methods:
 
-| type   | name                                                            | description                  |
-|--------|-----------------------------------------------------------------|------------------------------|
-| static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Clicks on the given element. |
+| type      | name                                                            | description                         |
+|-----------|-----------------------------------------------------------------|-------------------------------------|
+| static    | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Clicks on the given element.        |
+| inherited | ``retry()``                                                     | Retries clicking until it succeeds. |
 
 Returns:
 
@@ -126,6 +129,12 @@ class TestSuite {
   void runAsTest() {
     Click.on(element).runAs(actor);
   }
+
+  @Test
+  void retryClickTest() {
+    actor.attemptsTo(
+        Click.on(element).retry());
+  }
 }
 ```
 
@@ -135,9 +144,10 @@ ___
 
 Methods:
 
-| type   | name                                                            | description                   |
-|--------|-----------------------------------------------------------------|-------------------------------|
-| static | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Double clicks on the element. |
+| type      | name                                                            | description                                |
+|-----------|-----------------------------------------------------------------|--------------------------------------------|
+| static    | ``on( ``[``Element``](./browser_elements#finding-elements)``)`` | Double clicks on the element.              |
+| inherited | ``retry()``                                                     | Retries double clicking until it succeeds. |
 
 Returns:
 
@@ -163,6 +173,12 @@ class TestSuite {
   void runAsTest() {
     DoubleClick.on(element).runAs(actor);
   }
+
+  @Test
+  void retryDoubleClickTest() {
+    actor.attemptsTo(
+        DoubleClick.on(element).retry());
+  }
 }
 ```
 
@@ -172,11 +188,12 @@ ___
 
 Methods:
 
-| type   | name                                                                                      | description                                               |
-|--------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| static | ``text( String )``                                                                        | Enters the given text.                                    |
-|        | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                   |
-|        | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it. |
+| type      | name                                                                                      | description                                               |
+|-----------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| static    | ``text( String )``                                                                        | Enters the given text.                                    |
+|           | ``into( ``[``Element``](./browser_elements#finding-elements.md#Finding_Elements)``)``     | Enters the text into the given element.                   |
+|           | ``intoCleared( ``[``Element``](./browser_elements#finding-elements#Finding Elements)``)`` | Enters the text into the given element after clearing it. |
+| inherited | ``retry()``                                                                               | Retries entering the text until it succeeds.              |
 
 Returns:
 
@@ -220,14 +237,15 @@ ___
 
 Methods:
 
-| type   | name                                | description                                        |
-|--------|-------------------------------------|----------------------------------------------------|
-| static | ``press( Key... keys )``            | Presses the given key / key combination.           |
-| static | ``pressAndHold( Key... keys )``     | Presses and hold the given key / key combinations  |
-| static | ``release( Key... keys )``          | Releases the given key / key combination.          |
-|        | ``thenPressAndHold( Key... keys )`` | Presses and holds then given key / key combination |
-|        | ``thenRelease( Key... keys )``      | Releases the given key / key combination.          |
-|        | ``thenPress( Key... keys )``        | Presses the given key / key combination.           |
+| type      | name                                | description                                        |
+|-----------|-------------------------------------|----------------------------------------------------|
+| static    | ``press( Key... keys )``            | Presses the given key / key combination.           |
+| static    | ``pressAndHold( Key... keys )``     | Presses and hold the given key / key combinations  |
+| static    | ``release( Key... keys )``          | Releases the given key / key combination.          |
+|           | ``thenPressAndHold( Key... keys )`` | Presses and holds then given key / key combination |
+|           | ``thenRelease( Key... keys )``      | Releases the given key / key combination.          |
+|           | ``thenPress( Key... keys )``        | Presses the given key / key combination.           |
+| inherited | ``retry()``                         | Retries the key action until it succeeds.          |
 
 Returns:
 
@@ -286,9 +304,10 @@ ___
 
 Methods:
 
-| type   | name         | description                         |
-|--------|--------------|-------------------------------------|
-| static | ``ofPage()`` | Gets the title of the current page. |
+| type      | name                         | description                                                                  |
+|-----------|------------------------------|------------------------------------------------------------------------------|
+| static    | ``ofPage()``                 | Gets the title of the current page.                                          |
+| inherited | ``retry(Predicate<String>)`` | Retries getting the title until it succeeds and the passed predicate is met. |
 
 Returns:
 
@@ -323,6 +342,12 @@ class TestSuite {
     Navigate.to("https://www.google.com").runAs(actor);
     See.ifThe(Title.ofPage()).is(Expected.to.equal("Google")).runAs(actor);
   }
+
+  @Test
+  void retryTitleTest() {
+    actor.attemptsTo(
+        Title.ofPage().retry(title -> title.contains("Google")));
+  }
 }
 ```
 
@@ -332,9 +357,10 @@ ___
 
 Methods:
 
-| type   | name         | description                       |
-|--------|--------------|-----------------------------------|
-| static | ``ofPage()`` | Gets the URL of the current page. |
+| type      | name                         | description                                                                |
+|-----------|------------------------------|----------------------------------------------------------------------------|
+| static    | ``ofPage()``                 | Gets the URL of the current page.                                          |
+| inherited | ``retry(Predicate<String>)`` | Retries getting the URL until it succeeds and the passed predicate is met. |
 
 Returns:
 
@@ -361,21 +387,37 @@ class TestSuite {
   void runAsTest() {
     See.ifThe(Url.ofPage()).is(Expected.to.equal("https://www.google.com")).runAs(actor);
   }
+
+  @Test
+  void retryUrlTest() {
+    actor.attemptsTo(
+        Url.ofPage().retry(url -> url.contains("google.com")));
+  }
 }
 ```
 
 ___
 
-### Attribute
+### Attribute vs Property
+
+**Difference between Attribute and Property:**
+
+An **Attribute** is defined in the HTML markup and represents the initial state of an element.
+Attributes are part of the DOM (Document Object Model) and can be accessed using methods like `getAttribute()`.
+
+A **Property**, on the other hand, is a representation of the current state of an element in the browser.
+
+#### Attribute
 
 Get the value of an attribute of an element.
 
 Methods:
 
-| type   | name                                                           | description                                           |
-|--------|----------------------------------------------------------------|-------------------------------------------------------|
-| static | ``named( String )``                                            | Specify the name of the Attribute to get              |
-| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Specify the element from which the attribute is read. |
+| type      | name                                                           | description                                                                      |
+|-----------|----------------------------------------------------------------|----------------------------------------------------------------------------------|
+| static    | ``named( String )``                                            | Specify the name of the Attribute to get                                         |
+| static    | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Specify the element from which the attribute is read.                            |
+| inherited | ``retry(Predicate<String>)``                                   | Retries getting the attribute until it succeeds and the passed predicate is met. |
 
 Returns:
 
@@ -410,7 +452,55 @@ class TestSuite {
 
 ___
 
+#### Property
+
+Get the value of a property of an element.
+
+Methods:
+
+| type      | name                                                           | description                                                               |
+|-----------|----------------------------------------------------------------|---------------------------------------------------------------------------|
+| static    | ``named( String )``                                            | Specify the name of the Property to get                                   |
+| static    | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Specify the element from which the property is read.                      |
+| inherited | ``retry(Predicate<String>)``                                   | Retries getting the property until it succeeds and  the predicate is met. |
+
+Returns:
+
+- ``Either<ActivityError, String>``
+
+**Code:**
+
+```java
+class TestSuite {
+
+  @BeforeAll
+  static void setup() {
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Element element = Element.found(By.css("#elementId")).withName("element");
+  }
+
+  @Test
+  void attemptsToTest() {
+    actor.attemptsTo(
+        See.ifThe(Property.named("value").of(element))
+            .is(Expected.to.equal("input value")));
+
+  }
+
+  @Test
+  void runAsTest() {
+    See.ifThe(Property.named("value").of(element))
+        .is(Expected.to.equal("input value")).runAs(actor);
+  }
+}
+```
+
+___
+
 ### Value
+
+** DEPRICATED **
+use the Property activity instead to get the "value" property of an element.
 
 Methods:
 
@@ -452,9 +542,10 @@ ___
 
 Methods:
 
-| type   | name                                                           | description                          |
-|--------|----------------------------------------------------------------|--------------------------------------|
-| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the state of the given element. |
+| type      | name                                                           | description                                                                  |
+|-----------|----------------------------------------------------------------|------------------------------------------------------------------------------|
+| static    | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the state of the given element.                                         |
+| inherited | ``retry(Predicate<State>)``                                    | Retries getting the state until it succeeds and the passed predicate is met. |
 
 Returns:
 
@@ -509,9 +600,10 @@ ___
 
 Methods:
 
-| type   | name                                                           | description                         |
-|--------|----------------------------------------------------------------|-------------------------------------|
-| static | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the text of the given element. |
+| type      | name                                                           | description                                                                 |
+|-----------|----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| static    | ``of(``[``Element``](./browser_elements#finding-elements)``)`` | Gets the text of the given element.                                         |
+| inherited | ``retry(Predicate<String>)``                                   | Retries getting the text until it succeeds and the passed predicate is met. |
 
 Returns:
 
@@ -556,11 +648,12 @@ ___
 
 Methods:
 
-| type   | name                                                           | description            |
-|--------|----------------------------------------------------------------|------------------------|
-| static | ``shape(``[``Canvas``](./CANVAS)``)``                          | Draws one shape.       |
-| static | ``shapes(``List<[``Canvas``](./CANVAS)>``)``                   | Draws multiple shapes. |
-|        | ``on(``[``Element``](./browser_elements#finding-elements)``)`` | Draws on the element   |
+| type      | name                                                           | description                        |
+|-----------|----------------------------------------------------------------|------------------------------------|
+| static    | ``shape(``[``Canvas``](./CANVAS)``)``                          | Draws one shape.                   |
+| static    | ``shapes(``List<[``Canvas``](./CANVAS)>``)``                   | Draws multiple shapes.             |
+|           | ``on(``[``Element``](./browser_elements#finding-elements)``)`` | Draws on the element               |
+| inherited | ``retry()``                                                    | Retries drawing until it succeeds. |
 
 Returns:
 
@@ -617,10 +710,11 @@ ___
 
 Methods:
 
-| type   | name                                         | description                                        |
-|--------|----------------------------------------------|----------------------------------------------------|
-| static | ``onBrowser(String script)``                 | Executes the given JavaScript code.                |
-| static | ``onElement(String script, Element elment)`` | Executes the JavaScript code on the given element. |
+| type      | name                                         | description                                         |
+|-----------|----------------------------------------------|-----------------------------------------------------|
+| static    | ``onBrowser(String script)``                 | Executes the given JavaScript code.                 |
+| static    | ``onElement(String script, Element elment)`` | Executes the JavaScript code on the given element.  |
+| inherited | ``retry()``                                  | Retries executing the JavaScript until it succeeds. |
 
 Returns:
 
@@ -662,12 +756,15 @@ class TestSuite {
 
 Methods:
 
-| type   | name                                 | description                                                                   |
-|--------|--------------------------------------|-------------------------------------------------------------------------------|
-| static | ``by(Activity)``                     | Start the download by execution the activity                                  |
-|        | ``named(String fileName)``           | check if the file with name was downloaded                                    |
-|        | ``forAsLongAs(Duration timeout)``    | time out after ``timeout`` when the download is not complete (default 10 sec) |
-|        | ``every(Duration pollingIntervall)`` | check every ``pollingIntervall`` if the download is complete (default 500 ms) |
+| type      | name                                 | description                                                                   |
+|-----------|--------------------------------------|-------------------------------------------------------------------------------|
+| static    | ``by(Activity)``                     | Start the download by execution the activity                                  |
+|           | ``named(String fileName)``           | check if the file with name was downloaded                                    |
+|           | ``forAsLongAs(Duration timeout)``    | time out after ``timeout`` when the download is not complete (default 10 sec) |
+|           | ``every(Duration pollingIntervall)`` | check every ``pollingIntervall`` if the download is complete (default 500 ms) |
+| inherited | ``retry()``                          | Retries downloading the file until it succeeds.                               |
+
+A download is complete when the file exists, and is not changing its size since the last check cycle.
 
 Returns:
 
@@ -739,11 +836,12 @@ ___
 
 Methods:
 
-| type   | name                        | description                              |
-|--------|-----------------------------|------------------------------------------|
-| static | ``file(Path filePath)``     | select the file to upload                |
-| static | ``files(Path... filePath)`` | select multiple files to upload          |
-|        | ``to(Element element)``     | select the element to upload the file(s) |
+| type      | name                        | description                                      |
+|-----------|-----------------------------|--------------------------------------------------|
+| static    | ``file(Path filePath)``     | select the file to upload                        |
+| static    | ``files(Path... filePath)`` | select multiple files to upload                  |
+|           | ``to(Element element)``     | select the element to upload the file(s)         |
+| inherited | ``retry()``                 | Retries uploading the file(s) until it succeeds. |
 
 Returns:
 
@@ -800,10 +898,11 @@ Adds cookies to the browser.
 
 Methods:
 
-| type   | name                                                   | description                            |
-|--------|--------------------------------------------------------|----------------------------------------|
-| static | ``toBrowser(``[``Cookie``](../http/http_cookies)``)``  | Adds a single cookie to the browser.   |
-| static | ``list(List<``[``Cookie``](../http/http_cookies)``>)`` | Adds a list of cookies to the browser. |
+| type      | name                                                   | description                                  |
+|-----------|--------------------------------------------------------|----------------------------------------------|
+| static    | ``toBrowser(``[``Cookie``](../http/http_cookies)``)``  | Adds a single cookie to the browser.         |
+| static    | ``list(List<``[``Cookie``](../http/http_cookies)``>)`` | Adds a list of cookies to the browser.       |
+| inherited | ``retry()``                                            | Retries adding the cookie until it succeeds. |
 
 Returns:
 
@@ -842,9 +941,10 @@ ___
 
 Methods:
 
-| type   | name              | description                         |
-|--------|-------------------|-------------------------------------|
-| static | ``named(String)`` | Gets the value of the given cookie. |
+| type      | name                         | description                                                             |
+|-----------|------------------------------|-------------------------------------------------------------------------|
+| static    | ``named(String)``            | Gets the value of the given cookie.                                     |
+| inherited | ``retry(Predicate<Cookie>)`` | Retries getting the cookie until it succeeds and matches the predicate. |
 
 Returns:
 
@@ -880,9 +980,10 @@ ___
 
 Methods:
 
-| type   | name              | description                        |
-|--------|-------------------|------------------------------------|
-| static | ``fromBrowser()`` | Gets all cookies from the browser. |
+| type      | name                               | description                                                              |
+|-----------|------------------------------------|--------------------------------------------------------------------------|
+| static    | ``fromBrowser()``                  | Gets all cookies from the browser.                                       |
+| inherited | ``retry(Predicate<List<Cookie>>)`` | Retries getting all cookies until it succeeds and matches the Predicate. |
 
 Returns:
 
@@ -916,9 +1017,10 @@ ___
 
 Methods:
 
-| type   | name              | description               |
-|--------|-------------------|---------------------------|
-| static | ``named(String)`` | Deletes the given cookie. |
+| type      | name              | description                                    |
+|-----------|-------------------|------------------------------------------------|
+| static    | ``named(String)`` | Deletes the given cookie.                      |
+| inherited | ``retry()``       | Retries deleting the cookie until it succeeds. |
 
 Returns:
 
@@ -953,9 +1055,10 @@ class TestSuite {
 
 Methods:
 
-| type   | name              | description                           |
-|--------|-------------------|---------------------------------------|
-| static | ``fromBrowser()`` | Deletes all cookies from the browser. |
+| type      | name              | description                                     |
+|-----------|-------------------|-------------------------------------------------|
+| static    | ``fromBrowser()`` | Deletes all cookies from the browser.           |
+| inherited | ``retry()``       | Retries deleting all cookies until it succeeds. |
 
 Returns:
 
@@ -989,9 +1092,10 @@ class TestSuite {
 
 Methods:
 
-| type   | name                 | description                       |
-|--------|----------------------|-----------------------------------|
-| static | ``tabsAndWindows()`` | Gets the number of open browsers. |
+| type      | name                          | description                                                                         |
+|-----------|-------------------------------|-------------------------------------------------------------------------------------|
+| static    | ``tabsAndWindows()``          | Gets the number of open browsers.                                                   |
+| inherited | ``retry(Predicate<Integer>)`` | Retries getting the number of browsers until it succeeds and matches the predicate. |
 
 Returns:
 
@@ -1029,6 +1133,7 @@ Methods:
 |--------|--------------------------------------|-------------------------------------------------------------------|
 | static | ``havingTitle(String browserTitle)`` | Switch to browser tab or window having the title ``browserTitel`` |
 | static | ``byIndex(int index)``               | Switch to browser tab or window by index ``index``                |
+|        | ``retry()``                          | Retries switching to the browser until it succeeds.               |
 
 Returns:
 
@@ -1064,10 +1169,11 @@ class TestSuite {
 
 Methods:
 
-| type   | name         | description                                  |
-|--------|--------------|----------------------------------------------|
-| static | ``tab()``    | Create a new browser tab and switch to it    |
-| static | ``window()`` | Create a new browser window and switch to it |
+| type   | name         | description                                                        |
+|--------|--------------|--------------------------------------------------------------------|
+| static | ``tab()``    | Create a new browser tab and switch to it                          |
+| static | ``window()`` | Create a new browser window and switch to it                       |
+|        | ``retry()``  | Retries creating and switching to a new browser until it succeeds. |
 
 Returns:
 
