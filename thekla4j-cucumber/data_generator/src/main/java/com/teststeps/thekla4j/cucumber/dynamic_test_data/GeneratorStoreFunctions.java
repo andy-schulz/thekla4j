@@ -16,6 +16,9 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Functions for working with generator store
+ */
 @Log4j2
 public class GeneratorStoreFunctions {
 
@@ -25,6 +28,9 @@ public class GeneratorStoreFunctions {
 //  private static final String REGEX_ASSIGNMENT = "(.*?s)([A-Za-z0-9]+\\{.*\\}) => \\$\\{(.*)\\}";
   private static final String REGEX_ASSIGNMENT = "(.*) => \\$\\{(.*)\\}";
 
+  /**
+   * Regex pattern to match inline replacement e.g. ?{GENERATOR_NAME}
+   */
   protected static final String REGEX_INLINE_REPLACEMENT_PATTERN = "(\\?\\{([A-Z0-9_]*)\\})";
 
 
@@ -41,6 +47,9 @@ public class GeneratorStoreFunctions {
       return List.empty();
     };
 
+  /**
+   * Parse and execute a generator function from the generator map
+   */
   protected static final Function2<Map<Pattern, DataGenerator>, String, Try<String>> parseAndExecuteGeneratorFunction =
     (generatorMap, generatorInput) -> {
 
@@ -67,6 +76,9 @@ public class GeneratorStoreFunctions {
     };
 
 
+  /**
+   *  Match assignment pattern and return Assignment object
+   */
   protected static final Function<String, Option<Assignment>> matchAssignment =
     generatorInput -> Option.of(Pattern.compile(REGEX_ASSIGNMENT).matcher(generatorInput))
       .flatMap(matcher -> {
@@ -78,6 +90,9 @@ public class GeneratorStoreFunctions {
         }
       });
 
+  /**
+   * Check if parameter name is valid for setting
+   */
   protected static final Function<Assignment, Assignment> checkSetParameterName = assignment -> {
     if (!Pattern.compile(SET_REGEX_PARAMETER_NAME).matcher(assignment.name()).matches()) {
       throw new IllegalArgumentException("Cant assign value to parameter named: " + assignment.name() + ". Parameter names must match: " +
@@ -87,6 +102,9 @@ public class GeneratorStoreFunctions {
   };
 
 
+  /**
+   * Assignment record for parameter name and value
+   */
   protected record Assignment(String name, String value) {
     public static Assignment of(String name, String value) {
       return new Assignment(name, value);

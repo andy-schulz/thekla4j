@@ -20,12 +20,26 @@ import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFu
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.parseAndExecuteInlineGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.PredefinedInlineGeneratorFunctions.TIMESTAMP_IN_MS;
 
+/**
+ * A store for data generators
+ */
 @Log4j2
 public class GeneratorStore {
 
+  /**
+   * Regex pattern to match a specific generator
+   */
   protected static final Function1<String, String> REGEX_SPECIFIC_GENERATOR_PATTERN =
     prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
+
+  /**
+   * Regex pattern to match a general generator
+   */
   protected static final String REGEX_GENERAL_GENERATOR_PATTERN = "([A-Za-z0-9]+\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
+
+  /**
+   * Regex pattern to match a valid function name
+   */
   protected static final String REGEX_FUNCTION_NAME = "[A-Za-z0-9]+";
 
 
@@ -72,6 +86,13 @@ public class GeneratorStore {
     return this;
   }
 
+  /**
+   * Add an inline generator to the store
+   *
+   * @param generatorName the name of the generator
+   * @param generator     the generator
+   * @return the store
+   */
   public GeneratorStore addInlineGenerator(String generatorName, InlineGenerator generator) {
 
     this.inlineGeneratorMap = inlineGeneratorMap.put(generatorName, generator);
@@ -122,6 +143,9 @@ public class GeneratorStore {
     setParameterMap(storedParameters.put(name, result));
   }
 
+  /**
+   * Assign the result of a generator to a named parameter if present
+   */
   protected final Function2<String, Option<String>, String> assignResultToNamedParameter =
     (generatorInput, res) ->
       matchAssignment.apply(generatorInput)
@@ -132,6 +156,8 @@ public class GeneratorStore {
 
   /**
    * Create a new GeneratorStore with predefined generators
+   *
+   * @return the generator store
    */
   public static GeneratorStore create() {
     return (new GeneratorStore())
