@@ -21,10 +21,27 @@ public class JavaNetHttpResult implements HttpResult {
   private final List<Cookie> cookies;
 
   public JavaNetHttpResult(HttpResponse<String> response) {
+    log.info(() -> "Response Code: " + response.statusCode());
+
+
+    if (log.isTraceEnabled()) {
+      log.trace(() -> "Response Body: \n" + response.body());
+    } else {
+      int truncateAt = 400;
+      String body;
+      if (response.body().length() > truncateAt) {
+        body = response.body().substring(0, truncateAt);
+      } else {
+        body = response.body();
+      }
+      log.info(() -> "Response Body: " + body + (response.body().length() > truncateAt ? " ... (truncated)" : ""));
+    }
 
     this.response = response;
     this.headers = parseHeaders(response);
+    log.trace(() -> "Headers: \n" + headers);
     this.cookies = parseCookies(response);
+    log.trace(() -> "Cookies: \n" + cookies);
   }
 
   @Override
@@ -66,14 +83,10 @@ public class JavaNetHttpResult implements HttpResult {
   }
 
   private static List<Cookie> parseCookies(HttpResponse<String> response) {
-    io.vavr.collection.List<Cookie> cookies =
-        HashMap.ofAll(response.headers().map())
-            .filter((k, v) -> Objects.equals(Option.of(k).map(String::toLowerCase).getOrNull(), "set-cookie"))
-            .toList()
-            .flatMap(tuple -> tuple._2)
-            .map(CookieFunctions.toCookie);
-
-    log.debug("Cookies: {}", () -> cookies);
-    return cookies;
+    return HashMap.ofAll(response.headers().map())
+        .filter((k, v) -> Objects.equals(Option.of(k).map(String::toLowerCase).getOrNull(), "set-cookie"))
+        .toList()
+        .flatMap(tuple -> tuple._2)
+        .map(CookieFunctions.toCookie);
   }
 }
