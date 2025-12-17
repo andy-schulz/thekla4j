@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.http.httpConn;
 
+import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.core.HttpClient;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.core.HttpResult;
@@ -18,15 +19,15 @@ public class HcHttpClient implements HttpClient {
   }
 
   @Override
-  public Either<Throwable, HttpResult> send(Request request, HttpOptions activityOptions, Function<HttpRequest, Either<Throwable, HttpResult>> requestMethod) {
+  public Either<ActivityError, HttpResult> send(Request request, HttpOptions activityOptions, Function<HttpRequest, Try<HttpResult>> requestMethod) {
 
     return Try.of(() -> HcHttpRequest.on(request.resource)
         .doing(request.description)
         .using(activityOptions
             .mergeOnTopOf(request.options)
             .mergeOnTopOf(this.clientHttpOptions)))
-        .toEither()
-        .flatMap(requestMethod);
+        .flatMap(requestMethod)
+        .transform(ActivityError.toEither("Error sending HTTP request to resource: " + request.resource));
   }
 
   @Override

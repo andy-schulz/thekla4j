@@ -1,18 +1,19 @@
 package com.teststeps.thekla4j.http.httpRequest;
 
+import static com.teststeps.thekla4j.http.core.functions.UrlFunctions.createBody;
+import static com.teststeps.thekla4j.http.core.functions.UrlFunctions.getUrl;
+
 import com.teststeps.thekla4j.http.core.HttpResult;
-import com.teststeps.thekla4j.http.error.RequestError;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.multipart.FilePart;
 import com.teststeps.thekla4j.http.spp.multipart.Part;
-import com.teststeps.thekla4j.utils.url.UrlHelper;
 import io.vavr.collection.List;
-import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2(topic = "JavaNetHttpRequest")
@@ -28,11 +29,15 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
     return Builder.on(resource);
   }
 
-  private Either<Throwable, HttpResult> send(HttpRequest.Builder requestBuilder) {
-    URI uri = uri(httpOptions.baseUrl, resource, httpOptions.queryParameters);
+  private Try<HttpResult> send(HttpRequest.Builder requestBuilder) {
 
-    log.info(() -> "Starting Request: " + this.description + " to URI: " + uri);
+    log.info(() -> "Starting Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
+        this.description + "' " + this.resource));
+    String url = getUrl(httpOptions.baseUrl, httpOptions.port, resource, httpOptions.queryParameters, httpOptions.pathParameters);
+    log.debug("Using url: {}", url);
+    log.debug(() -> "with options: " + httpOptions.toString(1));
 
+    URI uri = URI.create(url);
     requestBuilder.uri(uri);
 
     requestBuilder.timeout(httpOptions.getResponseTimeout());
@@ -41,38 +46,33 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
 
     HttpRequest req = requestBuilder.build();
 
-
     return Try.of(() -> client.send(req, HttpResponse.BodyHandlers.ofString()))
         .onFailure(x -> log.error(x.getMessage()))
-        .transform(RequestError.toEither(() -> "Error sending HTTP request to " + resource))
-        .map(JavaNetHttpResult::new)
-        .map(r -> (HttpResult) r)
-        .mapLeft(x -> x);
+        .map(JavaNetHttpResult::new);
   }
 
   @Override
-  public Either<Throwable, HttpResult> get() {
-
+  public Try<HttpResult> get() {
     return send(requestBuilder.GET());
   }
 
   @Override
-  public Either<Throwable, HttpResult> post() {
-    return send(requestBuilder.POST(bodyPublisher(httpOptions.body)));
+  public Try<HttpResult> post() {
+    return createBody.apply(httpOptions).flatMap(bodyContent -> send(requestBuilder.POST(bodyPublisher(bodyContent))));
   }
 
   @Override
-  public Either<Throwable, HttpResult> patch() {
+  public Try<HttpResult> patch() {
     return send(requestBuilder.method("PATCH", bodyPublisher(httpOptions.body)));
   }
 
   @Override
-  public Either<Throwable, HttpResult> put() {
+  public Try<HttpResult> put() {
     return send(requestBuilder.PUT(bodyPublisher(httpOptions.body)));
   }
 
   @Override
-  public Either<Throwable, HttpResult> delete() {
+  public Try<HttpResult> delete() {
     if (httpOptions.body != null) {
       return send(requestBuilder.method("DELETE", bodyPublisher(httpOptions.body)));
     }
@@ -80,7 +80,7 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
   }
 
   @Override
-  public Either<Throwable, HttpResult> postFile(io.vavr.collection.List<FilePart> fileParts, List<Part> parts) {
+  public Try<HttpResult> postFile(io.vavr.collection.List<FilePart> fileParts, List<Part> parts) {
     MultipartBodyPublisher publisher = new MultipartBodyPublisher();
 
     fileParts.forEach(filePart -> publisher.addPart(
@@ -97,11 +97,6 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
     requestBuilder.setHeader("Content-Type", "multipart/form-data; boundary=" + publisher.getBoundary());
 
     return send(requestBuilder.POST(publisher.build()));
-  }
-
-
-  private URI uri(String baseUrl, String path, java.util.Map<String, String> queryParams) {
-    return URI.create(baseUrl + path + UrlHelper.buildQueryString.apply(queryParams));
   }
 
   private HttpRequest.BodyPublisher bodyPublisher(String body) {

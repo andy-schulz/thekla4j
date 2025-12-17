@@ -10,6 +10,7 @@ import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import com.teststeps.thekla4j.http.spp.abilities.UseTheRestApi;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.util.function.Function;
 
 public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> extends Interaction<Void, HttpResult> {
@@ -20,7 +21,7 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
   protected boolean followRedirects = true;
   protected String body;
 
-  private final Function<HttpRequest, Either<Throwable, HttpResult>> requestMethod;
+  private final Function<HttpRequest, Try<HttpResult>> requestMethod;
 
   @Called(name = "resource") // is set when request is assigned to Post interaction
   public String logResource = "";
@@ -40,9 +41,9 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
     HttpOptions finalOpts = opts;
 
     return UseTheRestApi.as(actor)
-        .toEither()
-        .flatMap(useRestAbility -> useRestAbility.send(this.request, finalOpts, requestMethod))
-        .mapLeft(ActivityError::of);
+        .transform(ActivityError.toEither("Error getting ability to use the REST API"))
+        .mapLeft(ActivityError::of)
+        .flatMap(useRestAbility -> useRestAbility.send(this.request, finalOpts, requestMethod));
 
   }
 
@@ -64,7 +65,7 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
     return (ReqT) this;
   }
 
-  public RequestInteraction(Request request, Function<HttpRequest, Either<Throwable, HttpResult>> requestMethod) {
+  public RequestInteraction(Request request, Function<HttpRequest, Try<HttpResult>> requestMethod) {
     this.request = request;
     this.requestMethod = requestMethod;
 

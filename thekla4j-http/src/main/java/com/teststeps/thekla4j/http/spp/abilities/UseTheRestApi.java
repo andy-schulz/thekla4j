@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.http.spp.abilities;
 
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
+import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.abilities.Ability;
 import com.teststeps.thekla4j.core.base.persona.UsesAbilities;
 import com.teststeps.thekla4j.http.core.HttpClient;
@@ -25,7 +26,7 @@ public class UseTheRestApi implements Ability {
     return new UseTheRestApi(httpClient);
   }
 
-  public Either<Throwable, HttpResult> send(Request spe, HttpOptions activityOptions, Function<HttpRequest, Either<Throwable, HttpResult>> method) {
+  public Either<ActivityError, HttpResult> send(Request spe, HttpOptions activityOptions, Function<HttpRequest, Try<HttpResult>> method) {
     return this.httpClient.send(spe, activityOptions, method);
   }
 

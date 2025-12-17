@@ -1,10 +1,12 @@
 package com.teststeps.thekla4j.http.httpRequest;
 
 
+import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.net.http.HttpClient;
 import java.security.cert.X509Certificate;
 import java.util.function.Function;
@@ -28,7 +30,7 @@ public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpC
   }
 
   @Override
-  public Either<Throwable, com.teststeps.thekla4j.http.core.HttpResult> send(Request request, HttpOptions activityOptions, Function<com.teststeps.thekla4j.http.core.HttpRequest, Either<Throwable, HttpResult>> method) {
+  public Either<ActivityError, com.teststeps.thekla4j.http.core.HttpResult> send(Request request, HttpOptions activityOptions, Function<com.teststeps.thekla4j.http.core.HttpRequest, Try<HttpResult>> method) {
 
     HttpOptions options = HttpOptions.empty()
         .mergeOnTopOf(this.clientHttpOptions)
@@ -45,7 +47,7 @@ public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpC
       try {
         httpClientBuilder.sslContext(insecureContext());
       } catch (Exception e) {
-        return Either.left(e);
+        return Either.left(ActivityError.of(e));
       }
     }
 
@@ -56,7 +58,8 @@ public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpC
         .using(options)
         .executeWith(httpClientBuilder.build());
 
-    return method.apply(req);
+    return method.apply(req)
+        .transform(ActivityError.toEither("Error sending HTTP request"));
   }
 
   private SSLContext insecureContext() throws Exception {

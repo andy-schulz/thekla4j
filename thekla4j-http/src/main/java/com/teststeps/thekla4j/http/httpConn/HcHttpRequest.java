@@ -1,14 +1,15 @@
 package com.teststeps.thekla4j.http.httpConn;
 
+import static com.teststeps.thekla4j.http.core.functions.UrlFunctions.getFormContent;
+import static com.teststeps.thekla4j.http.core.functions.UrlFunctions.getUrl;
+import static com.teststeps.thekla4j.http.core.functions.UrlFunctions.isXWwwFormUrlencoded;
 import static com.teststeps.thekla4j.http.httpConn.MultipartFunctions.appendFileParts;
 import static com.teststeps.thekla4j.http.httpConn.MultipartFunctions.appendParts;
-import static com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions.percentEncode;
 
 import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
-import com.teststeps.thekla4j.http.httpConn.functions.ConnectionFunctions;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.multipart.FilePart;
 import com.teststeps.thekla4j.http.spp.multipart.Part;
@@ -17,7 +18,6 @@ import io.vavr.Function3;
 import io.vavr.NotImplementedError;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
-import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.io.BufferedReader;
@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -133,7 +132,7 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeFormParameter = con -> Try.of(() -> {
 
-    String formContent = ConnectionFunctions.getFormContent.apply(this.opts);
+    String formContent = getFormContent.apply(this.opts);
     log.debug("Writing Form Parameter: {}", formContent);
 
     byte[] bytes = formContent.getBytes(StandardCharsets.UTF_8);
@@ -147,7 +146,7 @@ public class HcHttpRequest implements HttpRequest {
 
   private final Function1<HttpURLConnection, Try<HttpURLConnection>> writeContent =
 
-      con -> ConnectionFunctions.isXWwwFormUrlencoded.apply(this.opts)
+      con -> isXWwwFormUrlencoded.apply(this.opts)
           .map(isForm -> isForm ?
               writeFormParameter :
               writeBody)
@@ -169,42 +168,39 @@ public class HcHttpRequest implements HttpRequest {
   }
 
   @Override
-  public Either<Throwable, HttpResult> get() {
+  public Try<HttpResult> get() {
     log.debug("Method: GET");
 
     return this.executeRequest("GET")
-        .toEither()
         .flatMap(this::send);
   }
 
   @Override
-  public Either<Throwable, HttpResult> post() {
+  public Try<HttpResult> post() {
     log.debug("Method: POST with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     return this.executeRequest("POST")
         .flatMap(this.writeContent)
-        .toEither()
         .flatMap(this::send);
 //        return t.isSuccess() ? t.map(this::send).get() : Either.left(t.getCause());
   }
 
   @Override
-  public Either<Throwable, HttpResult> postFile(List<FilePart> fileParts, List<Part> parts) {
+  public Try<HttpResult> postFile(List<FilePart> fileParts, List<Part> parts) {
     log.debug("Method: POST of file with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     return this.executeRequest("POST")
         .flatMap(this.writeFile.apply(fileParts, parts))
-        .toEither()
         .flatMap(this::send);
   }
 
   @Override
-  public Either<Throwable, HttpResult> patch() {
-    return Either.left(new NotImplementedError("PATCH method is not implemented in HcHttpClient. Please use the JavaNetHttpClient implementation."));
+  public Try<HttpResult> patch() {
+    return Try.failure(new NotImplementedError("PATCH method is not implemented in HcHttpClient. Please use the JavaNetHttpClient implementation."));
   }
 
   @Override
-  public Either<Throwable, HttpResult> put() {
+  public Try<HttpResult> put() {
     log.debug("Method: PUT with body of length: {}", Objects.isNull(opts.body) ? -1 : opts.body.length());
 
     if (Objects.isNull(opts.body)) {
@@ -215,13 +211,12 @@ public class HcHttpRequest implements HttpRequest {
 
     return this.executeRequest("PUT")
         .flatMap(this.writeBody)
-        .toEither()
         .flatMap(this::send);
 
   }
 
   @Override
-  public Either<Throwable, HttpResult> delete() {
+  public Try<HttpResult> delete() {
     log.debug("Method: DELETE");
 
     if (Objects.isNull(opts.body))
@@ -229,7 +224,6 @@ public class HcHttpRequest implements HttpRequest {
 
     return this.executeRequest("DELETE")
         .flatMap(this.writeBody)
-        .toEither()
         .flatMap(this::send);
   }
 
@@ -249,29 +243,8 @@ public class HcHttpRequest implements HttpRequest {
     return con;
   }
 
-  private String getUrl(String baseUrl, int port, String resource, Map<String, String> queryParameters, Map<String, String> pathParameters) {
-    String url = (!baseUrl.isEmpty() ?
-        baseUrl.concat(port > 0 ? ":" + port + resource : resource) :
-        resource)
-        .concat(queryParameters != null && !queryParameters.isEmpty() ? "?" : "")
-        .concat(getParameterString(queryParameters));
 
-    return pathParameters.entrySet()
-        .stream()
-        .map(entry -> (Function<String, String>) s -> s.replaceAll(":" + entry.getKey(), entry.getValue()))
-        .reduce(Function.identity(), Function::andThen)
-        .apply(url);
-  }
-
-  private String getParameterString(Map<String, String> params) {
-    return params
-        .entrySet()
-        .stream()
-        .map(entry -> entry.getKey() + "=" + percentEncode.apply(entry.getValue()))
-        .collect(Collectors.joining("&"));
-  }
-
-  private Either<Throwable, HttpResult> send(HttpURLConnection con) {
+  private Try<HttpResult> send(HttpURLConnection con) {
 
     Try<HcHttpResult> t = Try.of(() -> {
       log.debug("Response Code: {}", con.getResponseCode());
@@ -332,8 +305,8 @@ public class HcHttpRequest implements HttpRequest {
     con.disconnect();
 
     return t.isSuccess() ?
-        Either.right(t.get()) :
-        Either.left(t.getCause());
+        Try.success(t.get()) :
+        Try.failure(t.getCause());
 
   }
 

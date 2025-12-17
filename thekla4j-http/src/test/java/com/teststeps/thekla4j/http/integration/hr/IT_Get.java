@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.http.integration.hr;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
@@ -54,6 +55,33 @@ public class IT_Get {
         .peek(r -> assertThat("test header exists:", r.headers().get(EXPECTED_HEADER_NAME).isDefined(), equalTo(true)))
         .peek(r -> assertThat("number of header values", r.headers().get(EXPECTED_HEADER_NAME).get().size(), equalTo(1)))
         .peek(r -> assertThat("header value", r.headers().get(EXPECTED_HEADER_NAME).get().head(), equalTo("HeaderValue")))
+        .getOrElseThrow(Function.identity());
+  }
+
+  @Test
+  public void sendQueryParametersInGetRequest() throws ActivityError {
+    Actor tester = Actor.named("Tester")
+        .whoCan(UseTheRestApi.with(JavaNetHttpClient.using(HttpOptions.empty())));
+
+    String expectedUrl = "http://localhost:3001/get?param1=value one&param2=value2";
+
+    String expectedArgs = """
+          "args": {
+            "param1": "value one",\s
+            "param2": "value2"
+          },\s
+        """;
+
+    HttpOptions httpOptions = HttpOptions.empty()
+        .queryParameter("param1", "value one")
+        .queryParameter("param2", "value2");
+
+    Request httpBin = Request.on(httpBinHost + "/get");
+
+    tester.attemptsTo(
+      Get.from(httpBin).options(httpOptions))
+        .peek(r -> assertThat("url is correct", r.response(), containsString(expectedUrl)))
+        .peek(r -> assertThat("args are correct", r.response(), containsString(expectedArgs)))
         .getOrElseThrow(Function.identity());
   }
 }
