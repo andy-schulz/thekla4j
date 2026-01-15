@@ -31,8 +31,6 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
 
   private Try<HttpResult> send(HttpRequest.Builder requestBuilder) {
 
-    log.info(() -> "Starting Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
-        this.description + "' " + this.resource));
     String url = getUrl(httpOptions.baseUrl, httpOptions.port, resource, httpOptions.queryParameters, httpOptions.pathParameters);
     log.debug("Using url: {}", url);
     log.debug(() -> "with options: " + httpOptions.toString(1));
@@ -53,26 +51,37 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
 
   @Override
   public Try<HttpResult> get() {
+    log.info(() -> "Starting GET Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
+        this.description + "' " + this.resource));
     return send(requestBuilder.GET());
   }
 
   @Override
   public Try<HttpResult> post() {
+    log.info(() -> "Starting POST Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
+        this.description + "' " + this.resource));
     return createBody.apply(httpOptions).flatMap(bodyContent -> send(requestBuilder.POST(bodyPublisher(bodyContent))));
   }
 
   @Override
   public Try<HttpResult> patch() {
+    log.info(() -> "Starting PATCH Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
+        this.description + "' " + this.resource));
     return send(requestBuilder.method("PATCH", bodyPublisher(httpOptions.body)));
   }
 
   @Override
   public Try<HttpResult> put() {
+    log.info(() -> "Starting PUT Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource : "'" +
+        this.description + "' " + this.resource));
     return send(requestBuilder.PUT(bodyPublisher(httpOptions.body)));
   }
 
   @Override
   public Try<HttpResult> delete() {
+    log.info(() -> "Starting DELETE Request: " + (Objects.isNull(this.description) || this.description.isBlank() ? "'unnamed' " + this.resource :
+        "'" +
+            this.description + "' " + this.resource));
     if (httpOptions.body != null) {
       return send(requestBuilder.method("DELETE", bodyPublisher(httpOptions.body)));
     }
