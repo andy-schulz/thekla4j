@@ -450,6 +450,38 @@ public class MobileBrowser implements Browser, BrowserLog {
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> resizeWindow(int width, int height) {
+    return Try.failure(ActivityError.of("Window resizing is not supported on mobile devices"));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> maximizeWindow() {
+    return Try.failure(ActivityError.of("Window maximization is not supported on mobile devices"));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> minimizeWindow() {
+    return Try.failure(ActivityError.of("Window minimization is not supported on mobile devices"));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> fullscreenWindow() {
+    return Try.failure(ActivityError.of("Window fullscreen is not supported on mobile devices"));
+  }
+
   @Override
   public Try<Void> initBrowserLog() {
     return appiumLoader.activateBrowserLog();

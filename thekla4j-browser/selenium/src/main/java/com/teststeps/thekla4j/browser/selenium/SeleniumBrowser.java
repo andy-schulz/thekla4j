@@ -32,13 +32,14 @@ import java.time.Duration;
 import java.util.Objects;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Selenium based browser implementation
  */
 @Log4j2(topic = "Browser")
-public class SeleniumBrowser implements Browser, BrowserLog {
+public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
 
   private final DriverLoader driverLoader;
   private final HighlightContext highlightContext = new HighlightContext();
@@ -720,6 +721,46 @@ public class SeleniumBrowser implements Browser, BrowserLog {
         .flatMap(d -> getRemoteDownloadedFile.apply(d, tempDownloadPath, fileName, timeout, waitBetweenRetries));
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> resizeWindow(int width, int height) {
+    return driverLoader.driver()
+        .flatMap(driver -> Try.run(() -> driver.manage().window().setSize(new org.openqa.selenium.Dimension(width, height))))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> maximizeWindow() {
+    return driverLoader.driver()
+        .flatMap(driver -> Try.run(() -> driver.manage().window().maximize()))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> minimizeWindow() {
+    return driverLoader.driver()
+        .flatMap(driver -> Try.run(() -> driver.manage().window().minimize()))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> fullscreenWindow() {
+    return driverLoader.driver()
+        .flatMap(driver -> Try.run(() -> driver.manage().window().fullscreen()))
+        .map(applyExecutionSlowDown());
+  }
+
   @Override
   public Try<Void> initBrowserLog() {
     return driverLoader.activateBrowserLog();
@@ -745,5 +786,11 @@ public class SeleniumBrowser implements Browser, BrowserLog {
   @Override
   public Try<Void> cleanUp() {
     return driverLoader.logManager().flatMap(LogManager::cleanUp);
+  }
+
+  @Override
+  public Try<WebDriver> getDriver() {
+    return driverLoader.driver()
+        .map(d -> (WebDriver) d);
   }
 }

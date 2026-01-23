@@ -393,4 +393,34 @@ public interface Browser {
    */
   Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries);
 
+  /**
+   * Resize the browser window to a specific width and height
+   *
+   * @param width  the width to resize to
+   * @param height the height to resize to
+   * @return a Try containing a Void
+   */
+  Try<Void> resizeWindow(int width, int height);
+
+  /**
+   * Maximize the browser window
+   *
+   * @return a Try containing a Void
+   */
+  Try<Void> maximizeWindow();
+
+  /**
+   * Minimize the browser window
+   *
+   * @return a Try containing a Void
+   */
+  Try<Void> minimizeWindow();
+
+  /**
+   * Set the browser window to fullscreen
+   *
+   * @return a Try containing a Void
+   */
+  Try<Void> fullscreenWindow();
+
 }

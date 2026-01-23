@@ -51,6 +51,7 @@ The following activities are currently implemented to interact with a browser.
 | [NumberOfBrowsers](#numberofbrowsers)     | Get the number of open browsers.                        |
 | [SwitchToBrowser](#switchtobrowser)       | Switch to a different browser tab or window.            |
 | [SwitchToNewBrowser](#switchtonewbrowser) | Switch to a new browser tab or window.                  |
+| [Resize](#resize)                         | Resize the browser window to a specific size.           |
 
 ___
 ___
@@ -1204,3 +1205,87 @@ class TestSuite {
 }
 
 ```
+
+___
+
+### Resize
+
+Resize the browser window to a specific size or state.
+
+Methods:
+
+| type      | name                      | description                                                  |
+|-----------|---------------------------|--------------------------------------------------------------|
+| static    | ``to(int, int)``          | Resize window to custom width and height                     |
+| static    | ``toMaximum()``           | Maximize the browser window                                  |
+| static    | ``toMinimum()``           | Minimize the browser window                                  |
+| static    | ``toFullscreen()``        | Set the browser window to fullscreen                         |
+| static    | ``toDesktop()``           | Resize to desktop viewport (1920x1080)                       |
+| static    | ``toLaptop()``            | Resize to laptop viewport (1366x768)                         |
+| static    | ``toTabletLandscape()``   | Resize to tablet landscape viewport (1024x768)               |
+| static    | ``toTabletPortrait()``    | Resize to tablet portrait viewport (768x1024)                |
+| static    | ``toMobileLandscape()``   | Resize to mobile landscape viewport (812x375)                |
+| static    | ``toMobilePortrait()``    | Resize to mobile portrait viewport (375x812)                 |
+| static    | ``toHdReady()``           | Resize to HD Ready viewport (1280x720)                       |
+| static    | ``to4K()``                | Resize to 4K viewport (3840x2160)                            |
+| inherited | ``retry()``               | Retries resizing the browser window until it succeeds.       |
+
+Returns:
+
+- ``Either<ActivityError, Void>``
+
+**Code:**
+
+```java
+class TestSuite {
+
+  @BeforeAll
+  static void setup() {
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+  }
+
+  @Test
+  void testCustomResize() {
+    actor.attemptsTo(
+        Navigate.to("https://www.example.com"),
+        Resize.to(1280, 720)  // Custom width and height
+    );
+  }
+
+  @Test
+  void testMaximizeWindow() {
+    actor.attemptsTo(
+        Resize.toMaximum()
+    );
+  }
+
+  @Test
+  void testResponsiveTesting() {
+    // Test mobile portrait
+    actor.attemptsTo(
+        Navigate.to("https://www.example.com"),
+        Resize.toMobilePortrait()
+    );
+    
+    // Test tablet landscape
+    actor.attemptsTo(
+        Resize.toTabletLandscape()
+    );
+    
+    // Test desktop
+    actor.attemptsTo(
+        Resize.toDesktop()
+    );
+  }
+
+  @Test
+  void runAsTest() {
+    Resize.to(1024, 768).runAs(actor);
+    Resize.toMaximum().runAs(actor);
+  }
+}
+
+```
+
+**Note:** Window resizing is not supported on mobile devices (Appium). Attempting to resize a mobile browser window will result in an error.
+
