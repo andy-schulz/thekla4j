@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.http.httpRequest;
 
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.http.core.HttpResult;
+import com.teststeps.thekla4j.http.core.HttpVersion;
 import com.teststeps.thekla4j.http.spp.HttpOptions;
 import com.teststeps.thekla4j.http.spp.Request;
 import io.vavr.control.Either;
@@ -43,6 +44,9 @@ public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpC
       httpClientBuilder.followRedirects(HttpClient.Redirect.NEVER);
     }
 
+    // Set HTTP version, defaults to HTTP/1.1
+    httpClientBuilder.version(toClientVersion(options.getHttpVersion()));
+
     if (options.getDisableSSLCertificateValidation()) {
       try {
         httpClientBuilder.sslContext(insecureContext());
@@ -66,6 +70,23 @@ public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpC
     SSLContext sslContext = SSLContext.getInstance("TLS");
     sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
     return sslContext;
+  }
+
+  /**
+   * Converts HttpVersion enum to java.net.http.HttpClient.Version
+   * 
+   * @param version the HttpVersion to convert
+   * @return the corresponding HttpClient.Version
+   * @throws UnsupportedOperationException if the version is not supported by java.net.http.HttpClient
+   */
+  private HttpClient.Version toClientVersion(HttpVersion version) {
+    return switch (version) {
+      case HTTP_1_1 -> HttpClient.Version.HTTP_1_1;
+      case HTTP_2 -> HttpClient.Version.HTTP_2;
+      case HTTP_1_0, HTTP_3 -> throw new UnsupportedOperationException(
+                                                                       "HTTP version " + version.getVersion() +
+                                                                           " is not supported by java.net.http.HttpClient");
+    };
   }
 
   private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {

@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.http.spp;
 
 import com.teststeps.thekla4j.http.commons.Cookie;
+import com.teststeps.thekla4j.http.core.HttpVersion;
 import com.teststeps.thekla4j.http.core.functions.CookieFunctions;
 import com.teststeps.thekla4j.utils.json.JSON;
 import io.vavr.collection.List;
@@ -29,6 +30,7 @@ public class HttpOptions {
 
   private Boolean disableSSLCertificateValidation = null;
   private Boolean followRedirects = null;
+  private Option<HttpVersion> httpVersion = Option.none();
 
   /**
    * Default timeout to receive a response from server. Overwrite this value for long running requests where needed,
@@ -61,6 +63,15 @@ public class HttpOptions {
    */
   public boolean getDisableSSLCertificateValidation() {
     return disableSSLCertificateValidation == null ? DEFAULT_DISABLE_SSL_CERTIFICATE_VALIDATION : disableSSLCertificateValidation;
+  }
+
+  /**
+   * Getters
+   *
+   * @return HttpVersion value, defaults to HTTP_1_1 if not set
+   */
+  public HttpVersion getHttpVersion() {
+    return httpVersion.getOrElse(HttpVersion.HTTP_1_1);
   }
 
 
@@ -179,6 +190,11 @@ public class HttpOptions {
         .setResponseTimeout(timeOut);
   }
 
+  public HttpOptions useVersion(HttpVersion version) {
+    return getNewRestOptions()
+        .setHttpVersion(version);
+  }
+
   public HttpOptions clone() {
     return getNewRestOptions();
   }
@@ -203,6 +219,9 @@ public class HttpOptions {
       clone.followRedirects = this.followRedirects;
     }
 
+    if (!this.httpVersion.isEmpty()) {
+      clone.httpVersion = this.httpVersion;
+    }
 
     if (this.responseTimeout != Duration.ZERO) {
       clone.setResponseTimeout(this.responseTimeout);
@@ -228,7 +247,7 @@ public class HttpOptions {
   private HttpOptions getNewRestOptions() {
     return new HttpOptions(
                            this.headers, this.queryParameters, this.pathParameters, this.formParameters, this.baseUrl, this.port, this.body,
-                           this.disableSSLCertificateValidation, this.responseTimeout, this.followRedirects);
+                           this.disableSSLCertificateValidation, this.responseTimeout, this.followRedirects, this.httpVersion);
   }
 
   private HttpOptions setBody(String body) {
@@ -280,6 +299,11 @@ public class HttpOptions {
     return this;
   }
 
+  private HttpOptions setHttpVersion(HttpVersion version) {
+    this.httpVersion = Option.of(version);
+    return this;
+  }
+
   private HttpOptions setResponseTimeout(int timeOutInMillis) {
     this.responseTimeout = Duration.ofMillis(timeOutInMillis);
     return this;
@@ -325,7 +349,7 @@ public class HttpOptions {
   }
 
   private HttpOptions(
-                      Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> pathParameters, Map<String, String> formParameters, String baseUrl, int port, String body, Boolean disableSSLCertificateValidation, Duration responseTimeout, Boolean followRedirects
+                      Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> pathParameters, Map<String, String> formParameters, String baseUrl, int port, String body, Boolean disableSSLCertificateValidation, Duration responseTimeout, Boolean followRedirects, Option<HttpVersion> httpVersion
   ) {
     // clone fields of request
 
@@ -335,6 +359,7 @@ public class HttpOptions {
     this.responseTimeout = responseTimeout;
     this.disableSSLCertificateValidation = disableSSLCertificateValidation;
     this.followRedirects = followRedirects;
+    this.httpVersion = httpVersion;
 
 
     // deep clone??
