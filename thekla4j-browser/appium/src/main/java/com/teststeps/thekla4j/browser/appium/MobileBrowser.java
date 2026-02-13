@@ -92,6 +92,14 @@ public class MobileBrowser implements Browser, BrowserLog {
    * {@inheritDoc}
    */
   @Override
+  public Try<Void> dragElement(Element sourceElement, Element targetElement) {
+    return seleniumBrowser.dragElement(sourceElement, targetElement);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return seleniumBrowser.enterTextInto(text, element, clearField);
   }

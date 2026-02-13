@@ -9,4 +9,5 @@ public class Constants {
   public static String CANVAS = FRAMEWORKTESTER + "/canvas/";
   public static String TABLE = FRAMEWORKTESTER + "/table/";
   public static String DOWNLOAD = FRAMEWORKTESTER + "/download/";
+  public static String DRAG_AND_DROP = FRAMEWORKTESTER + "/dragndrop/";
 }

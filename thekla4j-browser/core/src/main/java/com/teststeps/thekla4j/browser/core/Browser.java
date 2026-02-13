@@ -52,6 +52,15 @@ public interface Browser {
   Try<Void> doubleClickOn(Element element);
 
   /**
+   * Drag an element to another element
+   *
+   * @param sourceElement the element to drag
+   * @param targetElement the element to drag to
+   * @return a Try containing a Void
+   */
+  Try<Void> dragElement(Element sourceElement, Element targetElement);
+
+  /**
    * Enter text into a given element
    *
    * @param text       the text to enter

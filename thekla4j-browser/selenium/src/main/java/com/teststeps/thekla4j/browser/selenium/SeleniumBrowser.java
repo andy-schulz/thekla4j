@@ -200,6 +200,18 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
    * {@inheritDoc}
    */
   @Override
+  public Try<Void> dragElement(Element sourceElement, Element targetElement) {
+    // Handle frame switching: source and target must be in the same frame context
+    // We switch to source element's frame first
+    return switchFrame(sourceElement.frame())
+        .flatMap(d -> ActionFunctions.dragAndDropElement(d, highlightContext, sourceElement, targetElement))
+        .map(applyExecutionSlowDown());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Try<Void> enterTextInto(String text, Element element, Boolean clearField) {
     return switchFrame(element.frame())
         .flatMap(d -> enterTextIntoElement.apply(d, highlightContext, element, text, clearField))

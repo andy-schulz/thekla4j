@@ -53,10 +53,32 @@ class ActionFunctions {
         .flatMap(webElement -> ActionFunctions.moveAndClick.apply(webElement, new Actions(driver), startPoint));
   }
 
+  /**
+   * Drag and drop an element to another element
+   *
+   * @param driver        - the web driver
+   * @param hlx           - the highlight context
+   * @param sourceElement - the element to drag
+   * @param targetElement - the element to drop to
+   * @return - a Try of void
+   */
+  protected static Try<Void> dragAndDropElement(RemoteWebDriver driver, HighlightContext hlx, Element sourceElement, Element targetElement) {
+
+    return ElementFunctions.findElement(driver, hlx, sourceElement)
+        .flatMap(sourceWebElement -> ElementFunctions.findElement(driver, hlx, targetElement)
+            .flatMap(targetWebElement -> ActionFunctions.dragAndDrop.apply(sourceWebElement, targetWebElement, new Actions(driver))));
+  }
+
   private static final Function3<WebElement, Actions, StartPoint, Try<Void>> moveAndClick =
       (element, actions, startPoint) -> Try.of(() -> element)
           .flatMap(ActionFunctions.moveToStartPoint.apply(actions, startPoint))
           .flatMap(ActionFunctions.click)
+          .peek(Actions::perform)
+          .map(__ -> null);
+
+  private static final Function3<WebElement, WebElement, Actions, Try<Void>> dragAndDrop =
+      (sourceElement, targetElement, actions) -> Try.of(() -> actions.dragAndDrop(sourceElement, targetElement))
+          .onSuccess(__ -> log.debug("Drag element to target element"))
           .peek(Actions::perform)
           .map(__ -> null);
 

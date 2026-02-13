@@ -20,6 +20,7 @@ The following activities are currently implemented to interact with a browser.
 | [Navigate](#navigate)                   | Navigates to a given url                                |
 | [Click](#click)                         | Clicks on an element                                    |
 | [DoubleClick](#doubleclick)             | Double clicks on an element                             |
+| [Drag](#drag)                           | Drags an element to another element                     |
 | [Enter](#enter)                         | Enters text into a field / element                      |
 | [DoKey](#dokey)                         | Executes key actions                                    |
 | [Title](#title)                         | Returns the page title                                  |
@@ -179,6 +180,52 @@ class TestSuite {
   void retryDoubleClickTest() {
     actor.attemptsTo(
         DoubleClick.on(element).retry());
+  }
+}
+```
+
+___
+
+### Drag
+
+Methods:
+
+| type      | name                                                              | description                             |
+|-----------|-------------------------------------------------------------------|-----------------------------------------|
+| static    | ``element( ``[``Element``](./browser_elements#finding-elements)``)`` | Specifies the element to drag.          |
+|           | ``to( ``[``Element``](./browser_elements#finding-elements)``)``      | Specifies the target element to drop to. |
+| inherited | ``retry()``                                                       | Retries dragging until it succeeds.     |
+
+Returns:
+
+- ``Either<ActivityError, Void>``
+
+**Example:**
+
+```java
+class TestSuite {
+
+  @BeforeAll
+  static void setup() {
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Element draggableElement = Element.found(By.css("#draggable")).withName("draggable");
+    Element dropZone = Element.found(By.css("#dropzone")).withName("dropzone");
+  }
+
+  @Test
+  void attemptsToTest() {
+    actor.attemptsTo(Drag.element(draggableElement).to(dropZone));
+  }
+
+  @Test
+  void runAsTest() {
+    Drag.element(draggableElement).to(dropZone).runAs(actor);
+  }
+
+  @Test
+  void retryDragTest() {
+    actor.attemptsTo(
+        Drag.element(draggableElement).to(dropZone).retry());
   }
 }
 ```
