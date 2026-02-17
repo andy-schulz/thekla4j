@@ -22,7 +22,6 @@ The following activities are currently implemented to interact with a browser.
 | [DoubleClick](#doubleclick)             | Double clicks on an element                             |
 | [Drag](#drag)                           | Drags an element to another element                     |
 | [Enter](#enter)                         | Enters text into a field / element                      |
-| [DoKey](#dokey)                         | Executes key actions                                    |
 | [Title](#title)                         | Returns the page title                                  |
 | [Url](#url)                             | Returns the page url                                    |
 | [Attribute](#attribute)                 | Get the attribute value of an element                   |
@@ -32,6 +31,12 @@ The following activities are currently implemented to interact with a browser.
 | [Text](#test)                           | Get the text of an element                              |
 | [Draw](#draw)                           | Draw a shape onto an element                            |
 | [ExecuteJavaScript](#executejavascript) | Execute JavaScript code in the browser.                 |
+
+### Advanced Interactions
+
+| activity                                      | activity description                                           |
+|-----------------------------------------------|----------------------------------------------------------------|
+| [Key and Mouse Actions](./key_mouse_actions)  | Advanced keyboard and mouse interactions (DoKey, DoMouse)      |
 
 ### File Handlling
 
@@ -277,69 +282,15 @@ class TestSuite {
 ___
 ___
 
-## Key Interections
+## Advanced Interactions
 
-___
+For advanced keyboard and mouse interactions, see the dedicated page:
 
-### DoKey
-
-Methods:
-
-| type      | name                                | description                                        |
-|-----------|-------------------------------------|----------------------------------------------------|
-| static    | ``press( Key... keys )``            | Presses the given key / key combination.           |
-| static    | ``pressAndHold( Key... keys )``     | Presses and hold the given key / key combinations  |
-| static    | ``release( Key... keys )``          | Releases the given key / key combination.          |
-|           | ``thenPressAndHold( Key... keys )`` | Presses and holds then given key / key combination |
-|           | ``thenRelease( Key... keys )``      | Releases the given key / key combination.          |
-|           | ``thenPress( Key... keys )``        | Presses the given key / key combination.           |
-| inherited | ``retry()``                         | Retries the key action until it succeeds.          |
-
-Returns:
-
-- ``Either<ActivityError, Void>``
-
-**Code:**
-
-```java
-class TestSuite {
-
-  @BeforeAll
-  static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
-  }
-
-  @Test
-  void attemptsToTest() {
-    actor.attemptsTo(
-        DoKey.press(Key.ENTER),
-
-        DoKey.pressAndHold(Key.CONTROL, Key.ALT),
-
-        DoKey.release(Key.CONTROL, Key.ALT),
-
-        DoKey.press(Key.ENTER)
-            .thenPressAndHold(Key.CONTROL, Key.ALT),
-
-        DoKey.pressAndHold(Key.CONTROL, Key.ALT)
-            .press(Key.ENTER)
-            .thenRelease(Key.CONTROL, Key.ALT),
-
-        DoKey.press(Key.ENTER)
-            .thenPress(Key.ENTER));
-  }
-
-  @Test
-  void runAsTest() {
-    DoKey.press(Key.ENTER).runAs(actor);
-    DoKey.pressAndHold(Key.CONTROL, Key.ALT).runAs(actor);
-    DoKey.pressAndHold(Key.CONTROL, Key.ALT).release(Key.CONTROL, Key.ALT).runAs(actor);
-    DoKey.press(Key.ENTER).thenPressAndHold(Key.CONTROL, Key.ALT).runAs(actor);
-    DoKey.pressAndHold(Key.CONTROL, Key.ALT).thenRelease(Key.CONTROL, Key.ALT).runAs(actor);
-    DoKey.press(Key.ENTER).thenPress(Key.ENTER).runAs(actor);
-  }
-}
-```
+**[Key and Mouse Actions](./key_mouse_actions)** - Detailed documentation for `DoKey` and `DoMouse` activities including:
+- Keyboard interactions (key presses, combinations, sequences)
+- Mouse interactions (clicks, movements, drag and drop)
+- Angular CDK drag and drop with proper timing
+- Complex action chaining examples
 
 ___
 ___

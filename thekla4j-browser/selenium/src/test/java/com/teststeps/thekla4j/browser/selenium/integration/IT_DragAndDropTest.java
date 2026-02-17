@@ -49,7 +49,7 @@ public class IT_DragAndDropTest {
   @AfterEach
   public void tearDown() throws InterruptedException {
     Thread.sleep(10);
-    actor.cleansStage();
+//    actor.cleansStage();
   }
 
   private Browser chrome() {

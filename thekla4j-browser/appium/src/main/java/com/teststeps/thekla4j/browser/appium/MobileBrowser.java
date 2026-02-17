@@ -17,6 +17,7 @@ import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
+import com.teststeps.thekla4j.browser.spp.activities.mouseActions.MouseAction;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
@@ -411,6 +412,14 @@ public class MobileBrowser implements Browser, BrowserLog {
   @Override
   public Try<Void> executeKeyActions(List<KeyAction> actions) {
     return seleniumBrowser.executeKeyActions(actions);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> executeMouseActions(List<MouseAction> actions) {
+    return seleniumBrowser.executeMouseActions(actions);
   }
 
   /**

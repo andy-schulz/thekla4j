@@ -48,6 +48,7 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
   private Boolean browserDisposed = false;
 
   private Option<SeleniumKeyActionDriver> seleniumKeyActionDriver = Option.none();
+  private Option<SeleniumMouseActionDriver> seleniumMouseActionDriver = Option.none();
 
   /**
    * Create a new SeleniumBrowser instance
@@ -88,6 +89,22 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
     return Try.success(seleniumKeyActionDriver.get());
   }
 
+  private Try<SeleniumMouseActionDriver> seleniumMouseActionDriver() {
+    if (seleniumMouseActionDriver.isEmpty()) {
+
+      Try<SeleniumMouseActionDriver> actionDriver = driverLoader.driver()
+          .flatMap(driver -> driverLoader.actions()
+              .map(actions -> new SeleniumMouseActionDriver(actions, driver)));
+
+      if (actionDriver.isFailure())
+        return actionDriver;
+
+      seleniumMouseActionDriver = Option.of(actionDriver.get());
+
+    }
+
+    return Try.success(seleniumMouseActionDriver.get());
+  }
 
   private <T> Function1<T, T> applyExecutionSlowDown() {
 
@@ -628,6 +645,16 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
     return seleniumKeyActionDriver()
         .peek(actionDriver -> actions.forEach(a -> a.performKeyAction(actionDriver)))
         .flatMap(KeyActionDriver::perform);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> executeMouseActions(List<com.teststeps.thekla4j.browser.spp.activities.mouseActions.MouseAction> actions) {
+    return seleniumMouseActionDriver()
+        .peek(actionDriver -> actions.forEach(a -> a.performMouseAction(actionDriver)))
+        .flatMap(com.teststeps.thekla4j.browser.spp.activities.mouseActions.MouseActionDriver::perform);
   }
 
 

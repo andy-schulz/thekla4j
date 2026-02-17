@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
+import com.teststeps.thekla4j.browser.spp.activities.mouseActions.MouseAction;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -374,6 +375,14 @@ public interface Browser {
    * @return a Try containing the key actions
    */
   Try<Void> executeKeyActions(List<KeyAction> keyActions);
+
+  /**
+   * Execute mouse actions
+   *
+   * @param mouseActions the mouse actions to execute
+   * @return a Try containing the mouse actions
+   */
+  Try<Void> executeMouseActions(List<MouseAction> mouseActions);
 
   /**
    * Execute JavaScript
