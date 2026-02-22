@@ -15,7 +15,6 @@
 #page_layout {
     display: flex;
     flex-direction: row-reverse;
-    align-items: flex-start;
     gap: 2rem;
 }
 
@@ -25,10 +24,15 @@
     min-width: 0;
 }
 
-/* right-side TOC column – fixed width, never shrinks */
+/* right-side TOC column – sticky flex child */
 .page_toc {
     flex: 0 0 15rem;
     width: 15rem;
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    align-self: flex-start;
 }
 
 /* medium screens (sidebar + content + toc getting tight) */
@@ -51,10 +55,6 @@ ul {
 }
 
 .content_toc {
-    position: sticky;
-    top: 2rem;
     font-size: 14px !important;
-    overflow-y: auto;
-    max-height: calc(100vh - 4rem);
     word-break: break-word;
 }
