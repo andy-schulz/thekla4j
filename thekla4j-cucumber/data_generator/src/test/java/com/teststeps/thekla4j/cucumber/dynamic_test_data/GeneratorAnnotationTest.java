@@ -119,6 +119,41 @@ public class GeneratorAnnotationTest {
     }
   }
 
+  // ===== Inline generator providers =====
+
+  // Inline generator with explicit name
+  static class InlineExplicitNameProvider {
+    @InlineGen(name = "MY_INLINE")
+    public final InlineGenerator gen = () -> Try.success("inline result");
+  }
+
+  // Inline generator using field name (must be uppercase since inline regex is [A-Z0-9_])
+  static class InlineFieldNameProvider {
+    @InlineGen
+    public final InlineGenerator MY_INLINE_GEN = () -> Try.success("inline field result");
+  }
+
+  // Multiple inline generators
+  static class InlineMultiProvider {
+    @InlineGen(name = "INLINE_ONE")
+    public final InlineGenerator genOne = () -> Try.success("one");
+
+    @InlineGen(name = "INLINE_TWO")
+    public final InlineGenerator genTwo = () -> Try.success("two");
+  }
+
+  // Inline generator with wrong field type
+  static class InlineWrongTypeProvider {
+    @InlineGen(name = "BAD_INLINE")
+    public final String notAnInlineGenerator = "wrong type";
+  }
+
+  // Inline generator with null field
+  static class InlineNullFieldProvider {
+    @InlineGen(name = "NULL_INLINE")
+    public final InlineGenerator nullGen = null;
+  }
+
   @Test
   public void registerGeneratorWithExplicitName() {
     GeneratorStore store = GeneratorStore.create()
@@ -397,6 +432,134 @@ public class GeneratorAnnotationTest {
     assertThat("method generator should fail with invalid int", result.isFailure());
     assertThat("error message mentions integer conversion",
       result.getCause().getMessage().contains("expects an integer"), equalTo(true));
+  }
+
+  // ===== Inline generator tests =====
+
+  @Test
+  public void registerInlineGeneratorWithExplicitName() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineExplicitNameProvider());
+
+    Try<String> result = store.parseAndExecute("?{MY_INLINE}");
+    assertThat("inline generator executed successfully", result.isSuccess());
+    assertThat("inline generator returned expected value", result.get(), equalTo("inline result"));
+  }
+
+  @Test
+  public void registerInlineGeneratorUsingFieldName() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineFieldNameProvider());
+
+    Try<String> result = store.parseAndExecute("?{MY_INLINE_GEN}");
+    assertThat("inline generator executed successfully", result.isSuccess());
+    assertThat("inline generator returned expected value", result.get(), equalTo("inline field result"));
+  }
+
+  @Test
+  public void registerMultipleInlineGeneratorsFromSameProvider() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineMultiProvider());
+
+    Try<String> resultOne = store.parseAndExecute("?{INLINE_ONE}");
+    assertThat("first inline generator executed successfully", resultOne.isSuccess());
+    assertThat("first inline generator returned expected value", resultOne.get(), equalTo("one"));
+
+    Try<String> resultTwo = store.parseAndExecute("?{INLINE_TWO}");
+    assertThat("second inline generator executed successfully", resultTwo.isSuccess());
+    assertThat("second inline generator returned expected value", resultTwo.get(), equalTo("two"));
+  }
+
+  @Test
+  public void registerInlineGeneratorEmbeddedInString() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineExplicitNameProvider());
+
+    Try<String> result = store.parseAndExecute("prefix-?{MY_INLINE}-suffix");
+    assertThat("inline generator in string executed successfully", result.isSuccess());
+    assertThat("inline generator was replaced in string", result.get(), equalTo("prefix-inline result-suffix"));
+  }
+
+  @Test
+  public void registerMultipleInlineGeneratorsInOneString() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineMultiProvider());
+
+    Try<String> result = store.parseAndExecute("?{INLINE_ONE}-?{INLINE_TWO}");
+    assertThat("multiple inline generators executed successfully", result.isSuccess());
+    assertThat("both inline generators were replaced", result.get(), equalTo("one-two"));
+  }
+
+  @Test
+  public void registerInlineGeneratorWithAssignment() {
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new InlineExplicitNameProvider());
+
+    Try<String> result = store.parseAndExecute("?{MY_INLINE} => ${INLINE_RESULT}");
+    assertThat("inline generator executed successfully", result.isSuccess());
+    assertThat("inline generator returned expected value", result.get(), equalTo("inline result"));
+
+    Try<String> storedResult = store.parseAndExecute("${INLINE_RESULT}");
+    assertThat("retrieving stored parameter succeeded", storedResult.isSuccess());
+    assertThat("retrieved value is correct", storedResult.get(), equalTo("inline result"));
+  }
+
+  @Test
+  public void registerInlineGeneratorWithWrongFieldTypeThrowsException() {
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
+      GeneratorStore.create().registerGenerators(new InlineWrongTypeProvider()));
+
+    assertThat("correct error message is thrown",
+      thrown.getMessage(),
+      equalTo("Field 'notAnInlineGenerator' annotated with @InlineGen must be of type InlineGenerator, but is String"));
+  }
+
+  @Test
+  public void registerInlineGeneratorWithNullFieldThrowsException() {
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
+      GeneratorStore.create().registerGenerators(new InlineNullFieldProvider()));
+
+    assertThat("correct error message is thrown",
+      thrown.getMessage(),
+      equalTo("Field 'nullGen' annotated with @InlineGen is null"));
+  }
+
+  @Test
+  public void mixFieldAndInlineGenerators() {
+    class MixedProvider {
+      @Generator(name = "dataGen")
+      public final DataGenerator dataGenerator = parameterMap -> Try.success("data result");
+
+      @InlineGen(name = "INLINE")
+      public final InlineGenerator inlineGenerator = () -> Try.success("inline result");
+    }
+
+    GeneratorStore store = GeneratorStore.create()
+      .registerGenerators(new MixedProvider());
+
+    Try<String> dataResult = store.parseAndExecute("dataGen{test}");
+    assertThat("data generator executed successfully", dataResult.isSuccess());
+    assertThat("data generator returned expected value", dataResult.get(), equalTo("data result"));
+
+    Try<String> inlineResult = store.parseAndExecute("?{INLINE}");
+    assertThat("inline generator executed successfully", inlineResult.isSuccess());
+    assertThat("inline generator returned expected value", inlineResult.get(), equalTo("inline result"));
+  }
+
+  @Test
+  public void mixAnnotationAndLegacyInlineRegistration() {
+    @SuppressWarnings("deprecation")
+    GeneratorStore store = GeneratorStore.create()
+      .addInlineGenerator("LEGACY_INLINE", () -> Try.success("legacy inline"))
+      .registerGenerators(new InlineExplicitNameProvider());
+
+    Try<String> legacyResult = store.parseAndExecute("?{LEGACY_INLINE}");
+    assertThat("legacy inline generator executed successfully", legacyResult.isSuccess());
+    assertThat("legacy inline generator returned expected value", legacyResult.get(), equalTo("legacy inline"));
+
+    Try<String> annotatedResult = store.parseAndExecute("?{MY_INLINE}");
+    assertThat("annotated inline generator executed successfully", annotatedResult.isSuccess());
+    assertThat("annotated inline generator returned expected value", annotatedResult.get(), equalTo("inline result"));
   }
 }
 

@@ -166,11 +166,60 @@ generatorStore.addGenerator("createUser", "Creates a user and returns the ID", c
 Inline generators are simpler generators that take no parameters and can be embedded anywhere in a string using
 `?{GENERATOR_NAME}`.
 
+> **Note:** Inline generator names must consist only of uppercase letters, digits, and underscores (`[A-Z0-9_]`).
+
+### Annotation-based (recommended)
+
+Use the `@InlineGen` annotation on `InlineGenerator` fields and register them via `registerGenerators()`:
+
+```java
+public class MyInlineGenerators {
+
+    @InlineGen(name = "UUID")
+    public final InlineGenerator uuid = () -> Try.of(() -> UUID.randomUUID().toString());
+
+    @InlineGen(name = "TIMESTAMP")
+    public final InlineGenerator timestamp = () -> Try.of(() -> String.valueOf(System.currentTimeMillis()));
+}
+
+// Registration
+GeneratorStore store = GeneratorStore.create()
+    .registerGenerators(new MyInlineGenerators());
+```
+
+If the `name` attribute is omitted, the field name is used:
+
+```java
+@InlineGen
+public final InlineGenerator MY_SESSION_ID = () -> Try.of(() -> "sess-" + UUID.randomUUID());
+// registered as "MY_SESSION_ID"
+```
+
+`@InlineGen` and `@Generator` annotations can be mixed freely in the same provider class:
+
+```java
+public class AllGenerators {
+
+    @Generator(name = "createUser")
+    public final DataGenerator createUser = (data) -> Try.of(() -> "user-42");
+
+    @InlineGen(name = "REQUEST_ID")
+    public final InlineGenerator requestId = () -> Try.of(() -> UUID.randomUUID().toString());
+}
+```
+
+### Legacy form (deprecated)
+
 ```java
 GeneratorStore generatorStore = GeneratorStore.create()
     .addInlineGenerator("UUID", () -> Try.of(() -> UUID.randomUUID().toString()))
     .addInlineGenerator("TIMESTAMP", () -> Try.of(() -> String.valueOf(System.currentTimeMillis())));
 ```
+
+> **Deprecated:** `addInlineGenerator()` is deprecated since 2.2.0 and will be removed in a future version.
+> Use the `@InlineGen` annotation instead.
+
+### Usage
 
 Used in a step string:
 
@@ -213,6 +262,9 @@ public class ContractGenerators {
             return Try.of(() -> "published-" + contractId + "-on-" + environment);
         };
     }
+
+    @InlineGen(name = "REQUEST_ID")
+    public final InlineGenerator requestId = () -> Try.of(() -> UUID.randomUUID().toString());
 }
 
 // Setup in your Cucumber hooks or step definitions

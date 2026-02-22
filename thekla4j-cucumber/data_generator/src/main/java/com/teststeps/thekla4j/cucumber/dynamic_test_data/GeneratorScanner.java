@@ -30,6 +30,10 @@ public class GeneratorScanner {
         .filter(field -> field.isAnnotationPresent(Generator.class))
         .forEach(field -> registerField(store, provider, field));
 
+      List.of(provider.getClass().getDeclaredFields())
+        .filter(field -> field.isAnnotationPresent(InlineGen.class))
+        .forEach(field -> registerInlineField(store, provider, field));
+
       List.of(provider.getClass().getDeclaredMethods())
         .filter(method -> method.isAnnotationPresent(Generator.class))
         .forEach(method -> registerMethod(store, provider, method));
@@ -61,6 +65,31 @@ public class GeneratorScanner {
       log.debug("Registered generator '{}' from field '{}'", name, field.getName());
     } catch (IllegalAccessException e) {
       throw new RuntimeException("Cannot access field '" + field.getName() + "' annotated with @Generator", e);
+    }
+  }
+
+  private static void registerInlineField(GeneratorStore store, Object provider, Field field) {
+
+    if (!InlineGenerator.class.isAssignableFrom(field.getType())) {
+      throw new IllegalArgumentException(
+        "Field '" + field.getName() + "' annotated with @InlineGen must be of type InlineGenerator, but is " + field.getType().getSimpleName());
+    }
+
+    InlineGen annotation = field.getAnnotation(InlineGen.class);
+    String name = annotation.name().isEmpty() ? field.getName() : annotation.name();
+
+    try {
+      field.setAccessible(true);
+      InlineGenerator generator = (InlineGenerator) field.get(provider);
+
+      if (generator == null) {
+        throw new IllegalArgumentException("Field '" + field.getName() + "' annotated with @InlineGen is null");
+      }
+
+      store.addInlineGenerator(name, generator);
+      log.debug("Registered inline generator '{}' from field '{}'", name, field.getName());
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Cannot access field '" + field.getName() + "' annotated with @InlineGen", e);
     }
   }
 

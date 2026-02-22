@@ -58,7 +58,7 @@ public class GeneratorStore {
    * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
    * {@link #registerGenerators(Object...)} instead.
    */
-  @Deprecated(since = "1.0.0", forRemoval = true)
+  @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addGenerator(String name, DataGenerator generator) {
     return addGenerator(name, "no description given", generator);
   }
@@ -73,7 +73,7 @@ public class GeneratorStore {
    * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
    * {@link #registerGenerators(Object...)} instead.
    */
-  @Deprecated(since = "1.0.0", forRemoval = true)
+  @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addGenerator(String generatorName, String description, DataGenerator generator) {
     return addGeneratorInternal(generatorName, description, generator);
   }
@@ -129,7 +129,10 @@ public class GeneratorStore {
    * @param generatorName the name of the generator
    * @param generator     the generator
    * @return the store
+   * @deprecated Use {@link InlineGen} annotation on InlineGenerator fields and register them via
+   * {@link #registerGenerators(Object...)} instead.
    */
+  @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addInlineGenerator(String generatorName, InlineGenerator generator) {
 
     this.inlineGeneratorMap = inlineGeneratorMap.put(generatorName, generator);
