@@ -13,3 +13,9 @@ mermaid:
 
 exclude:
   - reference/*/part_*.*
+  - jekyll.log
+  - bin/
+  - serve-local.bat
+  - Gemfile
+  - Gemfile.lock
+  - _config_local.yml

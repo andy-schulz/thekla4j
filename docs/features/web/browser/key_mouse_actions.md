@@ -4,7 +4,7 @@ parent: Browser
 grand_parent: Web
 layout: default
 has_children: false
-nav_order: 1225
+nav_order: 1230
 ---
 
 # Key and Mouse Actions

@@ -1,0 +1,7 @@
+# Local override config - used for local development only
+# Run with: bundle exec jekyll serve --config _config.yml,_config_local.yml --baseurl ""
+
+# Override remote_theme with local gem
+theme: just-the-docs
+remote_theme: ""
+

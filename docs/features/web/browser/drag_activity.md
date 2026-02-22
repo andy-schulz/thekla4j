@@ -1,4 +1,14 @@
+---
+title: Drag and Drop
+parent: Browser
+grand_parent: Web
+layout: default
+has_children: false
+nav_order: 1220
+---
+
 # Drag and Drop Activity
+
 
 ## Overview
 

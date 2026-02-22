@@ -27,7 +27,7 @@ public class GeneratorStoreTest {
 
   @Test
   public void assignGeneratorWithInvalidName() {
-
+    @SuppressWarnings("deprecation")
     Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().addGenerator("Invalid!Generator", simpleGenerator));
 
     assertThat("correct error message is thrown",
@@ -39,6 +39,7 @@ public class GeneratorStoreTest {
   @Test
   public void executeSimpleGenerator() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
@@ -53,6 +54,7 @@ public class GeneratorStoreTest {
   @Test
   public void executeSimpleGeneratorWithAssignment() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
@@ -71,6 +73,7 @@ public class GeneratorStoreTest {
   @Test
   public void assignToInvalidParameterName() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
@@ -86,6 +89,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingValidAttributeOfParameterJson() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
@@ -102,6 +106,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingNotExistingAttributeOfParameter() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
@@ -120,6 +125,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingNotExistingParentAttributeOfParameter() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
       .addGenerator("jsonGenerator", jsonGenerator);
 
@@ -136,6 +142,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingAttributeOfString() {
 
+    @SuppressWarnings("deprecation")
     GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
@@ -320,7 +327,7 @@ public class GeneratorStoreTest {
 
     assertThat("executing the generator succeeded", retrievalResult.isSuccess());
     assertThat("executing the generator returned the expected value", retrievalResult.get(),
-      equalTo("Calling Test on Object {\n  \"name\": \"Test\",\n  \"value\": \"TestValue\",\n  \"details\": {\n    \"key\": \"value\"\n  }\n}\n"));
+      equalTo("Calling Test on Object {\n  \"name\": \"Test\",\n  \"value\": \"TestValue\",\n  \"details\": {\n    \"key\": \"value\"\n  },\n  \"emptyDetails\": {}\n}\n"));
 
 
     String retrievalString2 = "Calling ${TEST.name} with value ${TEST.value}";

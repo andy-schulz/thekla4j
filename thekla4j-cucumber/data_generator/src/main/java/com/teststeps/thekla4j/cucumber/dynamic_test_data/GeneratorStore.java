@@ -55,7 +55,10 @@ public class GeneratorStore {
    * @param name      the name of the generator
    * @param generator the generator
    * @return the store
+   * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
+   * {@link #registerGenerators(Object...)} instead.
    */
+  @Deprecated(since = "1.0.0", forRemoval = true)
   public GeneratorStore addGenerator(String name, DataGenerator generator) {
     return addGenerator(name, "no description given", generator);
   }
@@ -67,8 +70,24 @@ public class GeneratorStore {
    * @param description   the description of the generator
    * @param generator     the generator
    * @return the store
+   * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
+   * {@link #registerGenerators(Object...)} instead.
    */
+  @Deprecated(since = "1.0.0", forRemoval = true)
   public GeneratorStore addGenerator(String generatorName, String description, DataGenerator generator) {
+    return addGeneratorInternal(generatorName, description, generator);
+  }
+
+  /**
+   * Internal method to register a generator in the store.
+   * Used by both the deprecated {@link #addGenerator} methods and the {@link GeneratorScanner}.
+   *
+   * @param generatorName the name of the generator
+   * @param description   the description of the generator
+   * @param generator     the generator
+   * @return the store
+   */
+  GeneratorStore addGeneratorInternal(String generatorName, String description, DataGenerator generator) {
 
     if (!Pattern.compile(REGEX_FUNCTION_NAME).matcher(generatorName).matches())
       throw new IllegalArgumentException(
@@ -83,6 +102,24 @@ public class GeneratorStore {
       generator);
 
     this.nameList = nameList.put(generatorName, description);
+    return this;
+  }
+
+  /**
+   * Register generators from provider objects. Scans the given objects for fields annotated with
+   * {@link Generator} and registers them in this store.
+   *
+   * <p>Usage:</p>
+   * <pre>{@code
+   * GeneratorStore store = GeneratorStore.create()
+   *     .registerGenerators(new MyGeneratorProvider());
+   * }</pre>
+   *
+   * @param providers the objects containing annotated generator fields
+   * @return the store
+   */
+  public GeneratorStore registerGenerators(Object... providers) {
+    GeneratorScanner.scan(this, providers);
     return this;
   }
 
@@ -162,7 +199,7 @@ public class GeneratorStore {
   public static GeneratorStore create() {
     return (new GeneratorStore())
 
-      .addGenerator("randomString", PredefinedGeneratorFunctions.randomStringDescription, PredefinedGeneratorFunctions.randomString)
+      .addGeneratorInternal("randomString", PredefinedGeneratorFunctions.randomStringDescription, PredefinedGeneratorFunctions.randomString)
 
       .addInlineGenerator("TIMESTAMP_IN_MS", TIMESTAMP_IN_MS);
   }
