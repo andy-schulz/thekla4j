@@ -1,45 +1,60 @@
 ---
 ---
 
+/* ── Layout: right-side TOC + main content ──────────────────
+   #top  ==  .main  (just-the-docs gives it margin-left for the sidebar)
+   Inside it: .main-content-wrap > #page_layout > .page_toc + .main-content
+   ──────────────────────────────────────────────────────────── */
+
 #top {
-    max-width: 80rem;
+    max-width: 90rem;
+    margin: 0 auto;
+    /* do NOT set overflow-x here – it clips the sticky right TOC */
 }
 
 #page_layout {
     display: flex;
     flex-direction: row-reverse;
+    align-items: flex-start;
+    gap: 2rem;
 }
 
+/* main article column – shrinks freely, never clips */
 .main-content {
-    width: 75%;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
-@media (max-width: 50rem) {
+/* right-side TOC column – fixed width, never shrinks */
+.page_toc {
+    flex: 0 0 15rem;
+    width: 15rem;
+}
+
+/* medium screens (sidebar + content + toc getting tight) */
+@media (max-width: 75rem) {
+    .page_toc {
+        flex: 0 0 12rem;
+        width: 12rem;
+    }
+}
+
+/* small screens: drop the TOC */
+@media (max-width: 60rem) {
     .page_toc {
         display: none;
     }
-
-    .main-content {
-        width: 100%;
-    }
-
-    .page_toc {
-        width: 0%;
-    }
 }
-
-.page_toc {
-    width: 25%;
-}
-
 
 ul {
     list-style-type: none;
 }
 
-
 .content_toc {
     position: sticky;
     top: 2rem;
     font-size: 14px !important;
+    overflow-y: auto;
+    max-height: calc(100vh - 4rem);
+    word-break: break-word;
 }

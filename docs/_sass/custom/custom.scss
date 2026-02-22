@@ -1,0 +1,419 @@
+// ============================================================
+// Modern theme overrides for just-the-docs (dark color scheme)
+// ============================================================
+
+// --- Google Font ---
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+// --- Color palette overrides ---
+:root {
+  --modern-bg:          #0d1117;
+  --modern-surface:     #161b22;
+  --modern-surface-2:   #1c2430;
+  --modern-border:      #30363d;
+  --modern-accent:      #3b82f6;
+  --modern-accent-soft: rgba(59, 130, 246, 0.12);
+  --modern-green:       #3fb950;
+  --modern-text:        #e6edf3;
+  --modern-text-muted:  #8b949e;
+  --modern-heading:     #f0f6fc;
+  --modern-link:        #58a6ff;
+  --modern-link-hover:  #79c0ff;
+  --modern-code-bg:     #161b22;
+  --modern-code-border: #30363d;
+  --modern-radius:      8px;
+  --modern-radius-sm:   4px;
+  --modern-shadow:      0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
+  --modern-shadow-sm:   0 1px 2px rgba(0,0,0,0.3);
+}
+
+// --- Base / body ---
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-size: 15px;
+  line-height: 1.7;
+  background-color: var(--modern-bg) !important;
+  color: var(--modern-text) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+// --- Headings ---
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600;
+  color: var(--modern-heading) !important;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid var(--modern-border);
+  margin-bottom: 1.2em;
+}
+
+h2 {
+  font-size: 1.4rem;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--modern-border);
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.5em;
+  color: var(--modern-text) !important;
+}
+
+// --- Links ---
+a {
+  color: var(--modern-link) !important;
+  text-decoration: none;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--modern-link-hover) !important;
+    text-decoration: underline;
+  }
+}
+
+// --- Sidebar ---
+.side-bar {
+  background-color: var(--modern-surface) !important;
+  border-right: 1px solid var(--modern-border) !important;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  width: 16.5rem;
+
+  .site-title {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    color: var(--modern-heading) !important;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid var(--modern-border);
+  }
+
+  .nav-list {
+    .nav-list-item {
+      .nav-list-link {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: var(--modern-text-muted) !important;
+        border-radius: var(--modern-radius-sm);
+        margin: 1px 4px;
+        padding: 0.3rem 0.75rem;
+        transition: all 0.15s ease;
+
+        &:hover {
+          color: var(--modern-text) !important;
+          background-color: var(--modern-surface-2) !important;
+          text-decoration: none !important;
+        }
+
+        &.active {
+          color: var(--modern-accent) !important;
+          background-color: var(--modern-accent-soft) !important;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// --- Page centering wrapper ---
+// just-the-docs renders: body > .page-wrap > .side-bar + .main
+// The sidebar is position:fixed with width 16.5rem.
+// just-the-docs sets .side-bar + .main { margin-left: max(16.5rem, calc(...)) }
+// which breaks inside our centered container - we override it with a simple fixed value.
+.page-wrap {
+  max-width: 90rem;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  min-height: 100vh;
+  position: relative;  // anchor for absolute mobile sidebar
+}
+
+// Override just-the-docs' complex margin-left calc() with a simple fixed value.
+// Must mirror the same breakpoints the theme uses so small screens are unaffected.
+@media (min-width: 50rem) {
+  .side-bar + .main {
+    margin-left: 16.5rem !important;
+  }
+}
+
+// Below 50rem: sidebar is always fixed so it NEVER affects document flow.
+// Closed: only the site-header (toggle button) is visible, height is auto.
+// Open (.site-nav.nav-open): nav list becomes visible and fills the screen.
+@media (max-width: 49.99rem) {
+  .side-bar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    width: 100vw;
+    height: auto;
+    overflow: visible;
+  }
+
+  // Hide footer and search inside sidebar when closed
+  .side-bar .site-footer,
+  .side-bar #search {
+    display: none;
+  }
+
+  // Show footer and search again when nav is open
+  .side-bar:has(.site-nav.nav-open) .site-footer,
+  .side-bar:has(.site-nav.nav-open) #search {
+    display: block;
+  }
+
+  .side-bar .site-nav.nav-open {
+    height: calc(100vh - 3.75rem);
+    overflow-y: auto;
+  }
+
+  .side-bar + .main {
+    margin-left: 0 !important;
+  }
+}
+
+// --- Main content area ---
+.main {
+  background-color: var(--modern-bg) !important;
+}
+
+.main-content-wrap {
+  background-color: var(--modern-bg) !important;
+}
+
+.main-content {
+  main {
+    padding: 1rem 2rem 3rem 1rem;
+    max-width: 55rem;
+    box-sizing: border-box;
+  }
+}
+
+// Prevent the #page_layout flex children from overflowing
+#page_layout {
+  min-width: 0;
+}
+
+// --- Header / top bar ---
+.main-header {
+  background-color: var(--modern-surface) !important;
+  border-bottom: 1px solid var(--modern-border) !important;
+  box-shadow: var(--modern-shadow-sm);
+  backdrop-filter: blur(8px);
+  position: relative;
+  z-index: 201;
+}
+
+// --- Code blocks ---
+code, kbd {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;
+  font-size: 0.85em;
+}
+
+div.highlighter-rouge,
+figure.highlight,
+pre.highlight {
+  background-color: var(--modern-code-bg) !important;
+  border: 1px solid var(--modern-code-border) !important;
+  border-radius: var(--modern-radius) !important;
+  box-shadow: var(--modern-shadow-sm);
+  margin: 1.2em 0;
+  overflow: hidden;
+
+  pre, code {
+    background-color: transparent !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.83rem;
+    line-height: 1.6;
+  }
+}
+
+// Inline code
+p code, li code, td code {
+  background-color: var(--modern-surface-2) !important;
+  border: 1px solid var(--modern-border) !important;
+  border-radius: var(--modern-radius-sm) !important;
+  padding: 0.15em 0.4em;
+  font-size: 0.85em;
+  color: #e06c75 !important;
+}
+
+// --- Tables ---
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--modern-radius);
+  overflow: hidden;
+  box-shadow: var(--modern-shadow-sm);
+  margin: 1.5em 0;
+  font-size: 0.9rem;
+
+  th {
+    background-color: var(--modern-surface-2) !important;
+    color: var(--modern-text) !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--modern-accent) !important;
+  }
+
+  td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--modern-border) !important;
+    color: var(--modern-text) !important;
+    vertical-align: top;
+  }
+
+  tr {
+    background-color: var(--modern-surface) !important;
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background-color: var(--modern-surface-2) !important;
+    }
+
+    &:last-child td {
+      border-bottom: none !important;
+    }
+  }
+}
+
+// --- Horizontal rule ---
+hr {
+  border: none;
+  border-top: 1px solid var(--modern-border);
+  margin: 2em 0;
+}
+
+// --- Blockquotes / callouts ---
+blockquote {
+  border-left: 3px solid var(--modern-accent) !important;
+  background-color: var(--modern-accent-soft) !important;
+  border-radius: 0 var(--modern-radius) var(--modern-radius) 0;
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  color: var(--modern-text) !important;
+
+  p {
+    margin: 0;
+  }
+}
+
+// Deprecated callout (used in docs)
+.deprecated blockquote {
+  border-left-color: #f0883e !important;
+  background-color: rgba(240, 136, 62, 0.1) !important;
+}
+
+// --- Breadcrumbs ---
+.breadcrumb-nav {
+  font-size: 0.8rem;
+  color: var(--modern-text-muted) !important;
+  padding: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--modern-border);
+  margin-bottom: 1.5rem;
+}
+
+// --- Search ---
+.search-input {
+  background-color: var(--modern-surface-2) !important;
+  border: 1px solid var(--modern-border) !important;
+  border-radius: var(--modern-radius) !important;
+  color: var(--modern-text) !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    border-color: var(--modern-accent) !important;
+    box-shadow: 0 0 0 3px var(--modern-accent-soft) !important;
+    outline: none;
+  }
+}
+
+// --- Floating TOC ---
+.content_toc {
+  font-size: 0.8rem !important;
+  border-left: 1px solid var(--modern-border);
+  padding-left: 1rem;
+
+  a {
+    color: var(--modern-text-muted) !important;
+    display: block;
+    padding: 0.2rem 0;
+    transition: color 0.15s ease;
+    line-height: 1.4;
+
+    &:hover {
+      color: var(--modern-accent) !important;
+      text-decoration: none !important;
+    }
+  }
+
+  ul {
+    padding-left: 0.8rem;
+  }
+}
+
+// --- Copy code button ---
+.copy-code-button,
+button.copy-code-button {
+  background-color: var(--modern-surface-2) !important;
+  border: 1px solid var(--modern-border) !important;
+  border-radius: var(--modern-radius-sm) !important;
+  color: var(--modern-text-muted) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.7rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: var(--modern-surface) !important;
+    color: var(--modern-text) !important;
+    border-color: var(--modern-accent) !important;
+  }
+}
+
+// --- Footer ---
+footer {
+  border-top: 1px solid var(--modern-border) !important;
+  color: var(--modern-text-muted) !important;
+  font-size: 0.8rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+}
+
+// --- Children navigation ---
+.children-nav {
+  .nav-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--modern-text-muted) !important;
+  }
+}
+
+// --- Label / badge styling ---
+.label {
+  border-radius: var(--modern-radius-sm) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+
+
+
