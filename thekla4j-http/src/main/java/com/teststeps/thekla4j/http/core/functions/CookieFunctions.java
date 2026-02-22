@@ -14,6 +14,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class providing functions for cookie manipulation and conversion.
+ */
 public class CookieFunctions {
 
   private CookieFunctions() {

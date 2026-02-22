@@ -14,8 +14,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLConnection;
 
+/**
+ * Utility functions for constructing multipart/form-data HTTP request bodies.
+ */
 public class MultipartFunctions {
 
+  /**
+   * Appends all text parts to the multipart body writer.
+   */
   protected static final Function4<List<Part>, String, String, StringWriter, Try<Void>> appendParts =
       (parts, boundary, line, writer) -> parts
           .zipWithIndex()
@@ -23,6 +29,9 @@ public class MultipartFunctions {
           .transform(LiftTry.fromList())
           .map(__ -> null);
 
+  /**
+   * Appends a single text part to the multipart body writer.
+   */
   protected static final Function6<Part, Integer, Integer, String, String, StringWriter, Try<Void>> appendPart =
       (part, index, length, boundary, line, writer) -> Try.of(() -> {
         writer
@@ -46,6 +55,9 @@ public class MultipartFunctions {
         return null;
       });
 
+  /**
+   * Appends all file parts to the multipart body output stream.
+   */
   protected static final Function6<List<FilePart>, String, String, PrintWriter, OutputStream, StringWriter, Try<Void>> appendFileParts =
       (fileParts, boundary, line, printWriter, outputStream, logWriter) -> fileParts
           .zipWithIndex()
@@ -56,6 +68,9 @@ public class MultipartFunctions {
           .transform(LiftTry.fromList())
           .map(__ -> null);
 
+  /**
+   * Appends a single file part to the multipart body output stream.
+   */
   protected static final Function8<FilePart, Integer, Integer, String, String, PrintWriter, OutputStream, StringWriter, Try<Void>> appendFilePart =
       (filePart, index, length, boundary, line, printWriter, outputStream, logWriter) -> {
         StringWriter sw = new StringWriter();

@@ -4,9 +4,18 @@ import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.spp.Request;
 
-@Action("PUT to resource: '@{resource}' with options: @{options}")
+/**
+ * Activity class for performing HTTP PATCH requests.
+ */
+@Action("PATCH to resource: '@{resource}' with options: @{options}")
 public class Patch extends RequestInteraction<Patch> {
 
+  /**
+   * Creates a new PATCH request activity.
+   * 
+   * @param request the request configuration
+   * @return a new Patch instance
+   */
   public static Patch to(Request request) {
     return new Patch(request);
   }

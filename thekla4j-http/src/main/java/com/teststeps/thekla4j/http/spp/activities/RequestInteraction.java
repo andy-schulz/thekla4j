@@ -13,19 +13,30 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.util.function.Function;
 
+/**
+ * Base class for HTTP request interaction activities.
+ * Handles common request configuration such as options, body and redirect behaviour.
+ *
+ * @param <ReqT> the concrete request interaction type
+ */
 public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> extends Interaction<Void, HttpResult> {
 
+  /** The request configuration */
   protected Request request;
+  /** HTTP options for this interaction */
   protected HttpOptions httpOptions = HttpOptions.empty();
-
+  /** Whether to follow HTTP redirects */
   protected boolean followRedirects = true;
+  /** Optional request body */
   protected String body;
 
   private final Function<HttpRequest, Try<HttpResult>> requestMethod;
 
+  /** Resource URL logged for activity reporting */
   @Called(name = "resource") // is set when request is assigned to Post interaction
   public String logResource = "";
 
+  /** Options logged for activity reporting */
   @Called(name = "options") // is set when RestOptions are assigned to Post interaction
   public HttpOptions logOptions = HttpOptions.empty();
 
@@ -47,6 +58,12 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   }
 
+  /**
+   * Sets the HTTP options for this request.
+   * 
+   * @param opts the HTTP options
+   * @return this interaction instance
+   */
   public ReqT options(HttpOptions opts) {
     this.httpOptions = opts;
     // logging purpose
@@ -55,16 +72,34 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
     return (ReqT) this;
   }
 
+  /**
+   * Sets whether to follow HTTP redirects.
+   * 
+   * @param followRedirects true to follow redirects
+   * @return this interaction instance
+   */
   public ReqT followRedirects(boolean followRedirects) {
     this.followRedirects = followRedirects;
     return (ReqT) this;
   }
 
+  /**
+   * Sets the request body.
+   * 
+   * @param body the body content
+   * @return this interaction instance
+   */
   public ReqT body(String body) {
     this.body = body;
     return (ReqT) this;
   }
 
+  /**
+   * Creates a new RequestInteraction.
+   * 
+   * @param request       the request configuration
+   * @param requestMethod the HTTP method function to execute
+   */
   public RequestInteraction(Request request, Function<HttpRequest, Try<HttpResult>> requestMethod) {
     this.request = request;
     this.requestMethod = requestMethod;

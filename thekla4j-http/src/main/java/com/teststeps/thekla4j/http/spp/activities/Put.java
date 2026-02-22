@@ -4,9 +4,18 @@ import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.http.core.HttpRequest;
 import com.teststeps.thekla4j.http.spp.Request;
 
+/**
+ * Activity class for performing HTTP PUT requests.
+ */
 @Action("PUT to resource: '@{resource}' with options: @{options}")
 public class Put extends RequestInteraction<Put> {
 
+  /**
+   * Creates a new PUT request activity.
+   * 
+   * @param request the request configuration
+   * @return a new Put instance
+   */
   public static Put to(Request request) {
     return new Put(request);
   }

@@ -16,6 +16,9 @@ import java.net.http.HttpResponse;
 import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Java {@link java.net.http.HttpClient} based implementation of {@link com.teststeps.thekla4j.http.core.HttpRequest}.
+ */
 @Log4j2(topic = "JavaNetHttpRequest")
 public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.HttpRequest {
   private final String resource;
@@ -24,7 +27,12 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
   private final HttpClient client;
   private final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder();
 
-
+  /**
+   * Creates a new Builder for the given resource URL.
+   * 
+   * @param resource the target resource URL or path
+   * @return a new Builder instance
+   */
   public static Builder on(String resource) {
     return Builder.on(resource);
   }
@@ -123,6 +131,9 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
     this.httpOptions = options;
   }
 
+  /**
+   * Builder for constructing a {@link JavaNetHttpRequest}.
+   */
   public static class Builder {
     private final String resource;
     private String description = "no request description provided";
@@ -136,16 +147,34 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
       return new Builder(resource);
     }
 
+    /**
+     * Sets a human-readable description for the request.
+     * 
+     * @param description the description
+     * @return this Builder instance
+     */
     public Builder doing(String description) {
       this.description = description;
       return this;
     }
 
+    /**
+     * Sets the HTTP options for the request.
+     * 
+     * @param httpOptions the HTTP options
+     * @return this Builder instance
+     */
     public Builder using(HttpOptions httpOptions) {
       this.httpOptions = httpOptions;
       return this;
     }
 
+    /**
+     * Builds the {@link JavaNetHttpRequest} using the given HTTP client.
+     * 
+     * @param httpClient the HTTP client to execute requests with
+     * @return a new JavaNetHttpRequest instance
+     */
     public JavaNetHttpRequest executeWith(HttpClient httpClient) {
       return new JavaNetHttpRequest(httpClient, resource, description, httpOptions);
     }

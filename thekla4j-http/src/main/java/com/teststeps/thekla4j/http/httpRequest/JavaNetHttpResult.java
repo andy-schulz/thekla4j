@@ -20,6 +20,11 @@ public class JavaNetHttpResult implements HttpResult {
   private final Map<String, List<String>> headers;
   private final List<Cookie> cookies;
 
+  /**
+   * Creates a new result wrapping the given HTTP response.
+   * 
+   * @param response the HTTP response from the Java HTTP client
+   */
   public JavaNetHttpResult(HttpResponse<String> response) {
     log.info(() -> "Response Code: " + response.statusCode());
 

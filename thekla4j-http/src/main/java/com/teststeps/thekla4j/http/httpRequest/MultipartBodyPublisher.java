@@ -11,12 +11,22 @@ import java.nio.file.Path;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Builder for constructing a multipart/form-data {@link HttpRequest.BodyPublisher}.
+ */
 @Log4j2(topic = "MultipartBodyPublisher")
 public class MultipartBodyPublisher {
 
   private List<Part> parts = List.empty();
   private final String boundary = UUID.randomUUID().toString().replace("-", "");
 
+  /**
+   * Builds the {@link HttpRequest.BodyPublisher} from all added parts.
+   * File parts are placed after text parts as required by RFC 7578.
+   * 
+   * @return the body publisher
+   * @throws IllegalStateException if no parts have been added
+   */
   public HttpRequest.BodyPublisher build() {
     if (parts.isEmpty()) {
       throw new IllegalStateException("No parts specified.");
@@ -33,15 +43,37 @@ public class MultipartBodyPublisher {
     return HttpRequest.BodyPublishers.ofByteArrays(byteParts);
   }
 
+  /**
+   * Returns the multipart boundary string.
+   * 
+   * @return the boundary
+   */
   public String getBoundary() {
     return boundary;
   }
 
+  /**
+   * Adds a text part to the multipart body.
+   * 
+   * @param name        the form field name
+   * @param value       the field value
+   * @param contentType the content type of the part
+   * @return this publisher for chaining
+   */
   public MultipartBodyPublisher addPart(String name, String value, String contentType) {
     parts = parts.append(new StringPart(name, value, contentType));
     return this;
   }
 
+  /**
+   * Adds a file part to the multipart body.
+   * 
+   * @param name        the form field name
+   * @param value       the path to the file
+   * @param filename    the filename to use in the Content-Disposition header
+   * @param contentType the content type of the file
+   * @return this publisher for chaining
+   */
   public MultipartBodyPublisher addPart(String name, Path value, String filename, String contentType) {
     parts = parts.append(new FilePart(name, value, filename, contentType));
     return this;

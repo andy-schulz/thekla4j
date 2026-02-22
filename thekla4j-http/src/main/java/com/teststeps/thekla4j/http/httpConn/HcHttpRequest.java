@@ -44,18 +44,37 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Apache HttpComponents implementation of HTTP requests using HttpURLConnection.
+ */
 @Log4j2(topic = "HcHttpRequest")
 public class HcHttpRequest implements HttpRequest {
 
+  /**
+   * Helper class for building HTTP requests with fluent API.
+   */
   public static class HCRequestHelper {
     private String resource = "";
     private String description = "";
 
+    /**
+     * Sets the description for this request.
+     * 
+     * @param description the request description
+     * @return this helper for method chaining
+     */
     public HCRequestHelper doing(String description) {
       this.description = description;
       return this;
     }
 
+    /**
+     * Creates the HTTP request with the specified options.
+     * 
+     * @param opts the HTTP options to use
+     * @return a new HttpRequest instance
+     * @throws Exception if request creation fails
+     */
     public HttpRequest using(HttpOptions opts) throws Exception {
       return new HcHttpRequest(this.resource, description, opts);
     }
@@ -152,6 +171,12 @@ public class HcHttpRequest implements HttpRequest {
               writeBody)
           .flatMap(func -> func.apply(con));
 
+  /**
+   * Creates a new request helper for the specified resource.
+   * 
+   * @param resource the resource URL or path
+   * @return a new HCRequestHelper instance
+   */
   public static HCRequestHelper on(String resource) {
     return new HCRequestHelper(resource);
   }
@@ -342,6 +367,14 @@ public class HcHttpRequest implements HttpRequest {
     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
   }
 
+  /**
+   * Creates a new HTTP request with the specified resource, description, and options.
+   * 
+   * @param resource    the resource URL or path
+   * @param description the description of the request
+   * @param opts        the HTTP options to use
+   * @throws Exception if initialization or connection fails
+   */
   public HcHttpRequest(final String resource, final String description, final HttpOptions opts) throws Exception {
 
     if (opts.getDisableSSLCertificateValidation())

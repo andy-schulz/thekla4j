@@ -10,10 +10,19 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.util.function.Function;
 
+/**
+ * Apache HttpComponents implementation of the HttpClient interface.
+ */
 public class HcHttpClient implements HttpClient {
 
   private HttpOptions clientHttpOptions;
 
+  /**
+   * Creates a new HTTP client with the specified options.
+   * 
+   * @param opts the HTTP options to use
+   * @return a new HttpClient instance
+   */
   public static HttpClient using(HttpOptions opts) {
     return new HcHttpClient(opts);
   }

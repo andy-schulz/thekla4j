@@ -16,11 +16,21 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Java {@link java.net.http.HttpClient} based implementation of the {@link com.teststeps.thekla4j.http.core.HttpClient}
+ * interface.
+ */
 @Log4j2(topic = "JavaNetHttpClient")
 public class JavaNetHttpClient implements com.teststeps.thekla4j.http.core.HttpClient {
   private final HttpClient.Builder httpClientBuilder;
   private final HttpOptions clientHttpOptions;
 
+  /**
+   * Creates a new {@code JavaNetHttpClient} with the specified base options.
+   * 
+   * @param opts the HTTP options to use as client-level defaults
+   * @return a new JavaNetHttpClient instance
+   */
   public static JavaNetHttpClient using(HttpOptions opts) {
     return new JavaNetHttpClient(opts);
   }
