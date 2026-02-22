@@ -15,7 +15,7 @@ tasks.named('sourcesJar') {
 // ATTENTION: always set scmVersion properties before assigning the version to the version property
 scmVersion {
     versionCreator { version, position ->
-        'v' + version
+        version
     }
     versionIncrementer("incrementMinor")
     monorepo {
