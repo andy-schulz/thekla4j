@@ -6,8 +6,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import com.teststeps.thekla4j.core.base.persona.Performer;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import com.teststeps.thekla4j.http.core.HttpResult;
 import com.teststeps.thekla4j.http.httpRequest.JavaNetHttpClient;
@@ -113,5 +116,23 @@ public class IT_Post {
 
     assertThat("Post request failed", res.isLeft(), equalTo(true));
     assertThat("Error message is correct", res.getLeft().getMessage(), equalTo(expectedErrorMessage));
+  }
+
+  @Test
+  public void sendPostRequestWithBody() throws ActivityError {
+    Performer tester = Performer.of(Actor.named("Tester")
+        .whoCan(UseTheRestApi.with(JavaNetHttpClient.using(HttpOptions.empty()))));
+
+    String requestBody = "This is the body of the POST request";
+
+    Request postRequest = Request
+        .on(httpBinHost + "/post");
+
+    tester.attemptsTo(
+      Post.to(postRequest).body(requestBody),
+
+      See.<HttpResult>ifResult()
+          .is(Expected.to.pass(res -> res.response().contains(requestBody))));
+
   }
 }
