@@ -260,17 +260,14 @@ Cookie expiresCookie = Cookie.of("scheduled", "value")
 
 ```java
 // Login and extract session cookies
-HttpRequest loginResponse = actor.asksFor(
+HttpResult result = actor.attemptsTo(
     Post.to(Request.on("/auth/login")
         .withOptions(HttpOptions.empty()
             .body("{\"username\":\"test\",\"password\":\"pass\"}")
-            .header(ContentType.APPLICATION_JSON)
-        )
-    )
-);
+            .header(ContentType.APPLICATION_JSON))));
 
 // Extract Set-Cookie headers and parse them
-List<Cookie> sessionCookies = loginResponse.result().headers()
+List<Cookie> sessionCookies = result.result().headers()
     .entrySet().stream()
     .filter(entry -> entry.getKey().equalsIgnoreCase("Set-Cookie"))
     .map(entry -> CookieFunctions.toCookie.apply(entry.getValue()))

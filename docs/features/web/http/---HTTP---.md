@@ -273,22 +273,26 @@ HttpOptions options = HttpOptions.empty()
 HTTP requests return `HttpRequest` objects that can be processed and validated:
 
 ```java
+Performer performer = Performer.of(Actor.named("Tester"));
+
 // Perform request and get result
-HttpRequest httpRequest = actor.asksFor(
+HttpResult result = performer.attemptsTo(
     Get.from(Request.on("/users/123"))
 );
 
-// Access response details
-HttpResult result = httpRequest.result();
-int statusCode = result.statusCode();
-String responseBody = result.body();
-Map<String, String> headers = result.headers();
+assertThat("status code is 200", result.statusCode(), equalTo(200));
+assertThat("response contains John Doe", result.response(), contains("John Doe"));
+```
 
-// Validate response
-actor.attemptsTo(
-    Ensure.that(httpRequest.result().statusCode()).isEqualTo(200),
-    Ensure.that(httpRequest.result().body()).contains("John Doe")
+```java
+Performer performer = Performer.of(Actor.named("Tester"));
+
+performer.attemptsTo(
+    See.ifTask(Get.from(Request.on("/users/123")))
+        .is(Expected.to.pass(res -> res.statusCode().equals(200), ""))
+        .is(Expected.to.pass(res -> res.response().contains("John Doe")))
 );
+
 ```
 
 ## Multipart Requests
@@ -303,10 +307,13 @@ actor.attemptsTo(
 );
 
 // Multiple parts
+FilePart filePart = FilePart
+    .of(new File("avatar.jpg"), "avatar")
+    .withContentType("image/jpeg")
+    .withFileName("user-avatar.jpg");
+    
 actor.attemptsTo(
-    Post.filePart(FilePart.of(new File("avatar.jpg"), "avatar")
-            .withContentType("image/jpeg")
-            .withFileName("user-avatar.jpg"))
+    Post.filePart(filePart)
         .and(Part.of("userId", "123"))
         .and(Part.of("description", "User profile picture"))
         .to(Request.on("/users/avatar"))
@@ -334,7 +341,7 @@ HttpClient apiClient = JavaNetHttpClient.using(
 Use descriptive names for requests:
 
 ```java
-Request.on("/users/{userId}")
+Request.on("/users/:userId")
     .called("Get user profile by ID")
     .withOptions(HttpOptions.empty()
         .pathParameter("userId", userId)
