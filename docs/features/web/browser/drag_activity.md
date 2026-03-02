@@ -107,7 +107,8 @@ class DragAndDropTest {
         
         // Verify the item was moved
         user.attemptsTo(
-            Ensure.that(Text.of(target)).contains("item1")
+            See.if(Text.of(target))
+            .is(Expected.to.equal("item1"))
         );
     }
 }
