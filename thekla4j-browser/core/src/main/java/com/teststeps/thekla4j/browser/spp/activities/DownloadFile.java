@@ -6,7 +6,9 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.BasicInteraction;
 import com.teststeps.thekla4j.core.base.activities.SupplierTask;
 import com.teststeps.thekla4j.core.base.persona.Actor;
+import io.vavr.Function0;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.io.File;
 import java.time.Duration;
 import lombok.extern.log4j.Log4j2;
@@ -32,12 +34,20 @@ public class DownloadFile extends SupplierTask<File> {
   @Override
   protected Either<ActivityError, File> performAs(Actor actor) {
 
-    return actor.attemptsTo(fileNameActivity)
-        .map(__ -> BrowseTheWeb.as(actor)
-            .onSuccess(b -> log.info(() -> "Downloading file '%s' for as long as %s with polling interval %s"
-                .formatted(fileName, timeout, pollingInterval)))
-            .flatMap(browser -> browser.getDownloadedFile(fileName, timeout, pollingInterval)))
-        .flatMap(ActivityError.toEither("Error downloading file: " + fileName));
+    Function0<Try<Void>> downloadActivity = () -> Try.run(() -> {
+
+      Either<ActivityError, Void> executor = actor.attemptsTo(fileNameActivity);
+
+      if (executor.isLeft()) {
+        throw executor.getLeft();
+      }
+    });
+
+    return BrowseTheWeb.as(actor)
+        .onSuccess(b -> log.info(() -> "Downloading file '%s' for as long as %s with polling interval %s"
+            .formatted(fileName, timeout, pollingInterval)))
+        .flatMap(browser -> browser.getDownloadedFile(downloadActivity, fileName, timeout, pollingInterval))
+        .transform(ActivityError.toEither("Error downloading file: " + fileName));
   }
 
   /**

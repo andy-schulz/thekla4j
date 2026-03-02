@@ -23,6 +23,7 @@ import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
 import io.appium.java_client.PullsFiles;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.vavr.Function0;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -52,7 +53,8 @@ public class MobileBrowser implements Browser, BrowserLog {
     seleniumBrowser = new SeleniumBrowser(loader, browserConfig);
   }
 
-  static MobileBrowser start(@NonNull BrowserConfig browserConfig, @NonNull Option<AppiumConfig> appiumConfig, @NonNull Option<BrowserStartupConfig> startupConfig) {
+  static MobileBrowser start(
+                             @NonNull BrowserConfig browserConfig, @NonNull Option<AppiumConfig> appiumConfig, @NonNull Option<BrowserStartupConfig> startupConfig) {
     AppiumLoader loader = AppiumLoader.of(browserConfig, appiumConfig, startupConfig);
     return new MobileBrowser(loader, browserConfig, startupConfig);
   }
@@ -442,7 +444,7 @@ public class MobileBrowser implements Browser, BrowserLog {
    * {@inheritDoc}
    */
   @Override
-  public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
+  public Try<File> getDownloadedFile(Function0<Try<Void>> downloadActivity, String fileName, Duration timeout, Duration waitBetweenRetries) {
 
     if (!browserConfig.enableFileDownload())
       return Try.failure(new RuntimeException("""
@@ -462,7 +464,8 @@ public class MobileBrowser implements Browser, BrowserLog {
 
     Path tempDownloadPath = appiumLoader.downloadPath().map(TempFolderUtil::directory).get();
 
-    return appiumLoader.driver()
+    return downloadActivity.apply()
+        .flatMap(__ -> appiumLoader.driver())
         .flatMap(d -> getDownloadedFiles.apply((PullsFiles) d, tempDownloadPath, fileName, 0L, Instant.now().plus(timeout), waitBetweenRetries));
 
   }

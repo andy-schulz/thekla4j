@@ -27,23 +27,23 @@ public class BrowserConfigTest {
   @Test
   public void toStringBrowserName() {
 
-    assertThat("Chrome", YAML.jStringify(BrowserName.CHROME), equalTo("\"Chrome\"\n"));
-    assertThat("Chromium", YAML.jStringify(BrowserName.CHROMIUM), equalTo("\"Chromium\"\n"));
-    assertThat("Firefox", YAML.jStringify(BrowserName.FIREFOX), equalTo("\"Firefox\"\n"));
-    assertThat("Edge", YAML.jStringify(BrowserName.EDGE), equalTo("\"Edge\"\n"));
-    assertThat("Safari", YAML.jStringify(BrowserName.SAFARI), equalTo("\"Safari\"\n"));
+    assertThat("Chrome", YAML.jStringify(BrowserName.CHROME), equalTo("\"chrome\"\n"));
+    assertThat("Chromium", YAML.jStringify(BrowserName.CHROMIUM), equalTo("\"chromium\"\n"));
+    assertThat("Firefox", YAML.jStringify(BrowserName.FIREFOX), equalTo("\"firefox\"\n"));
+    assertThat("Edge", YAML.jStringify(BrowserName.EDGE), equalTo("\"edge\"\n"));
+    assertThat("Safari", YAML.jStringify(BrowserName.SAFARI), equalTo("\"safari\"\n"));
   }
 
   @Test
   public void loadBrowserConfigFile() throws IOException {
 
     String config = """
-          defaultConfig: Firefox1
+          defaultConfig: chromeConfig
 
-          Firefox1:
+          chromeConfig:
             platformName: OS X
             osVersion: 10.15
-            browserName: Chrome
+            browserName: chrome
             browserVersion: 80
             headless: true
             browserArgs:
@@ -55,15 +55,15 @@ public class BrowserConfigTest {
         .apply(config)
         .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
 
-    assertThat("check default config", browserConfigList.defaultConfig(), equalTo("Firefox1"));
+    assertThat("check default config", browserConfigList.defaultConfig(), equalTo("chromeConfig"));
 
     BrowserConfig browserConfig = browserConfigList.browserConfigs()
-        .get("Firefox1")
+        .get("chromeConfig")
         .getOrElseThrow(() -> new IllegalArgumentException("Cant find default browser config 'Firefox1' in config file"));
 
-    assertThat("check OS type", browserConfig.platformName().toString(), equalTo("MAC"));
+    assertThat("check OS type", browserConfig.platformName().toString(), equalTo("OS X"));
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
-    assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
+    assertThat("check browser name", browserConfig.browserName().toString(), equalTo("chrome"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
     assertThat("check headless", browserConfig.headless(), equalTo(true));
     assertThat("check browser args", browserConfig.browserArgs().mkString(", "), equalTo("--disable-gpu, --no-sandbox"));
@@ -151,7 +151,7 @@ public class BrowserConfigTest {
     String config = """
           platformName: OS X
           osVersion: 10.15
-          browserName: Chrome
+          browserName: chrome
           browserVersion: 80
         """;
 
@@ -159,9 +159,9 @@ public class BrowserConfigTest {
         .apply(config)
         .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
 
-    assertThat("check OS type", browserConfig.platformName().toString(), equalTo("MAC"));
+    assertThat("check OS type", browserConfig.platformName().toString(), equalTo("OS X"));
     assertThat("check OS Version", browserConfig.osVersion(), equalTo("10.15"));
-    assertThat("check browser name", browserConfig.browserName().toString(), equalTo("CHROME"));
+    assertThat("check browser name", browserConfig.browserName().toString(), equalTo("chrome"));
     assertThat("check browser version", browserConfig.browserVersion(), equalTo("80"));
     assertThat("check headless", browserConfig.headless(), equalTo(false));
     assertThat("check browser args", browserConfig.browserArgs().isEmpty(), equalTo(true));
@@ -174,11 +174,11 @@ public class BrowserConfigTest {
 
           osx:
             platformName: OS X
-            browserName: Chrome
+            browserName: chrome
 
           windows:
             platformName: Windows
-            browserName: Edge
+            browserName: edge
             browserVersion: 81
         """;
 
@@ -194,7 +194,7 @@ public class BrowserConfigTest {
     assertThat("retrieving seleniumConfig is success", browserConfig.isSuccess());
     assertThat("seleniumConfig is defined", browserConfig.get().isDefined());
 
-    assertThat("browser is set", browserConfig.get().get().browserName().getName(), equalTo("Edge"));
+    assertThat("browser is set", browserConfig.get().get().browserName().getName(), equalTo("edge"));
 
   }
 
