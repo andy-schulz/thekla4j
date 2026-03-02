@@ -5,7 +5,13 @@ plugins {
 }
 
 dependencies {
-    implementation project(":thekla4j-commons")
+    api project(":thekla4j-core")
+    api project(":thekla4j-commons")
+    api project(":thekla4j-browser:core")
+
+    implementation project(":thekla4j-utils")
+
+    implementation 'com.microsoft.playwright:playwright:1.50.0'
 }
 
 tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }

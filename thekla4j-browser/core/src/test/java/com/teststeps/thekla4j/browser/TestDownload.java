@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.browser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import com.teststeps.thekla4j.browser.spp.activities.DownloadFile;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
+import io.vavr.Function0;
 import io.vavr.control.Try;
 import java.io.File;
 import java.time.Duration;
@@ -52,18 +54,22 @@ public class TestDownload {
 
     File file = new File("", "");
 
-    when(chromeMock.clickOn(element)).thenReturn(Try.of(() -> null));
+    when(chromeMock.clickOn(element)).thenReturn(Try.success(null));
 
-    when(chromeMock.getDownloadedFile(any(String.class),
-      any(Duration.class),
-      any(Duration.class)))
-        .thenReturn(Try.of(() -> file));
+    doAnswer(invocation -> {
+      Function0<Try<Void>> downloadActivity = invocation.getArgument(0);
+      downloadActivity.apply();
+      return Try.of(() -> file);
+    }).when(chromeMock)
+        .getDownloadedFile(any(), any(String.class),
+          any(Duration.class),
+          any(Duration.class));
 
     File resultFile = DownloadFile.by(Click.on(element)).runAs(Performer.of(actor));
 
     verify(chromeMock, times(1)).clickOn(element);
     verify(chromeMock, times(1))
-        .getDownloadedFile(any(String.class),
+        .getDownloadedFile(any(), any(String.class),
           any(Duration.class),
           any(Duration.class));
 

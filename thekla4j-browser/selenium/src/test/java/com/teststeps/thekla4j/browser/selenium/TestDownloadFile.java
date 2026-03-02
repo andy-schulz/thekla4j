@@ -52,7 +52,7 @@ public class TestDownloadFile {
 
     browser = Selenium.localChrome();
 
-    Try<File> file = browser.getDownloadedFile("test.txt", Duration.ofSeconds(10), Duration.ofSeconds(1));
+    Try<File> file = browser.getDownloadedFile(() -> Try.success(null), "test.txt", Duration.ofSeconds(10), Duration.ofSeconds(1));
 
     assertThat("downloading file fails when not activated", file.isFailure(), equalTo(true));
 

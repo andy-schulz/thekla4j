@@ -7,6 +7,7 @@ import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
 import com.teststeps.thekla4j.browser.spp.activities.mouseActions.MouseAction;
 import com.teststeps.thekla4j.http.commons.Cookie;
+import io.vavr.Function0;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -402,6 +403,16 @@ public interface Browser {
   Try<Object> executeJavaScript(String script);
 
   /**
+   * Prepare the browser for a file download.
+   * Called before the download-triggering activity (e.g. a click) is executed.
+   * Implementations that require synchronous download interception (e.g. Playwright)
+   * override this method. The default implementation is a no-op.
+   */
+  default void prepareForDownload() {
+    // no-op for Selenium and other implementations that poll the filesystem
+  }
+
+  /**
    * Get the downloaded file
    *
    * @param fileName           the name of the file to get
@@ -409,7 +420,7 @@ public interface Browser {
    * @param waitBetweenRetries the wait duration between retries
    * @return a Try containing the downloaded file
    */
-  Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries);
+  Try<File> getDownloadedFile(Function0<Try<Void>> downloadActivity, String fileName, Duration timeout, Duration waitBetweenRetries);
 
   /**
    * Resize the browser window to a specific width and height

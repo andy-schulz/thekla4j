@@ -22,6 +22,7 @@ import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyActionDriver;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.http.commons.Cookie;
+import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
@@ -731,7 +732,7 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
    * {@inheritDoc}
    */
   @Override
-  public Try<File> getDownloadedFile(String fileName, Duration timeout, Duration waitBetweenRetries) {
+  public Try<File> getDownloadedFile(Function0<Try<Void>> downloadActivity, String fileName, Duration timeout, Duration waitBetweenRetries) {
 
     if (!browserConfig.enableFileDownload())
       return Try.failure(new RuntimeException("""
@@ -754,9 +755,11 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
     Path tempDownloadPath = driverLoader.downloadPath().map(TempFolderUtil::directory).get();
 
     if (driverLoader.isLocalExecution()) {
-      return getLocalDownloadedFile.apply(tempDownloadPath, fileName, timeout, waitBetweenRetries);
+      return downloadActivity.apply()
+          .flatMap(__ -> getLocalDownloadedFile.apply(tempDownloadPath, fileName, timeout, waitBetweenRetries));
     }
-    return driverLoader.driver()
+    return downloadActivity.apply()
+        .flatMap(__ -> driverLoader.driver())
         .flatMap(d -> getRemoteDownloadedFile.apply(d, tempDownloadPath, fileName, timeout, waitBetweenRetries));
   }
 
