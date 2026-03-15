@@ -60,7 +60,7 @@ class ElementFunctions {
       Instant.now(),
       Duration.ofMillis(0))
         .map(highlightElement.apply(driver, highlightContext, element.highlight()))
-        .flatMap(scrollIntoView.apply(driver));
+        .flatMap(scrollIntoView.apply(driver, element.autoScroll()));
   }
 
   static Try<WebElement> findElementOnFirstTry(RemoteWebDriver driver, HighlightContext highlightContext, Element element) {
@@ -78,7 +78,7 @@ class ElementFunctions {
       element,
       Instant.now(),
       Duration.ofMillis(0))
-        .flatMap(scrollIntoView.apply(driver));
+        .flatMap(scrollIntoView.apply(driver, element.autoScroll()));
   }
 
   static Try<WebElement> findElementWithoutScrolling(RemoteWebDriver driver, Element element) {

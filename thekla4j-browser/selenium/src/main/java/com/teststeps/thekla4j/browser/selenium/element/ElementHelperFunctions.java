@@ -6,6 +6,7 @@ import static com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrow
 import com.teststeps.thekla4j.browser.core.properties.DefaultThekla4jBrowserProperties;
 import io.vavr.Function0;
 import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.Function3;
 import io.vavr.control.Try;
 import java.util.Objects;
@@ -71,8 +72,8 @@ public class ElementHelperFunctions {
   /**
    * Scroll the element into view, used before interacting with the element
    */
-  public static Function1<RemoteWebDriver, Function1<WebElement, Try<WebElement>>> scrollIntoView =
-      driver -> element -> DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED.value().equals("true") ?
+  public static Function2<RemoteWebDriver, Boolean, Function1<WebElement, Try<WebElement>>> scrollIntoView =
+      (driver, elementAutoScroll) -> element -> DefaultThekla4jBrowserProperties.AUTO_SCROLL_ENABLED.value().equals("true") && elementAutoScroll ?
 
           Try.of(() -> (JavascriptExecutor) driver)
               .mapTry(d -> d.executeScript("arguments[0].scrollIntoView({block: '%s',inline: 'center', behavior: 'instant'});"

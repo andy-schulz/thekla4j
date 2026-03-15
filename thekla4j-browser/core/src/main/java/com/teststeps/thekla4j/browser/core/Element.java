@@ -56,6 +56,14 @@ public record Element(
                       Boolean highlight,
 
                       /**
+                       * whether to autoscroll the element
+                       *
+                       * @param autoScroll whether to auto scroll the element
+                       * @return whether to auto scroll the element
+                       */
+                      Boolean autoScroll,
+
+                      /**
                        * the waiter for the element
                        * 
                        * @param waiter the waiter for the element
@@ -76,6 +84,7 @@ public record Element(
                        Option.none(),
                        "unnamed",
                        true,
+                       true,
                        UntilElement.of(ElementStatusType.IS_NOT_STALE));
   }
 
@@ -91,6 +100,7 @@ public record Element(
                        List.of(locator),
                        Option.of(frame),
                        "unnamed",
+                       true,
                        true,
                        UntilElement.of(ElementStatusType.IS_NOT_STALE));
   }
@@ -115,7 +125,7 @@ public record Element(
    * @return a new Element instance
    */
   public Element called(String name) {
-    return new Element(locators, frame, name, highlight, waiter);
+    return new Element(locators, frame, name, highlight, autoScroll, waiter);
   }
 
   /**
@@ -125,7 +135,7 @@ public record Element(
    * @return a new Element instance
    */
   public Element andThenFound(Locator locator) {
-    return new Element(locators.append(locator), frame, "unnamed", highlight, waiter);
+    return new Element(locators.append(locator), frame, "unnamed", highlight, autoScroll, waiter);
   }
 
   /**
@@ -134,7 +144,16 @@ public record Element(
    * @return a new Element instance
    */
   public Element dontHighlight() {
-    return new Element(locators, frame, name, false, waiter);
+    return new Element(locators, frame, name, false, autoScroll, waiter);
+  }
+
+  /**
+   * set whether to auto scroll the element
+   *
+   * @return a new Element instance
+   */
+  public Element dontAutoScroll() {
+    return new Element(locators, frame, name, highlight, false, waiter);
   }
 
   /**
@@ -144,7 +163,7 @@ public record Element(
    * @return a new Element instance
    */
   public Element wait(UntilElement waiter) {
-    return new Element(locators, frame, name, highlight, waiter);
+    return new Element(locators, frame, name, highlight, autoScroll, waiter);
   }
 
   /**

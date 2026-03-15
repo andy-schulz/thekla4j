@@ -43,6 +43,6 @@ public record ShadowRoot(
 
     List<Locator> locators = parentElement.locators().append(ShadowRootLocator.of(locator));
 
-    return new Element(locators, parentElement.frame(), null, parentElement.highlight(), parentElement.waiter());
+    return new Element(locators, parentElement.frame(), null, parentElement.highlight(), parentElement.autoScroll(), parentElement.waiter());
   }
 }

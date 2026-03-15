@@ -26,7 +26,7 @@ class FrameFunctions {
       frame,
       Instant.now(),
       Duration.ofMillis(0))
-        .flatMap(scrollIntoView.apply(driver));
+        .flatMap(scrollIntoView.apply(driver, true));
   }
 
   private static final Function1<RemoteWebDriver, Function1<Frame, Try<WebElement>>> locateFrame =

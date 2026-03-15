@@ -6,3 +6,8 @@ thekla4j-websocket/src/test/
 docs/_site
 **/ignore_tests/**
 **/global_resources/publish/**
+
+#jekyll files
+docs/jekyll.log
+docs/.bundle
+docs/bin
