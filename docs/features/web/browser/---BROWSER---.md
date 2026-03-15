@@ -17,7 +17,7 @@ to the ability, which is then in turn communicating with the browser. Currently,
 
 Actor actor = Actor.named("BrowserTester");
 
-actor.whoCan(BrowseTheWeb.with(Selenium.browser()));
+actor.whoCan(BrowseTheWeb.with(Selenium.browser().build()));
 
 actor.attemptsTo(
     NavigateTo.url("https://example.com"),

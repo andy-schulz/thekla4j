@@ -97,6 +97,17 @@ Add the following dependency to your `pom.xml` file:
 </dependencies>
 ```
 
+## Quick Start
+
+**New to Thekla4j?** Check out the [Quick Start Guide](features/QUICK_START.md) to get up and running in minutes!
+
+The Quick Start Guide covers:
+- HTTP requests (GET, POST, PUT, DELETE)
+- Browser interactions
+- Result validation with `.is()`
+- Retry mechanisms
+- Complete working examples
+
 ## Usage
 
 To use Thekla4j, you need to create an actor and define the abilities that the actor has. Abilities are the tools or 
@@ -108,17 +119,16 @@ Here is an example of how to create an actor with the `BrowseTheWeb` ability:
 ```java
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.browser.core.Element;
-import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.ChromeBrowser;
+import com.teststeps.thekla4j.browser.selenium.Selenium;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
 import com.teststeps.thekla4j.browser.spp.activities.Enter;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.Title;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 
 import java.util.function.Function;
 
@@ -129,7 +139,7 @@ public class TestBasicBrowseTheWebExample {
   public void browseTheWeb() throws ActivityError {
 
     Actor actor = Actor.named("TestUser")
-      .whoCan(BrowseTheWeb.with(ChromeBrowser.withoutOptions()));
+      .whoCan(BrowseTheWeb.with(Selenium.browser().build()));
 
     Element googleSearchField = Element.found(By.xpath("//input[@name='q']"))
       .called("Google Search Field");
@@ -145,7 +155,7 @@ public class TestBasicBrowseTheWebExample {
 
         Click.on(googleSearchButton),
 
-        See.ifThe(Title.ofPage())
+        Title.ofPage()
           .is(Expected.to.pass(title -> title.contains("thekla4j"))))
 
       .getOrElseThrow(Function.identity());

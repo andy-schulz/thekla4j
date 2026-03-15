@@ -43,7 +43,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
   }
 
   @Test
@@ -85,7 +85,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     Element inputField = Element.found(By.css("#inputField")).called("Input Field");
   }
 
@@ -183,7 +183,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     Element button = Element.found(By.css("#submitButton")).called("Submit Button");
   }
 
@@ -221,7 +221,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     Element draggable = Element.found(By.css("#draggable")).called("Draggable Item");
     Element dropzone = Element.found(By.css("#dropzone")).called("Drop Zone");
   }
@@ -257,7 +257,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     
     Element sourceItem = Element.found(By.css("[data-id='item-2']")).called("Source Item");
     Element targetItem = Element.found(By.css("[data-id='item-0']")).called("Target Item");
@@ -290,7 +290,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     Element menuItem = Element.found(By.css("#menuItem")).called("Menu Item");
     Element subMenuItem = Element.found(By.css("#subMenuItem")).called("Sub Menu Item");
   }
@@ -329,7 +329,7 @@ class TestSuite {
 
   @BeforeAll
   static void setup() {
-    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser()));
+    Actor actor = Actor.named("Test User").whoCan(BrowseTheWeb.with(Selenium.browser().build()));
     Element canvas = Element.found(By.css("#drawingCanvas")).called("Canvas");
   }
 

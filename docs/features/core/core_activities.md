@@ -15,24 +15,30 @@ nav_order: 110
 | [Map](#map)     | The `Map` activity is used to transform the result of a task.                                   |
 | [Sleep](#sleep) | The `Sleep` activity is used to pause the execution of the test for a specified amount of time. |
 
-
-# Basic Interactions
-
 ___
-## See
+## Data Validation with See
 
-The `See` is used as an assertion in the screenplay pattern. It can accept a result of a task passed to it, or
-execute a task by itself.
+### Validating Activity Results
+
+Activities can be validated by calling `.is()` directly on them. This is the **recommended approach** for checking task results in the screenplay pattern.
+
+The `.is()` method is available on all activity types:
+- `Task<PT, RT>` - validates the return type RT
+- `SupplierTask<RT>` - validates the return type RT  
+- `ConsumerTask<PT>` - validates Void return
+- `BasicInteraction` - validates Void return
 
 Methods:
 
-| type   | method                     | description                                                                                       |
-|--------|----------------------------|---------------------------------------------------------------------------------------------------|
-| static | `See.ifThe( Activity )`    | Accepts a task as parameter and executes it. The result is checked for conditions.                |
-| static | `See.ifResult()...`        | A result is passed to the `See` activity and is then checked for conditions.                      |
-|        | `.is( SeeAssertion )`      | `.is()` accepts a SeeAssertion Functional Interface, which is checking the result for conditions. |
-|        | `.forAsLongAs(Duration x)` | Sets the timeout for which the `See` activity is repeated and the result is checked.              |
-|        | `.every( Duration x )`     | Repeat the `See` activity every x Seconds until the  assertion succeeds or timeout is reached.    |
+| type            | method                     | description                                                                                                      |
+|-----------------|----------------------------|------------------------------------------------------------------------------------------------------------------|
+| Activity method | `.is( SeeAssertion )`      | **Recommended**: Validate activity result directly. Accepts a SeeAssertion to check the result for conditions.   |
+|                 | `.forAsLongAs(Duration x)` | Sets the timeout for which validation is repeated until the assertion succeeds.                                  |
+|                 | `.every( Duration x )`     | Repeat the validation every x seconds until the assertion succeeds or timeout is reached.                        |
+| static          | `See.ifThe( Activity )`    | Alternative verbose form. Wraps an activity explicitly (rarely needed).                                          |
+| static          | `See.ifResult()...`        | Special case: validates the result passed from the previous activity.                                             |
+
+> **Best Practice**: Use `.is()` directly on activities for clearer test flow. The `See.ifThe()` wrapper adds unnecessary verbosity in most cases.
 
 
 ### SeeAssertion
@@ -71,14 +77,12 @@ SeeAssertion<Integer> expectedToBeGreaterThanFive = actualValue -> {
 };
 ```
 
-And then used in the `See` activity like this:
+And then used directly on an activity:
 
 ```java
-
 actor.attemptsTo(
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is( expectedToBeGreaterThanFive));
-
+  TaskReturningRandomInteger.between(1,10)
+    .is(expectedToBeGreaterThanFive));
 ```
 
 ### Expected SeeAssertion
@@ -100,67 +104,69 @@ Methods:
 
 
 **Example with Task:**
-The task ``TaskReturningRandomInteger.between(1,10)`` is executed and the result is checked if it greater than five
+The task ``TaskReturningRandomInteger.between(1,10)`` is executed and the result is checked if it is greater than five.
 
 ```java
 actor.attemptsTo(
-  
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is(Expected.to.pass( randomInteger -> randomInteger >= 5 )));
-
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.to.pass(randomInteger -> randomInteger >= 5)));
 ```
-or by defining a predicate
+
+or by defining a predicate:
 
 ```java
 Predicate<Integer> toBeGreaterThanFive = randomInteger -> randomInteger >= 5;
 
 actor.attemptsTo(
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is(Expected.to.pass(toBeGreaterThanFive)));
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.to.pass(toBeGreaterThanFive)));
 ```
-or if you want to use the same predicate to check for lower than 5
+
+or if you want to use the same predicate to check for lower than 5:
 
 ```java
 actor.attemptsTo(
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is(Expected.not.to.pass(toBeGreaterThanFive)));
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.not.to.pass(toBeGreaterThanFive)));
 ```
+
+_Note: The verbose form `See.ifThe(task).is(...)` also works but is less concise._
 
 ### Assertion Chaining
 
-You can chain multiple Assertions with the `See` activity. The `See` activity will check all assertions and fail if one 
-of them fails. If multiple assertions fail the error message will contain all failed assertions.
+You can chain multiple assertions by calling `.is()` multiple times. All assertions will be checked and the validation 
+fails if any assertion fails. If multiple assertions fail, the error message will contain all failed assertions.
 
 ```java
 actor.attemptsTo(
-  // the random integer has to be greater than 5 and a prime number
-  // I don't provide a function to check for prime number
+  // the random integer has to be greater than 5 AND a prime number
   // for multiple assertions the reason parameter is useful to identify which assertion failed
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is(Expected.to.pass( toBeGreaterThanFive, "check if greater than 5"))
-  .is(Expected.to.pass( isPrimeNumber , "check if prime number" )));
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.to.pass(toBeGreaterThanFive, "check if greater than 5"))
+    .is(Expected.to.pass(isPrimeNumber, "check if prime number")));
 ```
 
 ### Assertion Polling
 
-The `See` activity can be repeated until the assertion is successful or the timeout is reached. The `forAsLongAs` method
-is used to set the timeout. The `every` method is used to set the interval at which the assertion is checked.
+Activity validation can be repeated until the assertion is successful or the timeout is reached. The `forAsLongAs()` method
+is used to set the timeout. The `every()` method is used to set the interval at which the assertion is checked.
 
 The RandomNumber task is executed and the result will be checked if the random integer is greater than 5 
-every second for 10 seconds.
+every second for 10 seconds:
 
 ```java
 actor.attemptsTo(
-  See.ifThe( TaskReturningRandomInteger.between(1,10) )
-  .is(Expected.to.pass( toBeGreaterThanFive))
-  .forAsLongAs(Duration.ofSeconds(10))
-  .every(Duration.ofSeconds(1)));
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.to.pass(toBeGreaterThanFive))
+    .forAsLongAs(Duration.ofSeconds(10))
+    .every(Duration.ofSeconds(1)));
 ```
-The default timeout is 0 seconds so the `See` activity is executed only once. The default retry interval is 1 second 
+
+The default timeout is 0 seconds so the validation is executed only once. The default retry interval is 1 second 
 (so it could be omitted in the example above).
 
-This feature is useful for checking DB entries, or waiting for a specific state in the application (e.g. waiting for
-a GET call to return a specific value). 
+This feature is useful for checking database entries, or waiting for a specific state in the application (e.g. waiting for
+a GET call to return a specific value).
 
 ___
 ## Retry

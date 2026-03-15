@@ -31,14 +31,14 @@ class DragAndDropExample {
     public static void main(String[] args) {
         // Setup actor with browser capability
         Actor actor = Actor.named("Test User")
-            .whoCan(BrowseTheWeb.with(Selenium.browser()));
+            .whoCan(BrowseTheWeb.with(Selenium.browser().build()));
         
         // Define elements
         Element draggableElement = Element.found(By.css("#draggable"))
-            .withName("draggable item");
+            .called("draggable item");
         
         Element dropZone = Element.found(By.css("#dropzone"))
-            .withName("drop zone");
+            .called("drop zone");
         
         // Perform drag and drop
         actor.attemptsTo(
@@ -52,6 +52,9 @@ class DragAndDropExample {
 
 ```java
 // Drag and drop with automatic retry on failure
+
+Actor actor = Actor.named("Tester");
+
 actor.attemptsTo(
     Drag.element(draggableElement).to(dropZone).retry()
 );
@@ -95,7 +98,7 @@ class DragAndDropTest {
     @Test
     void shouldDragElementToDropZone() {
         Actor user = Actor.named("User")
-            .whoCan(BrowseTheWeb.with(Selenium.browser()));
+            .whoCan(BrowseTheWeb.with(Selenium.browser().build()));
         
         Element item = Element.found(By.id("item1"));
         Element target = Element.found(By.id("target-zone"));
@@ -107,7 +110,7 @@ class DragAndDropTest {
         
         // Verify the item was moved
         user.attemptsTo(
-            See.if(Text.of(target))
+            See.ifThe(Text.of(target))
             .is(Expected.to.equal("item1"))
         );
     }

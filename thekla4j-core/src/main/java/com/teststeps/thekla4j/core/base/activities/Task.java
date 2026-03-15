@@ -1,12 +1,15 @@
 package com.teststeps.thekla4j.core.base.activities;
 
+import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Retry;
+import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWithThrows;
 import com.teststeps.thekla4j.core.base.persona.Performer;
+import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import java.util.function.Predicate;
 import lombok.NonNull;
@@ -171,5 +174,27 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
   final public Retry<PT, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
         .until(predicate, "retry task " + this.getClass().getSimpleName() + " until predicate is met");
+  }
+
+  /**
+   * Validate the result of this task using a matcher.
+   * This method wraps the task in a See activity for validation.
+   *
+   * @param matcher the matcher to check the result
+   * @return a See activity that validates the result of this task
+   */
+  final public See<PT, RT> is(SeeAssertion<RT> matcher) {
+    return See.ifThe(this).is(matcher);
+  }
+
+  /**
+   * Validate the result of this task using a named matcher.
+   * This method wraps the task in a See activity for validation.
+   *
+   * @param matcher the named matcher to check the result
+   * @return a See activity that validates the result of this task
+   */
+  final public See<PT, RT> is(Tuple2<String, SeeAssertion<RT>> matcher) {
+    return See.ifThe(this).is(matcher);
   }
 }

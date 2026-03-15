@@ -2,10 +2,48 @@
 
 ## Table of Contents
 
+- [Release Notes v2.2.0](#release-notes-v220)
 - [Release Notes v2.1.0](#release-notes-v210)
 - [Release Notes v2.0.1](#release-notes-v201)
 - [Release Notes v2.0.0](#release-notes-v200)
 - [Release Notes v1.7.0](#release-notes-v170)
+
+---
+
+# Release Notes v2.2.0
+
+## Overview
+Version 2.2.0 introduces a cleaner, more concise syntax for validating activity results directly with the `.is()` method. This improvement enhances test readability by reducing verbosity while maintaining all validation features.
+
+## New Features
+- **Direct Activity Validation**: Implemented `.is()` method on all activity types for concise result validation.
+    - Available on `Task`, `SupplierTask`, `ConsumerTask`, and `BasicInteraction`
+    - **Recommended approach** for validating activity results
+    - Supports all validation features: chaining, polling with `forAsLongAs()` and `every()`
+    - Reduces code verbosity and improves test flow clarity
+
+**Before (verbose):**
+```java
+actor.attemptsTo(
+  See.ifThe(MyTask.getData())
+    .is(Expected.to.pass(data -> data.isValid()))
+    .forAsLongAs(Duration.ofSeconds(5))
+    .every(Duration.ofSeconds(1)));
+```
+
+**After (recommended):**
+```java
+actor.attemptsTo(
+  MyTask.getData()
+    .is(Expected.to.pass(data -> data.isValid()))
+    .forAsLongAs(Duration.ofSeconds(5))
+    .every(Duration.ofSeconds(1)));
+```
+
+## Documentation
+- **Core Activities**: Updated documentation to position `.is()` as the primary validation method
+- **Examples**: Revised all validation examples to demonstrate the recommended `.is()` syntax
+- **Best Practices**: Added guidance emphasizing direct activity validation for clearer test flow
 
 ---
 

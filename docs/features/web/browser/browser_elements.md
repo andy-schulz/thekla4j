@@ -23,7 +23,7 @@ Methods:
 | type   | method                         | description                                                                            |
 |--------|--------------------------------|----------------------------------------------------------------------------------------|
 | static | `Element.found( By locator )`  | Creates a new element with the given locator.                                          |
-|        | `.withName( String name )`     | Sets the name of the element, makes identifying the element easier in case of an error |
+|        | `.called( String name )`     | Sets the name of the element, makes identifying the element easier in case of an error |
 |        | `.wait( UntilElement waiter )` | wait for this element until condition is met                                           |
 |        | `.andThenFound( By locator )`  | chain multiple locators to find an element                                             |
 
@@ -32,7 +32,7 @@ Elements are declared using the `Element` class. The declaration consists of a l
 
 ```java
 Element element = Element.found(By.id("elementId"))
-  .withName("Element Name");
+  .called("Element Name");
 ```
 
 The name is important for error messages and logging. It makes it easier to understand what element is being interacted 
@@ -108,13 +108,13 @@ There are no waits no sleeps, just the plain test actions in the test code.
 
 ```java
 Element usernameField = Element.found(By.id("username"))
-  .withName("username input field")
+  .called("username input field")
   .wait(UntilElement.isVisible().forAsLongAs(Duration.ofSeconds(10)));
 
 Element passwordField = Element.found(By.id("password"));
 
 Element loginButton = Element.found(By.id("login"))
-  .withName("login button")
+  .called("login button")
   .wait(UntilElement.isEnabled());
 
 actor.attemptsTo(

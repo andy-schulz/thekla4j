@@ -143,7 +143,7 @@ public class TestBasicBrowseTheWebExample {
 
         Click.on(googleSearchButton),
 
-        See.ifThe(Title.ofPage())
+        Title.ofPage()
           .is(Expected.to.pass(title -> title.contains("thekla4j"))))
 
       .getOrElseThrow(Function.identity());

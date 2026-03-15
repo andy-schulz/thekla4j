@@ -20,17 +20,23 @@ A Task represents a unit of work that an Actor can perform. It can have input pa
 Example: Authorize to a backend and returning the token.
 
 ````java
+import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.base.activities.Task;
+import com.teststeps.thekla4j.core.base.persona.Actor;
+import io.vavr.control.Either;
+
 public class Authorize implements Task<User, String> {
     private final String url;
   
-    public Authorize(String url) {
+    private Authorize(String url) {
         this.url = url;
     }
 
     @Override
-    public String perform(Actor actor) {
+    public Either<ActivityError, String> performAs(Actor actor, User user) {
         // Perform the authorization task by sending one or multiple requests to the backend
-        return "token";
+        // Return Either.right() for success, Either.left() for errors
+        return Either.right("token");
     }
 
     public static Authorize toBackend(String url) {
