@@ -3,12 +3,13 @@ package com.teststeps.thekla4j.core.base.activities;
 import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Retry;
-import com.teststeps.thekla4j.core.activities.See;
+import com.teststeps.thekla4j.core.activities.SeeResult;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWithThrows;
 import com.teststeps.thekla4j.core.base.persona.Performer;
+import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import java.util.function.Predicate;
@@ -171,6 +172,25 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
     return (group, description) -> input -> performer.attemptsTo$_(this, group, description).using(input);
   }
 
+  /**
+   * Chain a mapping function after this task.
+   * Allows writing {@code someTask.map(result -> transform(result))} without explicit type
+   * annotation, because the compiler infers the lambda parameter type from the receiver's {@code RT}.
+   *
+   * @param fn   the function to apply to the result of this task
+   * @param <R2> the output type of the mapped task
+   * @return a new Task that first runs this task and then applies fn to its result
+   */
+  public final <R2> Task<PT, R2> map(Function1<RT, R2> fn) {
+    Task<PT, RT> self = this;
+    return new Task<PT, R2>() {
+      @Override
+      protected Either<ActivityError, R2> performAs(Actor actor, PT input) {
+        return self.performAs(actor, input).map(fn::apply);
+      }
+    };
+  }
+
   final public Retry<PT, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
         .until(predicate, "retry task " + this.getClass().getSimpleName() + " until predicate is met");
@@ -178,23 +198,23 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
 
   /**
    * Validate the result of this task using a matcher.
-   * This method wraps the task in a See activity for validation.
+   * Returns the task's result so it can be used after validation.
    *
    * @param matcher the matcher to check the result
-   * @return a See activity that validates the result of this task
+   * @return a SeeResult activity that validates and returns the result of this task
    */
-  final public See<PT, RT> is(SeeAssertion<RT> matcher) {
-    return See.ifThe(this).is(matcher);
+  final public SeeResult<PT, RT> is(SeeAssertion<RT> matcher) {
+    return SeeResult.of(this).is(matcher);
   }
 
   /**
    * Validate the result of this task using a named matcher.
-   * This method wraps the task in a See activity for validation.
+   * Returns the task's result so it can be used after validation.
    *
    * @param matcher the named matcher to check the result
-   * @return a See activity that validates the result of this task
+   * @return a SeeResult activity that validates and returns the result of this task
    */
-  final public See<PT, RT> is(Tuple2<String, SeeAssertion<RT>> matcher) {
-    return See.ifThe(this).is(matcher);
+  final public SeeResult<PT, RT> is(Tuple2<String, SeeAssertion<RT>> matcher) {
+    return SeeResult.of(this).is(matcher);
   }
 }

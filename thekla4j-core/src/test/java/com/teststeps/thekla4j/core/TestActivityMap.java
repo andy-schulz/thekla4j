@@ -5,14 +5,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.API;
 import com.teststeps.thekla4j.core.activities.Map;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
+import com.teststeps.thekla4j.core.tasks.SupplyList;
 import io.vavr.Function1;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 public class TestActivityMap {
@@ -135,5 +139,16 @@ public class TestActivityMap {
     assertThat("task execution is not successful", result.isLeft(), equalTo(true));
     assertThat("error message is as expected", result.getLeft().getMessage(), equalTo("Test exception"));
     assertThat("activity log contains reason", actor.activityLog.getLogTree().activityNodes.get(0).description, equalTo(reason));
+  }
+
+  @Test
+  void validateMap() {
+    Actor actor = Actor.named("TestUser");
+
+    Either<ActivityError, List<Integer>> result = actor.attemptsTo(
+      SupplyList.supplyNumber(1, 2, 3)
+          .is(Expected.to.pass(s -> Objects.equals(s.head(), 1))));
+
+    assertThat(result.get().head(), equalTo(1));
   }
 }

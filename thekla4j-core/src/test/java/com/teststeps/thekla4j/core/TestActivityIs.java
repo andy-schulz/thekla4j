@@ -27,7 +27,7 @@ public class TestActivityIs {
 
     Predicate<String> testForTestData = x -> x.equals("TestData");
 
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    Either<ActivityError, String> result = actor.attemptsTo(
       StaticStringTask.with("TestData")
           .is(Expected.to.pass(testForTestData, "string equals TestData")));
 
@@ -36,11 +36,11 @@ public class TestActivityIs {
     ActivityLogNode log = actor.activityLog.getLogTree();
 
     assertThat("Log should contain 1 entry", log.activityNodes.size(), equalTo(1));
-    assertThat("first element is a See activity", log.activityNodes.get(0).name, equalTo("See"));
-    assertThat("See activity has correct description", log.activityNodes.get(0).description,
-      containsString("ask if StaticStringTask is matching the validations"));
+    assertThat("first element is a SeeResult activity", log.activityNodes.get(0).name, equalTo("SeeResult"));
+    assertThat("SeeResult activity has correct description", log.activityNodes.get(0).description,
+      containsString("validate StaticStringTask and return its result"));
 
-    assertThat("See activity contains child activities", log.activityNodes.get(0).activityNodes.size(), equalTo(2));
+    assertThat("SeeResult activity contains child activities", log.activityNodes.get(0).activityNodes.size(), equalTo(2));
     assertThat("ValidateResult activity exists", log.activityNodes.get(0).activityNodes.get(1).name, equalTo("ValidateResult"));
     assertThat("ValidateResult activity passed", log.activityNodes.get(0).activityNodes.get(1).status, equalTo(ActivityStatus.passed));
     assertThat("ValidateResult shows assertion result", log.activityNodes.get(0).activityNodes.get(1).output,
@@ -53,7 +53,7 @@ public class TestActivityIs {
 
     Predicate<String> testForTestData = x -> x.equals("TestData");
 
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    Either<ActivityError, String> result = actor.attemptsTo(
       StaticStringTask.with("TestData")
           .is(Expected.to.pass(testForTestData)));
 
@@ -66,7 +66,7 @@ public class TestActivityIs {
 
     Predicate<String> testForExpected = x -> x.equals("expected");
 
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    Either<ActivityError, String> result = actor.attemptsTo(
       StaticStringTask.with("actual")
           .is(Expected.to.pass(testForExpected, "matches expected value")));
 
@@ -93,7 +93,7 @@ public class TestActivityIs {
         .using(5);
 
     assertThat("task validation passes after retry", result.isRight());
-    assertThat("result value is correct", result.get(), equalTo(5));
+    assertThat("result value is correct", result.get(), equalTo(8));
   }
 
   @Test
@@ -121,8 +121,8 @@ public class TestActivityIs {
 
     // Test with Task (already tested above with StaticStringTask and CountingTask)
 
-    // Test with SupplierTask - the is() wraps it in See which returns the input type (Void in this case)
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    // Test with Task - .is() now returns the task's result type (Integer for TaskSucceeding)
+    Either<ActivityError, Integer> result = actor.attemptsTo(
       TaskSucceeding.after(1)
           .is(Expected.to.pass(x -> x > 0, "value is positive")));
 
@@ -136,7 +136,7 @@ public class TestActivityIs {
     Predicate<String> lengthCheck = x -> x.length() > 5;
     Predicate<String> contentCheck = x -> x.contains("Test");
 
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    Either<ActivityError, String> result = actor.attemptsTo(
       StaticStringTask.with("TestData")
           .is(Expected.to.pass(lengthCheck, "length greater than 5"))
           .is(Expected.to.pass(contentCheck, "contains Test")));
@@ -146,7 +146,7 @@ public class TestActivityIs {
     ActivityLogNode log = actor.activityLog.getLogTree();
 
     assertThat("Log should contain 1 entry", log.activityNodes.size(), equalTo(1));
-    assertThat("See activity contains validation", log.activityNodes.get(0).activityNodes.size(), equalTo(2));
+    assertThat("SeeResult activity contains validation", log.activityNodes.get(0).activityNodes.size(), equalTo(2));
     assertThat("ValidateResult shows both assertions", log.activityNodes.get(0).activityNodes.get(1).output,
       containsString("length greater than 5"));
     assertThat("ValidateResult shows both assertions", log.activityNodes.get(0).activityNodes.get(1).output,
@@ -157,7 +157,7 @@ public class TestActivityIs {
   public void taskIsMethodVerifyActivityLogging() {
     Actor actor = Actor.named("Test Actor");
 
-    Either<ActivityError, Void> result = actor.attemptsTo(
+    Either<ActivityError, String> result = actor.attemptsTo(
       StaticStringTask.with("LogTest")
           .is(Expected.to.pass(x -> x.equals("LogTest"), "log test assertion")));
 
@@ -166,11 +166,11 @@ public class TestActivityIs {
     ActivityLogNode log = actor.activityLog.getLogTree();
 
     // Verify the log structure
-    assertThat("Root has one See activity", log.activityNodes.size(), equalTo(1));
+    assertThat("Root has one SeeResult activity", log.activityNodes.size(), equalTo(1));
 
     ActivityLogNode seeNode = log.activityNodes.get(0);
-    assertThat("See activity name", seeNode.name, equalTo("See"));
-    assertThat("See activity passed", seeNode.status, equalTo(ActivityStatus.passed));
+    assertThat("SeeResult activity name", seeNode.name, equalTo("SeeResult"));
+    assertThat("SeeResult activity passed", seeNode.status, equalTo(ActivityStatus.passed));
 
     // See should have 2 children: the task being validated and ValidateResult
     assertThat("See has 2 children", seeNode.activityNodes.size(), equalTo(2));
@@ -195,6 +195,6 @@ public class TestActivityIs {
         .using(3);
 
     assertThat("task passes with retry configuration", result.isRight());
-    assertThat("result value is correct", result.get(), equalTo(3));
+    assertThat("result value is correct", result.get(), equalTo(5));
   }
 }

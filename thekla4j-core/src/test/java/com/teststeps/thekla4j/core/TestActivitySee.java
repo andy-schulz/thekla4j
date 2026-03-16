@@ -32,7 +32,7 @@ public class TestActivitySee {
     Predicate<String> testForTestData = x -> x.equals("TestData");
 
     Either<ActivityError, Void> result = tester.attemptsTo(
-      See.<Void, String>ifThe(StaticStringTask.with("TestData"))
+      See.ifThe(StaticStringTask.with("TestData"))
           .is(Expected.to.pass(testForTestData, "predicate one")));
 
     assertThat("Either is right", result.isRight());
@@ -61,7 +61,7 @@ public class TestActivitySee {
     Predicate<String> testForTestData = x -> x.equals("TestData");
 
     Either<ActivityError, Void> result = tester.attemptsTo(
-      See.<Void, String>ifThe(StaticStringTask.with("TestData"))
+      See.ifThe(StaticStringTask.with("TestData"))
           .is(Expected.to.pass(testForTestData)));
 
     assertThat("Either is right", result.isRight());
