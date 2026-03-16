@@ -58,6 +58,43 @@ ${MY_PARAM.name}
 ${MY_PARAM.address.city}
 ```
 
+### Gherkin Example
+
+The following scenario demonstrates all generator patterns working together in a realistic feature file.
+It creates a user and a product, verifies the result, and cleans up — without a single hardcoded ID or
+timestamp:
+
+```gherkin
+Scenario: Admin creates and removes a product listing
+    Given Alice is logged in as an administrator using:
+      | user | createUser{role: admin} => ${ALICE} |
+    When Alice creates a new product with the following details:
+      | product name*?  | Widget_?{TIMESTAMP_IN_MS} => ${PRODUCT_NAME} |
+      | product sku*?   | SKU-?{TIMESTAMP_IN_MS} => ${PRODUCT_SKU}     |
+      | price*?         | 29.99                                        |
+      | owner id*?      | ${ALICE.id}                                  |
+      | owner name*?    | ${ALICE.name}                                |
+      | available until | dateOffset{+365d}                            |
+    Then she can see the product ${PRODUCT_NAME} in the product list:
+      | sku             | ${PRODUCT_SKU}    |
+      | price           | 29.99             |
+      | owner id        | ${ALICE.id}       |
+      | owner name      | ${ALICE.name}     |
+      | available until | dateOffset{+365d} |
+    When she removes the product ${PRODUCT_NAME}
+```
+
+Here is what each pattern does:
+
+| Pattern | Type | Explanation |
+|---|---|---|
+| `createUser{role: admin} => ${ALICE}` | Generator with storage | Calls the `createUser` generator with a `role` parameter. The returned value is a JSON object (e.g. `{"id": "user-42", "name": "Alice Admin"}`) stored as `${ALICE}`. |
+| `Widget_?{TIMESTAMP_IN_MS} => ${PRODUCT_NAME}` | Inline generator embedded in a string, with storage | The built-in `?{TIMESTAMP_IN_MS}` inline generator is embedded in the prefix `Widget_` to produce a unique name at runtime (e.g. `Widget_1710582007123`). The full resulting string is stored as `${PRODUCT_NAME}`. |
+| `SKU-?{TIMESTAMP_IN_MS} => ${PRODUCT_SKU}` | Inline generator embedded in a string, with storage | Same pattern as above — a unique SKU is generated and stored as `${PRODUCT_SKU}`. |
+| `${ALICE.id}`, `${ALICE.name}` | JSON dot-notation reference | When a stored parameter holds a JSON object, individual fields are accessed using dot notation. Nested paths like `${ALICE.address.city}` are also supported. |
+| `dateOffset{+365d}` | Generator without storage | Calls the `dateOffset` generator to compute a date relative to today. The result is used directly in the step without being stored. |
+| `${PRODUCT_NAME}`, `${PRODUCT_SKU}` | Parameter reference | Reference values stored in earlier steps — used to verify the created product and to target it for deletion. |
+
 ---
 
 ## Registering Generators – New Form (Annotation-based)
