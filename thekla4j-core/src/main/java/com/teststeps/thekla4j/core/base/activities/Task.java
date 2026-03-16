@@ -191,6 +191,23 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
     };
   }
 
+  /**
+   * Retry this task until the given predicate returns {@code true} for the result.
+   * Retries on both task failure (Left) and predicate returning false.
+   * Defaults to a 5-second timeout with a 1-second interval between attempts.
+   * Chain with {@link Retry#forAsLongAs(Duration)} and {@link Retry#every(Duration)} to configure,
+   * and with {@link Task#map(Function1)} and {@link Task#is} to transform and validate the final result:
+   * <pre>{@code
+   * task.retry(n -> n > 0)
+   *     .forAsLongAs(Duration.ofSeconds(10))
+   *     .every(Duration.ofMillis(200))
+   *     .map(n -> "result=" + n)
+   *     .is(Expected.to.pass(s -> s.startsWith("result=")));
+   * }</pre>
+   *
+   * @param predicate the stop condition — retrying stops when this returns {@code true}
+   * @return a configured {@link Retry} activity wrapping this task
+   */
   final public Retry<PT, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
         .until(predicate, "retry task " + this.getClass().getSimpleName() + " until predicate is met");

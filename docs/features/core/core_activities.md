@@ -12,7 +12,7 @@ nav_order: 110
 |-----------------|-------------------------------------------------------------------------------------------------|
 | [See](#see)     | The `See` activity is used to assert the result of a task.                                      |
 | [Retry](#retry) | The `Retry` activity is used to repeat a task until it succeeds or the timeout is reached.      |
-| [Map](#map)     | The `Map` activity is used to transform the result of a task.                                   |
+| [Map](#mapping) | Transform a task's result inline with `.map()` or via the static `API.map()` activity.          |
 | [Sleep](#sleep) | The `Sleep` activity is used to pause the execution of the test for a specified amount of time. |
 
 ___
@@ -179,6 +179,44 @@ ___
 The `Retry` activity is used to repeat a task until it succeeds or the timeout is reached. The `Retry` activity is
 useful for tasks that are not deterministic, like waiting for a specific state in the application.
 
+### Shorthand `task.retry()` Method
+
+The most concise way to retry a `Task` or `SupplierTask` is calling `.retry(predicate)` directly on the task.
+This is equivalent to the verbose static form but keeps the code fluent:
+
+```java
+// Shorthand (recommended)
+actor.attemptsTo(
+  GetCurrentTime.now()
+    .retry(time -> time > expectedTime)
+    .forAsLongAs(Duration.ofSeconds(10))
+    .every(Duration.ofMillis(200)));
+
+// Equivalent verbose form
+actor.attemptsTo(
+  Retry.task(GetCurrentTime.now())
+    .until(time -> time > expectedTime, "time exceeds expected")
+    .forAsLongAs(Duration.ofSeconds(10))
+    .every(Duration.ofMillis(200)));
+```
+
+**Full chain — retry, then map, then validate:**
+
+After `.retry()` resolves, you can continue with `.map()` and `.is()` to transform and validate the final value:
+
+```java
+Either<ActivityError, String> result = actor.attemptsTo(
+  CountingTaskSupplier.failsUntil(4)
+    .retry(n -> n >= 4)                                  // retry until task returns n >= 4
+    .forAsLongAs(Duration.ofSeconds(10))
+    .every(Duration.ofMillis(100))
+    .map(n -> "count=" + n)                              // transform result
+    .is(Expected.to.pass(s -> s.startsWith("count=")))); // validate and return
+// result.get() == "count=4"
+```
+
+### Static `Retry.task()` API
+
 Methods:
 
 | type   | method                   | description                                                                                      |
@@ -226,7 +264,62 @@ ___
 The `Mapping` feature is used to transform the result of a task. There are circumstances where its easier to transform the
 result of a task with a function then creating a new Task.
 
-The API class contains a static method `map` that accepts a function to which the result of the preceding task is passed.
+### Instance `.map()` Method
+
+The recommended approach is to call `.map()` directly on a `Task` or `SupplierTask`. This keeps the chain fluent and
+works seamlessly with `.is()` and `.retry()`.
+
+**Single map — type changes from `List<Integer>` to `Integer`:**
+
+```java
+actor.attemptsTo(
+  SupplyList.numbers(1, 2, 3)
+    .map(l -> l.head())                                  // List<Integer> → Integer
+    .is(Expected.to.pass(n -> n == 1, "head is 1")));
+```
+
+**Chained maps — each step narrows the type:**
+
+```java
+Either<ActivityError, String> result = actor.attemptsTo(
+  SupplyList.numbers(5, 6, 7)
+    .map(l -> l.head())                                  // List<Integer> → Integer
+    .map(n -> "value=" + n)                              // Integer → String
+    .is(Expected.to.pass(s -> s.equals("value=5"))));
+// result.get() == "value=5"
+```
+
+**Task with input:**
+
+```java
+Either<ActivityError, String> result = actor.attemptsTo_(
+  AddNumber.of(5)
+    .map(n -> "sum=" + n)                                // Integer → String
+    .is(Expected.to.pass(s -> s.equals("sum=15"))))
+  .using(10);
+// result.get() == "sum=15"
+```
+
+> **Key advantage:** `.is()` validates *and returns* the mapped result. The return type of
+> `actor.attemptsTo()` reflects the final mapped type — no extra `See.ifResult()` step needed.
+
+**Full chain with retry:**
+
+```java
+Either<ActivityError, Integer> result = actor.attemptsTo(
+  CountingTask.failsUntil(4)
+    .retry(n -> n >= 4)
+    .forAsLongAs(Duration.ofSeconds(10))
+    .every(Duration.ofMillis(200))
+    .map(n -> n * 10)                                    // Integer → Integer
+    .is(Expected.to.pass(n -> n == 40, "mapped value is 40")));
+// result.get() == 40
+```
+
+### Static `API.map()` Activity
+
+The API class also contains a static `map` method that accepts a function to which the result of the preceding task is passed.
+Use this form when you need to transform a result mid-chain between independent activities.
 
 Methods:
 

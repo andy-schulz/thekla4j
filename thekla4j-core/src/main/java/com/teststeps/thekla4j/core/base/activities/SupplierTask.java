@@ -137,10 +137,21 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
   }
 
   /**
-   * Create a retry for this supplier task
+   * Retry this supplier task until the given predicate returns {@code true} for the result.
+   * Retries on both task failure (Left) and predicate returning {@code false}.
+   * Defaults to a 5-second timeout with a 1-second interval between attempts.
+   * Chain with {@link Retry#forAsLongAs(Duration)} and {@link Retry#every(Duration)} to configure,
+   * and with {@link Task#map(Function1)} and {@link Task#is} to transform and validate the final result:
+   * <pre>{@code
+   * supplierTask.retry(n -> n > 0)
+   *     .forAsLongAs(Duration.ofSeconds(10))
+   *     .every(Duration.ofMillis(200))
+   *     .map(n -> "result=" + n)
+   *     .is(Expected.to.pass(s -> s.startsWith("result=")));
+   * }</pre>
    *
-   * @param predicate - the predicate to check if the task should be retried
-   * @return - the retry task
+   * @param predicate the stop condition — retrying stops when this returns {@code true}
+   * @return a configured {@link Retry} activity wrapping this task
    */
   final public Retry<Void, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
