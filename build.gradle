@@ -1,3 +1,20 @@
+// axion-release is applied ONLY on the root project so that JGit's IndexDiff
+// (git status walk) runs exactly once instead of once per subproject.
+// All subprojects reference rootProject.scmVersion.version via the publish convention plugin.
+plugins {
+    id "pl.allegro.tech.build.axion-release"
+}
+
+scmVersion {
+    versionCreator { version, position ->
+        version
+    }
+    versionIncrementer("incrementMinor")
+    monorepo {
+        include(subprojects.collect { p -> p.name })
+    }
+}
+
 // Task: gitReleaseNotes
 // Aufrufbeispiel:
 //   gradlew gitReleaseNotes -PtagRange=v1.7.0..HEAD

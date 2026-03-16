@@ -13,17 +13,16 @@ tasks.named('sourcesJar') {
 }
 
 // ATTENTION: always set scmVersion properties before assigning the version to the version property
-scmVersion {
-    versionCreator { version, position ->
-        version
-    }
-    versionIncrementer("incrementMinor")
-    monorepo {
-        include(rootProject.subprojects.collect({p -> p.name}))
+// axion-release is applied only on the root project (see root build.gradle).
+// Subprojects reference rootProject.scmVersion.version so JGit IndexDiff runs exactly once.
+
+// Lazy version resolution: defers the git call to execution time (not configuration time).
+version = new Object() {
+    @Override
+    String toString() {
+        rootProject.scmVersion.version
     }
 }
-
-version = scmVersion.version
 
 publishing {
 
@@ -31,7 +30,11 @@ publishing {
         maven {
             def releasesRepoUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
             def snapshotsRepoUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
-            url = project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            // Lazy URL: defer version resolution to task execution so JGit IndexDiff
+            // (triggered by axion-release checkUncommittedChanges) does not run during configuration.
+            url = providers.provider {
+                project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            }
 
             credentials {
                 username = project.findProperty('ossrhToken')
@@ -48,7 +51,8 @@ publishing {
 
             groupId = 'com.test-steps.thekla4j'
 //            archivesName = "test-steps-thekla4j"
-            version = project.version
+            // version is omitted: maven-publish derives it from project.version automatically,
+            // which keeps axion-release lazy and avoids eager JGit file-tree traversal.
 
             pom {
                 name = 'thekla4j'
