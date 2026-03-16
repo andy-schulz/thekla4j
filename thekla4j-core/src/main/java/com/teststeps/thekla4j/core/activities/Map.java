@@ -3,7 +3,7 @@ package com.teststeps.thekla4j.core.activities;
 import com.teststeps.thekla4j.activityLog.annotations.Action;
 import com.teststeps.thekla4j.activityLog.annotations.Called;
 import com.teststeps.thekla4j.commons.error.ActivityError;
-import com.teststeps.thekla4j.core.base.activities.Interaction;
+import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function1;
 import io.vavr.control.Either;
@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2(topic = "Map")
 @Action("@{reason}")
-public class Map<T, R> extends Interaction<T, R> {
+public class Map<T, R> extends Task<T, R> {
 
   private final Function1<T, Try<R>> mapper;
   @Called(name = "reason")

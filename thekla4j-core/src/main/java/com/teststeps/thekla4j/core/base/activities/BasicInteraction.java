@@ -1,13 +1,10 @@
 package com.teststeps.thekla4j.core.base.activities;
 
-import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.activities.Retry;
-import com.teststeps.thekla4j.core.activities.See;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
-import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
@@ -121,29 +118,5 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
   public Retry<Void, Void> retry() {
     return Retry.task(this)
         .until(r -> true, "retry " + this.getClass().getSimpleName());
-  }
-
-  /**
-   * Validate the result of this basic interaction using a matcher.
-   * This method wraps the interaction in a See activity for validation.
-   * Note: Basic interactions return Void, so the matcher validates Void.
-   *
-   * @param matcher the matcher to check the result
-   * @return a See activity that validates the result of this interaction
-   */
-  public See<Void, Void> is(SeeAssertion<Void> matcher) {
-    return See.ifThe(this).is(matcher);
-  }
-
-  /**
-   * Validate the result of this basic interaction using a named matcher.
-   * This method wraps the interaction in a See activity for validation.
-   * Note: Basic interactions return Void, so the matcher validates Void.
-   *
-   * @param matcher the named matcher to check the result
-   * @return a See activity that validates the result of this interaction
-   */
-  public See<Void, Void> is(Tuple2<String, SeeAssertion<Void>> matcher) {
-    return See.ifThe(this).is(matcher);
   }
 }

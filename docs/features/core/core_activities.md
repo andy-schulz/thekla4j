@@ -22,11 +22,16 @@ ___
 
 Activities can be validated by calling `.is()` directly on them. This is the **recommended approach** for checking task results in the screenplay pattern.
 
-The `.is()` method is available on all activity types:
+**The `.is()` method is available on activities that return a result:**
 - `Task<PT, RT>` - validates the return type RT
 - `SupplierTask<RT>` - validates the return type RT  
-- `ConsumerTask<PT>` - validates Void return
-- `BasicInteraction` - validates Void return
+
+**Not available on:**
+- `BasicInteraction` - returns Void (no result to validate)
+- `ConsumerTask<PT>` - returns Void (no result to validate)
+- `Interaction<PT, RT>` - use `See.ifThe()` for custom Interaction subclasses
+
+> **Note**: `Interaction` class doesn't have `.is()` due to type erasure conflicts with the See class which extends Interaction. For custom Interaction subclasses, use `See.ifThe(myInteraction).is(matcher)` instead.
 
 Methods:
 
