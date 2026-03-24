@@ -1,3 +1,75 @@
+/* ── CSS custom properties ─────────────────────────────────────── */
+:root {
+    --color-failed:  red;
+    --color-passed:  green;
+    --color-running: black;
+    --color-duration: #e50a78;
+    --color-activity-name: #ff0bb1;
+    --color-timestamp: #0277bd;
+    --color-info-bg: #f5f5f5;
+    --color-info-border: #d0d0d0;
+    --color-attachment-bg: #f8f8f8;
+    --color-attachment-border: #ddd;
+    --color-content-button: #31708f;
+    --color-content-button-active: #73318f;
+    --color-legend-bg: #f0f0f0;
+    --color-legend-border: #ccc;
+    --color-legend-text: inherit;
+    /* panel header accent colors */
+    --color-panel-input:      #1976d2;
+    --color-panel-output:     #388e3c;
+    --color-panel-desc:       #7b1fa2;
+    --color-panel-attachment: #e65100;
+    --color-panel-video:      #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+    /* only apply when user has not manually forced light mode */
+    :root:not([data-theme="light"]) {
+        --color-info-bg: #2a2a2a;
+        --color-info-border: #444;
+        --color-attachment-bg: #232323;
+        --color-attachment-border: #3a3a3a;
+        --color-timestamp: #7ec8e3;
+        --color-legend-bg: #2d2d2d;
+        --color-legend-border: #555;
+        --color-legend-text: #d4d4d4;
+        /* panel header accent colors – slightly lighter for dark bg */
+        --color-panel-input:      #42a5f5;
+        --color-panel-output:     #66bb6a;
+        --color-panel-desc:       #ba68c8;
+        --color-panel-attachment: #ffa726;
+        --color-panel-video:      #ef5350;
+    }
+    :root:not([data-theme="light"]) body,
+    :root:not([data-theme="light"]) #ActivityLog {
+        background: #1e1e1e;
+        color: #d4d4d4;
+    }
+}
+
+/* Manual dark mode override (regardless of system preference) */
+:root[data-theme="dark"] {
+    --color-info-bg: #2a2a2a;
+    --color-info-border: #444;
+    --color-attachment-bg: #232323;
+    --color-attachment-border: #3a3a3a;
+    --color-timestamp: #7ec8e3;
+    --color-legend-bg: #2d2d2d;
+    --color-legend-border: #555;
+    --color-legend-text: #d4d4d4;
+    --color-panel-input:      #42a5f5;
+    --color-panel-output:     #66bb6a;
+    --color-panel-desc:       #ba68c8;
+    --color-panel-attachment: #ffa726;
+    --color-panel-video:      #ef5350;
+}
+[data-theme="dark"] body,
+[data-theme="dark"] #ActivityLog {
+    background: #1e1e1e;
+    color: #d4d4d4;
+}
+
 ul, #ActivityLog {
     list-style-type: none;
     font-family: monospace;
@@ -25,21 +97,21 @@ ul, #ActivityLog {
 }
 
 .task.failed::before {
-    color: red;
+    color: var(--color-failed);
 }
 
 .task.passed::before {
-    color: green;
+    color: var(--color-passed);
 }
 
 .task.running::before {
-    color: black;
+    color: var(--color-running);
 }
 
 .task-open::before {
     -ms-transform: rotate(90deg); /* IE 9 */
-    -webkit-transform: rotate(90deg); /* Safari */'
-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg); /* Safari */
+    transform: rotate(90deg);
 }
 
 .nested {
@@ -52,72 +124,72 @@ transform: rotate(90deg);
 
 .longDescription {
     display: none;
+    margin-top: 6px;
+    padding-left: 1em;
+    transition: opacity 0.15s ease;
 }
 
 .descriptionActive {
     display: block;
 }
 
-.longDescription .descHeader {
-    background: lightgray;
-    border-radius: 1em;
-    border: 1px solid #898989;
-    position: relative;
-    top: 0.7em;
-    width: max-content;
-    right: -1em;
-    padding-left: 1em;
-    padding-right: 1em;
-}
-
-.longDescription .descMessage {
-    background: lightgray;
-    border-radius: 0.2em;
-    border: 1px solid #898989;
-    padding-left: 0.5em;
-}
-
 .inInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 .outInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 
 .attachmentInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 
 .videoInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
+}
+
+/* ── Info panel card ─────────────────────────────────────────────── */
+.ioContent {
+    border: 1px solid var(--color-info-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 10px;
 }
 
 .infoHeader {
-    background: lightgray;
-    border-radius: 1em;
-    border: 1px solid #898989;
-    position: relative;
-    top: 0.7em;
-    width: max-content;
-    right: -1em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #555; /* fallback; overridden per type below */
 }
 
 .infoMessage {
-    background: lightgray;
-    border-radius: 0.2em;
-    border: 1px solid #898989;
-    padding-left: 0.5em;
+    background: var(--color-info-bg);
+    padding: 8px 12px;
 }
 
-.ioContent {
-    margin-bottom: 10px;
-}
+/* Per-type header accent colors */
+.inInfo          .infoHeader { background: var(--color-panel-input); }
+.outInfo         .infoHeader { background: var(--color-panel-output); }
+.longDescription .infoHeader { background: var(--color-panel-desc); }
+.attachmentInfo  .infoHeader { background: var(--color-panel-attachment); }
+.videoInfo       .infoHeader { background: var(--color-panel-video); }
 .outActive {
     display: block;
 }
@@ -143,26 +215,74 @@ transform: rotate(90deg);
 }
 
 .contentButton {
-    /*position: absolute;*/
-    cursor: help;
-    /*border: 1px solid white;*/
-    border-radius: 2px;
-    box-shadow: 1px 1px 1px #808080;
-    color: white;
-    font-weight: bold;
-    height: 11px;
-    padding: 2px 4px 2px 4px;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1.5px solid var(--btn-accent, var(--color-content-button));
+    color: var(--btn-accent, var(--color-content-button));
+    background: transparent;
+    font-weight: 600;
+    padding: 1px 7px;
     text-align: center;
-    min-width: 12px;
-    font-size: x-small;
-    display: inline-block;
-    margin-left: 1em;
-    background: #31708f;
-    /*background: radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -moz-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -ms-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -o-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -webkit-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 0.6em;
+    vertical-align: middle;
+    transition: background 0.15s ease, color 0.15s ease;
+    user-select: none;
+}
+
+.contentButton:hover {
+    background: var(--btn-accent, var(--color-content-button));
+    color: white;
+}
+
+/* Per-type accent colors via --btn-accent */
+.inContentButton         { --btn-accent: var(--color-panel-input); }
+.outContentButton        { --btn-accent: var(--color-panel-output); }
+.attachmentContentButton { --btn-accent: var(--color-panel-attachment); }
+.videoContentButton      { --btn-accent: var(--color-panel-video); }
+.ellipses.contentButton  { --btn-accent: var(--color-panel-desc); }
+
+.legendButton {
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid #888;
+    background: var(--color-content-button);
+    color: white;
+    font-size: 12px;
+    padding: 2px 8px;
+    margin-left: 8px;
+}
+
+.legendButton:hover {
+    background: var(--color-content-button-active);
+}
+
+.legendButton--failed {
+    background: #a94442;
+    border-color: #843534;
+}
+
+.legendButton--failed:hover {
+    background: #c0392b;
+}
+
+.legendButton--theme {
+    background: #666;
+    border-color: #555;
+    margin-left: auto;
+    min-width: 5.5em;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.legendButton--theme:hover {
+    background: #444;
 }
 
 .video {
@@ -173,18 +293,19 @@ transform: rotate(90deg);
 }
 
 .videoButton {
-    padding: 2px 2px 5px 2px;
-    font-size:12px;
-    color:white;
+    font-size: 12px;
+    color: inherit;
 }
 
 .iconButton {
-    padding-right: 4px;
-    color:white;
+    padding-right: 3px;
+    color: inherit;
 }
 
 .contentButton.active {
-    background: #73318f;
+    background: var(--btn-accent, var(--color-content-button));
+    color: white;
+    border-color: var(--btn-accent, var(--color-content-button));
 }
 
 .interaction::before {
@@ -194,32 +315,47 @@ transform: rotate(90deg);
 }
 
 .interaction.failed::before {
-    color: red;
+    color: var(--color-failed);
 }
 
 .interaction.passed::before {
-    color: green;
+    color: var(--color-passed);
 }
 
 .interaction.running::before {
-    color: black;
+    color: var(--color-running);
 }
 
 .logMessage.fail {
-    color: red;
+    color: var(--color-failed);
 }
 
 .logMessage .timestamp {
-    color: lightskyblue;
+    color: var(--color-timestamp);
     display: none;
 }
 
+.logMessage .timestamp .ts-date {
+    opacity: 0.5;
+    font-size: 0.85em;
+}
+
+.logMessage .timestamp .ts-time {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.logMessage .timestamp .ts-micro {
+    opacity: 0.35;
+    font-size: 0.75em;
+}
+
 .logMessage .duration {
-    color: #e50a78;
+    color: var(--color-duration);
 }
 
 .activityName {
-    color: #ff0bb1;
+    color: var(--color-activity-name);
 }
 
 pre {
@@ -236,11 +372,12 @@ pre {
     display: flex;
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    background-color: var(--color-legend-bg);
+    border: 1px solid var(--color-legend-border);
     border-radius: 5px;
     font-family: Arial, sans-serif;
     font-size: 14px;
+    color: var(--color-legend-text);
 }
 
 .legend #toggleTimeSpan {
@@ -249,8 +386,8 @@ pre {
 
 /* Stacktrace block formatting */
 .attachment-block {
-    background: #f8f8f8;
-    border: 1px solid #ddd;
+    background: var(--color-attachment-bg);
+    border: 1px solid var(--color-attachment-border);
     padding: 10px;
     border-radius: 4px;
     font-size: 13px;

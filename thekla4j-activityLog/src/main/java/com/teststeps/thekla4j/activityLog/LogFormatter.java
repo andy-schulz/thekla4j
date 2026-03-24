@@ -70,11 +70,11 @@ public class LogFormatter {
           <span><span class="activityName">[{$$_NODE_NAME}]</span> - </span>
           <span class="activityDescription">{$$_NODE_DESCRIPTION}</span>
         </span>"""
-        .replace("{$$_NODE_STARTED_AT}", node.startedAt)
-        .replace("{$$_NODE_ENDED_AT}", node.endedAt)
+        .replace("{$$_NODE_STARTED_AT}", escapeHtml(node.startedAt))
+        .replace("{$$_NODE_ENDED_AT}", escapeHtml(node.endedAt))
         .replace("{$$_NODE_DURATION}", formatDuration(node.duration))
-        .replace("{$$_NODE_NAME}", node.name)
-        .replace("{$$_NODE_DESCRIPTION}", (node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
+        .replace("{$$_NODE_NAME}", escapeHtml(node.name))
+        .replace("{$$_NODE_DESCRIPTION}", escapeHtml(node.description.length() > 100 ? node.description.substring(0, 90) : node.description));
   }
 
   /**
@@ -87,89 +87,49 @@ public class LogFormatter {
   private static String formatNodeToHtml(ActivityLogNode logNode) {
 
     Option<String> descr = Option.of(logNode.description);
+    boolean isTask = logNode.logType.equals(ActivityLogEntryType.Task) || logNode.logType.equals(ActivityLogEntryType.Group);
+    boolean isInteraction = logNode.logType == ActivityLogEntryType.Interaction;
 
-    if (logNode.logType.equals(ActivityLogEntryType.Task) || logNode.logType.equals(ActivityLogEntryType.Group)) {
-
-      return """
-          <li><span class="task {$$_TASK_STATUS}">{$$_LOG_SHORT_CONTENT}</span>
-          {$$_EXPAND_DESCRIPTION_BUTTON}
-          {$$_IN_BUTTON}
-          {$$_OUT_BUTTON}
-          {$$_ATTACHMENT_BUTTON}
-          {$$_VIDEO_ATTACHMENT_BUTTON}
-          <div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre>{$$_DESCRIPTION}</pre></div></div>
-          {$$_IO_CONTENT}
-          <ul class="nested">{$$_SUBNOTES}</ul>
-          </li>
-          """
-          .replace("{$$_TASK_STATUS}", logNode.status.toString())
-          .replace("{$$_LOG_SHORT_CONTENT}", formatShortLogContentToHtml(logNode))
-          .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "")
-
-          .replace("{$$_IN_BUTTON}",
-            Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-                "<span class=\"label contentButton inContentButton\"><i class=\"fa fa-hand-o-right iconButton\"></i>In</span>")
-
-          .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-              "<span class=\"label contentButton outContentButton\"><i class=\"fa fa-hand-o-left iconButton\"></i>Out</span>")
-
-          .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-              "<span class=\"label contentButton attachmentContentButton\"><i class=\"fa fa-file-photo-o iconButton\"></i>Attachment</span>")
-
-          .replace("{$$_VIDEO_ATTACHMENT_BUTTON}", Objects.isNull(logNode.videoAttachments) || logNode.videoAttachments.isEmpty() ? "" :
-              "<span class=\"label videoContentButton contentButton videoButton\" ><i class=\"fa fa-video-camera videoButton\"></i></span>")
-
-          .replace("{$$_DESCRIPTION}", descr.getOrElse("").length() <= 100 ? "" : logNode.description)
-          .replace("{$$_IO_CONTENT}",
-            formatIOElement(
-              logNode.input, logNode.output,
-              Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments),
-              Objects.isNull(logNode.videoAttachments) ? List.empty() : List.ofAll(logNode.videoAttachments)))
-
-          .replace("{$$_SUBNOTES}", logNode.activityNodes.stream().reduce("", (acc, logEntry) -> acc + formatNodeToHtml(logEntry), (s1, s2) -> null));
-
-    } else if (logNode.logType == ActivityLogEntryType.Interaction) {
-
-      return """
-          <li class="interaction {$$_TASK_STATUS}">{$$_LOG_SHORT_CONTENT}
-            {$$_EXPAND_DESCRIPTION_BUTTON}
-            {$$_IN_BUTTON}
-            {$$_OUT_BUTTON}
-            {$$_ATTACHMENT_BUTTON}
-            {$$_VIDEO_ATTACHMENT_BUTTON}
-          <div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre>{$$_DESCRIPTION}</pre></div></div>
-          {$$_IO_CONTENT}
-          </li>
-          """
-          .replace("{$$_TASK_STATUS}", logNode.status.toString())
-          .replace("{$$_LOG_SHORT_CONTENT}", formatShortLogContentToHtml(logNode))
-          .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", descr.getOrElse("").length() > 100 ? "<span class=\"ellipses contentButton\">...</span>" : "")
-
-          .replace("{$$_IN_BUTTON}",
-            Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
-                """
-                      <span class="label contentButton inContentButton"><i class="fa fa-hand-o-right iconButton"></i>In</span>
-                    """)
-
-          .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
-              "<span class=\"label contentButton outContentButton\"><i class=\"fa fa-hand-o-left iconButton\"></i>Out</span>")
-
-          .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
-              "<span class=\"label contentButton attachmentContentButton\"><i class=\"fa fa-file-photo-o iconButton\"></i>Attachment</span>")
-
-          .replace("{$$_VIDEO_ATTACHMENT_BUTTON}", Objects.isNull(logNode.videoAttachments) || logNode.videoAttachments.isEmpty() ? "" :
-              "<span class=\"label attachmentContentButton contentButton videoButton\" ><i class=\"fa fa-video-camera videoButton\"></i></span>")
-
-          .replace("{$$_DESCRIPTION}", descr.getOrElse("").length() <= 100 ? "" : logNode.description.replace("%", "%%"))
-          .replace("{$$_IO_CONTENT}",
-            formatIOElement(
-              logNode.input, logNode.output,
-              Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments),
-              Objects.isNull(logNode.videoAttachments) ? List.empty() : List.ofAll(logNode.videoAttachments)));
-
-    } else {
-      throw new Error("Unknown Node Type ${logNode.logType}");
+    if (!isTask && !isInteraction) {
+      throw new Error("Unknown Node Type " + logNode.logType);
     }
+
+    String liOpenTag = isTask ? "<li><span class=\"task {$$_TASK_STATUS}\">{$$_LOG_SHORT_CONTENT}</span>" :
+        "<li class=\"interaction {$$_TASK_STATUS}\">{$$_LOG_SHORT_CONTENT}";
+
+    String childrenBlock = isTask ? "<ul class=\"nested\">{$$_SUBNOTES}</ul>" : "";
+
+    String html = liOpenTag + "\n" + "          {$$_EXPAND_DESCRIPTION_BUTTON}\n" + "          {$$_IN_BUTTON}\n" + "          {$$_OUT_BUTTON}\n" +
+        "          {$$_ATTACHMENT_BUTTON}\n" + "          {$$_VIDEO_ATTACHMENT_BUTTON}\n" + "          {$$_LONG_DESCRIPTION}\n" +
+        "          {$$_IO_CONTENT}\n" + "          " + childrenBlock + "\n" + "          </li>\n";
+
+    boolean hasLongDescription = descr.getOrElse("").length() > 100;
+
+    html = html
+        .replace("{$$_TASK_STATUS}", logNode.status.toString())
+        .replace("{$$_LOG_SHORT_CONTENT}", formatShortLogContentToHtml(logNode))
+        .replace("{$$_EXPAND_DESCRIPTION_BUTTON}", hasLongDescription ? "<span class=\"ellipses contentButton\">...</span>" : "")
+        .replace("{$$_IN_BUTTON}", Objects.isNull(logNode.input) || Objects.equals(logNode.input, "") ? "" :
+            "<span class=\"label contentButton inContentButton\"><i class=\"fa fa-hand-o-right iconButton\"></i>In</span>")
+        .replace("{$$_OUT_BUTTON}", Objects.isNull(logNode.output) || Objects.equals(logNode.output, "") ? "" :
+            "<span class=\"label contentButton outContentButton\"><i class=\"fa fa-hand-o-left iconButton\"></i>Out</span>")
+        .replace("{$$_ATTACHMENT_BUTTON}", Objects.isNull(logNode.attachments) || logNode.attachments.isEmpty() ? "" :
+            "<span class=\"label contentButton attachmentContentButton\"><i class=\"fa fa-file-photo-o iconButton\"></i>Attachment</span>")
+        .replace("{$$_VIDEO_ATTACHMENT_BUTTON}", Objects.isNull(logNode.videoAttachments) || logNode.videoAttachments.isEmpty() ? "" :
+            "<span class=\"label videoContentButton contentButton videoButton\"><i class=\"fa fa-video-camera videoButton\"></i></span>")
+        .replace("{$$_LONG_DESCRIPTION}", hasLongDescription ? "<div class=\"longDescription\"><div class=\"infoHeader\">Full Description</div>" +
+            "<div class=\"infoMessage\"><pre>" + escapeHtml(logNode.description) + "</pre></div></div>" : "")
+        .replace("{$$_IO_CONTENT}", formatIOElement(
+          logNode.input, logNode.output,
+          Objects.isNull(logNode.attachments) ? List.empty() : List.ofAll(logNode.attachments),
+          Objects.isNull(logNode.videoAttachments) ? List.empty() : List.ofAll(logNode.videoAttachments)));
+
+    if (isTask) {
+      html = html.replace("{$$_SUBNOTES}",
+        logNode.activityNodes.stream().reduce("", (acc, logEntry) -> acc + formatNodeToHtml(logEntry), (s1, s2) -> null));
+    }
+
+    return html;
   }
 
   /**
@@ -179,12 +139,11 @@ public class LogFormatter {
    * @return the html representation of the node
    */
   private static String formatLogWithHtmlTags(ActivityLogNode logNode) {
-    return "<ul id = \"ActivityLog\">" + formatNodeToHtml(logNode) + "</ul>";
+    return "<ul id=\"ActivityLog\">" + formatNodeToHtml(logNode) + "</ul>";
   }
 
   private static String formatLogWithHtmlTags(List<ActivityLogNode> logNodes) {
-    return logNodes.map(LogFormatter::formatLogWithHtmlTags)
-        .collect(Collectors.joining("<br>"));
+    return "<ul id=\"ActivityLog\">" + logNodes.map(LogFormatter::formatNodeToHtml).collect(Collectors.joining()) + "</ul>";
   }
 
   private static String legend = """
@@ -194,6 +153,16 @@ public class LogFormatter {
         </div>
       """;
 
+  private static String loadLegend() {
+    try {
+      String loaded = getResourceFileAsString("style/ActivityLog.legend.html");
+      return loaded != null ? loaded : legend;
+    } catch (Exception e) {
+      log.warn("Could not load ActivityLog.legend.html, using default legend");
+      return legend;
+    }
+  }
+
   /**
    * format the node to an html tree and add the style and JS function to the html representation
    *
@@ -201,29 +170,7 @@ public class LogFormatter {
    * @return the html representation of the node
    */
   public static String formatLogAsHtmlTree(ActivityLogNode logNode) {
-    String formattedText = """
-        <style>
-        {$$_STYLE}
-        </style>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-        {$$_LEGEND}
-
-        {$$_HTML_TAGS}
-
-        {$$_SCRIPT}
-        """;
-    String returnText = "";
-    try {
-      returnText = formattedText
-          .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
-          .replace("{$$_LEGEND}", legend)
-          .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNode))
-          .replace("{$$_SCRIPT}", functionScript);
-    } catch (Exception e) {
-      log.error(e);
-    }
-    return returnText;
+    return buildHtmlTree(formatLogWithHtmlTags(logNode));
   }
 
   /**
@@ -233,11 +180,14 @@ public class LogFormatter {
    * @return the html representation of the node list
    */
   public static String formatLogAsHtmlTree(List<ActivityLogNode> logNodes) {
+    return buildHtmlTree(formatLogWithHtmlTags(logNodes));
+  }
+
+  private static String buildHtmlTree(String htmlTags) {
     String formattedText = """
         <style>
         {$$_STYLE}
         </style>
-
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
         {$$_LEGEND}
@@ -248,11 +198,13 @@ public class LogFormatter {
         """;
     String returnText = "";
     try {
+      String js = getResourceFileAsString("style/ActivityLog.js");
+      String script = "<script>\n" + Objects.requireNonNull(js) + "\n</script>";
       returnText = formattedText
-          .replace("{$$_STYLE}", Objects.requireNonNull(LogFormatter.getResourceFileAsString("style/ActivityLog.css")))
-          .replace("{$$_LEGEND}", legend)
-          .replace("{$$_HTML_TAGS}", formatLogWithHtmlTags(logNodes))
-          .replace("{$$_SCRIPT}", functionScript);
+          .replace("{$$_STYLE}", Objects.requireNonNull(getResourceFileAsString("style/ActivityLog.css")))
+          .replace("{$$_LEGEND}", loadLegend())
+          .replace("{$$_HTML_TAGS}", htmlTags)
+          .replace("{$$_SCRIPT}", script);
     } catch (Exception e) {
       log.error(e);
     }
@@ -267,19 +219,12 @@ public class LogFormatter {
    * @return the html representation of the input and output of an activity
    */
   private static String formatIOElement(String input, String output, List<NodeAttachment> attachments, List<NodeAttachment> videoAttachments) {
-
-    return """
+    String inner = addInput(input) + addOutput(output) + addAttachments(attachments) + addVideoAttachments(videoAttachments);
+    return inner.isBlank() ? "" : """
         <span class="with options">
-          {$$_INPUT}
-          {$$_OUTPUT}
-          {$$_ATTACHMENT}
-          {$$_VIDEO_ATTACHMENT}
+          {$$_INNER}
         </span>
-        """
-        .replace("{$$_INPUT}", addInput(input))
-        .replace("{$$_OUTPUT}", addOutput(output))
-        .replace("{$$_ATTACHMENT}", addAttachments(attachments))
-        .replace("{$$_VIDEO_ATTACHMENT}", addVideoAttachments(videoAttachments));
+        """.replace("{$$_INNER}", inner);
   }
 
   /**
@@ -299,7 +244,7 @@ public class LogFormatter {
           </div>
         </div>
         """
-        .replace("{$$_INPUT}", input);
+        .replace("{$$_INPUT}", escapeHtml(input));
   }
 
   /**
@@ -341,7 +286,7 @@ public class LogFormatter {
           </div>
         </div>
         """
-        .replace("{$$_OUTPUT}", output);
+        .replace("{$$_OUTPUT}", escapeHtml(output));
   }
 
   /**
@@ -411,7 +356,7 @@ public class LogFormatter {
         <div class="attachment attachment-block">
             <pre>{$$_ATTACHMENT}</pre>
         </div>
-        """.replace("{$$_ATTACHMENT}", attachment);
+        """.replace("{$$_ATTACHMENT}", escapeHtml(attachment));
   }
 
   /**
@@ -489,74 +434,21 @@ public class LogFormatter {
     }
   }
 
-  /**
-   * the function script which is added to the HTML tree
-   */
-  private static final String functionScript =
-      """
-            <script>
-            var toggler = document.querySelectorAll(".task");
-            var inToggler = document.querySelectorAll(".label.inContentButton");
-            var outToggler = document.querySelectorAll(".label.outContentButton");
-            var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
-            var videoToggler = document.querySelectorAll(".label.videoContentButton");
-
-            var descToggler = document.querySelectorAll(".ellipses");
-            var i;
-
-            for (i = 0; i < toggler.length; i++) {
-              toggler[i].addEventListener("click", function() {
-                this.parentElement.querySelector(".nested").classList.toggle("active");
-                this.classList.toggle("task-open");
-              });
-            }
-
-            for (i = 0; i < inToggler.length; i++) {
-                inToggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
-                    this.classList.toggle("active");
-                });
-            }
-
-            for (i = 0; i < outToggler.length; i++) {
-                outToggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
-                    this.classList.toggle("active");
-                });
-            }
-            for (i = 0; i < descToggler.length; i++) {
-                descToggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
-                    this.classList.toggle("active");
-                });
-            }
-            for (i = 0; i < attachmentToggler.length; i++) {
-                attachmentToggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
-                    this.classList.toggle("active");
-                });
-            }
-            for (i = 0; i < videoToggler.length; i++) {
-                videoToggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".videoInfo").classList.toggle("videoActive");
-                    this.classList.toggle("active");
-                });
-            }
-
-            var toggleButton = document.getElementById("toggleTimeSpan");
-              toggleButton.addEventListener("change", function() {
-                  var timestamps = document.querySelectorAll(".timestamp");
-                  timestamps.forEach(function(timestamp) {
-                      if (toggleButton.checked) {
-                          timestamp.style.display = "inline-block";
-                      } else {
-                          timestamp.style.display = "none";
-                      }
-                  });
-              });
-            </script>
-          """;
-
   private LogFormatter() {
+  }
+
+  /**
+   * Escapes characters that have special meaning in HTML so that user-supplied
+   * content (names, descriptions, input/output values) cannot break the
+   * generated markup or cause unintended rendering.
+   */
+  private static String escapeHtml(String text) {
+    if (text == null) return "";
+    return text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&#39;");
   }
 }
