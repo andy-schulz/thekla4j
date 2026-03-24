@@ -31,8 +31,9 @@ public class ElementState extends SupplierTask<State> {
   protected Either<ActivityError, State> performAs(Actor actor) {
 
     return BrowseTheWeb.as(actor)
-        .onSuccess(b -> log.info(() -> "Getting state of element '%s'".formatted(element.name())))
+        .onSuccess(b -> log.info(() -> "Getting state of element '%s'".formatted(element)))
         .flatMap(b -> b.getState(element))
+        .peek(state -> log.debug(() -> "State of element '%s' is: %s".formatted(element, state)))
         .transform(TransformTry.toEither(x -> ActivityError.of(x.getMessage())));
   }
 
