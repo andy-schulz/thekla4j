@@ -13,6 +13,7 @@ import io.vavr.control.Try;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.extern.log4j.Log4j2;
+import org.hamcrest.Matcher;
 
 /**
  * Implementation of TheklaAssertion interface for making assertions in Thekla4j.
@@ -39,7 +40,10 @@ public class Assertion implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
+   *
+   * @deprecated Use {@code match(equalTo(expected))} instead.
    */
+  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
 
@@ -53,7 +57,10 @@ public class Assertion implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
+   *
+   * @deprecated Use {@code match(equalTo(expected), reason)} instead.
    */
+  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected, String reason) {
 
@@ -102,6 +109,30 @@ public class Assertion implements TheklaAssertion {
         .transform(t -> t.isFailure() ? Try.<Boolean>failure(mapUnnamedError.apply(t.getCause())) : t)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect unnamed predicate to pass on \n%s", p), res)))
         .transform(TransformTry.toEither(AssertionError::of));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <M> SeeAssertion<M> match(Matcher<? super M> matcher) {
+
+    return p -> Try.run(() -> assertThat(p, matcher))
+        .peek(r -> log.debug("Hamcrest matcher passed on actual {}", p))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(AssertionError::of));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <M> Tuple2<String, SeeAssertion<M>> match(Matcher<? super M> matcher, String reason) {
+
+    return Tuple.of(reason, (M p) -> Try.run(() -> assertThat(reason, p, matcher))
+        .peek(r -> log.debug("{} -> Hamcrest matcher passed on actual {}", reason, p))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(AssertionError::of)));
   }
 
 }
