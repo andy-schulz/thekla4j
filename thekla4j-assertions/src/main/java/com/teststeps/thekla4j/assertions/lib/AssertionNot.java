@@ -14,6 +14,7 @@ import io.vavr.control.Try;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.extern.log4j.Log4j2;
+import org.hamcrest.Matcher;
 
 /**
  * Implementation of TheklaAssertion interface for making negated assertions in Thekla4j.
@@ -33,7 +34,10 @@ public class AssertionNot implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
+   *
+   * @deprecated Use {@code match(not(equalTo(expected)))} instead.
    */
+  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
     return p -> Try.run(() -> assertThat(String.format("Expect actual '%s' to NOT equal '%s'", p, expected),
@@ -46,7 +50,10 @@ public class AssertionNot implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
+   *
+   * @deprecated Use {@code match(not(equalTo(expected)), reason)} instead.
    */
+  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected, String reason) {
     return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect actual %s to NOT equal %s", p, expected),
@@ -83,5 +90,31 @@ public class AssertionNot implements TheklaAssertion {
         .transform(t -> t.isFailure() ? Try.<Boolean>failure(mapUnnamedError.apply(t.getCause())) : t)
         .flatMap(res -> Try.run(() -> assertThat(String.format("expect predicate to fail on \n%s", p), res)))
         .transform(TransformTry.toEither(AssertionError::of));
+  }
+
+  /**
+   * {@inheritDoc}
+   * Negates the given Hamcrest matcher using {@code not(matcher)}.
+   */
+  @Override
+  public <M> SeeAssertion<M> match(Matcher<? super M> matcher) {
+
+    return p -> Try.run(() -> assertThat(p, not(matcher)))
+        .peek(r -> log.debug("Negated Hamcrest matcher passed on actual {}", p))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(AssertionError::of));
+  }
+
+  /**
+   * {@inheritDoc}
+   * Negates the given Hamcrest matcher using {@code not(matcher)}.
+   */
+  @Override
+  public <M> Tuple2<String, SeeAssertion<M>> match(Matcher<? super M> matcher, String reason) {
+
+    return Tuple.of(reason, (M p) -> Try.run(() -> assertThat(reason, p, not(matcher)))
+        .peek(r -> log.debug("{} -> Negated Hamcrest matcher passed on actual {}", reason, p))
+        .onFailure(log::error)
+        .transform(TransformTry.toEither(AssertionError::of)));
   }
 }
