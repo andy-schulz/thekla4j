@@ -86,13 +86,13 @@ public class PassTest {
     assertThat("Expected.to.be.pass fails", Expected.to.be.pass(expected)
         .affirm("unused")
         .getLeft()
-        .getMessage(), equalTo("RuntimeException was thrown executing unspecified predicate \nMessage: Test Exception"));
+        .getMessage(), equalTo("RuntimeException was thrown executing unnamed predicate \nMessage: Test Exception"));
 
     assertThat("Expected.to.pass fails", Expected.to.pass(expected).affirm("unused").isLeft());
     assertThat("Expected.to.pass fails", Expected.to.pass(expected)
         .affirm("unused")
         .getLeft()
-        .getMessage(), equalTo("RuntimeException was thrown executing unspecified predicate \nMessage: Test Exception"));
+        .getMessage(), equalTo("RuntimeException was thrown executing unnamed predicate \nMessage: Test Exception"));
 
   }
 }

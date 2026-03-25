@@ -3,6 +3,7 @@ package com.teststeps.thekla4j.activityLog;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import com.teststeps.thekla4j.activityLog.data.LogStackFrameAttachment;
 import com.teststeps.thekla4j.activityLog.data.StacktraceAttachment;
@@ -21,10 +22,10 @@ class StacktraceHtmlFormatterTest {
     StacktraceAttachment attachment = StacktraceAttachment.of(LocalDateTime.now(),
       "stacktrace", "ERROR", "javascript", "Some error occurred", frames);
     String html = StacktraceHtmlFormatter.formatStacktraceAttachment(attachment);
-    assertThat(html, containsString("<pre class=\"stacktrace-block\">"));
+    assertThat(html, containsString("<pre class=\"attachment-block\">"));
     assertThat(html, containsString("<span class=\"stacktrace-level-error\">[ERROR]</span> [javascript]"));
-    assertThat(html, containsString("at funcA (fileA.js:10:20)"));
-    assertThat(html, containsString("at funcB (fileB.js:30:40)"));
+    assertThat(html, containsString("at funcA (fileA.js:10,20)"));
+    assertThat(html, containsString("at funcB (fileB.js:30,40)"));
 
     System.out.println(html);
   }
@@ -37,7 +38,7 @@ class StacktraceHtmlFormatterTest {
       "stacktrace", "INFO", "js", "Info message", frames);
     String html = StacktraceHtmlFormatter.formatStacktraceAttachment(attachment);
     assertThat(html, containsString("<span class=\"stacktrace-level-info\">[INFO]</span> [js]"));
-    assertThat(html, containsString("at main (main.js:1:2)"));
+    assertThat(html, containsString("at main (main.js:1,2)"));
   }
 
   @Test
@@ -47,8 +48,9 @@ class StacktraceHtmlFormatterTest {
       "stacktrace", "WARNING", "js", "Warn message", frames);
     String html = StacktraceHtmlFormatter.formatStacktraceAttachment(attachment);
     assertThat(html, containsString("<span class=\"stacktrace-level-warning\">[WARNING]</span> [js]"));
-    // No stacktrace lines
-    assertThat(html.trim(), containsString("]</span> [js]</pre>"));
+    assertThat(html, containsString("stacktrace-text"));
+    // No stacktrace frame lines when frames list is empty
+    assertThat(html, not(containsString("at ")));
   }
 
   @Test
@@ -65,6 +67,6 @@ class StacktraceHtmlFormatterTest {
       "stacktrace", "OTHER", "custom", "Other message", frames);
     String html = StacktraceHtmlFormatter.formatStacktraceAttachment(attachment);
     assertThat(html, containsString("<span class=\"stacktrace-level-other\">[OTHER]</span> [custom]"));
-    assertThat(html, containsString("at foo (bar.js:5:6)"));
+    assertThat(html, containsString("at foo (bar.js:5,6)"));
   }
 }

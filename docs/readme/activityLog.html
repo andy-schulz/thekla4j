@@ -1,4 +1,76 @@
 <style>
+/* ── CSS custom properties ─────────────────────────────────────── */
+:root {
+    --color-failed:  red;
+    --color-passed:  green;
+    --color-running: black;
+    --color-duration: #e50a78;
+    --color-activity-name: #ff0bb1;
+    --color-timestamp: #0277bd;
+    --color-info-bg: #f5f5f5;
+    --color-info-border: #d0d0d0;
+    --color-attachment-bg: #f8f8f8;
+    --color-attachment-border: #ddd;
+    --color-content-button: #31708f;
+    --color-content-button-active: #73318f;
+    --color-legend-bg: #f0f0f0;
+    --color-legend-border: #ccc;
+    --color-legend-text: inherit;
+    /* panel header accent colors */
+    --color-panel-input:      #1976d2;
+    --color-panel-output:     #388e3c;
+    --color-panel-desc:       #7b1fa2;
+    --color-panel-attachment: #e65100;
+    --color-panel-video:      #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+    /* only apply when user has not manually forced light mode */
+    :root:not([data-theme="light"]) {
+        --color-info-bg: #2a2a2a;
+        --color-info-border: #444;
+        --color-attachment-bg: #232323;
+        --color-attachment-border: #3a3a3a;
+        --color-timestamp: #7ec8e3;
+        --color-legend-bg: #2d2d2d;
+        --color-legend-border: #555;
+        --color-legend-text: #d4d4d4;
+        /* panel header accent colors – slightly lighter for dark bg */
+        --color-panel-input:      #42a5f5;
+        --color-panel-output:     #66bb6a;
+        --color-panel-desc:       #ba68c8;
+        --color-panel-attachment: #ffa726;
+        --color-panel-video:      #ef5350;
+    }
+    :root:not([data-theme="light"]) body,
+    :root:not([data-theme="light"]) #ActivityLog {
+        background: #1e1e1e;
+        color: #d4d4d4;
+    }
+}
+
+/* Manual dark mode override (regardless of system preference) */
+:root[data-theme="dark"] {
+    --color-info-bg: #2a2a2a;
+    --color-info-border: #444;
+    --color-attachment-bg: #232323;
+    --color-attachment-border: #3a3a3a;
+    --color-timestamp: #7ec8e3;
+    --color-legend-bg: #2d2d2d;
+    --color-legend-border: #555;
+    --color-legend-text: #d4d4d4;
+    --color-panel-input:      #42a5f5;
+    --color-panel-output:     #66bb6a;
+    --color-panel-desc:       #ba68c8;
+    --color-panel-attachment: #ffa726;
+    --color-panel-video:      #ef5350;
+}
+[data-theme="dark"] body,
+[data-theme="dark"] #ActivityLog {
+    background: #1e1e1e;
+    color: #d4d4d4;
+}
+
 ul, #ActivityLog {
     list-style-type: none;
     font-family: monospace;
@@ -26,21 +98,21 @@ ul, #ActivityLog {
 }
 
 .task.failed::before {
-    color: red;
+    color: var(--color-failed);
 }
 
 .task.passed::before {
-    color: green;
+    color: var(--color-passed);
 }
 
 .task.running::before {
-    color: black;
+    color: var(--color-running);
 }
 
 .task-open::before {
     -ms-transform: rotate(90deg); /* IE 9 */
-    -webkit-transform: rotate(90deg); /* Safari */'
-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg); /* Safari */
+    transform: rotate(90deg);
 }
 
 .nested {
@@ -53,72 +125,72 @@ transform: rotate(90deg);
 
 .longDescription {
     display: none;
+    margin-top: 6px;
+    padding-left: 1em;
+    transition: opacity 0.15s ease;
 }
 
 .descriptionActive {
     display: block;
 }
 
-.longDescription .descHeader {
-    background: lightgray;
-    border-radius: 1em;
-    border: 1px solid #898989;
-    position: relative;
-    top: 0.7em;
-    width: max-content;
-    right: -1em;
-    padding-left: 1em;
-    padding-right: 1em;
-}
-
-.longDescription .descMessage {
-    background: lightgray;
-    border-radius: 0.2em;
-    border: 1px solid #898989;
-    padding-left: 0.5em;
-}
-
 .inInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 .outInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 
 .attachmentInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
 }
 
 .videoInfo {
     display: none;
-    padding-left: 2em;
+    padding-left: 1em;
+    margin-top: 6px;
+    transition: opacity 0.15s ease;
+}
+
+/* ── Info panel card ─────────────────────────────────────────────── */
+.ioContent {
+    border: 1px solid var(--color-info-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 10px;
 }
 
 .infoHeader {
-    background: lightgray;
-    border-radius: 1em;
-    border: 1px solid #898989;
-    position: relative;
-    top: 0.7em;
-    width: max-content;
-    right: -1em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #555; /* fallback; overridden per type below */
 }
 
 .infoMessage {
-    background: lightgray;
-    border-radius: 0.2em;
-    border: 1px solid #898989;
-    padding-left: 0.5em;
+    background: var(--color-info-bg);
+    padding: 8px 12px;
 }
 
-.ioContent {
-    margin-bottom: 10px;
-}
+/* Per-type header accent colors */
+.inInfo          .infoHeader { background: var(--color-panel-input); }
+.outInfo         .infoHeader { background: var(--color-panel-output); }
+.longDescription .infoHeader { background: var(--color-panel-desc); }
+.attachmentInfo  .infoHeader { background: var(--color-panel-attachment); }
+.videoInfo       .infoHeader { background: var(--color-panel-video); }
 .outActive {
     display: block;
 }
@@ -144,26 +216,74 @@ transform: rotate(90deg);
 }
 
 .contentButton {
-    /*position: absolute;*/
-    cursor: help;
-    /*border: 1px solid white;*/
-    border-radius: 2px;
-    box-shadow: 1px 1px 1px #808080;
-    color: white;
-    font-weight: bold;
-    height: 11px;
-    padding: 2px 4px 2px 4px;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1.5px solid var(--btn-accent, var(--color-content-button));
+    color: var(--btn-accent, var(--color-content-button));
+    background: transparent;
+    font-weight: 600;
+    padding: 1px 7px;
     text-align: center;
-    min-width: 12px;
-    font-size: x-small;
-    display: inline-block;
-    margin-left: 1em;
-    background: #31708f;
-    /*background: radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -moz-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -ms-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -o-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
-    /*background: -webkit-radial-gradient( 5px -9px, circle, white 8%, #14a0ff 26px );*/
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 0.6em;
+    vertical-align: middle;
+    transition: background 0.15s ease, color 0.15s ease;
+    user-select: none;
+}
+
+.contentButton:hover {
+    background: var(--btn-accent, var(--color-content-button));
+    color: white;
+}
+
+/* Per-type accent colors via --btn-accent */
+.inContentButton         { --btn-accent: var(--color-panel-input); }
+.outContentButton        { --btn-accent: var(--color-panel-output); }
+.attachmentContentButton { --btn-accent: var(--color-panel-attachment); }
+.videoContentButton      { --btn-accent: var(--color-panel-video); }
+.ellipses.contentButton  { --btn-accent: var(--color-panel-desc); }
+
+.legendButton {
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid #888;
+    background: var(--color-content-button);
+    color: white;
+    font-size: 12px;
+    padding: 2px 8px;
+    margin-left: 8px;
+}
+
+.legendButton:hover {
+    background: var(--color-content-button-active);
+}
+
+.legendButton--failed {
+    background: #a94442;
+    border-color: #843534;
+}
+
+.legendButton--failed:hover {
+    background: #c0392b;
+}
+
+.legendButton--theme {
+    background: #666;
+    border-color: #555;
+    margin-left: auto;
+    min-width: 5.5em;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.legendButton--theme:hover {
+    background: #444;
 }
 
 .video {
@@ -174,18 +294,19 @@ transform: rotate(90deg);
 }
 
 .videoButton {
-    padding: 2px 2px 5px 2px;
-    font-size:12px;
-    color:white;
+    font-size: 12px;
+    color: inherit;
 }
 
 .iconButton {
-    padding-right: 4px;
-    color:white;
+    padding-right: 3px;
+    color: inherit;
 }
 
 .contentButton.active {
-    background: #73318f;
+    background: var(--btn-accent, var(--color-content-button));
+    color: white;
+    border-color: var(--btn-accent, var(--color-content-button));
 }
 
 .interaction::before {
@@ -195,32 +316,47 @@ transform: rotate(90deg);
 }
 
 .interaction.failed::before {
-    color: red;
+    color: var(--color-failed);
 }
 
 .interaction.passed::before {
-    color: green;
+    color: var(--color-passed);
 }
 
 .interaction.running::before {
-    color: black;
+    color: var(--color-running);
 }
 
 .logMessage.fail {
-    color: red;
+    color: var(--color-failed);
 }
 
 .logMessage .timestamp {
-    color: lightskyblue;
+    color: var(--color-timestamp);
     display: none;
 }
 
+.logMessage .timestamp .ts-date {
+    opacity: 0.5;
+    font-size: 0.85em;
+}
+
+.logMessage .timestamp .ts-time {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.logMessage .timestamp .ts-micro {
+    opacity: 0.35;
+    font-size: 0.75em;
+}
+
 .logMessage .duration {
-    color: #e50a78;
+    color: var(--color-duration);
 }
 
 .activityName {
-    color: #ff0bb1;
+    color: var(--color-activity-name);
 }
 
 pre {
@@ -237,189 +373,378 @@ pre {
     display: flex;
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    background-color: var(--color-legend-bg);
+    border: 1px solid var(--color-legend-border);
     border-radius: 5px;
     font-family: Arial, sans-serif;
     font-size: 14px;
+    color: var(--color-legend-text);
 }
 
 .legend #toggleTimeSpan {
     margin-right: 10px;
 }
+
+/* Stacktrace block formatting */
+.attachment-block {
+    background: var(--color-attachment-bg);
+    border: 1px solid var(--color-attachment-border);
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+.stacktrace-text {
+    color: #154ccc;
+    font-weight: bold;
+}
+
+.stacktrace-level-error {
+    color: #d32f2f;
+    font-weight: bold;
+}
+.stacktrace-level-warning {
+    color: #fbc02d;
+    font-weight: bold;
+}
+.stacktrace-level-info {
+    color: #1976d2;
+    font-weight: bold;
+}
+.stacktrace-level-debug {
+    color: #616161;
+    font-weight: bold;
+}
+.stacktrace-level-log {
+    color: #388e3c;
+    font-weight: bold;
+}
+.stacktrace-level-other {
+    color: #757575;
+    font-weight: bold;
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <div class="legend">
-      <input type="checkbox" id="toggleTimeSpan">
-      <span id="timespanToggleDescription">switch visibility of timespan on or off</span>
-  </div>
+<div class="legend">
+    <input type="checkbox" id="toggleTimeSpan">
+    <span id="timespanToggleDescription">show timestamps</span>
+    <button id="expandAll" class="legendButton">Expand All</button>
+    <button id="collapseAll" class="legendButton">Collapse All</button>
+    <button id="expandFailed" class="legendButton legendButton--failed">Expand Failed</button>
+    <button id="themeToggle" class="legendButton legendButton--theme" title="Toggle colour theme">&#9681; Auto</button>
+</div>
 
-
-<ul id = "ActivityLog"><li><span class="task passed"><span class="logMessage">
-  <span class="timestamp">2025-02-27 16:58:52.101209 - not finished</span>
+<ul id="ActivityLog"><li><span class="task passed"><span class="logMessage">
+  <span class="timestamp">2026-03-24 18:22:08.251683 - not finished</span>
   <span class="duration">0.00 sec - </span>
   <span><span class="activityName">[Step]</span> - </span>
   <span class="activityDescription">step description</span>
 </span></span>
-
-
-
-
-
-<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
-<span class="with options">
-  
-  
-  
-  
-</span>
-
-<ul class="nested"><li><span class="task passed"><span class="logMessage">
-  <span class="timestamp">2025-02-27 16:58:52.101229 - not finished</span>
+          
+          
+          
+          
+          
+          
+          
+          <ul class="nested"><li><span class="task passed"><span class="logMessage">
+  <span class="timestamp">2026-03-24 18:22:08.251705 - not finished</span>
   <span class="duration">0.00 sec - </span>
   <span><span class="activityName">[TaskONE]</span> - </span>
   <span class="activityDescription">TaskONE description</span>
 </span></span>
-
-
-
-
-
-<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
-<span class="with options">
-  
-  
-  
-  
-</span>
-
-<ul class="nested"><li class="interaction passed"><span class="logMessage">
-  <span class="timestamp">2025-02-27 16:58:52.101271 - not finished</span>
+          
+          
+          
+          
+          
+          
+          
+          <ul class="nested"><li class="interaction passed"><span class="logMessage">
+  <span class="timestamp">2026-03-24 18:22:08.251737 - not finished</span>
   <span class="duration">0.00 sec - </span>
   <span><span class="activityName">[TaskONE-Child]</span> - </span>
   <span class="activityDescription">TaskONE-Child description</span>
 </span>
-  
-  
-  
-  
-  
-<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
-<span class="with options">
-  
-  
-  
-  
-</span>
-
-</li>
+          
+          
+          
+          
+          
+          
+          
+          
+          </li>
 </ul>
-</li>
+          </li>
 <li><span class="task passed"><span class="logMessage">
-  <span class="timestamp">2025-02-27 16:58:52.101249 - not finished</span>
+  <span class="timestamp">2026-03-24 18:22:08.251726 - not finished</span>
   <span class="duration">0.00 sec - </span>
   <span><span class="activityName">[TaskTWO]</span> - </span>
   <span class="activityDescription">TaskTWO description</span>
 </span></span>
-
-
-
-
-
-<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
-<span class="with options">
-  
-  
-  
-  
-</span>
-
-<ul class="nested"><li class="interaction passed"><span class="logMessage">
-  <span class="timestamp">2025-02-27 16:58:52.101288 - not finished</span>
+          
+          
+          
+          
+          
+          
+          
+          <ul class="nested"><li class="interaction passed"><span class="logMessage">
+  <span class="timestamp">2026-03-24 18:22:08.251743 - not finished</span>
   <span class="duration">0.00 sec - </span>
   <span><span class="activityName">[TaskTWO-Child]</span> - </span>
   <span class="activityDescription">TaskTWO-Child description</span>
 </span>
-  
-  
-  
-  
-  
-<div class="longDescription"><div class="infoHeader">Full Description</div><div class="infoMessage"><pre></pre></div></div>
-<span class="with options">
-  
-  
-  
-  
-</span>
-
-</li>
+          
+          
+          
+          
+          
+          
+          
+          
+          </li>
 </ul>
-</li>
+          </li>
 </ul>
-</li>
+          </li>
 </ul>
 
-  <script>
-  var toggler = document.querySelectorAll(".task");
-  var inToggler = document.querySelectorAll(".label.inContentButton");
-  var outToggler = document.querySelectorAll(".label.outContentButton");
-  var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
-  var videoToggler = document.querySelectorAll(".label.videoContentButton");
+<script>
+var toggler = document.querySelectorAll(".task");
+var inToggler = document.querySelectorAll(".label.inContentButton");
+var outToggler = document.querySelectorAll(".label.outContentButton");
+var attachmentToggler = document.querySelectorAll(".label.attachmentContentButton");
+var videoToggler = document.querySelectorAll(".label.videoContentButton");
+var descToggler = document.querySelectorAll(".ellipses");
+var i;
 
-  var descToggler = document.querySelectorAll(".ellipses");
-  var i;
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("task-open");
+  });
+}
 
-  for (i = 0; i < toggler.length; i++) {
-    toggler[i].addEventListener("click", function() {
-      this.parentElement.querySelector(".nested").classList.toggle("active");
-      this.classList.toggle("task-open");
+for (i = 0; i < inToggler.length; i++) {
+    inToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
+        this.classList.toggle("active");
     });
-  }
+}
 
-  for (i = 0; i < inToggler.length; i++) {
-      inToggler[i].addEventListener("click", function() {
-          this.parentElement.querySelector(".inInfo").classList.toggle("inActive");
-          this.classList.toggle("active");
-      });
-  }
+for (i = 0; i < outToggler.length; i++) {
+    outToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
+        this.classList.toggle("active");
+    });
+}
 
-  for (i = 0; i < outToggler.length; i++) {
-      outToggler[i].addEventListener("click", function() {
-          this.parentElement.querySelector(".outInfo").classList.toggle("outActive");
-          this.classList.toggle("active");
-      });
-  }
-  for (i = 0; i < descToggler.length; i++) {
-      descToggler[i].addEventListener("click", function() {
-          this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
-          this.classList.toggle("active");
-      });
-  }
-  for (i = 0; i < attachmentToggler.length; i++) {
-      attachmentToggler[i].addEventListener("click", function() {
-          this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
-          this.classList.toggle("active");
-      });
-  }
-  for (i = 0; i < videoToggler.length; i++) {
-      videoToggler[i].addEventListener("click", function() {
-          this.parentElement.querySelector(".videoInfo").classList.toggle("videoActive");
-          this.classList.toggle("active");
-      });
-  }
+for (i = 0; i < descToggler.length; i++) {
+    descToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".longDescription").classList.toggle("descriptionActive");
+        this.classList.toggle("active");
+    });
+}
 
-  var toggleButton = document.getElementById("toggleTimeSpan");
+for (i = 0; i < attachmentToggler.length; i++) {
+    attachmentToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".attachmentInfo").classList.toggle("attachmentActive");
+        this.classList.toggle("active");
+    });
+}
+
+for (i = 0; i < videoToggler.length; i++) {
+    videoToggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".videoInfo").classList.toggle("videoActive");
+        this.classList.toggle("active");
+    });
+}
+
+var toggleButton = document.getElementById("toggleTimeSpan");
+if (toggleButton) {
+    var savedState = localStorage.getItem("activityLog.showTimestamp");
+    if (savedState === "true") {
+        toggleButton.checked = true;
+        document.querySelectorAll(".timestamp").forEach(function(ts) {
+            ts.style.display = "inline-block";
+        });
+    }
     toggleButton.addEventListener("change", function() {
-        var timestamps = document.querySelectorAll(".timestamp");
-        timestamps.forEach(function(timestamp) {
-            if (toggleButton.checked) {
-                timestamp.style.display = "inline-block";
-            } else {
-                timestamp.style.display = "none";
-            }
+        var show = toggleButton.checked;
+        localStorage.setItem("activityLog.showTimestamp", show);
+        document.querySelectorAll(".timestamp").forEach(function(timestamp) {
+            timestamp.style.display = show ? "inline-block" : "none";
         });
     });
-  </script>
+}
 
+// Auto-expand all failed nodes on load (U8)
+document.querySelectorAll(".task.failed").forEach(function(failedTask) {
+    var nested = failedTask.parentElement.querySelector(".nested");
+    if (nested) {
+        nested.classList.add("active");
+        failedTask.classList.add("task-open");
+    }
+});
+
+// Expand All / Collapse All (U2)
+var expandAllBtn = document.getElementById("expandAll");
+var collapseAllBtn = document.getElementById("collapseAll");
+
+if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", function() {
+        document.querySelectorAll(".nested").forEach(function(el) { el.classList.add("active"); });
+        document.querySelectorAll(".task").forEach(function(el) { el.classList.add("task-open"); });
+    });
+}
+if (collapseAllBtn) {
+    collapseAllBtn.addEventListener("click", function() {
+        document.querySelectorAll(".nested").forEach(function(el) { el.classList.remove("active"); });
+        document.querySelectorAll(".task").forEach(function(el) { el.classList.remove("task-open"); });
+        document.querySelectorAll(".inInfo").forEach(function(el) { el.classList.remove("inActive"); });
+        document.querySelectorAll(".outInfo").forEach(function(el) { el.classList.remove("outActive"); });
+        document.querySelectorAll(".attachmentInfo").forEach(function(el) { el.classList.remove("attachmentActive"); });
+        document.querySelectorAll(".videoInfo").forEach(function(el) { el.classList.remove("videoActive"); });
+        document.querySelectorAll(".longDescription").forEach(function(el) { el.classList.remove("descriptionActive"); });
+        document.querySelectorAll(".contentButton").forEach(function(el) { el.classList.remove("active"); });
+    });
+}
+
+// Expand Failed — collapse all, then open the path to every failed node and scroll to the first
+var expandFailedBtn = document.getElementById("expandFailed");
+if (expandFailedBtn) {
+    expandFailedBtn.addEventListener("click", function() {
+        // First collapse everything
+        document.querySelectorAll(".nested").forEach(function(el) { el.classList.remove("active"); });
+        document.querySelectorAll(".task").forEach(function(el) { el.classList.remove("task-open"); });
+        document.querySelectorAll(".inInfo").forEach(function(el) { el.classList.remove("inActive"); });
+        document.querySelectorAll(".outInfo").forEach(function(el) { el.classList.remove("outActive"); });
+        document.querySelectorAll(".attachmentInfo").forEach(function(el) { el.classList.remove("attachmentActive"); });
+        document.querySelectorAll(".longDescription").forEach(function(el) { el.classList.remove("descriptionActive"); });
+        document.querySelectorAll(".contentButton").forEach(function(el) { el.classList.remove("active"); });
+
+        // Walk up the DOM from a failed element and open every ancestor .nested
+        function expandAncestors(el) {
+            var node = el.parentElement;
+            while (node) {
+                if (node.classList && node.classList.contains("nested")) {
+                    node.classList.add("active");
+                    // The task span immediately precedes the .nested ul in the DOM
+                    var taskSpan = node.previousElementSibling;
+                    while (taskSpan) {
+                        if (taskSpan.classList && taskSpan.classList.contains("task")) {
+                            taskSpan.classList.add("task-open");
+                            break;
+                        }
+                        taskSpan = taskSpan.previousElementSibling;
+                    }
+                }
+                node = node.parentElement;
+            }
+        }
+
+        // Open description, input, output and attachment panels on the failed <li>
+        function expandFailedDetails(failedEl) {
+            // .interaction.failed is the <li> itself; .task.failed is a <span> inside <li>
+            var li = failedEl.classList.contains("interaction") ? failedEl : failedEl.parentElement;
+
+            var longDesc = li.querySelector(":scope > .longDescription");
+            if (longDesc) longDesc.classList.add("descriptionActive");
+            var ellipsis = li.querySelector(":scope > .ellipses");
+            if (ellipsis) ellipsis.classList.add("active");
+
+            var inInfo = li.querySelector(".inInfo");
+            if (inInfo) inInfo.classList.add("inActive");
+            var inBtn = li.querySelector(".inContentButton");
+            if (inBtn) inBtn.classList.add("active");
+
+            var outInfo = li.querySelector(".outInfo");
+            if (outInfo) outInfo.classList.add("outActive");
+            var outBtn = li.querySelector(".outContentButton");
+            if (outBtn) outBtn.classList.add("active");
+
+            var attInfo = li.querySelector(".attachmentInfo");
+            if (attInfo) attInfo.classList.add("attachmentActive");
+            var attBtn = li.querySelector(".attachmentContentButton");
+            if (attBtn) attBtn.classList.add("active");
+        }
+
+        var firstFailed = null;
+        document.querySelectorAll(".task.failed, .interaction.failed").forEach(function(failedEl) {
+            expandAncestors(failedEl);
+            expandFailedDetails(failedEl);
+            if (!firstFailed) firstFailed = failedEl;
+        });
+
+        if (firstFailed) {
+            firstFailed.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    });
+}
+
+// Theme toggle — cycles: auto (system) → light → dark → auto
+var themeToggleBtn = document.getElementById("themeToggle");
+if (themeToggleBtn) {
+    var THEME_KEY = "activityLog.theme";
+
+    function updateThemeButton(theme) {
+        if (theme === "light") {
+            themeToggleBtn.textContent = "\u2600 Light";
+            themeToggleBtn.title = "Currently: Light. Click for Dark.";
+        } else if (theme === "dark") {
+            themeToggleBtn.textContent = "\u263E Dark";
+            themeToggleBtn.title = "Currently: Dark. Click for Auto (system).";
+        } else {
+            var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            themeToggleBtn.textContent = "\u25D1 Auto";
+            themeToggleBtn.title = "Currently: Auto (" + (prefersDark ? "dark" : "light") + " from system). Click for Light.";
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme === "light" || theme === "dark") {
+            document.documentElement.setAttribute("data-theme", theme);
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+        updateThemeButton(theme);
+    }
+
+    // Restore saved preference on load
+    var savedTheme = localStorage.getItem(THEME_KEY);
+    applyTheme(savedTheme || null);
+
+    themeToggleBtn.addEventListener("click", function() {
+        var current = document.documentElement.getAttribute("data-theme");
+        var next;
+        if (!current) {
+            next = "light";
+        } else if (current === "light") {
+            next = "dark";
+        } else {
+            next = null; // back to auto
+        }
+        if (next) {
+            localStorage.setItem(THEME_KEY, next);
+        } else {
+            localStorage.removeItem(THEME_KEY);
+        }
+        applyTheme(next);
+    });
+}
+
+// Timestamp emphasis — wrap date/time/microseconds in semantic spans so the
+// time part can be styled differently from the date and microsecond portions.
+document.querySelectorAll(".timestamp").forEach(function(el) {
+    el.innerHTML = el.textContent.replace(
+        /(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})(\.\d+)?/g,
+        '<span class="ts-date">$1</span> <span class="ts-time">$2</span><span class="ts-micro">$3</span>'
+    );
+});
+</script>

@@ -14,7 +14,6 @@ import java.time.Duration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 public class HtmlAttachmentTest {
 
 
@@ -76,11 +75,13 @@ public class HtmlAttachmentTest {
   }
 
 
+  @Disabled("visual-only: writes to C:/temp/index.html")
   @Test
   public void loadRedDotTest() {
     writeContentToIndexFile.apply(LogFormatter.formatLogAsHtmlTree(rootLoc));
   }
 
+  @Disabled("visual-only: writes to C:/temp/index.html")
   @Test
   public void loadRedDotTestList() {
     writeContentToIndexFile.apply(LogFormatter.formatLogAsHtmlTree(List.of(rootLoc, rootLoc)));
