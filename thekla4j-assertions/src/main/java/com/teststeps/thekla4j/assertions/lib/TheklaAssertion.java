@@ -15,10 +15,7 @@ public interface TheklaAssertion {
    * @param <M>      the type of the value to be asserted
    * @param expected the expected value
    * @return a SeeAssertion instance for further assertions
-   * @deprecated Use {@code match(equalTo(expected))} instead.
-   *             Example: {@code Expected.to.match(equalTo("value"))}
    */
-  @Deprecated(forRemoval = true)
   <M> SeeAssertion<M> equal(M expected);
 
   /**
@@ -28,10 +25,7 @@ public interface TheklaAssertion {
    * @param expected the expected value
    * @param reason   the small description for the assertion
    * @return a SeeAssertion instance for further assertions
-   * @deprecated Use {@code match(equalTo(expected), reason)} instead.
-   *             Example: {@code Expected.to.match(equalTo("value"), "my reason")}
    */
-  @Deprecated(forRemoval = true)
   <M> SeeAssertion<M> equal(M expected, String reason);
 
   /**

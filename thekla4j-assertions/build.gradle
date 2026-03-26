@@ -13,7 +13,9 @@ publishing {
     publications {
         pluginMaven(MavenPublication) {
             artifactId = 'thekla4j-assertions'
-            description = 'assertion implementation for See action (see core)'
+            pom {
+                description = 'assertion implementation for See action (see core)'
+            }
         }
     }
 }

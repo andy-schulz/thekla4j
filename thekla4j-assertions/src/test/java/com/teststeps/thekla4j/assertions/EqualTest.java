@@ -48,7 +48,8 @@ public class EqualTest {
     assertThat("Expected.to.be.equal fails", Expected.to.be.equal(expected)
         .affirm(actual)
         .getLeft()
-        .getMessage(), equalTo("Expect 'TestDate1' to equal 'TestDate'\nExpected: \"TestDate\"\n     but: was \"TestDate1\""));
+        .getMessage(), equalTo(
+          "Error comparing values: \nExpect 'TestDate1' being equal 'TestDate'\nExpected: \"TestDate\"\n     but: was \"TestDate1\""));
   }
 
   @Test
@@ -72,7 +73,7 @@ public class EqualTest {
     assertThat("Expected.to.be.equal fails", Expected.to.be.equal(expected)
         .affirm(actual)
         .getLeft()
-        .getMessage(), equalTo("Expect '2' to equal '1'\nExpected: <1>\n     but: was <2>"));
+        .getMessage(), equalTo("Error comparing values: \nExpect '2' being equal '1'\nExpected: <1>\n     but: was <2>"));
   }
 
 

@@ -34,10 +34,7 @@ public class AssertionNot implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
-   *
-   * @deprecated Use {@code match(not(equalTo(expected)))} instead.
    */
-  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
     return p -> Try.run(() -> assertThat(String.format("Expect actual '%s' to NOT equal '%s'", p, expected),
@@ -45,15 +42,12 @@ public class AssertionNot implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> "Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(AssertionError::of));
+        .transform(TransformTry.toEither(t -> AssertionError.of(t.getMessage().replace("\r\n", "\n"))));
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @deprecated Use {@code match(not(equalTo(expected)), reason)} instead.
    */
-  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected, String reason) {
     return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect actual %s to NOT equal %s", p, expected),
@@ -61,7 +55,7 @@ public class AssertionNot implements TheklaAssertion {
 
         .peek(r -> log.debug(() -> reason + " ->  Expect actual %s to NOT equal %s -> Result: %s".formatted(p, expected, r)))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(AssertionError::of));
+        .transform(TransformTry.toEither(t -> AssertionError.of(t.getMessage().replace("\r\n", "\n"))));
   }
 
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {

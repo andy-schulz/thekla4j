@@ -40,31 +40,25 @@ public class Assertion implements TheklaAssertion {
 
   /**
    * {@inheritDoc}
-   *
-   * @deprecated Use {@code match(equalTo(expected))} instead.
    */
-  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected) {
 
-    return p -> Try.run(() -> assertThat(String.format("Expect '%s' to equal '%s'", p, expected),
+    return p -> Try.run(() -> assertThat(String.format("Expect '%s' being equal '%s'", p, expected),
       p, equalTo(expected)))
 
         .peek(r -> log.debug("Expect actual {} to equal {} -> Result: true", p, expected))
         .onFailure(log::error)
-        .transform(TransformTry.toEither(AssertionError::of));
+        .transform(TransformTry.toEither(t -> AssertionError.of(("Error comparing values: \n" + t.getMessage()).replace("\r\n", "\n"))));
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @deprecated Use {@code match(equalTo(expected), reason)} instead.
    */
-  @Deprecated(forRemoval = true)
   @Override
   public <M> SeeAssertion<M> equal(M expected, String reason) {
 
-    return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect '%s' to equal '%s'", p, expected),
+    return p -> Try.run(() -> assertThat(String.format(reason + "\nExpect '%s' being equal to '%s'", p, expected),
       p, equalTo(expected)))
 
         .peek(r -> log.debug("{} -> Expect actual {} to equal {} -> Result: true", reason, p, expected))
