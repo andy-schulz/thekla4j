@@ -35,7 +35,10 @@ configure(spotlessApply) {
 
 spotless {
   java {
-    target project.fileTree(project.projectDir).include('**/*.java')
+    target project.fileTree(project.projectDir) {
+      include('**/*.java')
+      exclude('**/build/**')
+    }
     importOrder()
     removeUnusedImports()
 

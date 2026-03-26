@@ -11,3 +11,16 @@ docs/_site
 docs/jekyll.log
 docs/.bundle
 docs/bin
+
+# Eclipse / JDT language server generated files
+.project
+.classpath
+.factorypath
+.settings/
+bin/
+
+# Allure results (normally under build/, but guard against stale module-root dirs)
+allure-results/
+
+thekla4j-browser/**/page.png
+thekla4j-browser/**/button.png

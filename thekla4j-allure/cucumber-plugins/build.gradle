@@ -1,0 +1,32 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
+}
+
+dependencies {
+    implementation project(":thekla4j-commons")
+    implementation(platform("io.qameta.allure:allure-bom:${allureVersion}"))
+    implementation 'io.qameta.allure:allure-java-commons'
+    compileOnly 'io.cucumber:cucumber-plugin:7.13.0'
+    compileOnly 'io.cucumber:messages:22.0.0'
+    compileOnly 'io.cucumber:gherkin:26.2.0'
+
+    testImplementation 'io.cucumber:cucumber-core:7.13.0'
+    testImplementation 'io.cucumber:cucumber-java:7.13.0'
+    testImplementation 'io.qameta.allure:allure-java-commons-test'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.+'
+}
+
+test {
+    systemProperty 'allure.results.directory', "${buildDir}/allure-results"
+}
+
+publishing {
+    publications {
+        pluginMaven {
+            artifactId = 'thekla4j-allure-cucumber-plugins'
+            description = 'Allure cucumber plugins for Thekla4j'
+        }
+    }
+}

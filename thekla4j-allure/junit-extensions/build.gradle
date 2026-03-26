@@ -1,0 +1,38 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
+}
+
+dependencies {
+    implementation project(":thekla4j-commons")
+    implementation(platform("io.qameta.allure:allure-bom:${allureVersion}"))
+    implementation 'io.qameta.allure:allure-junit5'
+    compileOnly 'org.junit.jupiter:junit-jupiter-api:5.10.+'
+    compileOnly 'org.junit.platform:junit-platform-launcher:1.10.+'
+    testImplementation 'io.qameta.allure:allure-java-commons-test'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.+'
+}
+
+test {
+    filter {
+        // ActivityErrorFixture is a test fixture for the integration test and is
+        // intentionally failing. Exclude it from the normal Gradle test run; the
+        // integration test exercises it directly via LauncherFactory.
+        excludeTestsMatching("*ActivityErrorFixture*")
+        excludeTestsMatching("*FileOutputFixture*")
+        excludeTestsMatching("*FileOutputMethodOverrideFixture*")
+    }
+    systemProperty 'allure.results.directory', "${buildDir}/allure-results"
+}
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            artifactId = 'thekla4j-allure-junit-extensions'
+            pom {
+                description = 'Allure JUnit 5 extensions for thekla4j - tag annotations and ActivityError failure mapping'
+            }
+        }
+    }
+}

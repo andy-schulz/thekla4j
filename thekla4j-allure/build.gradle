@@ -1,0 +1,18 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
+}
+
+tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
+tasks.withType(PublishToMavenLocal).configureEach { it.enabled = false }
+
+tasks.named("spotlessApply") {
+    dependsOn ':thekla4j-allure:junit-extensions:spotlessApply'
+    dependsOn ':thekla4j-allure:cucumber-plugins:spotlessApply'
+}
+
+tasks.named("spotlessCheck") {
+    dependsOn ':thekla4j-allure:junit-extensions:spotlessCheck'
+    dependsOn ':thekla4j-allure:cucumber-plugins:spotlessCheck'
+}
