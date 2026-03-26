@@ -1,12 +1,12 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
-import io.vavr.collection.HashMap;
-import io.vavr.control.Try;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import io.vavr.collection.HashMap;
+import io.vavr.control.Try;
+import org.junit.jupiter.api.Test;
 
 public class PredefinedGeneratorTest {
 
@@ -41,15 +41,19 @@ public class PredefinedGeneratorTest {
     HashMap<String, String> data = HashMap.of("length", "abc");
     Try<String> result = PredefinedGeneratorFunctions.randomString.run(data);
     assertTrue(result.isFailure());
-    assertEquals("Generate random string failed: length must be an integer. => e.g. length: 16 => actual: {length: abc}", result.getCause().getMessage());
+    assertEquals("Generate random string failed: length must be an integer. => e.g. length: 16 => actual: {length: abc}", result.getCause()
+        .getMessage());
   }
 
-  @Test void testEmptyParameters() {
+  @Test
+  void testEmptyParameters() {
     HashMap<String, String> data = HashMap.empty();
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
       PredefinedGeneratorFunctions.randomString.run(data).get();
     });
-    assertEquals("Generate random string failed: no default string length is given: e.g. randomString{length: 16} or randomString{16} => actual: randomString{}", exception.getMessage());
+    assertEquals(
+      "Generate random string failed: no default string length is given: e.g. randomString{length: 16} or randomString{16} => actual: randomString{}",
+      exception.getMessage());
   }
 
   @Test
@@ -58,6 +62,7 @@ public class PredefinedGeneratorTest {
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
       PredefinedGeneratorFunctions.randomString.run(data).get();
     });
-    assertEquals("Generate random string failed: total length must be greater than prefix length. Prefix: toolongprefix( Length: 13), Length: 4", exception.getMessage());
+    assertEquals("Generate random string failed: total length must be greater than prefix length. Prefix: toolongprefix( Length: 13), Length: 4",
+      exception.getMessage());
   }
 }

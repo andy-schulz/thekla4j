@@ -1,24 +1,23 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
-import io.vavr.Function1;
-import io.vavr.Function2;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.CYAN;
-import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.GREEN;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.checkSetParameterName;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.matchAndRetrieveParameter;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.matchAssignment;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.parseAndExecuteGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.parseAndExecuteInlineGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.PredefinedInlineGeneratorFunctions.TIMESTAMP_IN_MS;
+import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.CYAN;
+import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.GREEN;
+
+import io.vavr.Function1;
+import io.vavr.Function2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * A store for data generators
@@ -30,7 +29,7 @@ public class GeneratorStore {
    * Regex pattern to match a specific generator
    */
   protected static final Function1<String, String> REGEX_SPECIFIC_GENERATOR_PATTERN =
-    prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
+      prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
 
   /**
    * Regex pattern to match a general generator
@@ -56,7 +55,7 @@ public class GeneratorStore {
    * @param generator the generator
    * @return the store
    * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
-   * {@link #registerGenerators(Object...)} instead.
+   *             {@link #registerGenerators(Object...)} instead.
    */
   @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addGenerator(String name, DataGenerator generator) {
@@ -71,7 +70,7 @@ public class GeneratorStore {
    * @param generator     the generator
    * @return the store
    * @deprecated Use {@link Generator} annotation on DataGenerator fields and register them via
-   * {@link #registerGenerators(Object...)} instead.
+   *             {@link #registerGenerators(Object...)} instead.
    */
   @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addGenerator(String generatorName, String description, DataGenerator generator) {
@@ -91,7 +90,8 @@ public class GeneratorStore {
 
     if (!Pattern.compile(REGEX_FUNCTION_NAME).matcher(generatorName).matches())
       throw new IllegalArgumentException(
-        "Generator name '" + generatorName + "' is invalid. Only alphanumeric characters are allowed " + REGEX_FUNCTION_NAME);
+                                         "Generator name '" + generatorName + "' is invalid. Only alphanumeric characters are allowed " +
+                                             REGEX_FUNCTION_NAME);
 
     if (nameList.keySet().contains(generatorName))
       throw new IllegalArgumentException("Generator with name '" + generatorName + "' already exists");
@@ -130,7 +130,7 @@ public class GeneratorStore {
    * @param generator     the generator
    * @return the store
    * @deprecated Use {@link InlineGen} annotation on InlineGenerator fields and register them via
-   * {@link #registerGenerators(Object...)} instead.
+   *             {@link #registerGenerators(Object...)} instead.
    */
   @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addInlineGenerator(String generatorName, InlineGenerator generator) {
@@ -148,9 +148,9 @@ public class GeneratorStore {
   public Try<String> parseAndExecute(String generatorInput) {
 
     if (Pattern.compile(REGEX_GENERAL_GENERATOR_PATTERN).matcher(generatorInput).matches()) {
-      return parseAndExecuteGeneratorFunction.apply(dataGeneratorMap,generatorInput)
-        .map(Option::of)
-        .map(assignResultToNamedParameter.apply(generatorInput));
+      return parseAndExecuteGeneratorFunction.apply(dataGeneratorMap, generatorInput)
+          .map(Option::of)
+          .map(assignResultToNamedParameter.apply(generatorInput));
     }
 
     /*
@@ -158,8 +158,7 @@ public class GeneratorStore {
       * 2. check if variable assignment is present and if yes assign the string to the variable
       * 3. assign result to variable
      */
-    return
-      parseAndExecuteInlineGeneratorFunction.apply(generatorInput, inlineGeneratorMap)
+    return parseAndExecuteInlineGeneratorFunction.apply(generatorInput, inlineGeneratorMap)
         .map(replacedString -> assignResultToNamedParameter.apply(replacedString, Option.none()))
         .flatMap(matchAndRetrieveParameter.apply(storedParameters));
   }
@@ -187,12 +186,11 @@ public class GeneratorStore {
    * Assign the result of a generator to a named parameter if present
    */
   protected final Function2<String, Option<String>, String> assignResultToNamedParameter =
-    (generatorInput, res) ->
-      matchAssignment.apply(generatorInput)
-        .map(checkSetParameterName)
-        .peek(a -> assignResult(res.getOrElse(a.value()), a.name()))
-        .map(a -> res.getOrElse(a.value()))
-        .getOrElse(res.getOrElse(generatorInput));
+      (generatorInput, res) -> matchAssignment.apply(generatorInput)
+          .map(checkSetParameterName)
+          .peek(a -> assignResult(res.getOrElse(a.value()), a.name()))
+          .map(a -> res.getOrElse(a.value()))
+          .getOrElse(res.getOrElse(generatorInput));
 
   /**
    * Create a new GeneratorStore with predefined generators
@@ -202,16 +200,16 @@ public class GeneratorStore {
   public static GeneratorStore create() {
     return (new GeneratorStore())
 
-      .addGeneratorInternal("randomString", PredefinedGeneratorFunctions.randomStringDescription, PredefinedGeneratorFunctions.randomString)
+        .addGeneratorInternal("randomString", PredefinedGeneratorFunctions.randomStringDescription, PredefinedGeneratorFunctions.randomString)
 
-      .addInlineGenerator("TIMESTAMP_IN_MS", TIMESTAMP_IN_MS);
+        .addInlineGenerator("TIMESTAMP_IN_MS", TIMESTAMP_IN_MS);
   }
 
   @Override
   public String toString() {
-    return
-      nameList.toList().collect(
-        Collectors.mapping(t -> CYAN("GeneratorFunction: " + t._1) + "\n" + GREEN(t._2),
-          Collectors.joining("\n" + CYAN("--------------------") + "\n")));
+    return nameList.toList()
+        .collect(
+          Collectors.mapping(t -> CYAN("GeneratorFunction: " + t._1) + "\n" + GREEN(t._2),
+            Collectors.joining("\n" + CYAN("--------------------") + "\n")));
   }
 }

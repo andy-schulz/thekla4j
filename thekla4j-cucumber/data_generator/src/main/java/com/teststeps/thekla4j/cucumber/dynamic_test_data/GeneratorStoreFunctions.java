@@ -8,13 +8,12 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-import org.json.JSONObject;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 
 /**
  * Functions for working with generator store
@@ -34,61 +33,61 @@ public class GeneratorStoreFunctions {
   protected static final String REGEX_INLINE_REPLACEMENT_PATTERN = "(\\?\\{([A-Z0-9_]*)\\})";
 
 
-
   /**
-   * match the groups in the input string group 1: whole generator function group 2: parameter string passed to generator function
+   * match the groups in the input string group 1: whole generator function group 2: parameter string passed to
+   * generator function
    */
   private static final Function2<String, Pattern, List<String>> matchGroups =
-    (input, pattern) -> {
-      Matcher matcher = pattern.matcher(input);
-      if (matcher.matches())
-        return List.of(matcher.group(1), matcher.group(2));
+      (input, pattern) -> {
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.matches())
+          return List.of(matcher.group(1), matcher.group(2));
 
-      return List.empty();
-    };
+        return List.empty();
+      };
 
   /**
    * Parse and execute a generator function from the generator map
    */
   protected static final Function2<Map<Pattern, DataGenerator>, String, Try<String>> parseAndExecuteGeneratorFunction =
-    (generatorMap, generatorInput) -> {
+      (generatorMap, generatorInput) -> {
 
-      Map<List<String>, DataGenerator> filteredGenerator = generatorMap
-        .mapKeys(matchGroups.apply(generatorInput))
-        .filterKeys(groupList -> groupList.size() == 2);
+        Map<List<String>, DataGenerator> filteredGenerator = generatorMap
+            .mapKeys(matchGroups.apply(generatorInput))
+            .filterKeys(groupList -> groupList.size() == 2);
 
-      if (filteredGenerator.size() > 1)
-        return io.vavr.control.Try.failure(new IllegalArgumentException("Multiple generators found for input: " + generatorInput));
+        if (filteredGenerator.size() > 1)
+          return io.vavr.control.Try.failure(new IllegalArgumentException("Multiple generators found for input: " + generatorInput));
 
 
-      if (filteredGenerator.isEmpty()) {
-        log.debug("No generator found for input: {}", generatorInput);
-        return io.vavr.control.Try.success(generatorInput);
-      }
+        if (filteredGenerator.isEmpty()) {
+          log.debug("No generator found for input: {}", generatorInput);
+          return io.vavr.control.Try.success(generatorInput);
+        }
 
-      String generatorParameterString = filteredGenerator.head()._1().get(1);
-      DataGenerator generator = filteredGenerator.values().head();
+        String generatorParameterString = filteredGenerator.head()._1().get(1);
+        DataGenerator generator = filteredGenerator.values().head();
 
-      Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(generatorParameterString);
+        Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(generatorParameterString);
 
-      return generator.run(genParameters)
-        .onSuccess(x -> log.debug("Generator Function executed: {}", x));
-    };
+        return generator.run(genParameters)
+            .onSuccess(x -> log.debug("Generator Function executed: {}", x));
+      };
 
 
   /**
-   *  Match assignment pattern and return Assignment object
+   * Match assignment pattern and return Assignment object
    */
   protected static final Function<String, Option<Assignment>> matchAssignment =
-    generatorInput -> Option.of(Pattern.compile(REGEX_ASSIGNMENT).matcher(generatorInput))
-      .flatMap(matcher -> {
-        if (matcher.matches()) {
-          return Option.of(Assignment.of(matcher.group(2), matcher.group(1)));
-        } else {
-          log.debug("No assignment match found");
-          return Option.none();
-        }
-      });
+      generatorInput -> Option.of(Pattern.compile(REGEX_ASSIGNMENT).matcher(generatorInput))
+          .flatMap(matcher -> {
+            if (matcher.matches()) {
+              return Option.of(Assignment.of(matcher.group(2), matcher.group(1)));
+            } else {
+              log.debug("No assignment match found");
+              return Option.none();
+            }
+          });
 
   /**
    * Check if parameter name is valid for setting
@@ -96,7 +95,7 @@ public class GeneratorStoreFunctions {
   protected static final Function<Assignment, Assignment> checkSetParameterName = assignment -> {
     if (!Pattern.compile(SET_REGEX_PARAMETER_NAME).matcher(assignment.name()).matches()) {
       throw new IllegalArgumentException("Cant assign value to parameter named: " + assignment.name() + ". Parameter names must match: " +
-        SET_REGEX_PARAMETER_NAME);
+          SET_REGEX_PARAMETER_NAME);
     }
     return assignment;
   };
@@ -112,13 +111,13 @@ public class GeneratorStoreFunctions {
   }
 
   private static final Predicate<String> checkGetParameterName = parameterName -> Pattern.compile(GET_REGEX_PARAMETER_NAME)
-    .matcher(parameterName)
-    .matches();
+      .matcher(parameterName)
+      .matches();
 
   private static final Function2<Map<String, String>, String, Try<String>> returnStoredParameters =
-    (storedParameter, key) -> storedParameter.get(key)
-      .map(Try::success)
-      .getOrElseThrow(() -> new IllegalArgumentException("Parameter not found: " + key));
+      (storedParameter, key) -> storedParameter.get(key)
+          .map(Try::success)
+          .getOrElseThrow(() -> new IllegalArgumentException("Parameter not found: " + key));
 
 
   /**
@@ -177,31 +176,33 @@ public class GeneratorStoreFunctions {
     List<String> attributes = paramPropertyList.tail();
 
     return returnStoredParameters.apply(storedParameters, key)
-      .flatMap(testParamIsValidJson)
-      .map(JSONObject::new)
-      .map(getJsonAttributes.apply(attributes))
-      .onFailure(e -> log.error("Error while parsing stored parameter: {}", NameAndProperties, e));
+        .flatMap(testParamIsValidJson)
+        .map(JSONObject::new)
+        .map(getJsonAttributes.apply(attributes))
+        .onFailure(e -> log.error("Error while parsing stored parameter: {}", NameAndProperties, e));
 
   };
 
   /**
    * Match and retrieve a parameter
    */
-  protected static final Function2<Map<String, String>, String, Try<String>> matchAndRetrieveSingleParameter = (storedParameters, singleParameter) -> {
+  protected static final Function2<Map<String, String>, String, Try<String>> matchAndRetrieveSingleParameter =
+      (storedParameters, singleParameter) -> {
 
-    Matcher matcher = Pattern.compile(GET_REGEX_PARAMETER).matcher(singleParameter);
+        Matcher matcher = Pattern.compile(GET_REGEX_PARAMETER).matcher(singleParameter);
 
-    if (matcher.matches()) {
-      if (checkGetParameterName.test(matcher.group(1))) {
-        return parseStoredParameter.apply(storedParameters, matcher.group(1));
-      } else {
-        return Try.failure(new IllegalArgumentException("Cant get value of parameter named: " + matcher.group(1) + ". Parameter names must match: " +
-          GET_REGEX_PARAMETER_NAME));
-      }
-    } else {
-      return Try.success(singleParameter);
-    }
-  };
+        if (matcher.matches()) {
+          if (checkGetParameterName.test(matcher.group(1))) {
+            return parseStoredParameter.apply(storedParameters, matcher.group(1));
+          } else {
+            return Try.failure(new IllegalArgumentException("Cant get value of parameter named: " + matcher.group(1) +
+                ". Parameter names must match: " +
+                GET_REGEX_PARAMETER_NAME));
+          }
+        } else {
+          return Try.success(singleParameter);
+        }
+      };
 
   /**
    * Match and retrieve a parameter
@@ -217,11 +218,11 @@ public class GeneratorStoreFunctions {
 
 
     return matches.map(boundary -> boundary.append(input.substring(boundary._1(), boundary._2())))
-      .map(t -> t.map3(matchAndRetrieveSingleParameter.apply(storedParameters)))
-      .map(LiftTry.fromTuple3$3())
-      .transform(LiftTry.fromList())
-      .map(l -> l.foldRight(new StringBuilder(input), (t, acc) -> acc.replace(t._1, t._2, t._3())))
-      .map(StringBuilder::toString);
+        .map(t -> t.map3(matchAndRetrieveSingleParameter.apply(storedParameters)))
+        .map(LiftTry.fromTuple3$3())
+        .transform(LiftTry.fromList())
+        .map(l -> l.foldRight(new StringBuilder(input), (t, acc) -> acc.replace(t._1, t._2, t._3())))
+        .map(StringBuilder::toString);
   };
 
 
@@ -229,10 +230,9 @@ public class GeneratorStoreFunctions {
    * Find and run single inline generator
    */
   protected static final Function2<Map<String, InlineGenerator>, String, Try<String>> replaceSingleInlineGenerator =
-    (inlineGeneratorMap, generatorName) -> inlineGeneratorMap.get(generatorName)
-    .toTry(() -> new IllegalArgumentException("No inline generator found for name: " + generatorName))
-    .flatMap(InlineGenerator::run);
-
+      (inlineGeneratorMap, generatorName) -> inlineGeneratorMap.get(generatorName)
+          .toTry(() -> new IllegalArgumentException("No inline generator found for name: " + generatorName))
+          .flatMap(InlineGenerator::run);
 
 
   private static final Function<String, String> extractInlineGeneratorName = input -> {
@@ -244,26 +244,26 @@ public class GeneratorStoreFunctions {
    * Parse and execute inline generator
    */
   public static final Function2<String, Map<String, InlineGenerator>, Try<String>> parseAndExecuteInlineGeneratorFunction =
-    (generatorInput, inlineGeneratorMap) -> {
+      (generatorInput, inlineGeneratorMap) -> {
 
 
-      Matcher matcher = Pattern.compile(REGEX_INLINE_REPLACEMENT_PATTERN).matcher(generatorInput);
+        Matcher matcher = Pattern.compile(REGEX_INLINE_REPLACEMENT_PATTERN).matcher(generatorInput);
 
-      List<Tuple2<Integer, Integer>> matches = List.empty();
-      while (matcher.find()) {
-        matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
-      }
+        List<Tuple2<Integer, Integer>> matches = List.empty();
+        while (matcher.find()) {
+          matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
+        }
 
 
-      return matches.map(boundary -> boundary.append(generatorInput.substring(boundary._1(), boundary._2())))
-        .map(t -> t.map3(extractInlineGeneratorName))
-        .map(t -> t.map3(replaceSingleInlineGenerator.apply(inlineGeneratorMap)))
-        .map(LiftTry.fromTuple3$3())
-        .transform(LiftTry.fromList())
-        .map(l -> l.foldRight(new StringBuilder(generatorInput), (t, acc) -> acc.replace(t._1, t._2, t._3())))
-        .map(StringBuilder::toString)
-        .onSuccess(x -> log.debug("Inline generator replaced: {}", x));
-    };
+        return matches.map(boundary -> boundary.append(generatorInput.substring(boundary._1(), boundary._2())))
+            .map(t -> t.map3(extractInlineGeneratorName))
+            .map(t -> t.map3(replaceSingleInlineGenerator.apply(inlineGeneratorMap)))
+            .map(LiftTry.fromTuple3$3())
+            .transform(LiftTry.fromList())
+            .map(l -> l.foldRight(new StringBuilder(generatorInput), (t, acc) -> acc.replace(t._1, t._2, t._3())))
+            .map(StringBuilder::toString)
+            .onSuccess(x -> log.debug("Inline generator replaced: {}", x));
+      };
 
 
   private GeneratorStoreFunctions() {

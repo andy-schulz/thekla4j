@@ -1,11 +1,11 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
-import io.vavr.control.Try;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import io.vavr.control.Try;
+import org.junit.jupiter.api.Test;
 
 public class GeneratorAnnotationTest {
 
@@ -57,8 +57,7 @@ public class GeneratorAnnotationTest {
   // Provider with parameterized generator
   static class ParameterizedProvider {
     @Generator(name = "paramGen")
-    public final DataGenerator parameterized = parameterMap ->
-      Try.success(parameterMap.foldLeft("", (s, entry) -> s + entry._2));
+    public final DataGenerator parameterized = parameterMap -> Try.success(parameterMap.foldLeft("", (s, entry) -> s + entry._2));
   }
 
   // ===== Method-based generator providers =====
@@ -157,7 +156,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerGeneratorWithExplicitName() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new ExplicitNameProvider());
+        .registerGenerators(new ExplicitNameProvider());
 
     Try<String> result = store.parseAndExecute("myExplicitGenerator{test}");
     assertThat("generator executed successfully", result.isSuccess());
@@ -167,7 +166,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerGeneratorUsingFieldName() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new FieldNameProvider());
+        .registerGenerators(new FieldNameProvider());
 
     Try<String> result = store.parseAndExecute("myFieldGenerator{test}");
     assertThat("generator executed successfully", result.isSuccess());
@@ -177,7 +176,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMultipleGeneratorsFromSameProvider() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MultiProvider());
+        .registerGenerators(new MultiProvider());
 
     Try<String> resultOne = store.parseAndExecute("genOne{test}");
     assertThat("first generator executed successfully", resultOne.isSuccess());
@@ -191,7 +190,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerGeneratorsFromMultipleProviders() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new ExplicitNameProvider(), new FieldNameProvider());
+        .registerGenerators(new ExplicitNameProvider(), new FieldNameProvider());
 
     Try<String> result1 = store.parseAndExecute("myExplicitGenerator{test}");
     assertThat("first generator executed successfully", result1.isSuccess());
@@ -204,8 +203,7 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerGeneratorWithWrongFieldTypeThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create().registerGenerators(new WrongTypeProvider()));
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().registerGenerators(new WrongTypeProvider()));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -214,8 +212,7 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerGeneratorWithNullFieldThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create().registerGenerators(new NullFieldProvider()));
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().registerGenerators(new NullFieldProvider()));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -224,8 +221,7 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerDuplicateGeneratorNameThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create()
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create()
         .registerGenerators(new ExplicitNameProvider(), new ExplicitNameProvider()));
 
     assertThat("correct error message is thrown",
@@ -236,7 +232,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerParameterizedGenerator() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new ParameterizedProvider());
+        .registerGenerators(new ParameterizedProvider());
 
     Try<String> result = store.parseAndExecute("paramGen{p1: one, p2: two, p3: three}");
     assertThat("generator executed successfully", result.isSuccess());
@@ -246,7 +242,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerGeneratorWithAssignment() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new ExplicitNameProvider());
+        .registerGenerators(new ExplicitNameProvider());
 
     String generatorString = "myExplicitGenerator{test} => ${RESULT}";
     Try<String> result = store.parseAndExecute(generatorString);
@@ -261,7 +257,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void generatorWithDefaultDescription() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new DefaultDescriptionProvider());
+        .registerGenerators(new DefaultDescriptionProvider());
 
     Try<String> result = store.parseAndExecute("autoNamedGen{test}");
     assertThat("generator executed successfully", result.isSuccess());
@@ -272,9 +268,8 @@ public class GeneratorAnnotationTest {
   public void existingAddGeneratorStillWorks() {
     DataGenerator simpleGenerator = parameterMap -> Try.success("legacy result");
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore store = GeneratorStore.create()
-      .addGenerator("legacyGen", simpleGenerator);
+    @SuppressWarnings("deprecation") GeneratorStore store = GeneratorStore.create()
+        .addGenerator("legacyGen", simpleGenerator);
 
     Try<String> result = store.parseAndExecute("legacyGen{test}");
     assertThat("legacy generator executed successfully", result.isSuccess());
@@ -285,10 +280,9 @@ public class GeneratorAnnotationTest {
   public void mixAnnotationAndLegacyRegistration() {
     DataGenerator legacyGen = parameterMap -> Try.success("legacy result");
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore store = GeneratorStore.create()
-      .addGenerator("legacyGen", legacyGen)
-      .registerGenerators(new ExplicitNameProvider());
+    @SuppressWarnings("deprecation") GeneratorStore store = GeneratorStore.create()
+        .addGenerator("legacyGen", legacyGen)
+        .registerGenerators(new ExplicitNameProvider());
 
     Try<String> legacyResult = store.parseAndExecute("legacyGen{test}");
     assertThat("legacy generator executed successfully", legacyResult.isSuccess());
@@ -304,7 +298,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithStringParameters() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodProvider());
+        .registerGenerators(new MethodProvider());
 
     Try<String> result = store.parseAndExecute("methodGen{one: hello, two: world}");
     assertThat("method generator executed successfully", result.isSuccess());
@@ -314,7 +308,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorUsingMethodName() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodFieldNameProvider());
+        .registerGenerators(new MethodFieldNameProvider());
 
     Try<String> result = store.parseAndExecute("autoNamedMethod{value: test123}");
     assertThat("method generator executed successfully", result.isSuccess());
@@ -324,7 +318,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithIntParameter() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodIntParamProvider());
+        .registerGenerators(new MethodIntParamProvider());
 
     Try<String> result = store.parseAndExecute("intGen{prefix: item, count: 42}");
     assertThat("method generator executed successfully", result.isSuccess());
@@ -334,7 +328,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithBooleanParameter() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodBooleanParamProvider());
+        .registerGenerators(new MethodBooleanParamProvider());
 
     Try<String> result = store.parseAndExecute("boolGen{label: active, flag: true}");
     assertThat("method generator executed successfully", result.isSuccess());
@@ -344,7 +338,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithMissingParameter() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodProvider());
+        .registerGenerators(new MethodProvider());
 
     Try<String> result = store.parseAndExecute("methodGen{one: hello}");
     assertThat("method generator should fail with missing parameter", result.isFailure());
@@ -354,8 +348,8 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerMethodGeneratorWithWrongReturnTypeThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create().registerGenerators(new MethodWrongReturnTypeProvider()));
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create()
+        .registerGenerators(new MethodWrongReturnTypeProvider()));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -365,7 +359,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorReturningNull() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodNullReturnProvider());
+        .registerGenerators(new MethodNullReturnProvider());
 
     Try<String> result = store.parseAndExecute("nullMethod{value: test}");
     assertThat("method generator should fail when returning null", result.isFailure());
@@ -376,7 +370,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithNoParameters() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodNoParamsProvider());
+        .registerGenerators(new MethodNoParamsProvider());
 
     Try<String> result = store.parseAndExecute("noParamGen{anything}");
     assertThat("method generator executed successfully", result.isSuccess());
@@ -386,7 +380,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithAssignment() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodProvider());
+        .registerGenerators(new MethodProvider());
 
     String generatorString = "methodGen{one: foo, two: bar} => ${METHOD_RESULT}";
     Try<String> result = store.parseAndExecute(generatorString);
@@ -412,7 +406,7 @@ public class GeneratorAnnotationTest {
     }
 
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MixedProvider());
+        .registerGenerators(new MixedProvider());
 
     Try<String> fieldResult = store.parseAndExecute("fieldGen{test}");
     assertThat("field generator executed successfully", fieldResult.isSuccess());
@@ -426,7 +420,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMethodGeneratorWithInvalidIntParameter() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MethodIntParamProvider());
+        .registerGenerators(new MethodIntParamProvider());
 
     Try<String> result = store.parseAndExecute("intGen{prefix: item, count: notAnInt}");
     assertThat("method generator should fail with invalid int", result.isFailure());
@@ -439,7 +433,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerInlineGeneratorWithExplicitName() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineExplicitNameProvider());
+        .registerGenerators(new InlineExplicitNameProvider());
 
     Try<String> result = store.parseAndExecute("?{MY_INLINE}");
     assertThat("inline generator executed successfully", result.isSuccess());
@@ -449,7 +443,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerInlineGeneratorUsingFieldName() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineFieldNameProvider());
+        .registerGenerators(new InlineFieldNameProvider());
 
     Try<String> result = store.parseAndExecute("?{MY_INLINE_GEN}");
     assertThat("inline generator executed successfully", result.isSuccess());
@@ -459,7 +453,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMultipleInlineGeneratorsFromSameProvider() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineMultiProvider());
+        .registerGenerators(new InlineMultiProvider());
 
     Try<String> resultOne = store.parseAndExecute("?{INLINE_ONE}");
     assertThat("first inline generator executed successfully", resultOne.isSuccess());
@@ -473,7 +467,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerInlineGeneratorEmbeddedInString() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineExplicitNameProvider());
+        .registerGenerators(new InlineExplicitNameProvider());
 
     Try<String> result = store.parseAndExecute("prefix-?{MY_INLINE}-suffix");
     assertThat("inline generator in string executed successfully", result.isSuccess());
@@ -483,7 +477,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerMultipleInlineGeneratorsInOneString() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineMultiProvider());
+        .registerGenerators(new InlineMultiProvider());
 
     Try<String> result = store.parseAndExecute("?{INLINE_ONE}-?{INLINE_TWO}");
     assertThat("multiple inline generators executed successfully", result.isSuccess());
@@ -493,7 +487,7 @@ public class GeneratorAnnotationTest {
   @Test
   public void registerInlineGeneratorWithAssignment() {
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new InlineExplicitNameProvider());
+        .registerGenerators(new InlineExplicitNameProvider());
 
     Try<String> result = store.parseAndExecute("?{MY_INLINE} => ${INLINE_RESULT}");
     assertThat("inline generator executed successfully", result.isSuccess());
@@ -506,8 +500,7 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerInlineGeneratorWithWrongFieldTypeThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create().registerGenerators(new InlineWrongTypeProvider()));
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().registerGenerators(new InlineWrongTypeProvider()));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -516,8 +509,7 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void registerInlineGeneratorWithNullFieldThrowsException() {
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
-      GeneratorStore.create().registerGenerators(new InlineNullFieldProvider()));
+    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().registerGenerators(new InlineNullFieldProvider()));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -535,7 +527,7 @@ public class GeneratorAnnotationTest {
     }
 
     GeneratorStore store = GeneratorStore.create()
-      .registerGenerators(new MixedProvider());
+        .registerGenerators(new MixedProvider());
 
     Try<String> dataResult = store.parseAndExecute("dataGen{test}");
     assertThat("data generator executed successfully", dataResult.isSuccess());
@@ -548,10 +540,9 @@ public class GeneratorAnnotationTest {
 
   @Test
   public void mixAnnotationAndLegacyInlineRegistration() {
-    @SuppressWarnings("deprecation")
-    GeneratorStore store = GeneratorStore.create()
-      .addInlineGenerator("LEGACY_INLINE", () -> Try.success("legacy inline"))
-      .registerGenerators(new InlineExplicitNameProvider());
+    @SuppressWarnings("deprecation") GeneratorStore store = GeneratorStore.create()
+        .addInlineGenerator("LEGACY_INLINE", () -> Try.success("legacy inline"))
+        .registerGenerators(new InlineExplicitNameProvider());
 
     Try<String> legacyResult = store.parseAndExecute("?{LEGACY_INLINE}");
     assertThat("legacy inline generator executed successfully", legacyResult.isSuccess());
@@ -562,4 +553,3 @@ public class GeneratorAnnotationTest {
     assertThat("annotated inline generator returned expected value", annotatedResult.get(), equalTo("inline result"));
   }
 }
-

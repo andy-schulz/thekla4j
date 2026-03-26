@@ -51,4 +51,3 @@ public @interface InlineGen {
    */
   String description() default "no description given";
 }
-

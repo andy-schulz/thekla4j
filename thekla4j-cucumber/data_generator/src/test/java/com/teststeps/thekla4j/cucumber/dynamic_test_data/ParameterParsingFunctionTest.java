@@ -1,15 +1,15 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
+import static com.teststeps.thekla4j.cucumber.dynamic_test_data.ParameterParsingFunctions.parseParameterStringToMap;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-
-import static com.teststeps.thekla4j.cucumber.dynamic_test_data.ParameterParsingFunctions.parseParameterStringToMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParameterParsingFunctionTest {
 

@@ -3,11 +3,10 @@ package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Try;
-import lombok.extern.log4j.Log4j2;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Scans objects for fields and methods annotated with {@link Generator} and registers them in a {@link GeneratorStore}.
@@ -27,16 +26,16 @@ public class GeneratorScanner {
 
     for (Object provider : providers) {
       List.of(provider.getClass().getDeclaredFields())
-        .filter(field -> field.isAnnotationPresent(Generator.class))
-        .forEach(field -> registerField(store, provider, field));
+          .filter(field -> field.isAnnotationPresent(Generator.class))
+          .forEach(field -> registerField(store, provider, field));
 
       List.of(provider.getClass().getDeclaredFields())
-        .filter(field -> field.isAnnotationPresent(InlineGen.class))
-        .forEach(field -> registerInlineField(store, provider, field));
+          .filter(field -> field.isAnnotationPresent(InlineGen.class))
+          .forEach(field -> registerInlineField(store, provider, field));
 
       List.of(provider.getClass().getDeclaredMethods())
-        .filter(method -> method.isAnnotationPresent(Generator.class))
-        .forEach(method -> registerMethod(store, provider, method));
+          .filter(method -> method.isAnnotationPresent(Generator.class))
+          .forEach(method -> registerMethod(store, provider, method));
     }
 
     return store;
@@ -46,7 +45,9 @@ public class GeneratorScanner {
 
     if (!DataGenerator.class.isAssignableFrom(field.getType())) {
       throw new IllegalArgumentException(
-        "Field '" + field.getName() + "' annotated with @Generator must be of type DataGenerator, but is " + field.getType().getSimpleName());
+                                         "Field '" + field.getName() + "' annotated with @Generator must be of type DataGenerator, but is " + field
+                                             .getType()
+                                             .getSimpleName());
     }
 
     Generator annotation = field.getAnnotation(Generator.class);
@@ -72,7 +73,9 @@ public class GeneratorScanner {
 
     if (!InlineGenerator.class.isAssignableFrom(field.getType())) {
       throw new IllegalArgumentException(
-        "Field '" + field.getName() + "' annotated with @InlineGen must be of type InlineGenerator, but is " + field.getType().getSimpleName());
+                                         "Field '" + field.getName() + "' annotated with @InlineGen must be of type InlineGenerator, but is " + field
+                                             .getType()
+                                             .getSimpleName());
     }
 
     InlineGen annotation = field.getAnnotation(InlineGen.class);
@@ -97,7 +100,8 @@ public class GeneratorScanner {
 
     if (!DataGenerator.class.isAssignableFrom(method.getReturnType())) {
       throw new IllegalArgumentException(
-        "Method '" + method.getName() + "' annotated with @Generator must return DataGenerator, but returns " + method.getReturnType().getSimpleName());
+                                         "Method '" + method.getName() + "' annotated with @Generator must return DataGenerator, but returns " +
+                                             method.getReturnType().getSimpleName());
     }
 
     Generator annotation = method.getAnnotation(Generator.class);
@@ -122,9 +126,10 @@ public class GeneratorScanner {
           Class<?> paramType = methodParameters[i].getType();
 
           String value = parameterMap.get(paramName)
-            .getOrElseThrow(() -> new IllegalArgumentException(
-              "Missing parameter '" + paramName + "' for generator method '" + method.getName() + "'. " +
-                "Expected parameters: " + parameterNames.mkString(", ")));
+              .getOrElseThrow(() -> new IllegalArgumentException(
+                                                                 "Missing parameter '" + paramName + "' for generator method '" + method.getName() +
+                                                                     "'. " +
+                                                                     "Expected parameters: " + parameterNames.mkString(", ")));
 
           args[i] = convertParameter(value, paramType, paramName, method.getName());
         }
@@ -133,19 +138,19 @@ public class GeneratorScanner {
 
         if (innerGenerator == null) {
           return Try.failure(new IllegalStateException(
-            "Generator method '" + method.getName() + "' returned null"));
+                                                       "Generator method '" + method.getName() + "' returned null"));
         }
 
         // pass remaining parameters (those not consumed by method params) to the inner generator
         Map<String, String> remainingParams = parameterNames
-          .foldLeft(parameterMap, (map, pName) -> map.remove(pName));
+            .foldLeft(parameterMap, (map, pName) -> map.remove(pName));
 
         return innerGenerator.run(remainingParams);
       } catch (IllegalArgumentException e) {
         return Try.failure(e);
       } catch (Exception e) {
         return Try.failure(new RuntimeException(
-          "Failed to invoke generator method '" + method.getName() + "'", e));
+                                                "Failed to invoke generator method '" + method.getName() + "'", e));
       }
     };
 
@@ -161,14 +166,16 @@ public class GeneratorScanner {
         return Integer.parseInt(value);
       } catch (NumberFormatException e) {
         throw new IllegalArgumentException(
-          "Parameter '" + paramName + "' of generator method '" + methodName + "' expects an integer, but got: " + value);
+                                           "Parameter '" + paramName + "' of generator method '" + methodName + "' expects an integer, but got: " +
+                                               value);
       }
     } else if (targetType == long.class || targetType == Long.class) {
       try {
         return Long.parseLong(value);
       } catch (NumberFormatException e) {
         throw new IllegalArgumentException(
-          "Parameter '" + paramName + "' of generator method '" + methodName + "' expects a long, but got: " + value);
+                                           "Parameter '" + paramName + "' of generator method '" + methodName + "' expects a long, but got: " +
+                                               value);
       }
     } else if (targetType == boolean.class || targetType == Boolean.class) {
       return Boolean.parseBoolean(value);
@@ -177,12 +184,13 @@ public class GeneratorScanner {
         return Double.parseDouble(value);
       } catch (NumberFormatException e) {
         throw new IllegalArgumentException(
-          "Parameter '" + paramName + "' of generator method '" + methodName + "' expects a double, but got: " + value);
+                                           "Parameter '" + paramName + "' of generator method '" + methodName + "' expects a double, but got: " +
+                                               value);
       }
     } else {
       throw new IllegalArgumentException(
-        "Unsupported parameter type '" + targetType.getSimpleName() + "' for parameter '" + paramName +
-          "' of generator method '" + methodName + "'. Supported types: String, int, long, boolean, double");
+                                         "Unsupported parameter type '" + targetType.getSimpleName() + "' for parameter '" + paramName +
+                                             "' of generator method '" + methodName + "'. Supported types: String, int, long, boolean, double");
     }
   }
 
@@ -190,4 +198,3 @@ public class GeneratorScanner {
     // utility class
   }
 }
-

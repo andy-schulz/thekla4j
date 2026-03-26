@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * {@code
  * @Generator(name = "myGenerator")
  * public DataGenerator myGenerator(String one, String two) {
- *     return parameterMap -> Try.of(() -> one + " " + two);
+ * return parameterMap -> Try.of(() -> one + " " + two);
  * }
  * }
  * </pre>
@@ -50,4 +50,3 @@ public @interface Generator {
    */
   String description() default "no description given";
 }
-

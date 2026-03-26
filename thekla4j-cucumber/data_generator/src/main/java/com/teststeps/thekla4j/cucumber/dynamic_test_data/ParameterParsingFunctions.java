@@ -4,10 +4,9 @@ import io.vavr.Function2;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
-import lombok.extern.log4j.Log4j2;
-
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class ParameterParsingFunctions {

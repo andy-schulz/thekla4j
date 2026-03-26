@@ -1,11 +1,11 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
-import io.vavr.control.Try;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import io.vavr.control.Try;
+import org.junit.jupiter.api.Test;
 
 public class GeneratorStoreTest {
 
@@ -27,8 +27,8 @@ public class GeneratorStoreTest {
 
   @Test
   public void assignGeneratorWithInvalidName() {
-    @SuppressWarnings("deprecation")
-    Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create().addGenerator("Invalid!Generator", simpleGenerator));
+    @SuppressWarnings("deprecation") Throwable thrown = assertThrows(IllegalArgumentException.class, () -> GeneratorStore.create()
+        .addGenerator("Invalid!Generator", simpleGenerator));
 
     assertThat("correct error message is thrown",
       thrown.getMessage(),
@@ -39,8 +39,7 @@ public class GeneratorStoreTest {
   @Test
   public void executeSimpleGenerator() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
     String generatorString = "simpleGenerator{TestString}";
@@ -54,8 +53,7 @@ public class GeneratorStoreTest {
   @Test
   public void executeSimpleGeneratorWithAssignment() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
     String generatorString = "simpleGenerator{TestString} => ${TEST}";
@@ -73,8 +71,7 @@ public class GeneratorStoreTest {
   @Test
   public void assignToInvalidParameterName() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("simpleGenerator", simpleGenerator);
 
     String generatorString = "simpleGenerator{TestString} => ${TEST.name}";
@@ -89,8 +86,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingValidAttributeOfParameterJson() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
@@ -106,8 +102,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingNotExistingAttributeOfParameter() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
@@ -125,9 +120,8 @@ public class GeneratorStoreTest {
   @Test
   public void accessingNotExistingParentAttributeOfParameter() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
-      .addGenerator("jsonGenerator", jsonGenerator);
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
     generatorStore.parseAndExecute(generatorString);
@@ -142,8 +136,7 @@ public class GeneratorStoreTest {
   @Test
   public void accessingAttributeOfString() {
 
-    @SuppressWarnings("deprecation")
-    GeneratorStore generatorStore = GeneratorStore.create()
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
         .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
@@ -161,19 +154,19 @@ public class GeneratorStoreTest {
   @Test
   public void accessingAttributeOfInvalidJsonObject() {
 
-      GeneratorStore generatorStore = GeneratorStore.create()
-          .addGenerator("failingJson", failingJson);
+    GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("failingJson", failingJson);
 
-      String generatorString = "failingJson{TestString} => ${TEST}";
-      generatorStore.parseAndExecute(generatorString);
+    String generatorString = "failingJson{TestString} => ${TEST}";
+    generatorStore.parseAndExecute(generatorString);
 
-      String retrievalString = "${TEST.name}";
-      Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
+    String retrievalString = "${TEST.name}";
+    Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
 
-      assertThat("executing the generator should fail", retrievalResult.isFailure(), equalTo(true));
-      assertThat("Thrown error",
-        retrievalResult.getCause().getMessage(),
-        equalTo("Cant get value of parameter. Parameter is not a valid json: { name:: Test }"));
+    assertThat("executing the generator should fail", retrievalResult.isFailure(), equalTo(true));
+    assertThat("Thrown error",
+      retrievalResult.getCause().getMessage(),
+      equalTo("Cant get value of parameter. Parameter is not a valid json: { name:: Test }"));
   }
 
   @Test
@@ -198,20 +191,20 @@ public class GeneratorStoreTest {
   @Test
   public void retrieveInvalidParameter() {
 
-      GeneratorStore generatorStore = GeneratorStore.create()
-          .addGenerator("failingJson", failingJson);
+    GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("failingJson", failingJson);
 
-      String generatorString = "failingJson{TestString} => ${TEST}";
-      generatorStore.parseAndExecute(generatorString);
+    String generatorString = "failingJson{TestString} => ${TEST}";
+    generatorStore.parseAndExecute(generatorString);
 
-      String retrievalString = "${TEST::}";
-      Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
+    String retrievalString = "${TEST::}";
+    Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
 
-      assertThat("retrieving an attribute on an invalid parameter string should fail",
-        retrievalResult.isFailure(), equalTo(true));
-      assertThat("retrieving the attribute of parameter failed with the correct error message",
-        retrievalResult.getCause().getMessage(),
-        equalTo("Cant get value of parameter named: TEST::. Parameter names must match: [A-Za-z0-9_.]+"));
+    assertThat("retrieving an attribute on an invalid parameter string should fail",
+      retrievalResult.isFailure(), equalTo(true));
+    assertThat("retrieving the attribute of parameter failed with the correct error message",
+      retrievalResult.getCause().getMessage(),
+      equalTo("Cant get value of parameter named: TEST::. Parameter names must match: [A-Za-z0-9_.]+"));
   }
 
   @Test
@@ -300,7 +293,7 @@ public class GeneratorStoreTest {
   public void replaceParameterAttributeWithinString() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addGenerator("jsonGenerator", jsonGenerator);
+        .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
     generatorStore.parseAndExecute(generatorString);
@@ -317,7 +310,7 @@ public class GeneratorStoreTest {
   public void replaceMultipleParameterAttributesWithinString() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addGenerator("jsonGenerator", jsonGenerator);
+        .addGenerator("jsonGenerator", jsonGenerator);
 
     String generatorString = "jsonGenerator{TestString} => ${TEST}";
     generatorStore.parseAndExecute(generatorString);
@@ -327,7 +320,8 @@ public class GeneratorStoreTest {
 
     assertThat("executing the generator succeeded", retrievalResult.isSuccess());
     assertThat("executing the generator returned the expected value", retrievalResult.get(),
-      equalTo("Calling Test on Object {\n  \"name\": \"Test\",\n  \"value\": \"TestValue\",\n  \"details\": {\n    \"key\": \"value\"\n  },\n  \"emptyDetails\": {}\n}\n"));
+      equalTo(
+        "Calling Test on Object {\n  \"name\": \"Test\",\n  \"value\": \"TestValue\",\n  \"details\": {\n    \"key\": \"value\"\n  },\n  \"emptyDetails\": {}\n}\n"));
 
 
     String retrievalString2 = "Calling ${TEST.name} with value ${TEST.value}";
@@ -341,17 +335,17 @@ public class GeneratorStoreTest {
   @Test
   public void replaceParameterWithAssignmentOperator() {
 
-      GeneratorStore generatorStore = GeneratorStore.create()
-          .addGenerator("simpleGenerator", simpleGenerator);
+    GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
 
-      String generatorString = "simpleGenerator{TestString} => ${TEST}";
-      generatorStore.parseAndExecute(generatorString);
+    String generatorString = "simpleGenerator{TestString} => ${TEST}";
+    generatorStore.parseAndExecute(generatorString);
 
-      String retrievalString = "Calling => ${TEST}";
-      Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
+    String retrievalString = "Calling => ${TEST}";
+    Try<String> retrievalResult = generatorStore.parseAndExecute(retrievalString);
 
-      assertThat("executing the generator succeeded", retrievalResult.isSuccess());
-      assertThat("executing the generator returned the expected value", retrievalResult.get(), equalTo("Calling"));
+    assertThat("executing the generator succeeded", retrievalResult.isSuccess());
+    assertThat("executing the generator returned the expected value", retrievalResult.get(), equalTo("Calling"));
   }
 
 
@@ -359,7 +353,7 @@ public class GeneratorStoreTest {
   public void replaceSingleInlineGenerator() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
 
     String generatorString = "?{INLINE}";
@@ -374,7 +368,7 @@ public class GeneratorStoreTest {
   public void replaceMultipleInlineGenerators() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
     String generatorString = "?{INLINE} ?{INLINE} ?{INLINE}";
     Try<String> result = generatorStore.parseAndExecute(generatorString);
@@ -388,7 +382,7 @@ public class GeneratorStoreTest {
   public void replaceInlineGeneratorWithinText() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
     String generatorString = "This is a test string with an inline generator ?{INLINE}";
 
@@ -405,7 +399,7 @@ public class GeneratorStoreTest {
   public void assignInlineGeneratorToParameter() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
     String generatorString = "?{INLINE} => ${TEST}";
 
@@ -424,7 +418,7 @@ public class GeneratorStoreTest {
   public void assignInlineGeneratorWithTextToParameter() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
     String generatorString = "This is a test string with an inline generator ?{INLINE} => ${TEST}";
 
@@ -443,18 +437,18 @@ public class GeneratorStoreTest {
   public void testToStringMethod() {
 
     GeneratorStore generatorStore = GeneratorStore.create()
-      .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
+        .addInlineGenerator("INLINE", () -> Try.success("1234567890"));
 
     assertThat("toString method returns correct string",
       generatorStore.toString(),
       equalTo("\u001B[36mGeneratorFunction: randomString\u001B[0m\n" +
-        "\u001B[32mrandomString{length: int, prefix: string, specialChars: boolean}\u001B[0m\n" +
-        "\u001B[32mrandomString{256} -> length: 256\u001B[0m\n" +
-        "\u001B[32m\u001B[0m\n" +
-        "\u001B[32m    Generate a random string with a given prefix and length.\u001B[0m\n" +
-        "\u001B[32m    length:        the generated string will have this length,             restriction: length > prefix.length,     default 8,\u001B[0m\n" +
-        "\u001B[32m    prefix:        the generated string will be prefixed by this string,                                            default: empty string.\"\"\u001B[0m\n" +
-        "\u001B[32m    specialChars:  the generated string will include special characters    ( !@#$%^&*()-_=+[]}|;:,.<>? )            default: false.\u001B[0m"));
+          "\u001B[32mrandomString{length: int, prefix: string, specialChars: boolean}\u001B[0m\n" +
+          "\u001B[32mrandomString{256} -> length: 256\u001B[0m\n" +
+          "\u001B[32m\u001B[0m\n" +
+          "\u001B[32m    Generate a random string with a given prefix and length.\u001B[0m\n" +
+          "\u001B[32m    length:        the generated string will have this length,             restriction: length > prefix.length,     default 8,\u001B[0m\n" +
+          "\u001B[32m    prefix:        the generated string will be prefixed by this string,                                            default: empty string.\"\"\u001B[0m\n" +
+          "\u001B[32m    specialChars:  the generated string will include special characters    ( !@#$%^&*()-_=+[]}|;:,.<>? )            default: false.\u001B[0m"));
 
   }
 }
