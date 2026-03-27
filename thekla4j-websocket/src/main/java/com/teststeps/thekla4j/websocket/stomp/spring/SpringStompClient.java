@@ -32,6 +32,12 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
+/**
+ * Spring SockJS-backed STOMP client implementing {@link StompClient}.
+ *
+ * <p>Manages multiple SockJS sessions and STOMP destinations. Use {@link #usingSockJs()} to
+ * create an instance, then connect via the {@code Connect} activity or {@link #connectTo}.</p>
+ */
 @Log4j2(topic = "SpringStompClient")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpringStompClient implements StompClient {
@@ -42,6 +48,11 @@ public class SpringStompClient implements StompClient {
   private List<SpringStompDestination> destinations;
 
 
+  /**
+   * Creates a new client that uses SockJS as the underlying transport.
+   *
+   * @return a new {@link SpringStompClient}
+   */
   public static SpringStompClient usingSockJs() {
     return new SpringStompClient(Option.none(), List.empty(), List.empty());
   }

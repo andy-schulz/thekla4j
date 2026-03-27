@@ -58,6 +58,13 @@ public class AssertionNot implements TheklaAssertion {
         .transform(TransformTry.toEither(t -> AssertionError.of(t.getMessage().replace("\r\n", "\n"))));
   }
 
+  /**
+   * Negates the given assertion by passing {@code false} to the assertion function.
+   *
+   * @param <M>       the type of the actual value
+   * @param assertion a function that builds a {@link SeeAssertion} based on a boolean flag
+   * @return a negated {@link SeeAssertion} produced by passing {@code false} to the function
+   */
   public <M> SeeAssertion<M> be(Function<Boolean, SeeAssertion<M>> assertion) {
     return assertion.apply(false);
   }

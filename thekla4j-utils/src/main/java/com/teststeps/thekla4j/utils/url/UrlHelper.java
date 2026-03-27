@@ -5,8 +5,14 @@ import io.vavr.control.Try;
 import java.net.URL;
 import java.util.Map;
 
+/**
+ * Utility class providing URL helper functions.
+ */
 public class UrlHelper {
 
+  /**
+   * Sanitizes a URL by masking user-info credentials in the authority component.
+   */
   public static final Function1<String, Try<String>> sanitizeUrl =
       urlString -> Try.of(() -> new URL(urlString))
           .mapTry(url -> {
@@ -18,6 +24,10 @@ public class UrlHelper {
             return urlString;
           });
 
+  /**
+   * Builds a URL query string from the given parameter map.
+   * Returns an empty string if the map is null or empty.
+   */
   public static final Function1<Map<String, String>, String> buildQueryString = params -> {
 
     System.out.println(params);

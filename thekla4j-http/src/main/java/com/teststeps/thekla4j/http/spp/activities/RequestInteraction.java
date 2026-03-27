@@ -60,10 +60,11 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   /**
    * Sets the HTTP options for this request.
-   * 
+   *
    * @param opts the HTTP options
    * @return this interaction instance
    */
+  @SuppressWarnings("unchecked")
   public ReqT options(HttpOptions opts) {
     this.httpOptions = opts;
     // logging purpose
@@ -74,10 +75,11 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   /**
    * Sets whether to follow HTTP redirects.
-   * 
+   *
    * @param followRedirects true to follow redirects
    * @return this interaction instance
    */
+  @SuppressWarnings("unchecked")
   public ReqT followRedirects(boolean followRedirects) {
     this.followRedirects = followRedirects;
     return (ReqT) this;
@@ -85,10 +87,11 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   /**
    * Sets the request body.
-   * 
+   *
    * @param body the body content
    * @return this interaction instance
    */
+  @SuppressWarnings("unchecked")
   public ReqT body(String body) {
     this.body = body;
     return (ReqT) this;
@@ -96,7 +99,7 @@ public class RequestInteraction<ReqT extends Interaction<Void, HttpResult>> exte
 
   /**
    * Creates a new RequestInteraction.
-   * 
+   *
    * @param request       the request configuration
    * @param requestMethod the HTTP method function to execute
    */

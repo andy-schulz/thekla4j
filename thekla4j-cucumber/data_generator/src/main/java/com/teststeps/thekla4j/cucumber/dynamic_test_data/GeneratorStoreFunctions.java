@@ -105,6 +105,13 @@ public class GeneratorStoreFunctions {
    * Assignment record for parameter name and value
    */
   protected record Assignment(String name, String value) {
+    /**
+     * Creates a new {@code Assignment} with the given parameter name and value.
+     *
+     * @param name  the parameter name to assign to
+     * @param value the value to assign
+     * @return a new {@code Assignment} instance
+     */
     public static Assignment of(String name, String value) {
       return new Assignment(name, value);
     }

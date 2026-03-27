@@ -17,5 +17,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Suite {
+  /**
+   * The label value.
+   * 
+   * @return the label value
+   */
   String value();
 }

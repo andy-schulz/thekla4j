@@ -8,8 +8,16 @@ import io.vavr.Function2;
 import io.vavr.collection.List;
 
 
+/**
+ * Conversion functions between thekla4j STOMP types and Spring STOMP types.
+ */
 public class SpringFunctions {
 
+  /**
+   * Converts a destination path and thekla4j {@link StompHeaders} into Spring
+   * {@link org.springframework.messaging.simp.stomp.StompHeaders},
+   * prepending the {@code DESTINATION} header automatically.
+   */
   public static final Function2<String, StompHeaders, org.springframework.messaging.simp.stomp.StompHeaders> toSpringStompHeaders =
       (destination, headers) -> headers
           .headerList()
@@ -22,6 +30,10 @@ public class SpringFunctions {
         return headers;
       };
 
+  /**
+   * Converts Spring {@link org.springframework.messaging.simp.stomp.StompHeaders} into
+   * thekla4j {@link StompHeaders}.
+   */
   public static final Function1<org.springframework.messaging.simp.stomp.StompHeaders, StompHeaders> toStompHeaders =
       headers -> List.ofAll(headers.entrySet())
           .map(e -> StompHeader.of(e.getKey(), List.ofAll(e.getValue()).head()))

@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Jackson deserializer for {@link java.time.LocalDateTime} using the {@code dd-MM-yyyy HH:mm:ss} pattern.
+ */
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");

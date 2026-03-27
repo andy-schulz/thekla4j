@@ -4,6 +4,9 @@ import io.vavr.Function2;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Utility class for applying ANSI color and text formatting codes to strings for terminal output.
+ */
 public class FormattedOutput {
 
   private static final String ANSI_RESET = "\u001B[0m";

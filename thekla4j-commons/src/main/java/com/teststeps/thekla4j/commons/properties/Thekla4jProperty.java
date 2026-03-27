@@ -9,6 +9,9 @@ import io.vavr.control.Try;
 import java.util.Properties;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Utility class for reading thekla4j framework properties from system properties or a property file.
+ */
 @Log4j2(topic = "Thekla4jProperty")
 public class Thekla4jProperty {
 
@@ -18,18 +21,30 @@ public class Thekla4jProperty {
   private static Function1<PropertyElement, Try<Integer>> asInteger = TestPropertyHelper._asInteger.memoized();
 
   /**
-   * get the value of the property
-   * <p>
-   * param: property element returns: property value
+   * Returns the value of the given property element, checking system properties first,
+   * then the property file, and finally the element's default value.
+   *
+   * @param element the property element to look up
+   * @return an {@link io.vavr.control.Option} containing the value, or empty if not found
    */
   public static Option<String> of(PropertyElement element) {
     return Thekla4jProperty.of.apply(element);
   }
 
+  /**
+   * Returns the value of the given property element as an integer.
+   *
+   * @param element the property element to look up
+   * @return a {@link io.vavr.control.Try} containing the integer value, or a failure if not found or not parseable
+   */
   public static Try<Integer> asInteger(PropertyElement element) {
     return Thekla4jProperty.asInteger.apply(element);
   }
 
+  /**
+   * Resets the memoized property cache so that properties are re-read on the next access.
+   * Useful in tests that need to change property values between runs.
+   */
   public static void resetPropertyCache() {
     Thekla4jProperty.of = TestPropertyHelper._withName.memoized();
     Thekla4jProperty.asInteger = TestPropertyHelper._asInteger.memoized();

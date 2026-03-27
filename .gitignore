@@ -24,3 +24,6 @@ allure-results/
 
 thekla4j-browser/**/page.png
 thekla4j-browser/**/button.png
+
+#Claude Config
+.claude/settings.local.json

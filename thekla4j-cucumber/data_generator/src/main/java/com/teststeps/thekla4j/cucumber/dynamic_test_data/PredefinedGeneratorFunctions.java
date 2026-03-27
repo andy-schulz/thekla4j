@@ -7,12 +7,18 @@ import java.security.SecureRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Provides predefined generator functions for dynamic test data generation.
+ */
 public class PredefinedGeneratorFunctions {
 
   private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   private static final String SPECIAL_CHARACTERS = "!@#$%^&*()-_=+[]}|;:,.<>?";
   private static final SecureRandom RANDOM = new SecureRandom();
 
+  /**
+   * Description for the {@code randomString} generator function, used in help and error messages.
+   */
   protected static final String randomStringDescription =
       """
           randomString{length: int, prefix: string, specialChars: boolean}
@@ -30,6 +36,10 @@ public class PredefinedGeneratorFunctions {
             Collectors.mapping(t -> t._1 + ": " + t._2,
               Collectors.joining(", ", "{", "}")));
 
+  /**
+   * A generator that produces a random alphanumeric string of configurable length and prefix.
+   * Supports the parameters: {@code length}, {@code prefix}, {@code specialChars}.
+   */
   protected static final DataGenerator randomString = data -> {
 
     if (data.isEmpty())

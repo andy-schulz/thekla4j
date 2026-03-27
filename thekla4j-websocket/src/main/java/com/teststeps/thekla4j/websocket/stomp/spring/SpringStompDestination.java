@@ -15,14 +15,50 @@ import lombok.With;
 import org.springframework.messaging.simp.stomp.StompSession;
 
 
+/**
+ * Spring-backed implementation of {@link StompDestination}.
+ *
+ * <p>Manages a single STOMP destination path within a {@link SpringSockJsSession}, supporting
+ * subscribe, send, and message retrieval operations.</p>
+ */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @With
 public class SpringStompDestination implements StompDestination {
 
+  /**
+   * The active SockJS session backing this destination.
+   * 
+   * @param session the active SockJS session
+   * @return a new instance with the updated session
+   */
   private SpringSockJsSession session;
+  /**
+   * The STOMP destination path.
+   * 
+   * @param destination the STOMP destination path
+   * @return a new instance with the updated destination
+   */
   private Option<String> destination;
+  /**
+   * The active subscription on this destination, if any.
+   * 
+   * @param subscription the active subscription
+   * @return a new instance with the updated subscription
+   */
   private Option<Subscription> subscription;
+  /**
+   * The last receipt obtained via a send operation, if any.
+   * 
+   * @param receipt the last receipt
+   * @return a new instance with the updated receipt
+   */
   private Option<Receipt> receipt;
+  /**
+   * The session handler that collects incoming frames for this destination.
+   * 
+   * @param sessionHandler the session handler
+   * @return a new instance with the updated session handler
+   */
   private SpringStompSessionHandler sessionHandler;
 
   private final String subscriptionId = UUID.randomUUID().toString();
@@ -62,6 +98,12 @@ public class SpringStompDestination implements StompDestination {
   }
 
 
+  /**
+   * Checks whether this destination matches the given {@link Destination}.
+   *
+   * @param destination the destination to compare against
+   * @return {@code true} if the paths match
+   */
   public Boolean equals(Destination destination) {
     return this.destination
         .map(dest -> dest.equals(destination.destination()))
@@ -79,10 +121,20 @@ public class SpringStompDestination implements StompDestination {
         .map(SpringStompSessionHandler::messages);
   }
 
+  /**
+   * Cancels the active subscription on this destination, if one exists.
+   */
   public void unsubscribe() {
     subscription.forEach(Subscription::unsubscribe);
   }
 
+  /**
+   * Creates a new {@link SpringStompDestination} for the given session and destination.
+   *
+   * @param session     the active SockJS session
+   * @param destination the target STOMP destination
+   * @return a configured {@link SpringStompDestination}
+   */
   public static SpringStompDestination usingSession(SpringSockJsSession session, Destination destination) {
 
     return new SpringStompDestination(

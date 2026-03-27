@@ -4,6 +4,9 @@ import io.vavr.Function1;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 
+/**
+ * Represents an error that occurs during an activity execution in a Thekla4j screenplay.
+ */
 public class ActivityError extends Throwable {
 
   /**
@@ -36,6 +39,11 @@ public class ActivityError extends Throwable {
     return new ActivityError(ex.getMessage(), ex.getCause());
   }
 
+  /**
+   * @deprecated Use {@link #of(Throwable)} instead.
+   * @param ex the cause of the error
+   * @return the ActivityError
+   */
   @Deprecated
   public static ActivityError with(Throwable ex) {
     return new ActivityError(ex.getMessage(), ex.getCause());
@@ -51,6 +59,11 @@ public class ActivityError extends Throwable {
     return new ActivityError(message);
   }
 
+  /**
+   * @deprecated Use {@link #of(String)} instead.
+   * @param message the error message
+   * @return the ActivityError
+   */
   @Deprecated
   public static ActivityError with(String message) {
     return new ActivityError(message);
@@ -68,6 +81,12 @@ public class ActivityError extends Throwable {
     return new ActivityError(message, cause);
   }
 
+  /**
+   * @deprecated Use {@link #of(String, Throwable)} instead.
+   * @param message the error message
+   * @param cause   the cause of the error
+   * @return the ActivityError
+   */
   @Deprecated
   public static ActivityError with(String message, Throwable cause) {
     return new ActivityError(message, cause);
@@ -86,6 +105,11 @@ public class ActivityError extends Throwable {
     return t -> t.isFailure() ? Either.left(ActivityError.of(errorMessage + "\n" + t.getCause().getMessage(), t.getCause())) : Either.right(t.get());
   }
 
+  /**
+   * Creates a new {@code ActivityError} by aggregating all cause messages into the primary message.
+   *
+   * @return a new {@code ActivityError} with all cause messages concatenated
+   */
   public ActivityError aggregateMessages() {
     return new ActivityError(aggregateMessages(this), this);
   }

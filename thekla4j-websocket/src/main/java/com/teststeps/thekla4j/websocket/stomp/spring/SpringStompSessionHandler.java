@@ -15,20 +15,38 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 
+/**
+ * {@link StompSessionHandler} that accumulates incoming MESSAGE and ERROR frames.
+ *
+ * <p>One instance is created per {@link SpringStompDestination}. Received frames and errors
+ * are stored in-memory and retrieved via {@link #messages()} and {@link #errors()}.</p>
+ */
 @Log4j2(topic = "SpringStompSessionHandler")
 public class SpringStompSessionHandler implements StompSessionHandler {
+  /** Log/session prefix (usually the destination path). */
   public String prefix;
   private List<StompFrame<Object>> messages = List.empty();
   private List<StompFrame<Object>> errors = List.empty();
 
+  /**
+   * Returns all successfully received MESSAGE frames for this destination.
+   *
+   * @return an immutable list of received frames
+   */
   public List<StompFrame<Object>> messages() {
     return messages;
   }
 
+  /**
+   * Returns all ERROR frames received for this destination.
+   *
+   * @return an immutable list of error frames
+   */
   public List<StompFrame<Object>> errors() {
     return errors;
   }
 
+  /** The STOMP headers received from the server upon successful connection. */
   public com.teststeps.thekla4j.websocket.stomp.core.StompHeaders connectHeaders;
 
   @Override
@@ -85,6 +103,11 @@ public class SpringStompSessionHandler implements StompSessionHandler {
         payload));
   }
 
+  /**
+   * Creates a new session handler with the given log prefix.
+   *
+   * @param prefix a descriptive prefix used in log messages (typically the destination path)
+   */
   public SpringStompSessionHandler(String prefix) {
     this.prefix = prefix;
   }

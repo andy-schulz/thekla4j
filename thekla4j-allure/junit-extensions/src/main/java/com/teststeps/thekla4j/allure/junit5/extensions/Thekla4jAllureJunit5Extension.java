@@ -86,10 +86,18 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
 
   private final AllureLifecycle lifecycle;
 
+  /**
+   * Creates a new {@code Thekla4jAllureJunit5Extension} using the default Allure lifecycle.
+   */
   public Thekla4jAllureJunit5Extension() {
     this(Allure.getLifecycle());
   }
 
+  /**
+   * Creates a new {@code Thekla4jAllureJunit5Extension} using the given Allure lifecycle.
+   *
+   * @param lifecycle the {@link AllureLifecycle} to use for reporting
+   */
   public Thekla4jAllureJunit5Extension(final AllureLifecycle lifecycle) {
     this.lifecycle = lifecycle;
   }
@@ -271,6 +279,15 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
     processFixture(TEAR_DOWN, invocation, invocationContext, extensionContext);
   }
 
+  /**
+   * Wraps each lifecycle step invocation (before/after all/each) as a named Allure fixture.
+   *
+   * @param type              the fixture type ({@code PREPARE} or {@code TEAR_DOWN})
+   * @param invocation        the JUnit invocation to proceed
+   * @param invocationContext the reflective invocation context
+   * @param extensionContext  the JUnit extension context
+   * @throws Throwable if the invocation throws
+   */
   protected void processFixture(
                                 final String type, final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
     final String uuid = UUID.randomUUID().toString();
@@ -284,6 +301,14 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
     }
   }
 
+  /**
+   * Builds the event map for a fixture start event.
+   *
+   * @param type   the fixture type
+   * @param uuid   the unique identifier for this fixture invocation
+   * @param method the fixture method
+   * @return a map of event properties for the start event
+   */
   public Map<String, String> buildStartEvent(final String type, final String uuid, final Method method) {
     final Map<String, String> map = new HashMap<>();
     map.put(ALLURE_FIXTURE, type);
@@ -293,6 +318,13 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
     return map;
   }
 
+  /**
+   * Builds the event map for a fixture stop event.
+   *
+   * @param type the fixture type
+   * @param uuid the unique identifier for this fixture invocation
+   * @return a map of event properties for the stop event
+   */
   public Map<String, String> buildStopEvent(final String type, final String uuid) {
     final Map<String, String> map = new HashMap<>();
     map.put(ALLURE_FIXTURE, type);
@@ -301,6 +333,14 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
     return map;
   }
 
+  /**
+   * Builds the event map for a fixture failure event.
+   *
+   * @param type      the fixture type
+   * @param uuid      the unique identifier for this fixture invocation
+   * @param throwable the exception that caused the failure
+   * @return a map of event properties for the failure event
+   */
   public Map<String, String> buildFailureEvent(final String type, final String uuid, final Throwable throwable) {
     final Map<String, String> map = new HashMap<>();
     map.put(ALLURE_FIXTURE, type);
@@ -316,6 +356,13 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
     return map;
   }
 
+  /**
+   * Wraps a report-entry data map so that blank/null values are prefixed with
+   * {@link io.qameta.allure.junitplatform.AllureJunitPlatform#ALLURE_REPORT_ENTRY_BLANK_PREFIX}.
+   *
+   * @param data the raw event data map
+   * @return a new map with blank values properly prefixed
+   */
   @SuppressWarnings("PMD.InefficientEmptyStringCheck")
   public Map<String, String> wrap(final Map<String, String> data) {
     final Map<String, String> res = new HashMap<>();

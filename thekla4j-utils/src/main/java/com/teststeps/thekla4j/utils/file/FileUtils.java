@@ -12,9 +12,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Utility class providing functions to read and move files.
+ */
 @Log4j2(topic = "FileUtils")
 public class FileUtils {
 
+  /**
+   * Reads the content of a classpath resource file as a string.
+   * Logs a debug message on success or an error message on failure.
+   */
   public static Function1<String, Try<String>> readStringFromResourceFile =
       file -> Try.of(() -> FileUtils.class.getClassLoader().getResourceAsStream(file))
           .flatMap(x -> x != null ? Try.success(x) : Try.failure(new RuntimeException("Did not find resource file: " + file)))
@@ -28,6 +35,10 @@ public class FileUtils {
     return s.hasNext() ? s.next() : "";
   }
 
+  /**
+   * Moves the given source file to the target folder, creating the folder if it does not exist.
+   * Returns the moved file as a {@link Try}.
+   */
   public static Function2<Path, File, Try<File>> moveFile =
       (targetFolder, sourceFile) -> (Files.exists(targetFolder) ? Try.success(targetFolder) : Try.of(() -> Files.createDirectories(targetFolder)))
 
@@ -36,6 +47,10 @@ public class FileUtils {
           .map(File::new)
           .onFailure(log::error);
 
+  /**
+   * Reads the content of a file at the given path as a string, joining lines with newline characters.
+   * Returns an empty string and logs an error if reading fails.
+   */
   public static Function<File, String> readStringFromFile =
       file -> Try.of(() -> file)
           .map(File::toPath)
@@ -46,6 +61,10 @@ public class FileUtils {
             return "";
           });
 
+  /**
+   * Reads the content of a file at the given location (path string) as a string.
+   * Returns a {@link Try} with the file content, or a failure if the file cannot be read.
+   */
   public static Function1<String, Try<String>> readStringFromLocation =
       location -> Try.of(() -> location)
           .map(Path::of)

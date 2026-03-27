@@ -124,6 +124,19 @@ public class GeneratorStore {
   }
 
   /**
+   * Internal method to register an inline generator in the store.
+   * Used by both the deprecated {@link #addInlineGenerator} method and the {@link GeneratorScanner}.
+   *
+   * @param generatorName the name of the inline generator
+   * @param generator     the inline generator
+   * @return the store
+   */
+  GeneratorStore addInlineGeneratorInternal(String generatorName, InlineGenerator generator) {
+    this.inlineGeneratorMap = inlineGeneratorMap.put(generatorName, generator);
+    return this;
+  }
+
+  /**
    * Add an inline generator to the store
    *
    * @param generatorName the name of the generator
@@ -134,9 +147,7 @@ public class GeneratorStore {
    */
   @Deprecated(since = "2.2.0", forRemoval = true)
   public GeneratorStore addInlineGenerator(String generatorName, InlineGenerator generator) {
-
-    this.inlineGeneratorMap = inlineGeneratorMap.put(generatorName, generator);
-    return this;
+    return addInlineGeneratorInternal(generatorName, generator);
   }
 
   /**
@@ -202,7 +213,7 @@ public class GeneratorStore {
 
         .addGeneratorInternal("randomString", PredefinedGeneratorFunctions.randomStringDescription, PredefinedGeneratorFunctions.randomString)
 
-        .addInlineGenerator("TIMESTAMP_IN_MS", TIMESTAMP_IN_MS);
+        .addInlineGeneratorInternal("TIMESTAMP_IN_MS", TIMESTAMP_IN_MS);
   }
 
   @Override

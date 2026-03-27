@@ -8,14 +8,25 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Utility class providing functions for parsing parameter strings, matching generator patterns,
+ * and storing/retrieving named values for dynamic test data generation.
+ */
 @Log4j2
 public class ParameterParsingFunctions {
 
+  /**
+   * Error message template for invalid key-value pair format.
+   */
   public static String ERROR_MESSAGE =
       """
           Invalid key-value pair: {KEYVALUE} in parameter string '{INPUT}'. A parameter list is expected to be in the format: key1: value1, key2: value2, ...
           """;
 
+  /**
+   * Parses a parameter string in the format {@code key1: value1, key2: value2, ...} into a map.
+   * A single value without a key is treated as the {@code default} key.
+   */
   public static Function<String, Map<String, String>> parseParameterStringToMap = input -> {
 
     return Option.of(input)

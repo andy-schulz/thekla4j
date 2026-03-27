@@ -102,11 +102,19 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
   private static final String TEXT_PLAIN = "text/plain";
   private static final String CUCUMBER_WORKING_DIR = Paths.get("").toUri().getSchemeSpecificPart();
 
+  /**
+   * Creates a new {@code Thekla4jAllureCucumberPlugin} using the default Allure lifecycle.
+   */
   @SuppressWarnings("unused")
   public Thekla4jAllureCucumberPlugin() {
     this(Allure.getLifecycle());
   }
 
+  /**
+   * Creates a new {@code Thekla4jAllureCucumberPlugin} using the given Allure lifecycle.
+   *
+   * @param lifecycle the {@link AllureLifecycle} to use for reporting
+   */
   public Thekla4jAllureCucumberPlugin(final AllureLifecycle lifecycle) {
     this.lifecycle = lifecycle;
   }

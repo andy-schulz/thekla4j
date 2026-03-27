@@ -2,6 +2,9 @@ package com.teststeps.thekla4j.commons.properties;
 
 import io.vavr.control.Option;
 
+/**
+ * Represents a single configuration property with a name, an optional default value, and a help text.
+ */
 public class PropertyElement {
 
   private final String name;
@@ -37,9 +40,10 @@ public class PropertyElement {
 
   /**
    * create a new PropertyElement with the given name and default value
-   * 
+   *
    * @param name         the name of the property
    * @param defaultValue the default value of the property
+   * @param helpText     a description of the property used in documentation and error messages
    * @return the new PropertyElement
    */
   public static PropertyElement of(String name, Option<String> defaultValue, String helpText) {

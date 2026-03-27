@@ -89,7 +89,7 @@ public class GeneratorScanner {
         throw new IllegalArgumentException("Field '" + field.getName() + "' annotated with @InlineGen is null");
       }
 
-      store.addInlineGenerator(name, generator);
+      store.addInlineGeneratorInternal(name, generator);
       log.debug("Registered inline generator '{}' from field '{}'", name, field.getName());
     } catch (IllegalAccessException e) {
       throw new RuntimeException("Cannot access field '" + field.getName() + "' annotated with @InlineGen", e);

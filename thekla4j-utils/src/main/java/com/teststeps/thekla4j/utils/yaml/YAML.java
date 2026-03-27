@@ -15,6 +15,9 @@ import io.vavr.control.Try;
 import io.vavr.jackson.datatype.VavrModule;
 import java.time.LocalDateTime;
 
+/**
+ * Utility class for YAML serialization and deserialization using Jackson.
+ */
 public class YAML {
   private static final ObjectMapper yamlNonNullMapper =
       new YAMLMapper()
@@ -28,6 +31,13 @@ public class YAML {
           .enable(SerializationFeature.INDENT_OUTPUT);
 
 
+  /**
+   * Serializes the given object to a YAML string, excluding null fields.
+   *
+   * @param <T> the type of the object
+   * @param obj the object to serialize
+   * @return the YAML string representation
+   */
   public static <T> String jStringify(T obj) {
     try {
       return yamlNonNullMapper.writeValueAsString(obj);
@@ -36,10 +46,25 @@ public class YAML {
     }
   }
 
+  /**
+   * Parses the given YAML string into an instance of the specified class, returning a {@link io.vavr.control.Try}.
+   *
+   * @param <T>   the target type
+   * @param json  the YAML string to parse
+   * @param clazz the target class
+   * @return a {@code Try} containing the parsed object, or a failure if parsing fails
+   */
   public static <T> Try<T> jParse(String json, Class<T> clazz) {
     return Try.of(() -> yamlNonNullMapper.readValue(json, clazz));
   }
 
+  /**
+   * Returns a function that parses a YAML string into an instance of the specified class.
+   *
+   * @param <T>   the target type
+   * @param clazz the target class
+   * @return a function that parses a YAML string into the target type
+   */
   public static <T> Function1<String, Try<T>> jParse(Class<T> clazz) {
     return json -> Try.of(() -> yamlNonNullMapper.readValue(json, clazz));
   }
