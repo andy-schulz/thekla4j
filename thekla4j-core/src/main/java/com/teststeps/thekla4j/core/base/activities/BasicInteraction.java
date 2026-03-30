@@ -6,6 +6,7 @@ import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.control.Either;
+import java.util.function.Supplier;
 import lombok.NonNull;
 
 /**
@@ -13,8 +14,11 @@ import lombok.NonNull;
  */
 public abstract class BasicInteraction extends Activity<Void, Void> {
 
+  private volatile Supplier<Boolean> condition = () -> true;
+
   @Override
   final protected Either<ActivityError, Void> perform(@NonNull Actor actor, Void unused) {
+    if (!condition.get()) return Either.right(null);
     return performAs(actor);
   }
 
@@ -35,6 +39,33 @@ public abstract class BasicInteraction extends Activity<Void, Void> {
    * @return an Either with the result of the activity or an error
    */
   protected abstract Either<ActivityError, Void> performAs(Actor actor);
+
+  /**
+   * Execute this interaction only when the given condition is {@code true}.
+   * The flag is captured eagerly at the time this method is called.
+   *
+   * <p><b>Note:</b> This method mutates the interaction instance. Always create a fresh instance
+   * per conditional use — do not store and reuse the same instance with different flags.
+   *
+   * @param flag if {@code false} the interaction is silently skipped and {@code Either.right(null)} is returned
+   * @return {@code this} for fluent chaining
+   */
+  public BasicInteraction when(final boolean flag) {
+    this.condition = () -> flag;
+    return this;
+  }
+
+  /**
+   * Execute this interaction only when the supplied condition evaluates to {@code true}.
+   * The supplier is evaluated lazily at execution time, so the condition may change between calls.
+   *
+   * @param conditionSupplier a supplier evaluated each time the interaction is performed
+   * @return {@code this} for fluent chaining
+   */
+  public BasicInteraction when(final Supplier<Boolean> conditionSupplier) {
+    this.condition = conditionSupplier;
+    return this;
+  }
 
   /**
    * Run the activity as the given actor.
