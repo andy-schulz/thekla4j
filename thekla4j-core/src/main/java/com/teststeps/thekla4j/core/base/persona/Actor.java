@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.Getter;
 
 /**
@@ -104,11 +105,12 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
    */
   @Override
   public <T extends Ability> Ability withAbilityTo(Class<T> abilityClass) throws DoesNotHaveTheAbility {
-    if (!this.abilityMap.containsKey(abilityClass.getName())) {
+    Ability ability = this.abilityMap.get(abilityClass.getName());
+    if (ability == null) {
       throw DoesNotHave.theAbility(abilityClass.getSimpleName()).usedBy(this);
     }
 
-    return this.abilityMap.get(abilityClass.getName());
+    return ability;
   }
 
   private final Function3<ActivityStatus, ActivityLogEntry, TheklaActivityLog, Consumer<Option<String>>> setActivityStatus =
@@ -119,6 +121,15 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
             .status(status);
         actLog.reset(activityLogEntry);
       };
+
+  private <R> Either<ActivityError, R> withLogGroup(
+                                                    String group, String groupName, Supplier<Either<ActivityError, R>> operation
+  ) {
+    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
+    return operation.get()
+        .peek(res -> this.activityLog.reset(entry))
+        .peekLeft(x -> this.activityLog.reset(entry));
+  }
 
   private <P, R> Either<ActivityError, R> perform(Activity<P, R> a, P param) {
 
@@ -391,15 +402,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1> AttemptsWith<P, Either<ActivityError, R1>> attemptsTo$_(
                                                                          Activity<P, R1> a1, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return perform(a1, param)
-          .peek(x -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1).using(param));
   }
 
   /**
@@ -409,16 +413,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2> AttemptsWith<P, Either<ActivityError, R2>> attemptsTo$_(
                                                                              Activity<P, R1> a1, Activity<R1, R2> a2, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1)
-          .using(param)
-          .flatMap(r -> perform(a2, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2).using(param));
   }
 
   /**
@@ -428,16 +424,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3> AttemptsWith<P, Either<ActivityError, R3>> attemptsTo$_(
                                                                                  Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2)
-          .using(param)
-          .flatMap(r -> perform(a3, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3).using(param));
   }
 
   /**
@@ -447,16 +435,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4> AttemptsWith<P, Either<ActivityError, R4>> attemptsTo$_(
                                                                                      Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3)
-          .using(param)
-          .flatMap(r -> perform(a4, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4).using(param));
   }
 
   /**
@@ -466,16 +446,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5> AttemptsWith<P, Either<ActivityError, R5>> attemptsTo$_(
                                                                                          Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4)
-          .using(param)
-          .flatMap(r -> perform(a5, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5).using(param));
   }
 
   /**
@@ -485,16 +457,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5, R6> AttemptsWith<P, Either<ActivityError, R6>> attemptsTo$_(
                                                                                              Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4, a5)
-          .using(param)
-          .flatMap(r -> perform(a6, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5, a6).using(param));
   }
 
   /**
@@ -504,16 +468,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5, R6, R7> AttemptsWith<P, Either<ActivityError, R7>> attemptsTo$_(
                                                                                                  Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6)
-          .using(param)
-          .flatMap(r -> perform(a7, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7).using(param));
   }
 
   /**
@@ -523,16 +479,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5, R6, R7, R8> AttemptsWith<P, Either<ActivityError, R8>> attemptsTo$_(
                                                                                                      Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7)
-          .using(param)
-          .flatMap(r -> perform(a8, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8).using(param));
   }
 
   /**
@@ -542,16 +490,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9> AttemptsWith<P, Either<ActivityError, R9>> attemptsTo$_(
                                                                                                          Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, Activity<R8, R9> a9, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8)
-          .using(param)
-          .flatMap(r -> perform(a9, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9).using(param));
   }
 
   /**
@@ -563,16 +503,8 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <P, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> AttemptsWith<P, Either<ActivityError, R10>> attemptsTo$_(
                                                                                                                Activity<P, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, Activity<R8, R9> a9, Activity<R9, R10> a10, String group, String groupName
   ) {
-    return (param) -> {
-
-      ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-      return this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9)
-          .using(param)
-          .flatMap(r -> perform(a10, r))
-          .peek(res -> this.activityLog.reset(entry))
-          .peekLeft(x -> this.activityLog.reset(entry));
-    };
+    return param -> withLogGroup(group, groupName,
+      () -> this.attemptsTo_(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10).using(param));
   }
 
   /**
@@ -582,11 +514,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1> Either<ActivityError, R1> attemptsTo$(
                                                     Activity<Void, R1> a1, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return perform(a1, null)
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1));
   }
 
   /**
@@ -596,12 +524,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2> Either<ActivityError, R2> attemptsTo$(
                                                         Activity<Void, R1> a1, Activity<R1, R2> a2, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1)
-        .flatMap(r -> perform(a2, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2));
   }
 
   /**
@@ -611,12 +534,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3> Either<ActivityError, R3> attemptsTo$(
                                                             Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2)
-        .flatMap(r -> perform(a3, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3));
   }
 
   /**
@@ -626,12 +544,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4> Either<ActivityError, R4> attemptsTo$(
                                                                 Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3)
-        .flatMap(r -> perform(a4, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4));
   }
 
   /**
@@ -641,13 +554,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5> Either<ActivityError, R5> attemptsTo$(
                                                                     Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, String group, String groupName
   ) {
-
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4)
-        .flatMap(r -> perform(a5, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5));
   }
 
   /**
@@ -657,12 +564,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5, R6> Either<ActivityError, R6> attemptsTo$(
                                                                         Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4, a5)
-        .flatMap(r -> perform(a6, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5, a6));
   }
 
   /**
@@ -672,12 +574,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5, R6, R7> Either<ActivityError, R7> attemptsTo$(
                                                                             Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4, a5, a6)
-        .flatMap(r -> perform(a7, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5, a6, a7));
   }
 
   /**
@@ -687,12 +584,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5, R6, R7, R8> Either<ActivityError, R8> attemptsTo$(
                                                                                 Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7)
-        .flatMap(r -> perform(a8, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8));
   }
 
   /**
@@ -702,12 +594,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5, R6, R7, R8, R9> Either<ActivityError, R9> attemptsTo$(
                                                                                     Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, Activity<R8, R9> a9, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8)
-        .flatMap(r -> perform(a9, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9));
   }
 
   /**
@@ -719,12 +606,7 @@ public class Actor implements PerformsTask, UsesAbilities, HasWorld {
   public <R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> Either<ActivityError, R10> attemptsTo$(
                                                                                           Activity<Void, R1> a1, Activity<R1, R2> a2, Activity<R2, R3> a3, Activity<R3, R4> a4, Activity<R4, R5> a5, Activity<R5, R6> a6, Activity<R6, R7> a7, Activity<R7, R8> a8, Activity<R8, R9> a9, Activity<R9, R10> a10, String group, String groupName
   ) {
-    ActivityLogEntry entry = this.activityLog.addGroup(group, groupName);
-
-    return this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9)
-        .flatMap(r -> perform(a10, r))
-        .peek(res -> this.activityLog.reset(entry))
-        .peekLeft(x -> this.activityLog.reset(entry));
+    return withLogGroup(group, groupName, () -> this.attemptsTo(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10));
   }
 
 
