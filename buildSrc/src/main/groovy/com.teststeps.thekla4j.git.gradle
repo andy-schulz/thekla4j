@@ -34,6 +34,7 @@ configure(spotlessApply) {
 }
 
 spotless {
+  ratchetFrom 'origin/master'
   java {
     target project.fileTree(project.projectDir) {
       include('**/*.java')
