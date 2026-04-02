@@ -429,7 +429,7 @@ public class LogFormatter {
       try (
            InputStreamReader isr = new InputStreamReader(is); BufferedReader reader = new BufferedReader(isr)
       ) {
-        return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        return reader.lines().collect(Collectors.joining("\n"));
       }
     }
   }
