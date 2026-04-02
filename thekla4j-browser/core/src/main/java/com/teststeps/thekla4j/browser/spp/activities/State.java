@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.spp.activities;
 
 import com.teststeps.thekla4j.browser.core.Element;
+import com.teststeps.thekla4j.utils.json.JSON;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class State {
 
   /**
    * The element
-   * 
+   *
    * @param element the element
    * @return the element.
    */
@@ -26,7 +27,7 @@ public class State {
 
   /**
    * is the element visible
-   * 
+   *
    * @param isVisible element is visible.
    * @return element is visible.
    */
@@ -34,7 +35,7 @@ public class State {
 
   /**
    * is the element enabled
-   * 
+   *
    * @param isEnabled element is enabled.
    * @return element is enabled.
    */
@@ -42,7 +43,7 @@ public class State {
 
   /**
    * is the element present
-   * 
+   *
    * @param isPresent element is present.
    * @return element is present.
    */
@@ -58,5 +59,10 @@ public class State {
     return new State(element, false, false, false);
   }
 
+
+  @Override
+  public String toString() {
+    return JSON.logOf(this);
+  }
 
 }
