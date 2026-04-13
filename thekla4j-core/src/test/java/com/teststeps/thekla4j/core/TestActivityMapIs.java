@@ -5,13 +5,17 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.teststeps.thekla4j.assertions.Expected;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.base.activities.SupplierTask;
+import com.teststeps.thekla4j.core.base.activities.Task;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.tasks.AddNumber;
 import com.teststeps.thekla4j.core.tasks.CountingTask;
 import com.teststeps.thekla4j.core.tasks.CountingTaskSupplier;
 import com.teststeps.thekla4j.core.tasks.SupplyList;
+import com.teststeps.thekla4j.core.tasks.SupplyNumber;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
@@ -165,5 +169,154 @@ public class TestActivityMapIs {
 
     assertThat("passes after task retries via retry()", result.isRight(), equalTo(true));
     assertThat("result is the mapped String after retry", result.get(), equalTo("count=5"));
+  }
+
+  @Test
+  void supplierTaskMultipleChainedMapsProduceFlatComposition() {
+    Actor actor = Actor.named("TestUser");
+
+    // 5 chained .map() calls should compose into a single MappedSupplierTask,
+    // not 5 nested anonymous wrappers.
+    SupplierTask<String> mapped = SupplyNumber.supplyNumber(3)
+        .map(n -> n + 1)        // 4
+        .map(n -> n * 10)       // 40
+        .map(n -> n + 2)        // 42
+        .map(n -> n / 2)        // 21
+        .map(n -> "result=" + n); // "result=21"
+
+    Either<ActivityError, String> result = actor.attemptsTo(mapped);
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("all 5 maps applied in sequence", result.get(), equalTo("result=21"));
+    assertThat("toString delegates to source task", mapped.toString(), equalTo("SupplyNumber"));
+  }
+
+  @Test
+  void taskMultipleChainedMapsProduceFlatComposition() {
+    Actor actor = Actor.named("TestUser");
+
+    // 4 chained .map() calls on a Task should compose into a single MappedTask.
+    Task<Integer, String> mapped = AddNumber.of(5)
+        .map(n -> n * 2)        // (10+5)*2 = 30
+        .map(n -> n - 10)       // 20
+        .map(n -> n + 1)        // 21
+        .map(n -> "sum=" + n);  // "sum=21"
+
+    Either<ActivityError, String> result = actor.attemptsTo_(mapped).using(10);
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("all 4 maps applied in sequence", result.get(), equalTo("sum=21"));
+    assertThat("toString delegates to source task", mapped.toString(), equalTo("AddNumber"));
+  }
+
+  @Test
+  void supplierTaskMapsChangingTypeAtEveryStepThenConsumedByIs() {
+    Actor actor = Actor.named("TestUser");
+
+    // Each .map() changes the return type:
+    //   Integer → String → List<String> → Integer → Boolean
+    // Then .is() consumes the final Boolean value.
+    Either<ActivityError, Boolean> result = actor.attemptsTo(
+      SupplyNumber.supplyNumber(42)
+          .map(n -> "val=" + n)                          // Integer → String
+          .map(s -> List.of(s, s.toUpperCase()))          // String → List<String>
+          .map(list -> list.mkString(",").length())       // List<String> → Integer
+          .map(len -> len > 10)                           // Integer → Boolean
+          .is(Expected.to.pass(b -> b, "final boolean is true")));
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    // "val=42" → List("val=42", "VAL=42") → "val=42,VAL=42" (length 13) → true
+    assertThat("result is the final Boolean after type-changing chain", result.get(), equalTo(true));
+  }
+
+  @Test
+  void taskMapsChangingTypeAtEveryStepThenConsumedByIs() {
+    Actor actor = Actor.named("TestUser");
+
+    // Each .map() changes the return type:
+    //   Integer → String → String[] → Integer → Boolean
+    // Then .is() validates and returns the final Boolean.
+    Either<ActivityError, Boolean> result = actor.attemptsTo_(
+      AddNumber.of(5)
+          .map(n -> "num:" + n)                          // Integer → String
+          .map(s -> s.split(":"))                         // String → String[]
+          .map(arr -> Integer.parseInt(arr[1]))           // String[] → Integer
+          .map(n -> n == 15)                              // Integer → Boolean
+          .is(Expected.to.pass(b -> b, "final boolean is true")))
+        .using(10);
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    // (10+5)=15 → "num:15" → ["num","15"] → 15 → true
+    assertThat("result is the final Boolean after type-changing chain", result.get(), equalTo(true));
+  }
+
+  @Test
+  void supplierTaskMapTrySuccess() {
+    Actor actor = Actor.named("TestUser");
+
+    Either<ActivityError, Integer> result = actor.attemptsTo(
+      SupplyNumber.supplyNumber(42)
+          .mapTry(n -> Try.of(() -> Integer.parseInt(String.valueOf(n)))));
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("mapTry applied successfully", result.get(), equalTo(42));
+  }
+
+  @Test
+  void supplierTaskMapTryFailureReturnsLeft() {
+    Actor actor = Actor.named("TestUser");
+
+    Either<ActivityError, Integer> result = actor.attemptsTo(
+      SupplyNumber.supplyNumber(42)
+          .map(n -> "not_a_number")
+          .mapTry(s -> Try.of(() -> Integer.parseInt(s))));
+
+    assertThat("is left on parse failure", result.isLeft(), equalTo(true));
+  }
+
+  @Test
+  void supplierTaskMixedMapAndMapTryChain() {
+    Actor actor = Actor.named("TestUser");
+
+    // map → mapTry → map → mapTry: alternating infallible and failable steps
+    Either<ActivityError, String> result = actor.attemptsTo(
+      SupplyNumber.supplyNumber(10)
+          .map(n -> n * 3)                                        // 30
+          .mapTry(n -> Try.of(() -> String.valueOf(n)))           // "30"
+          .map(s -> s + "!")                                       // "30!"
+          .mapTry(s -> Try.of(() -> s.substring(0, 2)))           // "30"
+          .is(Expected.to.pass(s -> s.equals("30"))));
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("mixed chain applied correctly", result.get(), equalTo("30"));
+  }
+
+  @Test
+  void taskMapTrySuccess() {
+    Actor actor = Actor.named("TestUser");
+
+    Either<ActivityError, String> result = actor.attemptsTo_(
+      AddNumber.of(5)
+          .mapTry(n -> Try.of(() -> "result=" + n)))
+        .using(10);
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("mapTry on Task applied", result.get(), equalTo("result=15"));
+  }
+
+  @Test
+  void taskMixedMapAndMapTryChain() {
+    Actor actor = Actor.named("TestUser");
+
+    Either<ActivityError, Boolean> result = actor.attemptsTo_(
+      AddNumber.of(5)
+          .map(n -> "num:" + n)                                   // "num:15"
+          .mapTry(s -> Try.of(() -> Integer.parseInt(s.split(":")[1]))) // 15
+          .map(n -> n > 10)                                       // true
+          .is(Expected.to.pass(b -> b, "parsed value > 10")))
+        .using(10);
+
+    assertThat("is right", result.isRight(), equalTo(true));
+    assertThat("mixed map/mapTry chain on Task", result.get(), equalTo(true));
   }
 }

@@ -8,12 +8,12 @@ nav_order: 110
 
 # Activities Overview
 
-| Activity        | Description                                                                                     |
-|-----------------|-------------------------------------------------------------------------------------------------|
-| [See](#see)     | The `See` activity is used to assert the result of a task.                                      |
-| [Retry](#retry) | The `Retry` activity is used to repeat a task until it succeeds or the timeout is reached.      |
-| [Map](#mapping) | Transform a task's result inline with `.map()` or via the static `API.map()` activity.          |
-| [Sleep](#sleep) | The `Sleep` activity is used to pause the execution of the test for a specified amount of time. |
+| Activity        | Description                                                                                          |
+|-----------------|------------------------------------------------------------------------------------------------------|
+| [See](#see)     | The `See` activity is used to assert the result of a task.                                           |
+| [Retry](#retry) | The `Retry` activity is used to repeat a task until it succeeds or the timeout is reached.           |
+| [Map](#mapping) | Transform a task's result inline with `.map()` / `.mapTry()` or via the static `API.map()` activity. |
+| [Sleep](#sleep) | The `Sleep` activity is used to pause the execution of the test for a specified amount of time.      |
 
 ___
 ## Data Validation with See
@@ -35,12 +35,12 @@ Activities can be validated by calling `.is()` directly on them. This is the **r
 
 Methods:
 
-| type            | method                     | description                                                                                                      |
-|-----------------|----------------------------|------------------------------------------------------------------------------------------------------------------|
-| Activity method | `.is( SeeAssertion )`      | **Recommended**: Validate activity result directly. Accepts a SeeAssertion to check the result for conditions.   |
-|                 | `.forAsLongAs(Duration x)` | Sets the timeout for which validation is repeated until the assertion succeeds.                                  |
-|                 | `.every( Duration x )`     | Repeat the validation every x seconds until the assertion succeeds or timeout is reached.                        |
-| static          | `See.ifThe( Activity )`    | Alternative verbose form. Wraps an activity explicitly (rarely needed).                                          |
+| type            | method                     | description                                                                                                       |
+|-----------------|----------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Activity method | `.is( SeeAssertion )`      | **Recommended**: Validate activity result directly. Accepts a SeeAssertion to check the result for conditions.    |
+|                 | `.forAsLongAs(Duration x)` | Sets the timeout for which validation is repeated until the assertion succeeds.                                   |
+|                 | `.every( Duration x )`     | Repeat the validation every x seconds until the assertion succeeds or timeout is reached.                         |
+| static          | `See.ifThe( Activity )`    | Alternative verbose form. Wraps an activity explicitly (rarely needed).                                           |
 | static          | `See.ifResult()...`        | Special case: validates the result passed from the previous activity.                                             |
 
 > **Best Practice**: Use `.is()` directly on activities for clearer test flow. The `See.ifThe()` wrapper adds unnecessary verbosity in most cases.
@@ -95,17 +95,33 @@ actor.attemptsTo(
 To facilitate the creation of assertions, the `Expected` class is provided. It contains a set of static methods that
 return `SeeAssertion` functions.
 
-Methods:
+Methods are grouped by assertion style:
+
+#### Predicate-based assertions
 
 | method                                        | description                                                                                                                             |
 |-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `Expected.to.pass( Predicate )`               | Accepts a predicate and checks if the result passes the predicate.                                                                      |
 | `Expected.to.pass( Predicate, String reason)` | Accepts a predicate and checks if the result passes the predicate. In case of an error the reason will be printed in the error message. |
 | `Expected.not.to.pass( Predicate )`           | Accepts a predicate and checks if the result DOES NOT pass the predicate.                                                               |
-| `Expected.to.equal( String )`                 | Accepts an object and checks if the result equals the object.                                                                           |
-| `Expected.to.be.equal( String )`              | same as above, the `.to.be` is just language candy                                                                                      |
-| `Expected.not.to.equal( String )`             | Accepts an object and checks if the result equals the object.                                                                           |
-| `Expected.not.to.be.equal( String )`          | same as above, the `.to.be` is just language candy                                                                                      |
+
+#### Hamcrest matcher assertions
+
+| method                                            | description                                                                             |
+|---------------------------------------------------|-----------------------------------------------------------------------------------------|
+| `Expected.to.match( Matcher )`                    | Accepts a Hamcrest matcher and checks if the result matches.                            |
+| `Expected.to.match( Matcher, String reason )`     | Same as above, but with a reason that appears in the activity log and assertion output. |
+| `Expected.not.to.match( Matcher )`                | Accepts a Hamcrest matcher and checks if the result does NOT match.                     |
+| `Expected.not.to.match( Matcher, String reason )` | Same as above, but with a reason that appears in the activity log and assertion output. |
+
+#### Direct value comparison assertions
+
+| method                                   | description                                                                                 |
+|------------------------------------------|---------------------------------------------------------------------------------------------|
+| `Expected.to.equal( M expected )`        | Compares the result directly with the expected value (generic type `M`, not only `String`). |
+| `Expected.to.be.equal( M expected )`     | Same as above; `.to.be` is language candy for readability.                                  |
+| `Expected.not.to.equal( M expected )`    | Negated direct comparison against the expected value (generic type `M`, not only `String`). |
+| `Expected.not.to.be.equal( M expected )` | Same as above; `.to.be` is language candy for readability.                                  |
 
 
 **Example with Task:**
@@ -133,6 +149,17 @@ or if you want to use the same predicate to check for lower than 5:
 actor.attemptsTo(
   TaskReturningRandomInteger.between(1,10)
     .is(Expected.not.to.pass(toBeGreaterThanFive)));
+```
+
+or by using a Hamcrest matcher:
+
+```java
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
+actor.attemptsTo(
+  TaskReturningRandomInteger.between(1,10)
+    .is(Expected.to.match(greaterThanOrEqualTo(5)))
+    .is(Expected.not.to.match(greaterThanOrEqualTo(11), "value should stay below 11")));
 ```
 
 _Note: The verbose form `See.ifThe(task).is(...)` also works but is less concise._
@@ -264,6 +291,15 @@ ___
 The `Mapping` feature is used to transform the result of a task. There are circumstances where its easier to transform the
 result of a task with a function then creating a new Task.
 
+Two instance methods are available on both `Task` and `SupplierTask`:
+
+| method                              | description                                                                                   |
+|-------------------------------------|-----------------------------------------------------------------------------------------------|
+| `.map(Function1<RT, R2>)`           | Direct mapping — transforms the result. Exceptions are caught automatically.                  |
+| `.mapTry(Function1<RT, Try<R2>>)`   | Failable mapping — the function returns a `Try`. A failed `Try` becomes an `ActivityError`.   |
+
+Both methods can be chained freely (`.map().mapTry().map()...`) and compose into a single lightweight wrapper internally.
+
 ### Instance `.map()` Method
 
 The recommended approach is to call `.map()` directly on a `Task` or `SupplierTask`. This keeps the chain fluent and
@@ -315,6 +351,61 @@ Either<ActivityError, Integer> result = actor.attemptsTo(
     .is(Expected.to.pass(n -> n == 40, "mapped value is 40")));
 // result.get() == 40
 ```
+
+### Instance `.mapTry()` Method
+
+Use `.mapTry()` when the mapping function itself can fail. The function returns a `Try<R2>` — if the `Try` 
+fails, the error is automatically converted to an `ActivityError`.
+
+**Basic failable mapping:**
+
+```java
+import io.vavr.control.Try;
+
+actor.attemptsTo(
+  SupplyNumber.supplyNumber(42)
+    .mapTry(n -> Try.of(() -> Integer.parseInt(String.valueOf(n))))  // Integer → Try<Integer>
+    .is(Expected.to.pass(n -> n == 42)));
+```
+
+**Handling failure — mapTry returns a failed Try:**
+
+```java
+actor.attemptsTo(
+  SupplyNumber.supplyNumber(0)
+    .mapTry(n -> Try.of(() -> 10 / n)));                            // ArithmeticException → ActivityError
+// Returns Either.left(ActivityError) because 10 / 0 throws
+```
+
+**Mixing `.map()` and `.mapTry()` in a single chain:**
+
+All `map()` and `mapTry()` calls compose into a single lightweight wrapper. You can freely alternate between them:
+
+```java
+Either<ActivityError, Boolean> result = actor.attemptsTo(
+  SupplyNumber.supplyNumber(10)
+    .map(n -> n * 3)                                                // Integer → Integer (direct)
+    .mapTry(n -> Try.of(() -> String.valueOf(n)))                   // Integer → Try<String> (failable)
+    .map(s -> s.startsWith("3"))                                    // String → Boolean (direct)
+    .is(Expected.to.pass(b -> b, "starts with 3")));
+// result.get() == true
+```
+
+**mapTry with Task (with input):**
+
+```java
+Either<ActivityError, String> result = actor.attemptsTo_(
+  AddNumber.of(5)
+    .mapTry(n -> Try.of(() -> formatNumber(n)))                     // Integer → Try<String>
+    .is(Expected.to.pass(s -> s.equals("15"))))
+  .using(10);
+```
+
+> **When to use `.map()` vs `.mapTry()`:**  
+> Use `.map()` for simple, direct transformations (e.g., `n -> n * 2`, `s -> s.toUpperCase()`).  
+> Use `.mapTry()` when the mapping can fail (e.g., parsing, division, I/O) — wrap the operation in `Try.of(...)`.  
+> If an exception occurs inside `.map()`, it is still caught and converted to an `ActivityError`, so `.map()` is safe too.  
+> The difference is intent: `.mapTry()` makes it explicit that the operation may fail.
 
 ### Static `API.map()` Activity
 

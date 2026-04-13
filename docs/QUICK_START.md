@@ -204,6 +204,16 @@ actor.attemptsTo(
         .is(Expected.to.equal("Welcome | Example Site")));
 ```
 
+#### Matcher Validation (Hamcrest)
+
+```java
+import static org.hamcrest.Matchers.containsString;
+
+actor.attemptsTo(
+    Title.ofPage()
+        .is(Expected.to.match(containsString("Welcome"))));
+```
+
 #### Named Assertions
 
 For better error messages, provide a reason:
@@ -243,6 +253,51 @@ actor.attemptsTo(
         .is(Expected.to.equal("Completed"))
         .forAsLongAs(Duration.ofSeconds(10))
         .every(Duration.ofSeconds(1)));
+```
+
+---
+
+## Transforming Results with Map
+
+### The `.map()` Method
+
+Transform a task's result inline without creating a new task:
+
+```java
+// Single map — change the result type
+actor.attemptsTo(
+    SupplyList.numbers(1, 2, 3)
+        .map(list -> list.head()))                       // List<Integer> → Integer
+  .peek(n -> System.out.println("First element: " + n));
+
+// Chained maps — each step narrows the type
+actor.attemptsTo(
+    SupplyList.numbers(5, 6, 7)
+        .map(list -> list.head())                        // List<Integer> → Integer
+        .map(n -> "value=" + n)                          // Integer → String
+        .is(Expected.to.pass(s -> s.equals("value=5"))));
+```
+
+### The `.mapTry()` Method
+
+Use `.mapTry()` when the transformation can fail. The function returns a `Try<R2>` — a failed `Try` becomes an `ActivityError`:
+
+```java
+import io.vavr.control.Try;
+
+// Failable mapping — exceptions are handled automatically
+actor.attemptsTo(
+    SupplyNumber.supplyNumber(42)
+        .mapTry(n -> Try.of(() -> Integer.parseInt(String.valueOf(n))))
+        .is(Expected.to.pass(n -> n == 42)));
+
+// Mix map and mapTry freely in a single chain
+actor.attemptsTo(
+    SupplyNumber.supplyNumber(10)
+        .map(n -> n * 3)                                 // direct mapping
+        .mapTry(n -> Try.of(() -> String.valueOf(n)))    // failable
+        .map(s -> s + "!")                               // direct mapping
+        .is(Expected.to.pass(s -> s.equals("30!"))));
 ```
 
 ---
@@ -397,9 +452,10 @@ Now that you understand the basics, explore more advanced features:
 ## Key Takeaways
 
 ✅ Use `.is()` for validating results - it's concise and reads naturally  
+✅ Use `.map()` to transform results and `.mapTry()` for failable transformations  
 ✅ Use `retry()` for flaky operations or when waiting for conditions  
 ✅ Combine `.is()` with `.forAsLongAs()` and `.every()` for polling validations  
 ✅ Give actors abilities they need: `BrowseTheWeb`, `UseHttpClient`  
-✅ Name your elements with `.called()` for better error messages  
+✅ Name your elements with `.called()` for better error messages
 
 Happy testing with Thekla4j! 🎭

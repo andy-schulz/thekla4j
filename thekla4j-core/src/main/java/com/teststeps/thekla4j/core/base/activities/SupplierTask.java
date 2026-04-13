@@ -10,6 +10,7 @@ import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.util.function.Predicate;
 import lombok.NonNull;
 
@@ -34,7 +35,7 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
 
   /**
    * return the name of the task
-   * 
+   *
    * @return the name of the task
    */
   @Override
@@ -126,14 +127,29 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
    * @param <R2> the output type of the mapped task
    * @return a new SupplierTask that first runs this task and then applies fn to its result
    */
+  @SuppressWarnings("unchecked")
   public final <R2> SupplierTask<R2> map(Function1<RT, R2> fn) {
-    SupplierTask<RT> self = this;
-    return new SupplierTask<>() {
-      @Override
-      protected Either<ActivityError, R2> performAs(Actor actor) {
-        return self.performAs(actor).map(fn::apply);
-      }
-    };
+    if (this instanceof MappedSupplierTask<?, ?> mapped) {
+      return ((MappedSupplierTask<Object, RT>) mapped).appendMap(fn);
+    }
+    return new MappedSupplierTask<>(this, orig -> Try.of(() -> fn.apply(orig)));
+  }
+
+  /**
+   * Chain a failable mapping function after this supplier task.
+   * If the function's {@link Try} fails, the error is converted to an {@link ActivityError}.
+   * Subsequent {@code .map()} and {@code .mapTry()} calls compose into the same wrapper.
+   *
+   * @param fn   the function to apply to the result of this task (may fail)
+   * @param <R2> the output type of the mapped task
+   * @return a new SupplierTask that first runs this task and then applies fn to its result
+   */
+  @SuppressWarnings("unchecked")
+  public final <R2> SupplierTask<R2> mapTry(Function1<RT, Try<R2>> fn) {
+    if (this instanceof MappedSupplierTask<?, ?> mapped) {
+      return ((MappedSupplierTask<Object, RT>) mapped).appendMapTry(fn);
+    }
+    return new MappedSupplierTask<>(this, fn);
   }
 
   /**

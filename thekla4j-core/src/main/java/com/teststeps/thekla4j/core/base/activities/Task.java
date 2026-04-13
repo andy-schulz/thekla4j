@@ -12,6 +12,7 @@ import com.teststeps.thekla4j.core.base.persona.Performer;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import java.util.function.Predicate;
 import lombok.NonNull;
 
@@ -181,14 +182,29 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
    * @param <R2> the output type of the mapped task
    * @return a new Task that first runs this task and then applies fn to its result
    */
+  @SuppressWarnings("unchecked")
   public final <R2> Task<PT, R2> map(Function1<RT, R2> fn) {
-    Task<PT, RT> self = this;
-    return new Task<PT, R2>() {
-      @Override
-      protected Either<ActivityError, R2> performAs(Actor actor, PT input) {
-        return self.performAs(actor, input).map(fn::apply);
-      }
-    };
+    if (this instanceof MappedTask<?, ?, ?> mapped) {
+      return ((MappedTask<PT, Object, RT>) mapped).appendMap(fn);
+    }
+    return new MappedTask<>(this, orig -> Try.of(() -> fn.apply(orig)));
+  }
+
+  /**
+   * Chain a failable mapping function after this task.
+   * If the function's {@link Try} fails, the error is converted to an {@link ActivityError}.
+   * Subsequent {@code .map()} and {@code .mapTry()} calls compose into the same wrapper.
+   *
+   * @param fn   the function to apply to the result of this task (may fail)
+   * @param <R2> the output type of the mapped task
+   * @return a new Task that first runs this task and then applies fn to its result
+   */
+  @SuppressWarnings("unchecked")
+  public final <R2> Task<PT, R2> mapTry(Function1<RT, Try<R2>> fn) {
+    if (this instanceof MappedTask<?, ?, ?> mapped) {
+      return ((MappedTask<PT, Object, RT>) mapped).appendMapTry(fn);
+    }
+    return new MappedTask<>(this, fn);
   }
 
   /**

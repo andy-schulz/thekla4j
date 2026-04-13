@@ -36,12 +36,12 @@ public class TestPropertyWaitFactor {
 
     Either<ActivityError, Void> result = actor.attemptsTo(
       See.ifThe(AddOne.to(1))
-          .is(Expected.to.equal(3))
+          .is(Expected.to.equal(3, "Adding 1 to 1 should equal 2"))
           .forAsLongAs(Duration.ofSeconds(1))
           .every(Duration.ofSeconds(1)));
 
     assertThat("result is left", result.isLeft(), is(true));
-    assertThat("error message is correct", result.getLeft().getMessage(), containsString("Expect '2' to equal '3'"));
+    assertThat("error message is correct", result.getLeft().getMessage(), containsString("Expect '2' being equal to '3'"));
 
 
   }
