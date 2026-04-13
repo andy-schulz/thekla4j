@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
@@ -63,6 +64,25 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     }
   }
 
+  /** Fixture: class-level issues are written as issue links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Issues({"FILE-1", "FILE-2"})
+  static class FileOutputIssuesFixture {
+    @Test
+    void passingTest() {
+    }
+  }
+
+  /** Fixture: method-level issues override class-level issues in file output. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Issues({"FILE-1", "FILE-2"})
+  static class FileOutputMethodIssuesOverrideFixture {
+    @Issues({"FILE-M-1", "FILE-M-2"})
+    @Test
+    void annotatedTest() {
+    }
+  }
+
   // ===== Helpers =====
 
   private JsonNode runFixtureAndReadResult(final Class<?> fixtureClass, final Path tempDir) throws IOException {
@@ -105,6 +125,16 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
       }
     }
     return values;
+  }
+
+  private List<String> issueLinkNames(final JsonNode root) {
+    List<String> names = new ArrayList<>();
+    for (JsonNode link : root.path("links")) {
+      if ("issue".equalsIgnoreCase(link.path("type").asText())) {
+        names.add(link.path("name").asText());
+      }
+    }
+    return names;
   }
 
   // ===== Tests: class-level annotations written to file =====
@@ -173,5 +203,19 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     List<String> storyValues = labelValues(result, "story");
     assertThat(storyValues, hasSize(1));
     assertThat(storyValues.get(0), is("MethodStory"));
+  }
+
+  @Test
+  void fileOutput_classLevelIssues_areWrittenAsIssueLinks(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputIssuesFixture.class, tempDir);
+
+    assertThat(issueLinkNames(result), is(List.of("FILE-1", "FILE-2")));
+  }
+
+  @Test
+  void fileOutput_methodIssues_overrideClassLevelIssues(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputMethodIssuesOverrideFixture.class, tempDir);
+
+    assertThat(issueLinkNames(result), is(List.of("FILE-M-1", "FILE-M-2")));
   }
 }

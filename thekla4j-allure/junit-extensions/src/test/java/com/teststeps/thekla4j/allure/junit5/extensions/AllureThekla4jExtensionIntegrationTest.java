@@ -7,6 +7,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
@@ -73,6 +74,25 @@ class AllureThekla4jExtensionIntegrationTest {
     }
   }
 
+  /** Fixture: class-level issue links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Issues({"CLASS-1", "CLASS-2"})
+  static class ClassIssuesFixture {
+    @Test
+    void passingTest() {
+    }
+  }
+
+  /** Fixture: method-level issue links override class-level links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Issues({"CLASS-1", "CLASS-2"})
+  static class MethodIssuesOverrideFixture {
+    @Issues({"METHOD-1", "METHOD-2"})
+    @Test
+    void annotatedTest() {
+    }
+  }
+
   /** Fixture: no annotations. */
   @ExtendWith(Thekla4jAllureJunit5Extension.class)
   static class NoAnnotationsFixture {
@@ -114,6 +134,14 @@ class AllureThekla4jExtensionIntegrationTest {
     return result.getLabels()
         .stream()
         .filter(l -> name.equals(l.getName()))
+        .collect(Collectors.toList());
+  }
+
+  private List<String> issueLinkNames(final TestResult result) {
+    return result.getLinks()
+        .stream()
+        .filter(link -> "issue".equalsIgnoreCase(link.getType()))
+        .map(link -> link.getName())
         .collect(Collectors.toList());
   }
 
@@ -211,6 +239,22 @@ class AllureThekla4jExtensionIntegrationTest {
     List<Label> storyLabels = labelsNamed(results.get(0), "story");
     assertThat(storyLabels, hasSize(1));
     assertThat(storyLabels.get(0).getValue(), is("MethodStory"));
+  }
+
+  @Test
+  void classAnnotations_issues_areRecordedInAllureOutput() {
+    List<TestResult> results = runFixture(ClassIssuesFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(issueLinkNames(results.get(0)), is(List.of("CLASS-1", "CLASS-2")));
+  }
+
+  @Test
+  void methodAnnotations_issues_overrideClassLevelIssuesInAllureOutput() {
+    List<TestResult> results = runFixture(MethodIssuesOverrideFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(issueLinkNames(results.get(0)), is(List.of("METHOD-1", "METHOD-2")));
   }
 
   @Test

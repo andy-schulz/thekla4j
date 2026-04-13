@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
@@ -74,6 +75,14 @@ class AllureThekla4jExtensionTest {
         .collect(Collectors.toList());
   }
 
+  private List<String> issueLinkNames(final TestResult result) {
+    return result.getLinks()
+        .stream()
+        .filter(link -> "issue".equalsIgnoreCase(link.getType()))
+        .map(link -> link.getName())
+        .collect(Collectors.toList());
+  }
+
   private ExtensionContext contextForClass(final Class<?> testClass) {
     ExtensionContext ctx = mock(ExtensionContext.class);
     org.mockito.Mockito.when(ctx.getTestClass()).thenReturn(Optional.of(testClass));
@@ -113,6 +122,21 @@ class AllureThekla4jExtensionTest {
 
   @ParentSuite("ClassParentSuite")
   static class WithParentSuite {
+  }
+
+  @Issues({"CLASS-1", "CLASS-2"})
+  static class WithIssues {
+  }
+
+  @Issues({"CLASS-1", "CLASS-2"})
+  static class WithClassAndMethodIssues {
+    @Issues({"METHOD-1", " METHOD-2 "})
+    void methodWithIssues() {
+    }
+  }
+
+  @Issues({"ISSUE-1", "  ", ""})
+  static class WithIssuesAndBlanks {
   }
 
   @Epic("ClassEpic")
@@ -186,6 +210,30 @@ class AllureThekla4jExtensionTest {
       ext.beforeTestExecution(contextForClass(WithParentSuite.class));
 
       assertThat(labelValue(stopAndWrite().get(0), "parentSuite"), is("ClassParentSuite"));
+    }
+
+    @Test
+    void classLevel_issues_addIssueLinks() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClass(WithIssues.class));
+
+      assertThat(issueLinkNames(stopAndWrite().get(0)), is(List.of("CLASS-1", "CLASS-2")));
+    }
+
+    @Test
+    void methodLevel_issues_overrideClassLevel() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClassAndMethod(WithClassAndMethodIssues.class, "methodWithIssues"));
+
+      assertThat(issueLinkNames(stopAndWrite().get(0)), is(List.of("METHOD-1", "METHOD-2")));
+    }
+
+    @Test
+    void classLevel_issues_blankValuesAreIgnored() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClass(WithIssuesAndBlanks.class));
+
+      assertThat(issueLinkNames(stopAndWrite().get(0)), is(List.of("ISSUE-1")));
     }
 
     @Test

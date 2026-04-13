@@ -14,6 +14,7 @@ import static io.qameta.allure.junitplatform.AllureJunitPlatform.TEAR_DOWN;
 
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
@@ -58,6 +59,8 @@ import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
  * <li><strong>Hierarchy labels</strong> – processes {@link Epic}, {@link Feature}, {@link Story},
  * {@link Suite}, {@link SubSuite}, and {@link ParentSuite} annotations on test classes and
  * methods, adding the corresponding Allure labels to the test result.
+ * <li><strong>Issue links</strong> – processes {@link Issues} annotations on test classes and
+ * methods, adding issue links to the test result.
  * <li><strong>Fixture lifecycle</strong> – wraps {@code @BeforeAll}, {@code @AfterAll},
  * {@code @BeforeEach}, and {@code @AfterEach} methods as named Allure fixtures with
  * pass/fail status.
@@ -122,8 +125,28 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
           processFeature(testMethod, testResult);
           processStory(testMethod, testResult);
         });
+        processIssues(context, testResult);
       });
     });
+  }
+
+  private void processIssues(final ExtensionContext context, final io.qameta.allure.model.TestResult testResult) {
+    final Optional<Method> maybeMethod = context.getTestMethod();
+    if (maybeMethod.isPresent() && maybeMethod.get().isAnnotationPresent(Issues.class)) {
+      addIssueLinks(maybeMethod.get().getAnnotation(Issues.class).value(), testResult);
+      return;
+    }
+
+    context.getTestClass()
+        .filter(testClass -> testClass.isAnnotationPresent(Issues.class))
+        .ifPresent(testClass -> addIssueLinks(testClass.getAnnotation(Issues.class).value(), testResult));
+  }
+
+  private void addIssueLinks(final String[] issueIds, final io.qameta.allure.model.TestResult testResult) {
+    Stream.of(issueIds)
+        .map(String::trim)
+        .filter(issueId -> !issueId.isEmpty())
+        .forEach(issueId -> testResult.getLinks().add(ResultsUtils.createIssueLink(issueId)));
   }
 
   private void processParentSuite(final Class<?> testClass, final io.qameta.allure.model.TestResult testResult) {

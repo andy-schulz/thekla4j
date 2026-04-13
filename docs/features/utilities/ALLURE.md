@@ -53,6 +53,7 @@ thekla4j-specific Allure capabilities:
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **ActivityError → FAILED** | Catches `ActivityError` during a test, sets Allure status to FAILED, and re-throws as `AssertionError` so both the extension and `AllureJunitPlatform` agree on the status |
 | **Hierarchy labels**       | Processes `@Epic`, `@Feature`, `@Story`, `@Suite`, `@SubSuite`, `@ParentSuite` class/method annotations                                                                    |
+| **Issue links**            | Processes `@Issues({...})` on class/method and adds Allure issue links                                                                                                     |
 | **Fixture lifecycle**      | Wraps `@BeforeAll`, `@AfterAll`, `@BeforeEach`, `@AfterEach` as named Allure fixtures with pass/fail status                                                                |
 | **Parameterized tests**    | Publishes `@ParameterizedTest` parameters to Allure via report entries                                                                                                     |
 
@@ -114,18 +115,21 @@ classes without any `@ExtendWith` annotation.
 | `@Epic`        | class, method | `epic`        | Epic in the Behaviors tree; method value overrides class value     |
 | `@Feature`     | class, method | `feature`     | Feature in the Behaviors tree; method value overrides class value  |
 | `@Story`       | class, method | `story`       | Story in the Behaviors tree; method value overrides class value    |
+| `@Issues`      | class, method | issue links   | Adds one or more issue links; method value overrides class value   |
 
 ### Example
 
 ```java
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Suite;
 
 @Epic("Shopping")
 @Feature("Checkout")
 @Suite("E2E Tests")
+@Issues({"SHOP-101", "SHOP-102"})
 public class CheckoutTest {
 
   @Story("Guest checkout")
@@ -136,6 +140,12 @@ public class CheckoutTest {
   @Test
   void registeredUserCanCheckOut() { ... }
 }
+```
+
+Issue link URLs are resolved by Allure using your issue pattern configuration, for example:
+
+```properties
+allure.link.issue.pattern=https://jira.example.com/browse/{}
 ```
 
 ---
@@ -190,15 +200,15 @@ details.
 
 When no explicit tags are provided, the plugin derives the following Allure labels automatically:
 
-| Allure label | Default value                                         |
-|--------------|-------------------------------------------------------|
-| `feature`    | The Gherkin `Feature:` name                           |
-| `suite`      | The Gherkin `Feature:` name                           |
-| `story`      | The scenario name                                     |
-| `package`    | The `.feature` file path (slashes → dots, `.` → `_`) |
-| `testClass`  | The scenario name                                     |
-| `framework`  | `cucumber7jvm`                                        |
-| `language`   | `java`                                                |
+| Allure label | Default value                                          |
+|--------------|--------------------------------------------------------|
+| `feature`    | The Gherkin `Feature:` name                            |
+| `suite`      | The Gherkin `Feature:` name                            |
+| `story`      | The scenario name                                      |
+| `package`    | The `.feature` file path (slashes → dots, `.` → `_`)   |
+| `testClass`  | The scenario name                                      |
+| `framework`  | `cucumber7jvm`                                         |
+| `language`   | `java`                                                 |
 
 ### Gherkin tag reference
 
@@ -207,31 +217,31 @@ Scenario-level tags take precedence over feature-level tags.
 
 **Composite tags** use the `@KEY=value` format:
 
-| Tag | Effect in Allure |
-|-----|-----------------|
-| `@SEVERITY=<level>` | Sets the severity label. Valid levels: `blocker`, `critical`, `normal`, `minor`, `trivial` |
-| `@ISSUE=<id>` | Adds a single issue link (e.g. `@ISSUE=PROJ-123`) |
-| `@ISSUES=<id1>,<id2>` | Adds multiple issue links (comma- or semicolon-separated) |
-| `@TMSLINK=<id>` | Adds a TMS (test-management system) link |
-| `@LINK=<url>` | Adds a plain hyperlink |
-| `@LINK.<type>=<name>` | Adds a named typed link (e.g. `@LINK.confluence=MyPage`) |
-| `@OWNER=<name>` | Sets the test owner label |
-| `@EPIC=<name>` | Sets the Epic in the Behaviors tree |
-| `@STORY=<name>` | Sets the Story label (overrides the scenario-name default) |
-| `@SUITE=<name>` | Sets the Suite label (overrides the feature-name default) |
-| `@SUB_SUITE=<name>` | Sets the Sub-Suite label |
+| Tag                    | Effect in Allure                                                                             |
+|------------------------|----------------------------------------------------------------------------------------------|
+| `@SEVERITY=<level>`    | Sets the severity label. Valid levels: `blocker`, `critical`, `normal`, `minor`, `trivial`   |
+| `@ISSUE=<id>`          | Adds a single issue link (e.g. `@ISSUE=PROJ-123`)                                            |
+| `@ISSUES=<id1>,<id2>`  | Adds multiple issue links (comma- or semicolon-separated)                                    |
+| `@TMSLINK=<id>`        | Adds a TMS (test-management system) link                                                     |
+| `@LINK=<url>`          | Adds a plain hyperlink                                                                       |
+| `@LINK.<type>=<name>`  | Adds a named typed link (e.g. `@LINK.confluence=MyPage`)                                     |
+| `@OWNER=<name>`        | Sets the test owner label                                                                    |
+| `@EPIC=<name>`         | Sets the Epic in the Behaviors tree                                                          |
+| `@STORY=<name>`        | Sets the Story label (overrides the scenario-name default)                                   |
+| `@SUITE=<name>`        | Sets the Suite label (overrides the feature-name default)                                    |
+| `@SUB_SUITE=<name>`    | Sets the Sub-Suite label                                                                     |
 | `@PARENT_SUITE=<name>` | Sets the Parent Suite label; the `PARENT_SUITE` environment variable overrides the tag value |
-| `@TEST_ID=<id>` | Attaches a test ID — shown as `<scenario name> (testId: <id>)` in the report |
+| `@TEST_ID=<id>`        | Attaches a test ID — shown as `<scenario name> (testId: <id>)` in the report                 |
 
 **Simple tags** (no `=`):
 
-| Tag | Effect in Allure |
-|-----|-----------------|
-| `@FLAKY` | Marks the test as flaky |
-| `@KNOWN` | Marks the test as a known issue |
-| `@MUTED` | Mutes the test in the Allure report |
+| Tag                                                      | Effect in Allure                                                 |
+|----------------------------------------------------------|------------------------------------------------------------------|
+| `@FLAKY`                                                 | Marks the test as flaky                                          |
+| `@KNOWN`                                                 | Marks the test as a known issue                                  |
+| `@MUTED`                                                 | Mutes the test in the Allure report                              |
 | `@critical`, `@blocker`, `@normal`, `@minor`, `@trivial` | Bare-word severity shorthand (equivalent to `@SEVERITY=<level>`) |
-| Any other tag | Added as a raw tag label |
+| Any other tag                                            | Added as a raw tag label                                         |
 
 ### Example feature file
 
