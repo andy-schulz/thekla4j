@@ -9,9 +9,11 @@ import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Reqs;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Suite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.TestId;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import io.qameta.allure.Allure;
 import io.qameta.allure.AllureLifecycle;
@@ -101,6 +103,53 @@ class AllureThekla4jExtensionIntegrationTest {
     }
   }
 
+  /** Fixture: class-level requirement links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Reqs({"REQ-1", "REQ-2"})
+  static class ClassReqsFixture {
+    @Test
+    void passingTest() {
+    }
+  }
+
+  /** Fixture: method-level requirement links override class-level links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Reqs({"REQ-1", "REQ-2"})
+  static class MethodReqsOverrideFixture {
+    @Reqs({"METHOD-REQ-1", "METHOD-REQ-2"})
+    @Test
+    void annotatedTest() {
+    }
+  }
+
+  /** Fixture: method-level @TestId. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  static class MethodTestIdFixture {
+    @TestId("TC-001")
+    @Test
+    void annotatedTest() {
+    }
+  }
+
+  /** Fixture: class-level @TestId. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @TestId("CLASS-TC")
+  static class ClassTestIdFixture {
+    @Test
+    void passingTest() {
+    }
+  }
+
+  /** Fixture: method-level @TestId overrides class-level. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @TestId("CLASS-TC")
+  static class MethodTestIdOverrideFixture {
+    @TestId("METHOD-TC")
+    @Test
+    void annotatedTest() {
+    }
+  }
+
   // ===== Helpers =====
 
   private List<TestResult> runFixture(final Class<?> fixtureClass) {
@@ -141,6 +190,14 @@ class AllureThekla4jExtensionIntegrationTest {
     return result.getLinks()
         .stream()
         .filter(link -> "issue".equalsIgnoreCase(link.getType()))
+        .map(link -> link.getName())
+        .collect(Collectors.toList());
+  }
+
+  private List<String> requirementLinkNames(final TestResult result) {
+    return result.getLinks()
+        .stream()
+        .filter(link -> "requirement".equalsIgnoreCase(link.getType()))
         .map(link -> link.getName())
         .collect(Collectors.toList());
   }
@@ -258,6 +315,22 @@ class AllureThekla4jExtensionIntegrationTest {
   }
 
   @Test
+  void classAnnotations_reqs_areRecordedInAllureOutput() {
+    List<TestResult> results = runFixture(ClassReqsFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(requirementLinkNames(results.get(0)), is(List.of("REQ-1", "REQ-2")));
+  }
+
+  @Test
+  void methodAnnotations_reqs_overrideClassLevelReqsInAllureOutput() {
+    List<TestResult> results = runFixture(MethodReqsOverrideFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(requirementLinkNames(results.get(0)), is(List.of("METHOD-REQ-1", "METHOD-REQ-2")));
+  }
+
+  @Test
   void noAnnotations_allureOutputContainsNoTagLabels() {
     List<TestResult> results = runFixture(NoAnnotationsFixture.class);
 
@@ -265,5 +338,34 @@ class AllureThekla4jExtensionIntegrationTest {
     assertThat(labelsNamed(results.get(0), "epic"), hasSize(0));
     assertThat(labelsNamed(results.get(0), "feature"), hasSize(0));
     assertThat(labelsNamed(results.get(0), "story"), hasSize(0));
+  }
+
+  // ===== TestId tests =====
+
+  @Test
+  void methodTestId_appendedToNameAndSetsTestCaseId() {
+    List<TestResult> results = runFixture(MethodTestIdFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(results.get(0).getName(), is("annotatedTest() (TestId: TC-001)"));
+    assertThat(results.get(0).getTestCaseId(), is("TC-001"));
+  }
+
+  @Test
+  void classTestId_appendedToNameAndSetsTestCaseId() {
+    List<TestResult> results = runFixture(ClassTestIdFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(results.get(0).getName(), is("passingTest() (TestId: CLASS-TC)"));
+    assertThat(results.get(0).getTestCaseId(), is("CLASS-TC"));
+  }
+
+  @Test
+  void methodTestId_overridesClassLevelTestId() {
+    List<TestResult> results = runFixture(MethodTestIdOverrideFixture.class);
+
+    assertThat(results, hasSize(1));
+    assertThat(results.get(0).getName(), is("annotatedTest() (TestId: METHOD-TC)"));
+    assertThat(results.get(0).getTestCaseId(), is("METHOD-TC"));
   }
 }

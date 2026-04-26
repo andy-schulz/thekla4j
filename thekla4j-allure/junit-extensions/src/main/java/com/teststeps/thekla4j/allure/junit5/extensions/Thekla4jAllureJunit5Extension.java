@@ -1,25 +1,26 @@
 package com.teststeps.thekla4j.allure.junit5.extensions;
 
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_FIXTURE;
 import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_PARAMETER;
 import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_PARAMETER_EXCLUDED_KEY;
 import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_PARAMETER_MODE_KEY;
 import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_PARAMETER_VALUE_KEY;
 import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_REPORT_ENTRY_BLANK_PREFIX;
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.EVENT_FAILURE;
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.EVENT_START;
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.EVENT_STOP;
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.PREPARE;
-import static io.qameta.allure.junitplatform.AllureJunitPlatform.TEAR_DOWN;
 
+import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.AllureActor;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Reqs;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Suite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.TestId;
+import com.teststeps.thekla4j.allure.shared.ActivityLogReporter;
+import com.teststeps.thekla4j.allure.shared.RequirementLinkResolver;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.qameta.allure.Allure;
 import io.qameta.allure.AllureLifecycle;
 import io.qameta.allure.Param;
@@ -30,18 +31,23 @@ import io.qameta.allure.util.ObjectUtils;
 import io.qameta.allure.util.ResultsUtils;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Combined thekla4j Allure JUnit 5 extension.
@@ -59,13 +65,16 @@ import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
  * <li><strong>Hierarchy labels</strong> – processes {@link Epic}, {@link Feature}, {@link Story},
  * {@link Suite}, {@link SubSuite}, and {@link ParentSuite} annotations on test classes and
  * methods, adding the corresponding Allure labels to the test result.
- * <li><strong>Issue links</strong> – processes {@link Issues} annotations on test classes and
- * methods, adding issue links to the test result.
+ * <li><strong>Issue/Requirement links</strong> – processes {@link Issues} and {@link Reqs}
+ * annotations on test classes and methods, adding links to the test result.
  * <li><strong>Fixture lifecycle</strong> – wraps {@code @BeforeAll}, {@code @AfterAll},
  * {@code @BeforeEach}, and {@code @AfterEach} methods as named Allure fixtures with
  * pass/fail status.
  * <li><strong>Parameterized test parameters</strong> – publishes test-template parameters to
  * Allure via report entries.
+ * <li><strong>Activity log steps</strong> – after test execution, scans for fields annotated with
+ * {@link AllureActor} and maps each Actor's {@link ActivityLogNode} tree into native Allure
+ * steps with status, timing, parameters, and attachments.
  * </ul>
  *
  * <h2>Registration</h2>
@@ -85,7 +94,9 @@ import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
  * </pre>
  */
 @SuppressWarnings("MultipleStringLiterals")
-public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, BeforeTestExecutionCallback {
+public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Thekla4jAllureJunit5Extension.class);
 
   private final AllureLifecycle lifecycle;
 
@@ -126,8 +137,85 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
           processStory(testMethod, testResult);
         });
         processIssues(context, testResult);
+        processRequirements(context, testResult);
+        processTestId(context, testResult);
       });
     });
+  }
+
+  private void processTestId(final ExtensionContext context, final io.qameta.allure.model.TestResult testResult) {
+    final Optional<Method> maybeMethod = context.getTestMethod();
+    if (maybeMethod.isPresent() && maybeMethod.get().isAnnotationPresent(TestId.class)) {
+      applyTestId(maybeMethod.get().getAnnotation(TestId.class).value(), testResult);
+      return;
+    }
+
+    context.getTestClass()
+        .filter(testClass -> testClass.isAnnotationPresent(TestId.class))
+        .ifPresent(testClass -> applyTestId(testClass.getAnnotation(TestId.class).value(), testResult));
+  }
+
+  private void applyTestId(final String testId, final io.qameta.allure.model.TestResult testResult) {
+    final String id = testId.trim();
+    if (!id.isEmpty()) {
+      testResult.setName(testResult.getName() + " (TestId: " + id + ")");
+      testResult.setTestCaseId(id);
+    }
+  }
+
+  // ===== AfterTestExecutionCallback – activity log step mapping =====
+
+  @Override
+  public void afterTestExecution(final ExtensionContext context) {
+    lifecycle.getCurrentTestCase().ifPresent(uuid -> {
+      final Object testInstance = context.getTestInstance().orElse(null);
+      if (testInstance == null) {
+        return;
+      }
+
+      final List<Actor> actors = findAllureActors(testInstance);
+      ActivityLogReporter.reportActorLogs(
+        lifecycle,
+        uuid,
+        actors,
+        context.getExecutionException().isPresent());
+    });
+  }
+
+  /**
+   * Scans the test instance's class hierarchy for fields annotated with {@link AllureActor}
+   * and returns the Actor values.
+   */
+  private List<Actor> findAllureActors(final Object testInstance) {
+    final List<Actor> result = new ArrayList<>();
+    Class<?> clazz = testInstance.getClass();
+    while (clazz != null && clazz != Object.class) {
+      for (final Field field : clazz.getDeclaredFields()) {
+        if (field.isAnnotationPresent(AllureActor.class) && Actor.class.isAssignableFrom(field.getType())) {
+          try {
+            if (!field.canAccess(testInstance) && !field.trySetAccessible()) {
+              LOGGER.warn(
+                "Could not access @AllureActor field '{}' on test class '{}'",
+                field.getName(),
+                clazz.getName());
+              continue;
+            }
+            final Actor actor = (Actor) field.get(testInstance);
+            if (actor != null) {
+              result.add(actor);
+            }
+          } catch (IllegalAccessException | SecurityException e) {
+            LOGGER.warn(
+              "Could not access @AllureActor field '{}' on test class '{}'",
+              field.getName(),
+              clazz.getName(),
+              e);
+          }
+        }
+      }
+      clazz = clazz.getSuperclass();
+    }
+    return result;
   }
 
   private void processIssues(final ExtensionContext context, final io.qameta.allure.model.TestResult testResult) {
@@ -147,6 +235,26 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
         .map(String::trim)
         .filter(issueId -> !issueId.isEmpty())
         .forEach(issueId -> testResult.getLinks().add(ResultsUtils.createIssueLink(issueId)));
+  }
+
+  private void processRequirements(final ExtensionContext context, final io.qameta.allure.model.TestResult testResult) {
+    final Optional<Method> maybeMethod = context.getTestMethod();
+    if (maybeMethod.isPresent() && maybeMethod.get().isAnnotationPresent(Reqs.class)) {
+      addRequirementLinks(maybeMethod.get().getAnnotation(Reqs.class).value(), testResult);
+      return;
+    }
+
+    context.getTestClass()
+        .filter(testClass -> testClass.isAnnotationPresent(Reqs.class))
+        .ifPresent(testClass -> addRequirementLinks(testClass.getAnnotation(Reqs.class).value(), testResult));
+  }
+
+  private void addRequirementLinks(final String[] requirementIds, final io.qameta.allure.model.TestResult testResult) {
+    Stream.of(requirementIds)
+        .map(String::trim)
+        .filter(requirementId -> !requirementId.isEmpty())
+        .forEach(requirementId -> testResult.getLinks()
+            .add(RequirementLinkResolver.createRequirementLink(requirementId)));
   }
 
   private void processParentSuite(final Class<?> testClass, final io.qameta.allure.model.TestResult testResult) {
@@ -274,109 +382,6 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
 
       extensionContext.publishReportEntry(wrap(map));
     }
-  }
-
-  // ===== InvocationInterceptor – fixture hooks =====
-
-  @Override
-  public void interceptBeforeAllMethod(
-                                       final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-    processFixture(PREPARE, invocation, invocationContext, extensionContext);
-  }
-
-  @Override
-  public void interceptAfterAllMethod(
-                                      final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-    processFixture(TEAR_DOWN, invocation, invocationContext, extensionContext);
-  }
-
-  @Override
-  public void interceptBeforeEachMethod(
-                                        final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-    processFixture(PREPARE, invocation, invocationContext, extensionContext);
-  }
-
-  @Override
-  public void interceptAfterEachMethod(
-                                       final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-    processFixture(TEAR_DOWN, invocation, invocationContext, extensionContext);
-  }
-
-  /**
-   * Wraps each lifecycle step invocation (before/after all/each) as a named Allure fixture.
-   *
-   * @param type              the fixture type ({@code PREPARE} or {@code TEAR_DOWN})
-   * @param invocation        the JUnit invocation to proceed
-   * @param invocationContext the reflective invocation context
-   * @param extensionContext  the JUnit extension context
-   * @throws Throwable if the invocation throws
-   */
-  protected void processFixture(
-                                final String type, final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-    final String uuid = UUID.randomUUID().toString();
-    try {
-      extensionContext.publishReportEntry(wrap(buildStartEvent(type, uuid, invocationContext.getExecutable())));
-      invocation.proceed();
-      extensionContext.publishReportEntry(wrap(buildStopEvent(type, uuid)));
-    } catch (Throwable throwable) {
-      extensionContext.publishReportEntry(wrap(buildFailureEvent(type, uuid, throwable)));
-      throw throwable;
-    }
-  }
-
-  /**
-   * Builds the event map for a fixture start event.
-   *
-   * @param type   the fixture type
-   * @param uuid   the unique identifier for this fixture invocation
-   * @param method the fixture method
-   * @return a map of event properties for the start event
-   */
-  public Map<String, String> buildStartEvent(final String type, final String uuid, final Method method) {
-    final Map<String, String> map = new HashMap<>();
-    map.put(ALLURE_FIXTURE, type);
-    map.put("event", EVENT_START);
-    map.put("uuid", uuid);
-    map.put("name", method.getName());
-    return map;
-  }
-
-  /**
-   * Builds the event map for a fixture stop event.
-   *
-   * @param type the fixture type
-   * @param uuid the unique identifier for this fixture invocation
-   * @return a map of event properties for the stop event
-   */
-  public Map<String, String> buildStopEvent(final String type, final String uuid) {
-    final Map<String, String> map = new HashMap<>();
-    map.put(ALLURE_FIXTURE, type);
-    map.put("event", EVENT_STOP);
-    map.put("uuid", uuid);
-    return map;
-  }
-
-  /**
-   * Builds the event map for a fixture failure event.
-   *
-   * @param type      the fixture type
-   * @param uuid      the unique identifier for this fixture invocation
-   * @param throwable the exception that caused the failure
-   * @return a map of event properties for the failure event
-   */
-  public Map<String, String> buildFailureEvent(final String type, final String uuid, final Throwable throwable) {
-    final Map<String, String> map = new HashMap<>();
-    map.put(ALLURE_FIXTURE, type);
-    map.put("event", EVENT_FAILURE);
-    map.put("uuid", uuid);
-
-    final Optional<Status> maybeStatus = ResultsUtils.getStatus(throwable);
-    maybeStatus.map(Status::value).ifPresent(status -> map.put("status", status));
-
-    final Optional<StatusDetails> maybeDetails = ResultsUtils.getStatusDetails(throwable);
-    maybeDetails.map(StatusDetails::getMessage).ifPresent(message -> map.put("message", message));
-    maybeDetails.map(StatusDetails::getTrace).ifPresent(trace -> map.put("trace", trace));
-    return map;
   }
 
   /**

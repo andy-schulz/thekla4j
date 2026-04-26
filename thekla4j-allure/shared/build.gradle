@@ -1,0 +1,23 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
+}
+
+dependencies {
+    implementation project(":thekla4j-activityLog")
+    implementation project(":thekla4j-core")
+    implementation(platform("io.qameta.allure:allure-bom:${allureJavaVersion}"))
+    implementation 'io.qameta.allure:allure-java-commons'
+}
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            artifactId = 'thekla4j-allure-shared'
+            pom {
+                description = 'Shared Allure helper classes used by thekla4j allure integrations'
+            }
+        }
+    }
+}

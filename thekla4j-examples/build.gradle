@@ -1,0 +1,187 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.git'
+    id 'io.qameta.allure-adapter' version '3.0.1'
+    id 'io.qameta.allure-report' version '3.0.1'
+}
+
+dependencies {
+    testImplementation project(':thekla4j-allure:junit-extensions')
+    testImplementation project(':thekla4j-allure:cucumber-plugins')
+    testImplementation project(':thekla4j-cucumber:thekla4j-world')
+    testImplementation project(':thekla4j-core')
+    testImplementation(platform("io.qameta.allure:allure-bom:${allureJavaVersion}"))
+    testImplementation 'io.qameta.allure:allure-junit5'
+    testImplementation 'io.cucumber:cucumber-java:7.13.0'
+    testImplementation 'io.cucumber:cucumber-picocontainer:7.13.0'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.13.0'
+    testImplementation 'org.junit.platform:junit-platform-suite:1.10.+'
+}
+
+def examplesTasksExplicitlyRequested = providers.provider {
+    gradle.startParameter.taskNames.any { taskName ->
+        def normalized = taskName.startsWith(':') ? taskName : ":${taskName}"
+        normalized == ':thekla4j-examples' || normalized.startsWith(':thekla4j-examples:')
+    } || gradle.startParameter.currentDir == project.projectDir
+}
+
+def aggregateTasksRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName == 'test' || taskName == 'check' || taskName == 'build'
+        || taskName == ':test' || taskName == ':check' || taskName == ':build'
+}
+if (aggregateTasksRequested && !examplesTasksExplicitlyRequested.get()) {
+    gradle.startParameter.excludedTaskNames.add(':thekla4j-examples:test')
+}
+
+test {
+    // This module intentionally contains one failing test for report demonstration.
+    onlyIf('run examples tests only for explicit examples task invocations') {
+        examplesTasksExplicitlyRequested.get()
+    }
+    ignoreFailures = true
+    systemProperty 'allure.results.directory', "${buildDir}/allure-results"
+}
+
+allure {
+    version.set(allureVersion)
+}
+
+def preparedAllureHome = project(':thekla4j-allure:allure2-commandline-distribution')
+    .layout.buildDirectory
+    .dir('allure/commandline-with-thekla4j-plugin')
+def allure3ReportDir = layout.buildDirectory.dir('allure3-report')
+def allure3ServerPidFile = layout.buildDirectory.file('allure3-report/server.pid')
+def allure3ServerLogFile = layout.buildDirectory.file('allure3-report/server.log')
+
+def shouldPatchAllure3Ui = { String version ->
+    def numbers = version.tokenize('.-')
+    if (numbers.size() < 2 || !numbers[0].isInteger() || !numbers[1].isInteger()) {
+        return false
+    }
+    def major = numbers[0] as int
+    def minor = numbers[1] as int
+    return major == 3 && minor >= 3 && minor <= 6
+}
+
+def patchAllure3Ui = { File reportDir ->
+    if (!shouldPatchAllure3Ui(allure3Version.toString())) {
+        logger.lifecycle("Skipping Allure 3 UI patch for version ${allure3Version}")
+        return
+    }
+    def oldUreCode = 'const{item:n,bodyItems:r,suppressInlineError:i}=e,o=Boolean((n.message||n.trace)&&!n.hasSimilarErrorInSubSteps&&!i),a=Boolean(r.length||n.parameters?.length||o),s=!W6.value.has(n.stepId);'
+    def fixedUreCode = 'const{item:n,bodyItems:r,suppressInlineError:i}=e??{};if(!n||!r)return null;const o=Boolean((n.message||n.trace)&&!n.hasSimilarErrorInSubSteps&&!i),a=Boolean(r.length||n.parameters?.length||o),s=!W6.value.has(n.stepId);'
+    def sandboxBefore = 'sandbox:"allow-same-origin"'
+    def sandboxAfter = 'sandbox:"allow-same-origin allow-scripts"'
+    def sanitizeBefore = 'i=r.length>0?(e=>s_.sanitize(e,void 0))(r):""'
+    def sanitizeAfter = 'i=r.length>0?r:""'
+
+    def ureOk = false
+    def sandboxOk = false
+    def sanitizeOk = false
+
+    fileTree(reportDir).matching { include 'app-*.js' }.each { jsFile ->
+        def content = jsFile.text
+        def changed = false
+        if (content.contains(oldUreCode)) {
+            content = content.replace(oldUreCode, fixedUreCode)
+            changed = true
+        }
+        if (content.contains(sandboxBefore)) {
+            content = content.replace(sandboxBefore, sandboxAfter)
+            changed = true
+        }
+        if (content.contains(sanitizeBefore)) {
+            content = content.replace(sanitizeBefore, sanitizeAfter)
+            changed = true
+        }
+        if (changed) {
+            jsFile.text = content
+            logger.lifecycle("Patched Allure 3 report UI in ${jsFile.name}")
+        }
+        // Accept either the original anchor (just patched) or the fixed form (already patched)
+        if (content.contains(fixedUreCode))     ureOk = true
+        if (content.contains(sandboxAfter))     sandboxOk = true
+        if (content.contains(sanitizeAfter))    sanitizeOk = true
+    }
+
+    if (!ureOk || !sandboxOk || !sanitizeOk) {
+        throw new GradleException(
+            "Expected Allure 3 patch anchors not found for version ${allure3Version}. " +
+                "Review generated app-*.js and update patch logic.")
+    }
+}
+
+tasks.matching { it.name in ['allureReport', 'allureServe'] }.configureEach {
+    dependsOn ':thekla4j-allure:allure2-commandline-distribution:prepareAllureWithThekla4jPlugin'
+    dependsOn tasks.named('test')
+    allureHome.set(preparedAllureHome)
+}
+
+tasks.named('allureReport') {
+    clean.set(true)
+}
+
+tasks.register('allure3Report') {
+    group = 'reporting'
+    description = 'Generate Allure 3 report from allure-results (requires Node.js/npm)'
+    dependsOn tasks.named('test')
+    doLast {
+        exec {
+            commandLine 'npx', '--yes', "allure@${allure3Version}", 'generate',
+                '--output', "${allure3ReportDir.get().asFile}",
+                "${buildDir}/allure-results"
+        }
+        patchAllure3Ui(allure3ReportDir.get().asFile)
+        ["${allure3ReportDir.get().asFile}/widgets", "${allure3ReportDir.get().asFile}/awesome/widgets"].each { dir ->
+            def envFile = new File("${dir}/allure_environment.json")
+            if (new File(dir).exists() && !envFile.exists()) envFile.text = '{"items":[]}'
+        }
+    }
+}
+
+tasks.register('allure3Serve') {
+    group = 'reporting'
+    description = 'Generate and serve Allure 3 report via HTTP (requires Node.js/npm)'
+    dependsOn tasks.named('allure3Report')
+    doLast {
+        def pidFile = allure3ServerPidFile.get().asFile
+        def logFile = allure3ServerLogFile.get().asFile
+        pidFile.parentFile.mkdirs()
+        if (pidFile.exists()) {
+            def existingPid = pidFile.text.trim()
+            if (existingPid.isInteger()) {
+                exec {
+                    ignoreExitValue = true
+                    commandLine 'kill', existingPid
+                }
+            }
+            pidFile.delete()
+        }
+        exec {
+            commandLine 'bash', '-c',
+                "nohup python3 -m http.server 8979 --directory '${allure3ReportDir.get().asFile}' > '${logFile}' 2>&1 & echo \$! > '${pidFile}'"
+        }
+        logger.lifecycle("Allure 3 report server started at http://localhost:8979 (PID ${pidFile.text.trim()})")
+    }
+}
+
+tasks.register('allure3Stop') {
+    group = 'reporting'
+    description = 'Stop the running Allure 3 report server'
+    doLast {
+        def pidFile = allure3ServerPidFile.get().asFile
+        if (!pidFile.exists()) {
+            logger.lifecycle('No running Allure 3 server PID file found')
+            return
+        }
+        def pid = pidFile.text.trim()
+        if (!pid.isInteger()) {
+            throw new GradleException("Invalid PID file content in ${pidFile}: '${pid}'")
+        }
+        exec {
+            ignoreExitValue = true
+            commandLine 'kill', pid
+        }
+        pidFile.delete()
+    }
+}

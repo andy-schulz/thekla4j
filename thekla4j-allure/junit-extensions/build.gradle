@@ -6,7 +6,9 @@ plugins {
 
 dependencies {
     implementation project(":thekla4j-commons")
-    implementation(platform("io.qameta.allure:allure-bom:${allureVersion}"))
+    implementation project(":thekla4j-core")
+    implementation project(":thekla4j-allure:shared")
+    implementation(platform("io.qameta.allure:allure-bom:${allureJavaVersion}"))
     implementation 'io.qameta.allure:allure-junit5'
     compileOnly 'org.junit.jupiter:junit-jupiter-api:5.10.+'
     compileOnly 'org.junit.platform:junit-platform-launcher:1.10.+'
@@ -22,6 +24,14 @@ test {
         excludeTestsMatching("*ActivityErrorFixture*")
         excludeTestsMatching("*FileOutputFixture*")
         excludeTestsMatching("*FileOutputMethodOverrideFixture*")
+        excludeTestsMatching("*SingleActorFixture*")
+        excludeTestsMatching("*NoAnnotationFixture*")
+        excludeTestsMatching("*MultipleActorsFixture*")
+        excludeTestsMatching("*RootAttachmentsFixture*")
+        excludeTestsMatching("*VideoAttachmentsFixture*")
+        excludeTestsMatching("*MethodTestIdFixture*")
+        excludeTestsMatching("*ClassTestIdFixture*")
+        excludeTestsMatching("*MethodTestIdOverrideFixture*")
     }
     systemProperty 'allure.results.directory', "${buildDir}/allure-results"
 }

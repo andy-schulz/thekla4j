@@ -1,0 +1,8 @@
+.requirements__list {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.requirements__item + .requirements__item {
+    margin-top: 0.2em;
+}

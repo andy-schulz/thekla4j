@@ -1,0 +1,110 @@
+import org.gradle.api.publish.maven.tasks.PublishToMavenLocal
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+
+plugins {
+    id 'base'
+    id 'io.qameta.allure-report' version '3.0.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    allurePluginRuntime {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    allurePluginRuntime project(path: ':thekla4j-allure:thekla4j-allure2-plugin', configuration: 'runtimeElements')
+}
+
+allure {
+    version.set(allureVersion)
+}
+
+def customAllureConfigFile = layout.projectDirectory.file('src/main/resources/allure/config/allure.yml')
+def pluginDescriptor = project(':thekla4j-allure:thekla4j-allure2-plugin').layout.projectDirectory.file('src/main/resources/allure-plugin.yml')
+def pluginStaticDir = project(':thekla4j-allure:thekla4j-allure2-plugin').layout.projectDirectory.dir('src/main/resources/static')
+def preparedAllureHome = layout.buildDirectory.dir('allure/commandline-with-thekla4j-plugin')
+def allurePluginRuntime = configurations.named('allurePluginRuntime')
+
+tasks.register('prepareAllureWithThekla4jPlugin') {
+    group = 'distribution'
+    description = 'Assembles an Allure commandline home with the thekla4j plugin preinstalled.'
+
+    dependsOn tasks.named('downloadAllure')
+    dependsOn allurePluginRuntime
+
+    inputs.file(customAllureConfigFile)
+    inputs.file(pluginDescriptor)
+    inputs.dir(pluginStaticDir)
+    inputs.files(allurePluginRuntime)
+    outputs.dir(preparedAllureHome)
+
+    doLast {
+        def sourceAllureHome = tasks.named('downloadAllure').get().destinationDir.get().asFile
+        def targetAllureHome = preparedAllureHome.get().asFile
+
+        delete(targetAllureHome)
+        copy {
+            from sourceAllureHome
+            into targetAllureHome
+        }
+
+        def customPluginDir = new File(targetAllureHome, 'plugins/thekla4j-allure2-plugin')
+        def customPluginLibDir = new File(customPluginDir, 'lib')
+        def customPluginStaticDir = new File(customPluginDir, 'static')
+        customPluginLibDir.mkdirs()
+        customPluginStaticDir.mkdirs()
+
+        copy {
+            from pluginDescriptor.asFile
+            into customPluginDir
+        }
+        copy {
+            from pluginStaticDir.asFile
+            into customPluginStaticDir
+        }
+        copy {
+            from allurePluginRuntime.get()
+            into customPluginLibDir
+        }
+
+        def enabledPlugins = new LinkedHashSet<String>()
+        new File(targetAllureHome, 'plugins').eachDir { pluginDir ->
+            enabledPlugins.add(pluginDir.name)
+        }
+        customAllureConfigFile.asFile.eachLine { line ->
+            def trimmed = line.trim()
+            if (trimmed.startsWith('-')) {
+                enabledPlugins.add(trimmed.substring(1).trim())
+            }
+        }
+
+        def mergedAllureConfig = new File(targetAllureHome, 'config/allure.yml')
+        mergedAllureConfig.parentFile.mkdirs()
+        mergedAllureConfig.text = 'plugins:\n' + enabledPlugins.collect { "  - ${it}" }.join('\n') + '\n'
+    }
+}
+
+tasks.register('packageAllureWithThekla4jPlugin', Zip) {
+    group = 'distribution'
+    description = 'Creates a Jenkins-ready Allure commandline zip with the thekla4j plugin preinstalled.'
+
+    dependsOn tasks.named('prepareAllureWithThekla4jPlugin')
+    from(preparedAllureHome)
+
+    archiveBaseName.set('allure-commandline-thekla4j')
+    archiveVersion.set(allureVersion)
+    destinationDirectory.set(layout.buildDirectory.dir('distributions'))
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('packageAllureWithThekla4jPlugin')
+}
+
+tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
+tasks.withType(PublishToMavenLocal).configureEach { it.enabled = false }

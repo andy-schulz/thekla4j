@@ -6,7 +6,10 @@ plugins {
 
 dependencies {
     implementation project(":thekla4j-commons")
-    implementation(platform("io.qameta.allure:allure-bom:${allureVersion}"))
+    implementation project(":thekla4j-core")
+    implementation project(":thekla4j-allure:shared")
+    implementation project(":thekla4j-cucumber:thekla4j-world")
+    implementation(platform("io.qameta.allure:allure-bom:${allureJavaVersion}"))
     implementation 'io.qameta.allure:allure-java-commons'
     compileOnly 'io.cucumber:cucumber-plugin:7.13.0'
     compileOnly 'io.cucumber:messages:22.0.0'
@@ -14,6 +17,7 @@ dependencies {
 
     testImplementation 'io.cucumber:cucumber-core:7.13.0'
     testImplementation 'io.cucumber:cucumber-java:7.13.0'
+    testImplementation 'io.cucumber:cucumber-picocontainer:7.13.0'
     testImplementation 'io.qameta.allure:allure-java-commons-test'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.+'
 }

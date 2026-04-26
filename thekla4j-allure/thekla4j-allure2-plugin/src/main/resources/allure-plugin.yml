@@ -1,0 +1,10 @@
+id: thekla4j-allure2-plugin
+name: Thekla4j Allure2 Plugin
+description: Adds requirements section and activity log section to the Allure report.
+extensions:
+  - com.teststeps.thekla4j.allure.plugin.Thekla4jAllurePlugin
+jsFiles:
+  - index.js
+cssFiles:
+  - styles.css
+

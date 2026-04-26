@@ -1,0 +1,22 @@
+plugins {
+    id 'com.teststeps.java-conventions'
+    id 'com.teststeps.thekla4j.publish'
+    id 'com.teststeps.thekla4j.git'
+}
+
+dependencies {
+    compileOnly "io.qameta.allure:allure-plugin-api:${allureVersion}"
+    testImplementation "io.qameta.allure:allure-plugin-api:${allureVersion}"
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+}
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            artifactId = 'thekla4j-allure2-plugin'
+            pom {
+                description = 'Allure report plugin for thekla4j - requirements section and activity log section'
+            }
+        }
+    }
+}

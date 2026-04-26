@@ -25,6 +25,7 @@ import static io.qameta.allure.util.ResultsUtils.createSuiteLabel;
 import static io.qameta.allure.util.ResultsUtils.createTestClassLabel;
 import static io.qameta.allure.util.ResultsUtils.createThreadLabel;
 
+import com.teststeps.thekla4j.allure.shared.RequirementLinkResolver;
 import io.cucumber.messages.types.Feature;
 import io.cucumber.plugin.event.TestCase;
 import io.qameta.allure.model.Label;
@@ -55,6 +56,8 @@ class LabelBuilder {
   private static final String SEVERITY = "@SEVERITY";
   private static final String ISSUE_LINK = "@ISSUE";
   private static final String ISSUES_LINK = "@ISSUES";
+  private static final String REQ_LINK = "@REQ";
+  private static final String REQS_LINK = "@REQS";
   private static final String TMS_LINK = "@TMSLINK";
   private static final String PLAIN_LINK = "@LINK";
   private static final String OWNER = "@OWNER";
@@ -109,7 +112,28 @@ class LabelBuilder {
           case ISSUES_LINK:
             Arrays.stream(tagValue.split(","))
                 .flatMap(issue -> Arrays.stream(issue.split(";")))
-                .forEach(issue -> getScenarioLinks().add(ResultsUtils.createIssueLink(issue)));
+                .forEach(issue -> {
+                  final String issueId = issue.trim();
+                  if (!issueId.isEmpty()) {
+                    getScenarioLinks().add(ResultsUtils.createIssueLink(issueId));
+                  }
+                });
+            break;
+          case REQ_LINK:
+            final String singleRequirementId = tagValue.trim();
+            if (!singleRequirementId.isEmpty()) {
+              getScenarioLinks().add(RequirementLinkResolver.createRequirementLink(singleRequirementId));
+            }
+            break;
+          case REQS_LINK:
+            Arrays.stream(tagValue.split(","))
+                .flatMap(requirement -> Arrays.stream(requirement.split(";")))
+                .forEach(requirement -> {
+                  final String requirementId = requirement.trim();
+                  if (!requirementId.isEmpty()) {
+                    getScenarioLinks().add(RequirementLinkResolver.createRequirementLink(requirementId));
+                  }
+                });
             break;
           case PLAIN_LINK:
             getScenarioLinks().add(ResultsUtils.createLink(null, tagValue, tagValue, null));

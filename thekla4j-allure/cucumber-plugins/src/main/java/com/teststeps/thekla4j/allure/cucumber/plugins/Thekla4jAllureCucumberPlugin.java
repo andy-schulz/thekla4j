@@ -21,7 +21,9 @@ import static io.qameta.allure.util.ResultsUtils.getStatusDetails;
 import static io.qameta.allure.util.ResultsUtils.md5;
 
 import com.teststeps.thekla4j.allure.cucumber.plugins.testsourcemodel.TestSourcesModelProxy;
+import com.teststeps.thekla4j.allure.shared.ActivityLogReporter;
 import com.teststeps.thekla4j.commons.error.ActivityError;
+import com.teststeps.thekla4j.cucumber.Thekla4jWorld;
 import io.cucumber.messages.types.Examples;
 import io.cucumber.messages.types.Feature;
 import io.cucumber.messages.types.Scenario;
@@ -97,6 +99,7 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
   private final EventHandler<EmbedEvent> embedEventHandler = this::handleEmbedEvent;
 
   private final Map<UUID, String> hookStepContainerUuid = new ConcurrentHashMap<>();
+  private final Map<String, Thekla4jWorld> worldByTestCaseUuid = new ConcurrentHashMap<>();
 
   private static final String TXT_EXTENSION = ".txt";
   private static final String TEXT_PLAIN = "text/plain";
@@ -212,11 +215,27 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
           .setStatusDetails(statusDetails);
     });
 
+    // Prefer the best available world (world that already has actors), then fallback to live state.
+    final Thekla4jWorld world = selectMoreRelevantWorld(worldByTestCaseUuid.get(uuid), resolveCurrentWorld());
+    try {
+      if (hasActors(world)) {
+        ActivityLogReporter.reportActorLogs(
+          lifecycle,
+          uuid,
+          world.getCast().crew().values().toJavaList(),
+          status == Status.FAILED);
+      }
+    } finally {
+      worldByTestCaseUuid.remove(uuid);
+      Thekla4jWorld.clearCurrentWorld();
+    }
+
     lifecycle.stopTestCase(uuid);
     lifecycle.writeTestCase(uuid);
   }
 
   private void handleTestStepStarted(final TestStepStarted event) {
+    cacheWorldForTestCase(event.getTestCase());
     final TestCase testCase = event.getTestCase();
     if (event.getTestStep() instanceof HookTestStep) {
       final HookTestStep hook = (HookTestStep) event.getTestStep();
@@ -288,6 +307,7 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
   }
 
   private void handleTestStepFinished(final TestStepFinished event) {
+    cacheWorldForTestCase(event.getTestCase());
     if (event.getTestStep() instanceof HookTestStep) {
       final HookTestStep hook = (HookTestStep) event.getTestStep();
       if (isFixtureHook(hook)) {
@@ -489,5 +509,37 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
           .setStatus(stepStatus)
           .setStatusDetails(statusDetails));
     lifecycle.stopStep(stepUuid);
+  }
+
+  private void cacheWorldForTestCase(final TestCase testCase) {
+    final Thekla4jWorld currentWorld = resolveCurrentWorld();
+    if (currentWorld != null) {
+      worldByTestCaseUuid.compute(
+        testCase.getId().toString(),
+        (key, cachedWorld) -> selectMoreRelevantWorld(cachedWorld, currentWorld));
+    }
+  }
+
+  private Thekla4jWorld resolveCurrentWorld() {
+    return Thekla4jWorld.getCurrentWorld();
+  }
+
+  private static Thekla4jWorld selectMoreRelevantWorld(
+                                                       final Thekla4jWorld primaryWorld, final Thekla4jWorld fallbackWorld
+  ) {
+    if (primaryWorld == null) {
+      return fallbackWorld;
+    }
+    if (fallbackWorld == null) {
+      return primaryWorld;
+    }
+    if (!hasActors(primaryWorld) && hasActors(fallbackWorld)) {
+      return fallbackWorld;
+    }
+    return primaryWorld;
+  }
+
+  private static boolean hasActors(final Thekla4jWorld world) {
+    return world != null && !world.getCast().crew().isEmpty();
   }
 }

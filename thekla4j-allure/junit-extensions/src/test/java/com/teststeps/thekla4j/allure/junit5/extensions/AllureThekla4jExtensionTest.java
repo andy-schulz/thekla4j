@@ -18,6 +18,7 @@ import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Reqs;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Suite;
@@ -83,6 +84,14 @@ class AllureThekla4jExtensionTest {
         .collect(Collectors.toList());
   }
 
+  private List<String> requirementLinkNames(final TestResult result) {
+    return result.getLinks()
+        .stream()
+        .filter(link -> "requirement".equalsIgnoreCase(link.getType()))
+        .map(link -> link.getName())
+        .collect(Collectors.toList());
+  }
+
   private ExtensionContext contextForClass(final Class<?> testClass) {
     ExtensionContext ctx = mock(ExtensionContext.class);
     org.mockito.Mockito.when(ctx.getTestClass()).thenReturn(Optional.of(testClass));
@@ -137,6 +146,21 @@ class AllureThekla4jExtensionTest {
 
   @Issues({"ISSUE-1", "  ", ""})
   static class WithIssuesAndBlanks {
+  }
+
+  @Reqs({"REQ-1", "REQ-2"})
+  static class WithReqs {
+  }
+
+  @Reqs({"REQ-1", "REQ-2"})
+  static class WithClassAndMethodReqs {
+    @Reqs({"METHOD-REQ-1", " METHOD-REQ-2 "})
+    void methodWithReqs() {
+    }
+  }
+
+  @Reqs({"REQ-1", "  ", ""})
+  static class WithReqsAndBlanks {
   }
 
   @Epic("ClassEpic")
@@ -234,6 +258,30 @@ class AllureThekla4jExtensionTest {
       ext.beforeTestExecution(contextForClass(WithIssuesAndBlanks.class));
 
       assertThat(issueLinkNames(stopAndWrite().get(0)), is(List.of("ISSUE-1")));
+    }
+
+    @Test
+    void classLevel_reqs_addRequirementLinks() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClass(WithReqs.class));
+
+      assertThat(requirementLinkNames(stopAndWrite().get(0)), is(List.of("REQ-1", "REQ-2")));
+    }
+
+    @Test
+    void methodLevel_reqs_overrideClassLevel() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClassAndMethod(WithClassAndMethodReqs.class, "methodWithReqs"));
+
+      assertThat(requirementLinkNames(stopAndWrite().get(0)), is(List.of("METHOD-REQ-1", "METHOD-REQ-2")));
+    }
+
+    @Test
+    void classLevel_reqs_blankValuesAreIgnored() throws Exception {
+      Thekla4jAllureJunit5Extension ext = new Thekla4jAllureJunit5Extension(lifecycle);
+      ext.beforeTestExecution(contextForClass(WithReqsAndBlanks.class));
+
+      assertThat(requirementLinkNames(stopAndWrite().get(0)), is(List.of("REQ-1")));
     }
 
     @Test

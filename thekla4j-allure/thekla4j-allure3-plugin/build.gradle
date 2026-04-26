@@ -1,0 +1,49 @@
+plugins {
+  id 'base'
+}
+
+//def npmBuild = tasks.register('npmBuild', Exec) {
+//  group = 'build'
+//  workingDir = projectDir
+//  commandLine 'npm', 'run', 'build'
+//  inputs.dir('src')
+//  inputs.file('package.json')
+//  inputs.file('tsconfig.json')
+//  outputs.dir('dist')
+//}
+//
+//tasks.named('assemble') { dependsOn npmBuild }
+//
+//tasks.named('clean') {
+//  delete('dist', 'node_modules')
+//}
+//
+//def npmVersion = tasks.register('npmVersion', Exec) {
+//  group = 'publishing'
+//  workingDir = projectDir
+//  dependsOn npmBuild
+//  doFirst {
+//    commandLine 'npm', 'version', '--no-git-tag-version', '--allow-same-version',
+//      rootProject.scmVersion.version.toString()
+//  }
+//}
+//
+//tasks.register('npmPublish', Exec) {
+//  group = 'publishing'
+//  workingDir = projectDir
+//  dependsOn npmVersion
+//  doFirst {
+//    def version = rootProject.scmVersion.version.toString()
+//    def isSnapshot = version.endsWith('-SNAPSHOT')
+//    def args = ['npm', 'publish', '--access', 'public']
+//    if (isSnapshot) {
+//      args += ['--registry', 'https://npm.pkg.github.com', '--tag', 'snapshot']
+//    }
+//    commandLine args
+//  }
+//}
+//
+//tasks.register('publish') {
+//  group = 'publishing'
+//  dependsOn 'npmPublish'
+//}

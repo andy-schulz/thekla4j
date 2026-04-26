@@ -11,9 +11,15 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teststeps.thekla4j.cucumber.Thekla4jWorld;
 import io.cucumber.core.options.CommandlineOptionsParser;
 import io.cucumber.core.options.RuntimeOptions;
 import io.cucumber.core.runtime.Runtime;
+import io.cucumber.plugin.ConcurrentEventListener;
+import io.cucumber.plugin.Plugin;
+import io.cucumber.plugin.event.EventHandler;
+import io.cucumber.plugin.event.EventPublisher;
+import io.cucumber.plugin.event.TestCaseFinished;
 import io.qameta.allure.AllureLifecycle;
 import io.qameta.allure.FileSystemResultsWriter;
 import io.qameta.allure.model.Label;
@@ -25,6 +31,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -38,37 +45,68 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
 
   private static final String STEP_DEFS_PACKAGE =
       "com.teststeps.thekla4j.allure.cucumber.test.stepdefs";
+  private static final String ACTIVITY_LOG_STEP_DEFS_PACKAGE =
+      "com.teststeps.thekla4j.allure.cucumber.test.activitylog";
+  private static final String THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY = "thekla4j.req.link.issue.pattern";
 
   // ===== Helpers =====
 
   private List<TestResult> runFeature(final String featurePath) {
+    return runFeature(featurePath, List.of(STEP_DEFS_PACKAGE));
+  }
+
+  private List<TestResult> runFeature(
+                                      final String featurePath, final List<String> gluePackages, final Plugin... additionalPlugins
+  ) {
     final AllureResultsWriterStub stub = new AllureResultsWriterStub();
     final AllureLifecycle lifecycle = new AllureLifecycle(stub);
     final Thekla4jAllureCucumberPlugin plugin = new Thekla4jAllureCucumberPlugin(lifecycle);
 
-    runCucumber(featurePath, plugin);
+    runCucumber(featurePath, plugin, gluePackages, additionalPlugins);
     return stub.getTestResults();
   }
 
   private Path runFeatureToDir(final String featurePath, final Path resultsDir) {
+    return runFeatureToDir(featurePath, resultsDir, List.of(STEP_DEFS_PACKAGE));
+  }
+
+  private Path runFeatureToDir(
+                               final String featurePath, final Path resultsDir, final List<String> gluePackages, final Plugin... additionalPlugins
+  ) {
     final FileSystemResultsWriter writer = new FileSystemResultsWriter(resultsDir);
     final AllureLifecycle lifecycle = new AllureLifecycle(writer);
     final Thekla4jAllureCucumberPlugin plugin = new Thekla4jAllureCucumberPlugin(lifecycle);
 
-    runCucumber(featurePath, plugin);
+    runCucumber(featurePath, plugin, gluePackages, additionalPlugins);
     return resultsDir;
   }
 
-  private void runCucumber(final String featurePath, final Thekla4jAllureCucumberPlugin plugin) {
+  private void runCucumber(
+                           final String featurePath, final Thekla4jAllureCucumberPlugin plugin, final List<String> gluePackages, final Plugin... additionalPlugins
+  ) {
+    final List<String> commandLineArgs = new ArrayList<>();
+    commandLineArgs.add(featurePath);
+    for (final String gluePackage : gluePackages) {
+      commandLineArgs.add("--glue");
+      commandLineArgs.add(gluePackage);
+    }
+    commandLineArgs.add("--no-publish");
+
     final RuntimeOptions options =
         new CommandlineOptionsParser(OutputStream.nullOutputStream())
-            .parse(featurePath, "--glue", STEP_DEFS_PACKAGE, "--no-publish")
+            .parse(commandLineArgs.toArray(new String[0]))
             .build();
+
+    final Plugin[] plugins = new Plugin[additionalPlugins.length + 1];
+    plugins[0] = plugin;
+    if (additionalPlugins.length > 0) {
+      System.arraycopy(additionalPlugins, 0, plugins, 1, additionalPlugins.length);
+    }
 
     Runtime.builder()
         .withRuntimeOptions(options)
         .withClassLoader(getClass()::getClassLoader)
-        .withAdditionalPlugins(plugin)
+        .withAdditionalPlugins(plugins)
         .build()
         .run();
   }
@@ -80,6 +118,14 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
         .map(Label::getValue)
         .findFirst()
         .orElse(null);
+  }
+
+  private List<String> linkNamesByType(final TestResult result, final String linkType) {
+    return result.getLinks()
+        .stream()
+        .filter(link -> linkType.equalsIgnoreCase(link.getType()))
+        .map(link -> link.getName())
+        .collect(Collectors.toList());
   }
 
   private JsonNode readResultJson(final Path resultsDir) throws IOException {
@@ -218,6 +264,26 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
     assertThat(labelValue(tagged, "severity"), is("critical"));
   }
 
+  @Test
+  void taggedScenario_shouldHaveRequirementLinks() {
+    final List<TestResult> results = runFeature("classpath:features/tagged_scenario.feature");
+
+    final TestResult tagged = results.stream()
+        .filter(r -> r.getName() != null && r.getName().contains("TC-001"))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("tagged scenario not found"));
+
+    assertThat(linkNamesByType(tagged, "requirement"), is(List.of("REQ-001", "REQ-002")));
+  }
+
+  @Test
+  void scenarioWithBlankSingularRequirementTag_shouldNotHaveRequirementLinks() {
+    final List<TestResult> results = runFeature("classpath:features/blank_singular_req_tag.feature");
+
+    assertThat(results, hasSize(1));
+    assertThat(linkNamesByType(results.get(0), "requirement"), is(List.of()));
+  }
+
   // ===== TEST_ID in name =====
 
   @Test
@@ -273,6 +339,25 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
     assertThat(paramValues.contains("bar"), is(true));
   }
 
+  @Test
+  void activityLogScenario_shouldBeReportedWhenThreadLocalWorldIsClearedBeforeCaseFinished() {
+    final List<TestResult> results =
+        runFeature(
+          "classpath:features/activity_log_world_scenario.feature",
+          List.of(ACTIVITY_LOG_STEP_DEFS_PACKAGE),
+          new ClearWorldBeforeCaseFinishedPlugin());
+
+    assertThat(results, hasSize(1));
+    assertThat(results.get(0).getSteps(), notNullValue());
+
+    final boolean hasActivityLogSection = results.get(0)
+        .getSteps()
+        .stream()
+        .map(step -> step.getName() == null ? "" : step.getName())
+        .anyMatch(name -> name.contains("Activity Log"));
+    assertThat("Expected an Activity Log section in the Allure test steps", hasActivityLogSection, is(true));
+  }
+
   // ===== JSON file output =====
 
   @Test
@@ -325,6 +410,109 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
   }
 
   @Test
+  void fileOutput_requirementLinks_areWrittenToResultJson(@TempDir final Path tempDir) throws IOException {
+    runFeatureToDir("classpath:features/tagged_scenario.feature", tempDir);
+
+    final List<Path> resultFiles =
+        Files.list(tempDir)
+            .filter(p -> p.getFileName().toString().endsWith("-result.json"))
+            .collect(Collectors.toList());
+
+    assertThat(
+      "expected two result JSON files (one per scenario)",
+      resultFiles.size(),
+      greaterThanOrEqualTo(1));
+
+    final ObjectMapper mapper = new ObjectMapper();
+    final boolean anyHasRequirementLinks =
+        resultFiles.stream()
+            .map(
+              path -> {
+                try {
+                  return mapper.readTree(path.toFile());
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              })
+            .anyMatch(
+              json -> {
+                final JsonNode links = json.path("links");
+                boolean hasReq001 = false;
+                boolean hasReq002 = false;
+                for (final JsonNode link : links) {
+                  if ("requirement".equals(link.path("type").asText())) {
+                    if ("REQ-001".equals(link.path("name").asText())) {
+                      hasReq001 = true;
+                    }
+                    if ("REQ-002".equals(link.path("name").asText())) {
+                      hasReq002 = true;
+                    }
+                  }
+                }
+                return hasReq001 && hasReq002;
+              });
+
+    assertThat("requirement links should appear in a result JSON", anyHasRequirementLinks, is(true));
+  }
+
+  @Test
+  void fileOutput_requirementLinks_useTheklaRequirementPattern(@TempDir final Path tempDir) throws IOException {
+    final String previousPattern = System.getProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY);
+    System.setProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY, "https://req.local/{}");
+    try {
+      runFeatureToDir("classpath:features/tagged_scenario.feature", tempDir);
+
+      final List<Path> resultFiles =
+          Files.list(tempDir)
+              .filter(p -> p.getFileName().toString().endsWith("-result.json"))
+              .collect(Collectors.toList());
+
+      assertThat(
+        "expected two result JSON files (one per scenario)",
+        resultFiles.size(),
+        greaterThanOrEqualTo(1));
+
+      final ObjectMapper mapper = new ObjectMapper();
+      final List<String> requirementUrls =
+          resultFiles.stream()
+              .map(
+                path -> {
+                  try {
+                    return mapper.readTree(path.toFile());
+                  } catch (IOException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+              .flatMap(
+                json -> {
+                  final List<String> urls = new java.util.ArrayList<>();
+                  for (final JsonNode link : json.path("links")) {
+                    if ("requirement".equals(link.path("type").asText())) {
+                      urls.add(link.path("url").asText());
+                    }
+                  }
+                  return urls.stream();
+                })
+              .collect(Collectors.toList());
+
+      assertThat(
+        "requirement links should include resolved URL for REQ-001 in result JSON",
+        requirementUrls.contains("https://req.local/REQ-001"),
+        is(true));
+      assertThat(
+        "requirement links should include resolved URL for REQ-002 in result JSON",
+        requirementUrls.contains("https://req.local/REQ-002"),
+        is(true));
+    } finally {
+      if (previousPattern == null) {
+        System.clearProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY);
+      } else {
+        System.setProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY, previousPattern);
+      }
+    }
+  }
+
+  @Test
   void fileOutput_activityError_isWrittenAsFailedInResultJson(@TempDir final Path tempDir) throws IOException {
     runFeatureToDir("classpath:features/activity_error_scenario.feature", tempDir);
 
@@ -337,5 +525,16 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
     assertThat(
       root.path("statusDetails").path("trace").asText(),
       containsString("ActivityError"));
+  }
+
+  private static final class ClearWorldBeforeCaseFinishedPlugin implements ConcurrentEventListener {
+
+    private final EventHandler<TestCaseFinished> caseFinishedHandler =
+        event -> Thekla4jWorld.clearCurrentWorld();
+
+    @Override
+    public void setEventPublisher(final EventPublisher publisher) {
+      publisher.registerHandlerFor(TestCaseFinished.class, caseFinishedHandler);
+    }
   }
 }

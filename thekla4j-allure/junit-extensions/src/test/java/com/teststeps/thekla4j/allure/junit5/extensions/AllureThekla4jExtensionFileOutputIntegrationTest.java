@@ -11,6 +11,7 @@ import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.ParentSuite;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Reqs;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Story;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.SubSuite;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Suite;
@@ -35,6 +36,7 @@ import org.junit.platform.launcher.core.LauncherFactory;
  * JSON result files on disk.
  */
 class AllureThekla4jExtensionFileOutputIntegrationTest {
+  private static final String THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY = "thekla4j.req.link.issue.pattern";
 
   /** Fixture with all six label annotations at class level. */
   @ExtendWith(Thekla4jAllureJunit5Extension.class)
@@ -78,6 +80,25 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
   @Issues({"FILE-1", "FILE-2"})
   static class FileOutputMethodIssuesOverrideFixture {
     @Issues({"FILE-M-1", "FILE-M-2"})
+    @Test
+    void annotatedTest() {
+    }
+  }
+
+  /** Fixture: class-level requirements are written as requirement links. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Reqs({"REQ-1", "REQ-2"})
+  static class FileOutputReqsFixture {
+    @Test
+    void passingTest() {
+    }
+  }
+
+  /** Fixture: method-level requirements override class-level requirements in file output. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Reqs({"REQ-1", "REQ-2"})
+  static class FileOutputMethodReqsOverrideFixture {
+    @Reqs({"REQ-M-1", "REQ-M-2"})
     @Test
     void annotatedTest() {
     }
@@ -135,6 +156,26 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
       }
     }
     return names;
+  }
+
+  private List<String> requirementLinkNames(final JsonNode root) {
+    List<String> names = new ArrayList<>();
+    for (JsonNode link : root.path("links")) {
+      if ("requirement".equalsIgnoreCase(link.path("type").asText())) {
+        names.add(link.path("name").asText());
+      }
+    }
+    return names;
+  }
+
+  private List<String> requirementLinkUrls(final JsonNode root) {
+    List<String> urls = new ArrayList<>();
+    for (JsonNode link : root.path("links")) {
+      if ("requirement".equalsIgnoreCase(link.path("type").asText())) {
+        urls.add(link.path("url").asText());
+      }
+    }
+    return urls;
   }
 
   // ===== Tests: class-level annotations written to file =====
@@ -217,5 +258,37 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     JsonNode result = runFixtureAndReadResult(FileOutputMethodIssuesOverrideFixture.class, tempDir);
 
     assertThat(issueLinkNames(result), is(List.of("FILE-M-1", "FILE-M-2")));
+  }
+
+  @Test
+  void fileOutput_classLevelReqs_areWrittenAsRequirementLinks(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputReqsFixture.class, tempDir);
+
+    assertThat(requirementLinkNames(result), is(List.of("REQ-1", "REQ-2")));
+  }
+
+  @Test
+  void fileOutput_methodReqs_overrideClassLevelReqs(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputMethodReqsOverrideFixture.class, tempDir);
+
+    assertThat(requirementLinkNames(result), is(List.of("REQ-M-1", "REQ-M-2")));
+  }
+
+  @Test
+  void fileOutput_reqs_useTheklaRequirementPattern(@TempDir final Path tempDir) throws IOException {
+    final String previousPattern = System.getProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY);
+    System.setProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY, "https://req.local/{}");
+    try {
+      JsonNode result = runFixtureAndReadResult(FileOutputReqsFixture.class, tempDir);
+      assertThat(requirementLinkUrls(result), is(List.of(
+        "https://req.local/REQ-1",
+        "https://req.local/REQ-2")));
+    } finally {
+      if (previousPattern == null) {
+        System.clearProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY);
+      } else {
+        System.setProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY, previousPattern);
+      }
+    }
   }
 }

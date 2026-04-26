@@ -7,6 +7,10 @@ docs/_site
 **/ignore_tests/**
 **/global_resources/publish/**
 
+#node
+node_modules
+dist
+
 #jekyll files
 docs/jekyll.log
 docs/.bundle
@@ -27,3 +31,5 @@ thekla4j-browser/**/button.png
 
 #Claude Config
 .claude/settings.local.json
+
+
