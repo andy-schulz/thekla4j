@@ -8,6 +8,7 @@ import static io.qameta.allure.junitplatform.AllureJunitPlatform.ALLURE_REPORT_E
 
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.AllureActor;
+import com.teststeps.thekla4j.allure.junit5.extensions.tags.Description;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Epic;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Feature;
 import com.teststeps.thekla4j.allure.junit5.extensions.tags.Issues;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -139,6 +141,7 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
         processIssues(context, testResult);
         processRequirements(context, testResult);
         processTestId(context, testResult);
+        processDescription(context, testResult);
       });
     });
   }
@@ -255,6 +258,27 @@ public class Thekla4jAllureJunit5Extension implements InvocationInterceptor, Bef
         .filter(requirementId -> !requirementId.isEmpty())
         .forEach(requirementId -> testResult.getLinks()
             .add(RequirementLinkResolver.createRequirementLink(requirementId)));
+  }
+
+  private void processDescription(final ExtensionContext context, final io.qameta.allure.model.TestResult testResult) {
+    final Optional<Method> maybeMethod = context.getTestMethod();
+    if (maybeMethod.isPresent() && maybeMethod.get().isAnnotationPresent(Description.class)) {
+      applyDescription(maybeMethod.get().getAnnotation(Description.class).value(), testResult);
+      return;
+    }
+    context.getTestClass()
+        .filter(testClass -> testClass.isAnnotationPresent(Description.class))
+        .ifPresent(testClass -> applyDescription(testClass.getAnnotation(Description.class).value(), testResult));
+  }
+
+  private void applyDescription(final String[] lines, final io.qameta.allure.model.TestResult testResult) {
+    final String joined = Stream.of(lines)
+        .map(String::trim)
+        .filter(line -> !line.isEmpty())
+        .collect(Collectors.joining("\n"));
+    if (!joined.isEmpty()) {
+      testResult.setDescription(joined);
+    }
   }
 
   private void processParentSuite(final Class<?> testClass, final io.qameta.allure.model.TestResult testResult) {
