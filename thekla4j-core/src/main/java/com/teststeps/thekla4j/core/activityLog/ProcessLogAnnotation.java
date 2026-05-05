@@ -245,6 +245,28 @@ public class ProcessLogAnnotation<P1, R1> {
   private final Function2<String, Tuple2<String, String>, String> replaceSingleAttributeInString =
       (theDesc, tu) -> theDesc.replace(tu._2, tu._1);
 
+  private static final java.util.regex.Pattern PLACEHOLDER_PATTERN =
+      java.util.regex.Pattern.compile("@\\{([^}]+)\\}");
+
+  @SuppressWarnings("java:S3011")
+  private String resolveUnmatchedPlaceholders(String description, Class<?> clazz) {
+    java.util.regex.Matcher matcher = PLACEHOLDER_PATTERN.matcher(description);
+    List<String> remaining = List.empty();
+    while (matcher.find()) {
+      remaining = remaining.append(matcher.group(1));
+    }
+    if (remaining.isEmpty()) return description;
+
+    List<String> toResolve = remaining;
+    return List.of(clazz.getFields())
+        .appendAll(List.of(clazz.getDeclaredFields()))
+        .distinctBy(Field::getName)
+        .filter(f -> toResolve.contains(f.getName()))
+        .map(makePrivateFieldAccessible)
+        .map(f -> Tuple.of(f.getName(), getFieldValueOfActivity(this.activity).apply(f).toString()))
+        .foldLeft(description, (desc, t) -> desc.replace("@{" + t._1 + "}", t._2));
+  }
+
   /**
    * process the annotation list and replace the annotation value in the description string
    */
@@ -271,13 +293,13 @@ public class ProcessLogAnnotation<P1, R1> {
           .trim();
 
   private String createLogDescription(String description, Class<?> clazz, Option<P1> param) {
-
-
     return Option.of(description)
         // process and replace the fields
         .map(processAnnotationsAndReplace.apply(getFieldValueAndAnnotations.apply(this.activity, clazz), clazz))
         // process and replace the parameter in the performAs method
         .map(processAnnotationsAndReplace.apply(getAnnotationsOfParameters1.apply(param, clazz), clazz))
+        // fallback: resolve remaining @{xxx} by field name
+        .map(desc -> resolveUnmatchedPlaceholders(desc, clazz))
         .get();
   }
 

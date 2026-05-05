@@ -243,5 +243,39 @@ public class TestAnnotationLog {
     }
   }
 
+  @Test
+  @DisplayName("fallback to field name when @Called annotation is missing")
+  void testFieldNameFallbackWhenCalledAnnotationMissing() {
+    Actor actor = Actor.named("TestActor");
+
+    Either<ActivityError, Void> result = actor.attemptsTo(FieldNameFallbackTask.with("appt-42"));
+
+    assertThat("task execution is successful", result.isRight());
+
+    ActivityLogNode log = actor.activityLog.getLogTree();
+    assertThat("field name used as placeholder fallback",
+      log.activityNodes.get(0).description,
+      equalTo("Delete appointment by id 'appt-42' (raw)"));
+  }
+
+  @Workflow("Delete appointment by id '@{appointmentId}' (raw)")
+  static class FieldNameFallbackTask extends Task<Void, Void> {
+
+    private final String appointmentId;
+
+    @Override
+    protected Either<ActivityError, Void> performAs(Actor actor, Void unused) {
+      return Either.right(null);
+    }
+
+    public static FieldNameFallbackTask with(String appointmentId) {
+      return new FieldNameFallbackTask(appointmentId);
+    }
+
+    private FieldNameFallbackTask(String appointmentId) {
+      this.appointmentId = appointmentId;
+    }
+  }
+
 
 }
