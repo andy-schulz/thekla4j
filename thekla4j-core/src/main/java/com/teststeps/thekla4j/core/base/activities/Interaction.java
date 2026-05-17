@@ -5,6 +5,7 @@ import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import com.teststeps.thekla4j.core.base.persona.AttemptsWith;
 import com.teststeps.thekla4j.core.base.persona.Performer;
+import io.vavr.Function1;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
@@ -118,5 +119,19 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
    */
   final public LogAnnotator<AttemptsWith<PT, Either<ActivityError, RT>>> runAs$(@NonNull Actor actor) {
     return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
+  }
+
+  public final <R2> Task<PT, R2> map(Function1<RT, R2> fn) {
+    Interaction<PT, RT> self = this;
+    return new Task<PT, R2>() {
+      @Override
+      protected Either<ActivityError, R2> performAs(Actor actor, PT result) {
+        return self.runAs(actor, result).map(fn::apply);
+      }
+    };
+  }
+
+  public final Task<PT, Void> drop() {
+    return this.map(__ -> null);
   }
 }

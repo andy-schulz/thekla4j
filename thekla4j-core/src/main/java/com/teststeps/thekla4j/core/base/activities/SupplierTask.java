@@ -195,4 +195,8 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
   final public SeeResult<Void, RT> is(Tuple2<String, SeeAssertion<RT>> matcher) {
     return SeeResult.of(this).is(matcher);
   }
+
+  public final SupplierTask<Void> drop() {
+    return this.map(__ -> null);
+  }
 }

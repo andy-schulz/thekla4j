@@ -224,6 +224,10 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
    * @param predicate the stop condition — retrying stops when this returns {@code true}
    * @return a configured {@link Retry} activity wrapping this task
    */
+  public final Task<PT, Void> drop() {
+    return this.map(__ -> null);
+  }
+
   final public Retry<PT, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
         .until(predicate, "retry task " + this.getClass().getSimpleName() + " until predicate is met");
