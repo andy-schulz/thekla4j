@@ -45,14 +45,25 @@ public class Thekla4jWorld {
   private final Cast cast = Cast.setScene();
   private final GeneratorStore generatorStore = GeneratorStore.create();
 
+  /**
+   * Creates a new world instance and registers it as the current world on this thread.
+   */
   public Thekla4jWorld() {
     CURRENT_WORLD.set(this);
   }
 
+  /**
+   * Returns the {@link Thekla4jWorld} instance bound to the current thread, or {@code null} if none is set.
+   *
+   * @return the current thread-local world instance
+   */
   public static Thekla4jWorld getCurrentWorld() {
     return CURRENT_WORLD.get();
   }
 
+  /**
+   * Removes the current thread's world reference, allowing it to be garbage-collected.
+   */
   public static void clearCurrentWorld() {
     CURRENT_WORLD.remove();
   }

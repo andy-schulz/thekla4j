@@ -38,7 +38,7 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
 
   /**
    * Return the name of the task
-   * 
+   *
    * @return the name of the task
    */
   @Override
@@ -48,7 +48,7 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
 
   /**
    * Perform the task as the given actor
-   * 
+   *
    * @param actor  the actor to perform the task as
    * @param result the input to the task
    * @return the result of the task
@@ -208,6 +208,15 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
   }
 
   /**
+   * if the return value is not needed in subsequent activities, you can drop it and return void.
+   * 
+   * @return this task returning void
+   */
+  public final Task<PT, Void> drop() {
+    return this.map(__ -> null);
+  }
+
+  /**
    * Retry this task until the given predicate returns {@code true} for the result.
    * Retries on both task failure (Left) and predicate returning false.
    * Defaults to a 5-second timeout with a 1-second interval between attempts.
@@ -224,10 +233,6 @@ public abstract class Task<PT, RT> extends Activity<PT, RT> {
    * @param predicate the stop condition — retrying stops when this returns {@code true}
    * @return a configured {@link Retry} activity wrapping this task
    */
-  public final Task<PT, Void> drop() {
-    return this.map(__ -> null);
-  }
-
   final public Retry<PT, RT> retry(Predicate<RT> predicate) {
     return Retry.task(this)
         .until(predicate, "retry task " + this.getClass().getSimpleName() + " until predicate is met");

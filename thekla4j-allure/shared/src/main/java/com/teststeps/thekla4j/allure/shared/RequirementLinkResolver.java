@@ -19,6 +19,13 @@ public final class RequirementLinkResolver {
   private RequirementLinkResolver() {
   }
 
+  /**
+   * Creates an Allure requirement link for the given requirement ID.
+   * The link URL is resolved from the {@code thekla4j.req.link.issue.pattern} property.
+   *
+   * @param requirementId the requirement identifier
+   * @return the Allure link
+   */
   public static Link createRequirementLink(final String requirementId) {
     final String id = requirementId.trim();
     final String resolvedUrl = resolveTheklaRequirementLinkUrl(id).orElse(null);

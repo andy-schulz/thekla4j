@@ -196,6 +196,11 @@ public abstract class SupplierTask<RT> extends Activity<Void, RT> {
     return SeeResult.of(this).is(matcher);
   }
 
+  /**
+   * if the return value is not needed in subsequent activities, you can drop it and return void.
+   *
+   * @return this task returning void
+   */
   public final SupplierTask<Void> drop() {
     return this.map(__ -> null);
   }

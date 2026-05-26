@@ -97,6 +97,13 @@ public final class ActivityLogAllureMapper {
     lifecycle.stopStep(actorStepUuid);
   }
 
+  /**
+   * Recursively maps a single {@link ActivityLogNode} and its children as nested Allure steps.
+   *
+   * @param lifecycle  the Allure lifecycle
+   * @param parentUuid UUID of the parent step to nest under
+   * @param node       the activity log node to map
+   */
   private static void mapNode(final AllureLifecycle lifecycle, final String parentUuid, final ActivityLogNode node) {
     if (node == null) {
       return;
@@ -136,6 +143,9 @@ public final class ActivityLogAllureMapper {
   /**
    * Maps ActivityStatus to Allure Status.
    * {@code running} maps to BROKEN as a fallback for unfinished activities.
+   *
+   * @param activityStatus the activity status to map
+   * @return the corresponding Allure status
    */
   public static Status mapStatus(final ActivityStatus activityStatus) {
     if (activityStatus == null) {
@@ -156,11 +166,19 @@ public final class ActivityLogAllureMapper {
   /**
    * Returns the worse status using deterministic precedence:
    * FAILED > BROKEN > PASSED/SKIPPED/UNKNOWN.
+   *
+   * @param current   the current aggregate status
+   * @param candidate the new status to compare against
+   * @return whichever status is worse according to precedence
    */
   public static Status aggregateWorstStatus(final Status current, final Status candidate) {
     return statusRank(candidate) > statusRank(current) ? candidate : current;
   }
 
+  /**
+   * Returns a numeric rank for the given status used by {@link #aggregateWorstStatus}
+   * to determine precedence: FAILED (3) > BROKEN (2) > everything else (1), null (0).
+   */
   private static int statusRank(final Status status) {
     if (status == null) {
       return 0;
@@ -175,6 +193,14 @@ public final class ActivityLogAllureMapper {
     }
   }
 
+  /**
+   * Builds a display name for an Allure step by combining name and description.
+   * Truncates to 100 characters (with trailing "...") if the combined string is too long.
+   *
+   * @param name        the activity name (falls back to "unnamed" if {@code null})
+   * @param description optional description appended after " - "
+   * @return the formatted step name
+   */
   public static String buildStepName(final String name, final String description) {
     final String base = name != null ? name : "unnamed";
     if (description == null || description.isEmpty()) {
@@ -187,12 +213,19 @@ public final class ActivityLogAllureMapper {
     return full;
   }
 
+  /**
+   * Adds a parameter to the step result if the value is non-null and non-blank.
+   */
   private static void addParameterIfNotBlank(final StepResult step, final String name, final String value) {
     if (value != null && !value.trim().isEmpty()) {
       step.getParameters().add(new Parameter().setName(name).setValue(value));
     }
   }
 
+  /**
+   * Emits non-video {@link NodeAttachment}s to the current Allure step.
+   * Base64-encoded images are decoded to binary; all other types are emitted as text.
+   */
   private static void emitAttachments(final AllureLifecycle lifecycle, final List<NodeAttachment> attachments) {
     if (attachments == null) {
       return;
@@ -223,6 +256,9 @@ public final class ActivityLogAllureMapper {
     }
   }
 
+  /**
+   * Emits video {@link NodeAttachment}s as URI-list attachments to the current Allure step.
+   */
   private static void emitVideoAttachments(final AllureLifecycle lifecycle, final List<NodeAttachment> videoAttachments) {
     if (videoAttachments == null) {
       return;
@@ -237,6 +273,10 @@ public final class ActivityLogAllureMapper {
     }
   }
 
+  /**
+   * Returns the file extension string for the given {@link LogAttachmentType}.
+   * Defaults to {@code ".txt"} for unknown or {@code null} types.
+   */
   private static String extensionForType(final LogAttachmentType type) {
     if (type == null) {
       return ".txt";
@@ -260,6 +300,9 @@ public final class ActivityLogAllureMapper {
   /**
    * Parses a timestamp string to epoch millis.
    * Falls back to current time if parsing fails.
+   *
+   * @param timestamp the timestamp string in {@code yyyy-MM-dd HH:mm:ss.SSSSSS} format
+   * @return epoch milliseconds
    */
   public static Long parseTimestamp(final String timestamp) {
     if (timestamp == null || timestamp.isEmpty()) {
@@ -273,6 +316,10 @@ public final class ActivityLogAllureMapper {
     }
   }
 
+  /**
+   * Derives the stop time for a node from its duration or {@code endedAt} timestamp.
+   * Falls back to the current system time if neither is available.
+   */
   private static Long deriveStopTime(final ActivityLogNode node) {
     final Long start = parseTimestamp(node.startedAt);
     if (node.duration != null) {

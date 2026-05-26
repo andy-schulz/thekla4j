@@ -41,7 +41,7 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
 
   /**
    * return the name of the interaction
-   * 
+   *
    * @return the name of the interaction
    */
   @Override
@@ -121,6 +121,14 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
     return (group, description) -> input -> actor.attemptsTo$_(this, group, description).using(input);
   }
 
+  /**
+   * Transforms the result of this interaction by applying the given function,
+   * returning a new {@link Task} that produces the mapped result.
+   *
+   * @param fn   the mapping function applied to the interaction result
+   * @param <R2> the type of the mapped result
+   * @return a new task producing the mapped result
+   */
   public final <R2> Task<PT, R2> map(Function1<RT, R2> fn) {
     Interaction<PT, RT> self = this;
     return new Task<PT, R2>() {
@@ -131,6 +139,11 @@ public abstract class Interaction<PT, RT> extends Activity<PT, RT> {
     };
   }
 
+  /**
+   * Discards the result of this interaction, returning a {@link Task} that produces {@link Void}.
+   *
+   * @return a new task that drops the interaction result
+   */
   public final Task<PT, Void> drop() {
     return this.map(__ -> null);
   }
