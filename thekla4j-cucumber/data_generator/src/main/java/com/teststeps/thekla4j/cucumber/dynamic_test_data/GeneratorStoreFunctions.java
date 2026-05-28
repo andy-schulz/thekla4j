@@ -1,7 +1,9 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
 import com.teststeps.thekla4j.utils.vavr.LiftTry;
+import io.vavr.Function1;
 import io.vavr.Function2;
+import io.vavr.Function3;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
@@ -33,46 +35,71 @@ public class GeneratorStoreFunctions {
   protected static final String REGEX_INLINE_REPLACEMENT_PATTERN = "(\\?\\{([A-Z0-9_]*)\\})";
 
 
-  /**
-   * match the groups in the input string group 1: whole generator function group 2: parameter string passed to
-   * generator function
-   */
-  private static final Function2<String, Pattern, List<String>> matchGroups =
-      (input, pattern) -> {
-        Matcher matcher = pattern.matcher(input);
-        if (matcher.matches())
-          return List.of(matcher.group(1), matcher.group(2));
-
-        return List.empty();
-      };
+  private static final Pattern SHORT_PARAM_PATTERN = Pattern.compile("\\$([A-Za-z0-9_]+)");
 
   /**
-   * Parse and execute a generator function from the generator map
+   * Resolve short parameter references ($PARAM) in a single value string using stored parameters.
    */
-  protected static final Function2<Map<Pattern, DataGenerator>, String, Try<String>> parseAndExecuteGeneratorFunction =
-      (generatorMap, generatorInput) -> {
+  protected static final Function2<Map<String, String>, String, Try<String>> resolveShortParamReferences =
+      (storedParameters, value) -> {
+        Matcher matcher = SHORT_PARAM_PATTERN.matcher(value);
 
-        Map<List<String>, DataGenerator> filteredGenerator = generatorMap
-            .mapKeys(matchGroups.apply(generatorInput))
-            .filterKeys(groupList -> groupList.size() == 2);
-
-        if (filteredGenerator.size() > 1)
-          return io.vavr.control.Try.failure(new IllegalArgumentException("Multiple generators found for input: " + generatorInput));
-
-
-        if (filteredGenerator.isEmpty()) {
-          log.debug("No generator found for input: {}", generatorInput);
-          return io.vavr.control.Try.success(generatorInput);
+        List<Tuple2<Integer, Integer>> matches = List.empty();
+        while (matcher.find()) {
+          matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
         }
 
-        String generatorParameterString = filteredGenerator.head()._1().get(1);
-        DataGenerator generator = filteredGenerator.values().head();
+        if (matches.isEmpty()) {
+          return Try.success(value);
+        }
 
-        Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(generatorParameterString);
+        return matches
+            .map(boundary -> boundary.append(value.substring(boundary._1() + 1, boundary._2())))
+            .map(t -> t.map3(paramName -> storedParameters.get(paramName)
+                .toTry(() -> new IllegalArgumentException("Parameter not found: $" + paramName))))
+            .map(LiftTry.fromTuple3$3())
+            .transform(LiftTry.fromList())
+            .map(l -> l.foldRight(new StringBuilder(value), (t, acc) -> acc.replace(t._1, t._2, t._3())))
+            .map(StringBuilder::toString);
+      };
 
-        return generator.run(genParameters)
+  /**
+   * Execute a generator with resolved parameter values
+   */
+  protected static final Function3<DataGenerator, Map<String, String>, String, Try<String>> executeGeneratorFunction =
+      (generator, storedParameters, parameterString) -> {
+
+        Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(parameterString);
+
+        // Resolve $PARAM references in parameter values
+        Try<Map<String, String>> resolvedParameters = genParameters
+            .mapValues(resolveShortParamReferences.apply(storedParameters))
+            .transform(LiftTry.fromMap());
+
+        return resolvedParameters
+            .flatMap(generator::run)
             .onSuccess(x -> log.debug("Generator Function executed: {}", x));
       };
+
+  /**
+   * Convert short parameter references ($PARAM) to brace syntax (${PARAM}) so they can be
+   * resolved by the existing {@link #matchAndRetrieveParameter} function.
+   */
+  protected static final Function1<String, String> convertShortParamSyntax = input -> {
+    Matcher matcher = SHORT_PARAM_PATTERN.matcher(input);
+
+    List<Tuple2<Integer, Integer>> matches = List.empty();
+    while (matcher.find()) {
+      matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
+    }
+
+    if (matches.isEmpty()) return input;
+
+    return matches
+        .map(boundary -> boundary.append(input.substring(boundary._1() + 1, boundary._2())))
+        .foldRight(new StringBuilder(input), (t, acc) -> acc.replace(t._1(), t._2(), "${" + t._3() + "}"))
+        .toString();
+  };
 
 
   /**

@@ -1,15 +1,17 @@
 package com.teststeps.thekla4j.cucumber.dynamic_test_data;
 
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.checkSetParameterName;
+import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.convertShortParamSyntax;
+import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.executeGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.matchAndRetrieveParameter;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.matchAssignment;
-import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.parseAndExecuteGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorStoreFunctions.parseAndExecuteInlineGeneratorFunction;
 import static com.teststeps.thekla4j.cucumber.dynamic_test_data.PredefinedInlineGeneratorFunctions.TIMESTAMP_IN_MS;
 import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.CYAN;
 import static com.teststeps.thekla4j.utils.terminal.FormattedOutput.GREEN;
 
-import io.vavr.Function1;
+import com.teststeps.thekla4j.cucumber.dynamic_test_data.GeneratorCallParser.GeneratorCall;
+import com.teststeps.thekla4j.utils.vavr.LiftTry;
 import io.vavr.Function2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
@@ -26,25 +28,14 @@ import lombok.extern.log4j.Log4j2;
 public class GeneratorStore {
 
   /**
-   * Regex pattern to match a specific generator
+   * Pre-compiled pattern for valid generator function names
    */
-  protected static final Function1<String, String> REGEX_SPECIFIC_GENERATOR_PATTERN =
-      prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s\\\"]*)\\}).*";
-
-  /**
-   * Regex pattern to match a general generator
-   */
-  protected static final String REGEX_GENERAL_GENERATOR_PATTERN = "([A-Za-z0-9]+\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s\\\"]*)\\}).*";
-
-  /**
-   * Regex pattern to match a valid function name
-   */
-  protected static final String REGEX_FUNCTION_NAME = "[A-Za-z0-9]+";
+  private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
 
 
   private Map<String, String> storedParameters = HashMap.empty();
 
-  private Map<Pattern, DataGenerator> dataGeneratorMap = HashMap.empty();
+  private Map<String, DataGenerator> dataGeneratorMap = HashMap.empty();
   private Map<String, InlineGenerator> inlineGeneratorMap = HashMap.empty();
   private Map<String, String> nameList = HashMap.empty();
 
@@ -88,18 +79,16 @@ public class GeneratorStore {
    */
   GeneratorStore addGeneratorInternal(String generatorName, String description, DataGenerator generator) {
 
-    if (!Pattern.compile(REGEX_FUNCTION_NAME).matcher(generatorName).matches())
+    if (!FUNCTION_NAME_PATTERN.matcher(generatorName).matches())
       throw new IllegalArgumentException(
                                          "Generator name '" + generatorName + "' is invalid. Only alphanumeric characters are allowed " +
-                                             REGEX_FUNCTION_NAME);
+                                             FUNCTION_NAME_PATTERN.pattern());
 
     if (nameList.keySet().contains(generatorName))
       throw new IllegalArgumentException("Generator with name '" + generatorName + "' already exists");
 
 
-    this.dataGeneratorMap = dataGeneratorMap.put(
-      Pattern.compile(REGEX_SPECIFIC_GENERATOR_PATTERN.apply(generatorName)),
-      generator);
+    this.dataGeneratorMap = dataGeneratorMap.put(generatorName, generator);
 
     this.nameList = nameList.put(generatorName, description);
     return this;
@@ -158,20 +147,63 @@ public class GeneratorStore {
    */
   public Try<String> parseAndExecute(String generatorInput) {
 
-    if (Pattern.compile(REGEX_GENERAL_GENERATOR_PATTERN).matcher(generatorInput).matches()) {
-      return parseAndExecuteGeneratorFunction.apply(dataGeneratorMap, generatorInput)
-          .map(Option::of)
-          .map(assignResultToNamedParameter.apply(generatorInput));
+    Option<GeneratorCall> call = GeneratorCallParser.parse(generatorInput);
+
+    if (call.isDefined()) {
+      GeneratorCall gc = call.get();
+      Option<DataGenerator> generator = dataGeneratorMap.get(gc.name());
+
+      if (generator.isDefined()) {
+        return executeGeneratorFunction.apply(generator.get(), storedParameters, gc.parameterString())
+            .map(Option::of)
+            .map(assignResultToNamedParameter.apply(generatorInput));
+      }
+
+      log.warn("No registered generator found for '{}'. Available generators: {}",
+        gc.name(), nameList.keySet().mkString(", "));
+      return Try.success(generatorInput);
     }
 
     /*
       * 1. replace inline generators
       * 2. check if variable assignment is present and if yes assign the string to the variable
-      * 3. assign result to variable
+      * 3. convert $PARAM → ${PARAM} for unified resolution
+      * 4. resolve ${PARAM} references
      */
     return parseAndExecuteInlineGeneratorFunction.apply(generatorInput, inlineGeneratorMap)
         .map(replacedString -> assignResultToNamedParameter.apply(replacedString, Option.none()))
+        .map(convertShortParamSyntax)
         .flatMap(matchAndRetrieveParameter.apply(storedParameters));
+  }
+
+  /**
+   * Resolves a parameter map by renaming the "default" key and resolving all values
+   * through {@link #parseAndExecute}. This eliminates the need for consumer projects
+   * to manually call {@code replaceShortVariable} and {@code generateData} on each value.
+   *
+   * <p>Usage in a generator implementation:</p>
+   * <pre>{@code
+   * @Generator(name = "formatDate")
+   * public DataGenerator formatDate() {
+   * return functionParams -> {
+   * Map<String, String> params = world.getGeneratorStore()
+   * .resolveParameterMap(functionParams, "date")
+   * .getOrElseThrow(x -> new IllegalArgumentException(x.getMessage()));
+   * // params now contains resolved values
+   * return Try.of(() -> ...);
+   * };
+   * }
+   * }</pre>
+   *
+   * @param params         the parameter map from the generator call
+   * @param defaultKeyName the name to assign to the "default" parameter (if present)
+   * @return a Try containing the resolved parameter map
+   */
+  public Try<Map<String, String>> resolveParameterMap(Map<String, String> params, String defaultKeyName) {
+    Map<String, String> prepared = params.containsKey("default") ? params.remove("default").put(defaultKeyName, params.get("default").get()) : params;
+    return prepared
+        .mapValues(this::parseAndExecute)
+        .transform(LiftTry.fromMap());
   }
 
   /**

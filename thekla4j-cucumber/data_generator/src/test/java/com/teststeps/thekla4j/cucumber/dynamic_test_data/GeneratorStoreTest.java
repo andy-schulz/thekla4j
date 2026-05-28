@@ -4,7 +4,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.control.Try;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 public class GeneratorStoreTest {
@@ -487,5 +492,137 @@ public class GeneratorStoreTest {
     Try<String> result = generatorStore.parseAndExecute(generatorString);
     assertThat("executing the generator succeeded", result.isSuccess());
     assertThat("format parameter preserves colons", result.get(), equalTo("format=HH:mm:ss"));
+  }
+
+  @Test
+  public void chainedGeneratorsWithParamResolution() {
+
+    DataGenerator dataGenerator = parameterMap -> {
+      String type = parameterMap.get("default").getOrElse("today");
+      if ("today".equals(type)) {
+        return Try.success(LocalDate.now().toString());
+      }
+      return Try.success(type);
+    };
+
+    DataGenerator formatDateGenerator = parameterMap -> {
+      String date = parameterMap.get("date").getOrElse("");
+      String format = parameterMap.get("format").getOrElse("yyyy-MM-dd");
+      LocalDate parsed = LocalDate.parse(date);
+      String formatted = parsed.format(DateTimeFormatter.ofPattern(format, Locale.GERMAN));
+      return Try.success(formatted);
+    };
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("data", dataGenerator)
+        .addGenerator("formatDate", formatDateGenerator);
+
+    // Step 1: generate today's date and store it
+    generatorStore.parseAndExecute("data{today} => ${DATE}");
+
+    // Step 2: use $DATE reference inside formatDate generator params
+    Try<String> result = generatorStore.parseAndExecute("formatDate{date: $DATE, format: \"EEEE, d. MMMM yyyy\"}");
+
+    String expected = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d. MMMM yyyy", Locale.GERMAN));
+
+    assertThat("formatDate generator succeeded", result.isSuccess());
+    assertThat("date is formatted correctly using resolved $DATE", result.get(), equalTo(expected));
+
+    // Step 3: use stored result in a string
+    generatorStore.parseAndExecute("formatDate{date: $DATE, format: \"EEEE, d. MMMM yyyy\"} => ${FORMATTED}");
+    Try<String> finalResult = generatorStore.parseAndExecute("Today is ${FORMATTED}");
+
+    assertThat("final string with embedded param", finalResult.isSuccess());
+    assertThat("final result", finalResult.get(), equalTo("Today is " + expected));
+  }
+
+  @Test
+  public void multipleParamRefsInSingleValue() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${A}");
+
+    DataGenerator concatGenerator = parameterMap -> Try.success(parameterMap.get("items").getOrElse(""));
+
+    @SuppressWarnings("deprecation") GeneratorStore store = GeneratorStore.create()
+        .addGenerator("concat", concatGenerator);
+
+    store.parseAndExecute("concat{items: first} => ${FIRST}");
+    store.parseAndExecute("concat{items: second} => ${SECOND}");
+    Try<String> result = store.parseAndExecute("concat{items: $FIRST;$SECOND}");
+
+    assertThat("multiple params resolved", result.isSuccess());
+    assertThat("both refs replaced", result.get(), equalTo("first;second"));
+  }
+
+  @Test
+  public void unresolvedParamRefFails() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    Try<String> result = generatorStore.parseAndExecute("simpleGenerator{param: $NONEXISTENT}");
+
+    assertThat("unresolved param should fail", result.isFailure());
+    assertThat("error message mentions param", result.getCause().getMessage(), equalTo("Parameter not found: $NONEXISTENT"));
+  }
+
+  @Test
+  public void shortParamSyntaxResolvedInNonGeneratorPath() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${GREETING}");
+
+    Try<String> result = generatorStore.parseAndExecute("$GREETING");
+    assertThat("short param resolved", result.isSuccess());
+    assertThat("value resolved", result.get(), equalTo("Hello World"));
+  }
+
+  @Test
+  public void shortParamSyntaxInStringContext() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${GREETING}");
+
+    Try<String> result = generatorStore.parseAndExecute("Say $GREETING to all");
+    assertThat("short param in string resolved", result.isSuccess());
+    assertThat("value resolved", result.get(), equalTo("Say Hello World to all"));
+  }
+
+  @Test
+  public void resolveParameterMapWithDefaultKey() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${VALUE}");
+
+    Map<String, String> params = HashMap.of("default", "${VALUE}", "extra", "literal");
+    Try<Map<String, String>> result = generatorStore.resolveParameterMap(params, "myKey");
+
+    assertThat("resolution succeeded", result.isSuccess());
+    assertThat("default key renamed and resolved", result.get().get("myKey").get(), equalTo("Hello World"));
+    assertThat("literal preserved", result.get().get("extra").get(), equalTo("literal"));
+  }
+
+  @Test
+  public void resolveParameterMapWithShortParamSyntax() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${VALUE}");
+
+    Map<String, String> params = HashMap.of("ref", "$VALUE");
+    Try<Map<String, String>> result = generatorStore.resolveParameterMap(params, "unused");
+
+    assertThat("resolution succeeded", result.isSuccess());
+    assertThat("short param resolved", result.get().get("ref").get(), equalTo("Hello World"));
   }
 }
