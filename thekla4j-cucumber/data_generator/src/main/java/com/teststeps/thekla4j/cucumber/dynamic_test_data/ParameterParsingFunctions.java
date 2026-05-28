@@ -44,10 +44,54 @@ public class ParameterParsingFunctions {
       str -> str.isEmpty() ? Option.none() : Option.of(str);
 
   private static final Function<String, List<String>> splitParameterString =
-      str -> List.of(str.split(","));
+      str -> {
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < str.length(); i++) {
+          char c = str.charAt(i);
+          if (c == '"') {
+            inQuotes = !inQuotes;
+            current.append(c);
+          } else if (c == ',' && !inQuotes) {
+            parts.add(current.toString());
+            current = new StringBuilder();
+          } else {
+            current.append(c);
+          }
+        }
+        // Match Java's split behavior: discard trailing empty segments
+        String last = current.toString();
+        if (!last.trim().isEmpty()) {
+          parts.add(last);
+        }
+        return List.ofAll(parts);
+      };
 
   private static final Function<List<String>, List<List<String>>> splitKeyValuePair =
-      list -> list.map(pair -> List.of(pair.split(":")).map(String::trim));
+      list -> list.map(pair -> {
+        String trimmed = pair.trim();
+        if (trimmed.isEmpty()) {
+          return List.of(trimmed);
+        }
+        // Split on the first colon that is not inside quotes
+        boolean inQuotes = false;
+        for (int i = 0; i < trimmed.length(); i++) {
+          char c = trimmed.charAt(i);
+          if (c == '"') {
+            inQuotes = !inQuotes;
+          } else if (c == ':' && !inQuotes) {
+            String key = trimmed.substring(0, i).trim();
+            String rawValue = trimmed.substring(i + 1).trim();
+            if (rawValue.isEmpty()) {
+              return List.of(key);
+            }
+            return List.of(key, stripQuotes(rawValue));
+          }
+        }
+        // No colon found — treat as single value
+        return List.of(stripQuotes(trimmed));
+      });
 
   private static final Function<List<List<String>>, List<List<String>>> checkAndSetDefault = list -> {
     if (list.size() == 1 && list.get(0).size() == 1) {
@@ -74,6 +118,13 @@ public class ParameterParsingFunctions {
   private static final Function<List<List<String>>, Map<String, String>> convertToMap =
       list -> list.toMap(keyValue -> keyValue.get(0), keyValue -> keyValue.get(1));
 
+
+  private static String stripQuotes(String value) {
+    if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+      return value.substring(1, value.length() - 1);
+    }
+    return value;
+  }
 
   private ParameterParsingFunctions() {
     // utility class

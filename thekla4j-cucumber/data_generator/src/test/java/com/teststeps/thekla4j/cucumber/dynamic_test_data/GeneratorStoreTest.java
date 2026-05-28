@@ -451,4 +451,41 @@ public class GeneratorStoreTest {
           "\u001B[32m    specialChars:  the generated string will include special characters    ( !@#$%^&*()-_=+[]}|;:,.<>? )            default: false.\u001B[0m"));
 
   }
+
+  @Test
+  public void generatorWithQuotedParameterContainingCommas() {
+
+    DataGenerator formatGenerator = parameterMap -> {
+      String date = parameterMap.get("date").getOrElse("today");
+      String format = parameterMap.get("format").getOrElse("yyyy-MM-dd");
+      return Try.success("formatted:" + date + ":" + format);
+    };
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("formatDate", formatGenerator);
+
+    String generatorString = "formatDate{date: 2025-01-01, format: \"EEEE, d. MMMM yyyy\"}";
+
+    Try<String> result = generatorStore.parseAndExecute(generatorString);
+    assertThat("executing the generator succeeded", result.isSuccess());
+    assertThat("format parameter preserves commas", result.get(), equalTo("formatted:2025-01-01:EEEE, d. MMMM yyyy"));
+  }
+
+  @Test
+  public void generatorWithQuotedParameterContainingColons() {
+
+    DataGenerator timeGenerator = parameterMap -> {
+      String format = parameterMap.get("format").getOrElse("HH:mm");
+      return Try.success("format=" + format);
+    };
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("formatTime", timeGenerator);
+
+    String generatorString = "formatTime{format: \"HH:mm:ss\"}";
+
+    Try<String> result = generatorStore.parseAndExecute(generatorString);
+    assertThat("executing the generator succeeded", result.isSuccess());
+    assertThat("format parameter preserves colons", result.get(), equalTo("format=HH:mm:ss"));
+  }
 }

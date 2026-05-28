@@ -5,10 +5,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
 import io.vavr.collection.Map;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 public class ParameterParsingFunctionTest {
@@ -111,41 +108,33 @@ public class ParameterParsingFunctionTest {
   }
 
   @Test
-  public void jsonTest() {
+  public void testingQuotedValueWithCommas() {
+    Map<String, String> map = parseParameterStringToMap.apply("date: 2025-01-01, format: \"EEEE, d. MMMM yyyy\"");
 
-    String newJson = """
-        {
-          "userId":"123",
-          "userName":"John Doe",
-          "details": {
-            "name": "John",
-            "age": 25
-          }
-        }
-        """;
+    assertThat("date is set", map.get("date").get(), equalTo("2025-01-01"));
+    assertThat("format is set with commas preserved", map.get("format").get(), equalTo("EEEE, d. MMMM yyyy"));
+  }
 
-    String newJson2 = "value1";
+  @Test
+  public void testingQuotedValueWithColons() {
+    Map<String, String> map = parseParameterStringToMap.apply("pattern: \"HH:mm:ss\"");
 
-    HashMap<String, String> map = HashMap.of("TEST", newJson, "TEST2", newJson2);
+    assertThat("pattern is set with colons preserved", map.get("pattern").get(), equalTo("HH:mm:ss"));
+  }
 
-    String props = "TEST.details";
-//    String props = "TEST2";
+  @Test
+  public void testingMixedQuotedAndUnquotedParams() {
+    Map<String, String> map = parseParameterStringToMap.apply("name: John, format: \"yyyy-MM-dd, HH:mm\", age: 25");
 
-    List<String> test = List.of(props.split("\\."));
+    assertThat("name is set", map.get("name").get(), equalTo("John"));
+    assertThat("format is set", map.get("format").get(), equalTo("yyyy-MM-dd, HH:mm"));
+    assertThat("age is set", map.get("age").get(), equalTo("25"));
+  }
 
-    String key = test.head();
-    List<String> attributes = test.tail();
+  @Test
+  public void testingQuotedDefaultValue() {
+    Map<String, String> map = parseParameterStringToMap.apply("\"hello, world\"");
 
-    Object elem = attributes.foldLeft((Object) new JSONObject(map.get(key).get()), (json, k) -> {
-      if (json instanceof JSONObject j) {
-        Object e = j.get(k);
-        return e;
-      }
-
-      return json;
-    });
-
-    System.out.println(elem);
-
+    assertThat("default value preserves commas", map.get("default").get(), equalTo("hello, world"));
   }
 }

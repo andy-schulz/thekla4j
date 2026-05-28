@@ -29,12 +29,12 @@ public class GeneratorStore {
    * Regex pattern to match a specific generator
    */
   protected static final Function1<String, String> REGEX_SPECIFIC_GENERATOR_PATTERN =
-      prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
+      prefix -> "(" + prefix + "\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s\\\"]*)\\}).*";
 
   /**
    * Regex pattern to match a general generator
    */
-  protected static final String REGEX_GENERAL_GENERATOR_PATTERN = "([A-Za-z0-9]+\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s]*)\\}).*";
+  protected static final String REGEX_GENERAL_GENERATOR_PATTERN = "([A-Za-z0-9]+\\{([A-Za-z0-9\\-\\+\\_\\.\\;\\=\\$\\:\\,\\s\\\"]*)\\}).*";
 
   /**
    * Regex pattern to match a valid function name
