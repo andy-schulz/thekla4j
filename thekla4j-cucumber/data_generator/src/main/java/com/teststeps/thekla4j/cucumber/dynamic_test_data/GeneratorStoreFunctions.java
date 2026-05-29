@@ -35,55 +35,11 @@ public class GeneratorStoreFunctions {
   protected static final String REGEX_INLINE_REPLACEMENT_PATTERN = "(\\?\\{([A-Z0-9_]*)\\})";
 
 
-  private static final Pattern SHORT_PARAM_PATTERN = Pattern.compile("\\$([A-Za-z0-9_]+)");
+  private static final Pattern SHORT_PARAM_PATTERN = Pattern.compile("\\$([A-Za-z0-9_.]+)");
 
   /**
-   * Resolve short parameter references ($PARAM) in a single value string using stored parameters.
-   */
-  protected static final Function2<Map<String, String>, String, Try<String>> resolveShortParamReferences =
-      (storedParameters, value) -> {
-        Matcher matcher = SHORT_PARAM_PATTERN.matcher(value);
-
-        List<Tuple2<Integer, Integer>> matches = List.empty();
-        while (matcher.find()) {
-          matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
-        }
-
-        if (matches.isEmpty()) {
-          return Try.success(value);
-        }
-
-        return matches
-            .map(boundary -> boundary.append(value.substring(boundary._1() + 1, boundary._2())))
-            .map(t -> t.map3(paramName -> storedParameters.get(paramName)
-                .toTry(() -> new IllegalArgumentException("Parameter not found: $" + paramName))))
-            .map(LiftTry.fromTuple3$3())
-            .transform(LiftTry.fromList())
-            .map(l -> l.foldRight(new StringBuilder(value), (t, acc) -> acc.replace(t._1, t._2, t._3())))
-            .map(StringBuilder::toString);
-      };
-
-  /**
-   * Execute a generator with resolved parameter values
-   */
-  protected static final Function3<DataGenerator, Map<String, String>, String, Try<String>> executeGeneratorFunction =
-      (generator, storedParameters, parameterString) -> {
-
-        Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(parameterString);
-
-        // Resolve $PARAM references in parameter values
-        Try<Map<String, String>> resolvedParameters = genParameters
-            .mapValues(resolveShortParamReferences.apply(storedParameters))
-            .transform(LiftTry.fromMap());
-
-        return resolvedParameters
-            .flatMap(generator::run)
-            .onSuccess(x -> log.debug("Generator Function executed: {}", x));
-      };
-
-  /**
-   * Convert short parameter references ($PARAM) to brace syntax (${PARAM}) so they can be
-   * resolved by the existing {@link #matchAndRetrieveParameter} function.
+   * Convert short parameter references ($PARAM or $PARAM.attr) to brace syntax (${PARAM} or ${PARAM.attr})
+   * so they can be resolved by the existing {@link #matchAndRetrieveParameter} function.
    */
   protected static final Function1<String, String> convertShortParamSyntax = input -> {
     Matcher matcher = SHORT_PARAM_PATTERN.matcher(input);
@@ -259,6 +215,53 @@ public class GeneratorStoreFunctions {
         .map(StringBuilder::toString);
   };
 
+
+  /**
+   * Resolve short parameter references ($PARAM or $PARAM.attr) in a single value string using stored parameters.
+   */
+  protected static final Function2<Map<String, String>, String, Try<String>> resolveShortParamReferences =
+      (storedParameters, value) -> {
+        Matcher matcher = SHORT_PARAM_PATTERN.matcher(value);
+
+        List<Tuple2<Integer, Integer>> matches = List.empty();
+        while (matcher.find()) {
+          matches = matches.append(Tuple.of(matcher.start(), matcher.end()));
+        }
+
+        if (matches.isEmpty()) {
+          return Try.success(value);
+        }
+
+        return matches
+            .map(boundary -> boundary.append(value.substring(boundary._1() + 1, boundary._2())))
+            .map(t -> t.map3(paramName -> Try.of(() -> parseStoredParameter.apply(storedParameters, paramName)).flatMap(x -> x)))
+            .map(LiftTry.fromTuple3$3())
+            .transform(LiftTry.fromList())
+            .map(l -> l.foldRight(new StringBuilder(value), (t, acc) -> acc.replace(t._1, t._2, t._3())))
+            .map(StringBuilder::toString);
+      };
+
+  /**
+   * Execute a generator with resolved parameter values.
+   * Resolves both $PARAM (short) and ${PARAM.attr} (brace) syntax in parameter values.
+   */
+  protected static final Function3<DataGenerator, Map<String, String>, String, Try<String>> executeGeneratorFunction =
+      (generator, storedParameters, parameterString) -> {
+
+        Map<String, String> genParameters = ParameterParsingFunctions.parseParameterStringToMap.apply(parameterString);
+
+        // Resolve $PARAM and $PARAM.attr references, then ${PARAM.attr} references
+        Try<Map<String, String>> resolvedParameters = genParameters
+            .mapValues(resolveShortParamReferences.apply(storedParameters))
+            .transform(LiftTry.fromMap())
+            .flatMap(params -> params
+                .mapValues(matchAndRetrieveParameter.apply(storedParameters))
+                .transform(LiftTry.fromMap()));
+
+        return resolvedParameters
+            .flatMap(generator::run)
+            .onSuccess(x -> log.debug("Generator Function executed: {}", x));
+      };
 
   /**
    * Find and run single inline generator

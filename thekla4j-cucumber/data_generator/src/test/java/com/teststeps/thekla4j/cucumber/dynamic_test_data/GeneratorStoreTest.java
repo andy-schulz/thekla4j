@@ -566,7 +566,7 @@ public class GeneratorStoreTest {
     Try<String> result = generatorStore.parseAndExecute("simpleGenerator{param: $NONEXISTENT}");
 
     assertThat("unresolved param should fail", result.isFailure());
-    assertThat("error message mentions param", result.getCause().getMessage(), equalTo("Parameter not found: $NONEXISTENT"));
+    assertThat("error message mentions param", result.getCause().getMessage(), equalTo("Parameter not found: NONEXISTENT"));
   }
 
   @Test
@@ -624,5 +624,61 @@ public class GeneratorStoreTest {
 
     assertThat("resolution succeeded", result.isSuccess());
     assertThat("short param resolved", result.get().get("ref").get(), equalTo("Hello World"));
+  }
+
+  @Test
+  public void shortParamDottedPathInGeneratorParam() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("jsonGen", jsonGenerator)
+        .addGenerator("echo", simpleGeneratorWithParameter);
+
+    generatorStore.parseAndExecute("jsonGen{x} => ${OBJ}");
+
+    Try<String> result = generatorStore.parseAndExecute("echo{val: $OBJ.name}");
+    assertThat("dotted short param resolved", result.isSuccess());
+    assertThat("attribute extracted", result.get(), equalTo("Test"));
+  }
+
+  @Test
+  public void braceParamDottedPathInGeneratorParam() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("jsonGen", jsonGenerator)
+        .addGenerator("echo", simpleGeneratorWithParameter);
+
+    generatorStore.parseAndExecute("jsonGen{x} => ${OBJ}");
+
+    Try<String> result = generatorStore.parseAndExecute("echo{val: ${OBJ.name}}");
+    assertThat("dotted brace param resolved", result.isSuccess());
+    assertThat("attribute extracted", result.get(), equalTo("Test"));
+  }
+
+  @Test
+  public void braceParamSimpleInGeneratorParam() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("simpleGenerator", simpleGenerator)
+        .addGenerator("echo", simpleGeneratorWithParameter);
+
+    generatorStore.parseAndExecute("simpleGenerator{x} => ${GREETING}");
+
+    Try<String> result = generatorStore.parseAndExecute("echo{msg: ${GREETING}}");
+    assertThat("brace param resolved", result.isSuccess());
+    assertThat("value resolved", result.get(), equalTo("Hello World"));
+  }
+
+  @Test
+  public void shortParamNestedDottedPathInGeneratorParam() {
+
+    @SuppressWarnings("deprecation") GeneratorStore generatorStore = GeneratorStore.create()
+        .addGenerator("jsonGen", jsonGenerator)
+        .addGenerator("echo", simpleGeneratorWithParameter);
+
+    generatorStore.parseAndExecute("jsonGen{x} => ${OBJ}");
+
+    Try<String> result = generatorStore.parseAndExecute("echo{val: $OBJ.details.key}");
+    assertThat("nested dotted path resolved", result.isSuccess());
+    assertThat("nested attribute extracted", result.get(), equalTo("value"));
   }
 }
