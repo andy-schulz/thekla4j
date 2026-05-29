@@ -45,17 +45,21 @@ The result can optionally be stored in a named parameter for later retrieval:
 generatorName{param1: value1} => ${MY_PARAM}
 ```
 
-Stored parameters can be referenced anywhere using `${MY_PARAM}` or as part of a string:
+Stored parameters can be referenced anywhere using `${MY_PARAM}` or the shorthand `$MY_PARAM`:
 
 ```
 Hello ${MY_PARAM}!
+Hello $MY_PARAM!
 ```
+
+Both forms are equivalent. The shorthand `$PARAM` is converted to `${PARAM}` internally.
 
 JSON results can be accessed via dot notation:
 
 ```
 ${MY_PARAM.name}
 ${MY_PARAM.address.city}
+$MY_PARAM.name
 ```
 
 ### Gherkin Example
@@ -94,6 +98,65 @@ Here is what each pattern does:
 | `${ALICE.id}`, `${ALICE.name}` | JSON dot-notation reference | When a stored parameter holds a JSON object, individual fields are accessed using dot notation. Nested paths like `${ALICE.address.city}` are also supported. |
 | `dateOffset{+365d}` | Generator without storage | Calls the `dateOffset` generator to compute a date relative to today. The result is used directly in the step without being stored. |
 | `${PRODUCT_NAME}`, `${PRODUCT_SKU}` | Parameter reference | Reference values stored in earlier steps — used to verify the created product and to target it for deletion. |
+
+### Quoted Parameter Values
+
+Parameter values can be enclosed in double quotes. This is useful when the value itself contains commas or colons
+that would otherwise be interpreted as separators:
+
+```
+formatDate{date: $DATE, format: "EEEE, d. MMMM yyyy"}
+```
+
+Without quotes, the commas inside the format string would be treated as parameter separators.
+
+### Parameter References Inside Generator Calls
+
+Stored parameters can be referenced inside generator parameter values using either the short `$PARAM` syntax
+or the brace `${PARAM}` syntax:
+
+```
+generatorName{param: $STORED_VALUE}
+generatorName{param: ${STORED_VALUE}}
+```
+
+Dot notation for JSON attribute access works in both forms:
+
+```
+formatDate{date: $USER.startDate, format: "dd.MM.yyyy"}
+formatDate{date: ${USER.startDate}, format: "dd.MM.yyyy"}
+echo{value: $CONFIG.database.host}
+```
+
+This allows chaining generators — one generator produces a value, and a subsequent generator
+consumes it:
+
+```gherkin
+Given the following test data is created:
+  | user       | createUser{role: admin} => ${USER}                             |
+  | start date | formatDate{date: $USER.startDate, format: "dd.MM.yyyy"}        |
+```
+
+### resolveParameterMap
+
+When implementing a custom generator that receives parameter references, the `resolveParameterMap` utility
+resolves all values through `parseAndExecute` automatically. It also renames the `"default"` key to a
+meaningful name:
+
+```java
+@Generator(name = "formatDate")
+public DataGenerator formatDate() {
+    return functionParams -> {
+        Map<String, String> params = world.getGeneratorStore()
+            .resolveParameterMap(functionParams, "date")
+            .getOrElseThrow(x -> new IllegalArgumentException(x.getMessage()));
+        String dateValue = params.get("date").getOrElse("");
+        String format = params.get("format").getOrElse("yyyy-MM-dd");
+        // format the date ...
+        return Try.of(() -> formattedDate);
+    };
+}
+```
 
 ---
 
@@ -334,8 +397,9 @@ Common error causes:
 
 | Cause | Description |
 |---|---|
-| Generator name not found | The input string is returned as-is (no error) |
+| Generator name not found | The input string is returned as-is and a warning is logged |
 | Missing required parameter | `IllegalArgumentException` with parameter name |
 | Invalid parameter type | `IllegalArgumentException` with type hint |
 | Duplicate generator name | `IllegalArgumentException` on registration |
 | Generator returns `null` | `IllegalStateException` |
+| Unresolved parameter reference | `IllegalArgumentException` when a `$PARAM` or `${PARAM}` reference cannot be found |
