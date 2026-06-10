@@ -13,6 +13,7 @@ nav_order: 110
 | [See](#see)     | The `See` activity is used to assert the result of a task.                                           |
 | [Retry](#retry) | The `Retry` activity is used to repeat a task until it succeeds or the timeout is reached.           |
 | [Map](#mapping) | Transform a task's result inline with `.map()` / `.mapTry()` or via the static `API.map()` activity. |
+| [Zip](#zip)     | Combine the results of several independent `SupplierTask`s into a single tuple with `API.zip()`.     |
 | [Sleep](#sleep) | The `Sleep` activity is used to pause the execution of the test for a specified amount of time.      |
 
 ___
@@ -434,6 +435,59 @@ actor.attemptsTo(
     .is(Expected.to.pass( isEven, "check if the result is even")));
 
 ```
+
+___
+## Zip
+
+The static `API.zip()` method combines several independent `SupplierTask`s into a single `SupplierTask` that
+returns their results as a Vavr tuple. The tasks are run left-to-right; the run short-circuits on the first
+failure (the resulting `Either` is `Left`), otherwise the results are collected into a `TupleN` in argument order.
+
+Overloads are provided for two to eight tasks (returning `Tuple2` through `Tuple8`). Because the result is itself a
+`SupplierTask`, it composes with the rest of the API — you can `.map()` the tuple, validate it with `.is()`, run it
+with `.runAs()`, or nest it inside another `zip`.
+
+Methods:
+
+| type   | method                                                          | description                                                                                  |
+|--------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| static | `API.zip(SupplierTask<R1> t1, SupplierTask<R2> t2)`             | Runs both tasks and returns their results as a `Tuple2<R1, R2>`.                              |
+| static | `API.zip(t1, t2, t3)` … up to `API.zip(t1, ..., t8)`            | Same for three to eight tasks, returning `Tuple3<…>` through `Tuple8<…>`.                     |
+| static | `Zip.of(t1, t2)` … up to `Zip.of(t1, ..., t8)`                  | The standalone form `API.zip()` delegates to. Use it directly to build a `Zip` task.         |
+
+```java
+import com.teststeps.thekla4j.core.activities.API;
+
+Either<ActivityError, Tuple3<Integer, String, Integer>> result = actor.attemptsTo(
+  API.zip(
+    SupplyNumber.supplyNumber(1),     // SupplierTask<Integer>
+    SupplyString.shallThrow(false),   // SupplierTask<String>
+    SupplyNumber.supplyNumber(3)));   // SupplierTask<Integer>
+
+// result.get() -> (1, "Hello World", 3)
+```
+
+`API.zip()` is a convenience facade over `Zip.of()` — both produce the same `Zip` task. Use `Zip.of()`
+directly when you want to hold the task as a standalone value before running it:
+
+```java
+import com.teststeps.thekla4j.core.activities.Zip;
+
+Zip<Tuple2<String, Integer>> profile = Zip.of(supplyName, supplyAge);
+
+Either<ActivityError, Tuple2<String, Integer>> result = profile.runAs(actor);
+```
+
+The combined task is a normal `SupplierTask`, so the tuple can be transformed or validated further:
+
+```java
+actor.attemptsTo(
+  API.zip(supplyName, supplyAge)
+    .map(Tuple2::_1)                  // keep only the first result
+    .is(Expected.to.equal("Alice")));
+```
+
+> If any task fails, the remaining tasks are **not** run and the failure is returned immediately.
 
 ___
 ## Sleep
