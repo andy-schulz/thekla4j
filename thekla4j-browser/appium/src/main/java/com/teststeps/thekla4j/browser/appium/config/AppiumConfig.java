@@ -1,9 +1,12 @@
 package com.teststeps.thekla4j.browser.appium.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.teststeps.thekla4j.browser.appium.AppiumConstants;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
+import java.util.Objects;
 import lombok.With;
 
 /**
@@ -48,6 +51,21 @@ public record AppiumConfig(
    */
   public static AppiumConfig of(String remoteUrl) {
     return new AppiumConfig(remoteUrl, HashMap.empty());
+  }
+
+  /**
+   * Check if this configuration describes a native app session instead of a mobile browser session.
+   * A native app session is detected when the appium capability section contains the
+   * 'app' or 'appPackage' capability.
+   *
+   * @return true if the config targets a native app
+   */
+  @JsonIgnore
+  public boolean isNativeAppConfig() {
+    return capabilities.get(AppiumConstants.APPIUM_PREFIX)
+        .map(caps -> !Objects.isNull(caps) &&
+            (caps.containsKey(AppiumConstants.APP) || caps.containsKey(AppiumConstants.APP_PACKAGE)))
+        .getOrElse(false);
   }
 
 }

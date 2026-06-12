@@ -58,11 +58,11 @@ public class TestCapabilitiesRemote {
     assertThat("check platformName is set", caps.getCapability("platformName").toString(), equalToIgnoringCase("Android"));
     assertThat("check browserName is set", caps.getCapability("browserName").toString(), equalToIgnoringCase("Safari"));
     assertThat("check browserVersion is set", caps.getCapability("browserVersion"), equalTo("80"));
-    assertThat("check avdLaunchTimeout is set", caps.getCapability("appium:avdLaunchTimeout"), equalTo("120000"));
-    assertThat("check avdReadyTimeout is set", caps.getCapability("appium:avdReadyTimeout"), equalTo("120000"));
-    assertThat("check adbExecTimeout is set", caps.getCapability("appium:adbExecTimeout"), equalTo("120000"));
-    assertThat("check unicodeKeyboard is set", caps.getCapability("appium:unicodeKeyboard"), equalTo("true"));
-    assertThat("check resetKeyboard is set", caps.getCapability("appium:resetKeyboard"), equalTo("true"));
+    assertThat("check avdLaunchTimeout is set", caps.getCapability("appium:avdLaunchTimeout"), equalTo(120000L));
+    assertThat("check avdReadyTimeout is set", caps.getCapability("appium:avdReadyTimeout"), equalTo(120000L));
+    assertThat("check adbExecTimeout is set", caps.getCapability("appium:adbExecTimeout"), equalTo(120000L));
+    assertThat("check unicodeKeyboard is set", caps.getCapability("appium:unicodeKeyboard"), equalTo(true));
+    assertThat("check resetKeyboard is set", caps.getCapability("appium:resetKeyboard"), equalTo(true));
     assertThat("check testName is set", caps.getCapability("se:testName"), equalTo("Appium Test"));
 
   }

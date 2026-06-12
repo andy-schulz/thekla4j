@@ -160,10 +160,10 @@ public class AppiumLoader implements DriverLoader {
           .map(d -> BidiLogManager.init(d));
     } else {
 
-      if (!browserConfig.browserName().equals(BrowserName.CHROME)) {
+      if (!BrowserName.CHROME.equals(browserConfig.browserName())) {
         String message =
             "Browser log listening is only supported for Chrome when not using WebDriver Bidi. Ignoring browser log listening for {{BROWSER}}."
-                .replace("{{BROWSER}}", browserConfig.browserName().name());
+                .replace("{{BROWSER}}", Objects.toString(browserConfig.browserName()));
 
         log.warn(message);
         this.initLogManager = d -> Try.success(EmptyLogManager.init(message));
@@ -395,10 +395,24 @@ public class AppiumLoader implements DriverLoader {
   protected Function2<Option<AppiumConfig>, MutableCapabilities, Try<MutableCapabilities>> addCapabilities =
       (selConfig, options) -> selConfig.map(config -> Try.of(() -> createCapabilityMapWithPrefix.apply(config.capabilities())
           .foldLeft(options, (opts, entry) -> {
-            opts.setCapability(entry._1, entry._2);
+            opts.setCapability(entry._1, coerceCapabilityValue(entry._2));
             return opts;
           })))
           .getOrElse(Try.success(options));
+
+  /**
+   * The yaml capability map is typed String -> String, but drivers like UiAutomator2 reject
+   * boolean/number capabilities passed as strings. Restore the yaml scalar types.
+   */
+  private static Object coerceCapabilityValue(String value) {
+    if (Objects.isNull(value))
+      return null;
+    if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value))
+      return Boolean.parseBoolean(value);
+    if (value.matches("-?\\d+"))
+      return Try.<Object>of(() -> Long.parseLong(value)).getOrElse(value);
+    return value;
+  }
 
   private static final Function2<List<Function1<MutableCapabilities, MutableCapabilities>>, MutableCapabilities, MutableCapabilities> setOptionUpdates =
       (optionUpdates, options) -> optionUpdates.foldLeft(options, (opts, func) -> func.apply(opts));
@@ -416,6 +430,19 @@ public class AppiumLoader implements DriverLoader {
   };
 
   Try<MutableCapabilities> loadOptions(AppiumConfig appConfig) {
+
+    if (appConfig.isNativeAppConfig()) {
+      log.info(() -> "Native app capabilities (app/appPackage) detected. Creating session without browserName.");
+      return Try.success(new AppiumOptions())
+          .map(setPlatformName.apply(browserConfig))
+          .map(setOsVersion.apply(browserConfig))
+          .map(setDeviceName.apply(browserConfig))
+          .flatMap(setAutomationNameFromConfigs.apply(browserConfig, appConfig))
+          .map(setVideoRecording.apply(browserConfig))
+          .flatMap(addCapabilities.apply(appiumConfig))
+          .map(setOptionUpdates.apply(optionUpdates));
+    }
+
     return createBrowserOptions(browserConfig.browserName())
         .map(setBrowserVersion.apply(browserConfig))
         .map(setPlatformName.apply(browserConfig))

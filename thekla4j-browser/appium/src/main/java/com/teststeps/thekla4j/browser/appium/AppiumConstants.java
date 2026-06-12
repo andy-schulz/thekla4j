@@ -19,6 +19,10 @@ public class AppiumConstants {
   public final static String K_PLATFORM_VERSION = APPIUM_PREFIX + ":platformVersion";
   /** appium capability key for chrome driver with prefix */
   public final static String K_CHROME_DRIVER_EXECUTABLE = APPIUM_PREFIX + ":chromedriverExecutable";
+  /** appium capability key for the app under test without prefix */
+  public final static String APP = "app";
+  /** appium capability key for the app package without prefix */
+  public final static String APP_PACKAGE = "appPackage";
 
   /** appium capability value for UiAutomator2 */
   public final static String V_UI_AUTOMATOR_2 = "uiautomator2";

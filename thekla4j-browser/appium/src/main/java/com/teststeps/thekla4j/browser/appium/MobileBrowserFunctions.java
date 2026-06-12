@@ -53,6 +53,18 @@ public class MobileBrowserFunctions {
           return Try.failure(new RuntimeException(errorMsg));
         }
 
+        if (appiumConfig.map(AppiumConfig::isNativeAppConfig).getOrElse(false)) {
+          if (Objects.isNull(browserConfig.get().platformName())) {
+            String errorMessage = "Native app config is not complete. Please provide the following capability: \n" +
+                """
+                      platformName: "Android" or "iOS"
+                    """;
+            log.error(() -> errorMessage);
+            return Try.failure(new RuntimeException(errorMessage));
+          }
+          return Try.of(() -> MobileBrowser.start(browserConfig.get(), appiumConfig, startupConfig));
+        }
+
         if (!MobileBrowserFunctions.isMobileConfig.apply(browserConfig.get())) {
           String errorMessage = "Mobile Browser Config is not complete. Please provide the following capabilities: \n" +
               """
