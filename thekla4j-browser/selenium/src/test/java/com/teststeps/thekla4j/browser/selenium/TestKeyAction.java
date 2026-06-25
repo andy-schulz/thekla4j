@@ -158,4 +158,17 @@ public class TestKeyAction {
     verify(actions, times(1)).keyDown(Keys.TAB);
     verify(actions, times(1)).keyDown(Keys.ENTER);
   }
+
+  @Test
+  public void everyKeyPressesItsSeleniumKey() throws ActivityError {
+
+    actor = Actor.named("Test Actor")
+        .whoCan(BrowseTheWeb.with(browser));
+
+    for (Key key : Key.values()) {
+      actor.attemptsTo(DoKey.press(key))
+          .getOrElseThrow(Function.identity());
+      verify(actions, times(1)).sendKeys(Keys.valueOf(key.name()));
+    }
+  }
 }
