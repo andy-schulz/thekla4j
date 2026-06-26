@@ -292,6 +292,7 @@ class ElementFunctions {
   final static Function2<RemoteWebDriver, Element, Try<Integer>> countElements =
       (driver, element) -> findElementsWithoutScrolling(driver, element)
           .map(List::size)
+          .recover(ElementNotFoundError.class, e -> 0)
           .onFailure(log::error);
 
   private static final String scrollElementInArea =
