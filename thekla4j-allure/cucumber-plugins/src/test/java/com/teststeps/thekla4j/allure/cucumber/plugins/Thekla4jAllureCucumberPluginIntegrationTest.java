@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.allure.cucumber.plugins;
 
+import static io.qameta.allure.util.ResultsUtils.md5;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -337,6 +338,58 @@ class Thekla4jAllureCucumberPluginIntegrationTest {
     assertThat(paramValues, hasSize(2));
     assertThat(paramValues.contains("foo"), is(true));
     assertThat(paramValues.contains("bar"), is(true));
+  }
+
+  // ===== historyId =====
+
+  @Test
+  void taggedScenario_historyId_isMd5OfTestId_lineExcluded() {
+    final List<TestResult> results = runFeature("classpath:features/tagged_scenario.feature");
+
+    final TestResult tagged = results.stream()
+        .filter(r -> "TC-001".equals(r.getTestCaseId()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("tagged scenario not found"));
+
+    // A scenario with @TEST_ID is identified by the test id alone (no parameters here), so
+    // the line number is excluded: moving the scenario must not change its historyId.
+    assertThat(tagged.getHistoryId(), is(md5("TC-001")));
+  }
+
+  @Test
+  void taggedScenarioOutline_rows_shareTestId_butKeepDistinctHistoryIds() {
+    final List<TestResult> results =
+        runFeature("classpath:features/tagged_scenario_outline.feature");
+
+    assertThat(results, hasSize(2));
+
+    // Both example rows inherit the outline's @TEST_ID ...
+    assertThat(results.get(0).getTestCaseId(), is("OUTLINE-1"));
+    assertThat(results.get(1).getTestCaseId(), is("OUTLINE-1"));
+
+    final String historyId0 = results.get(0).getHistoryId();
+    final String historyId1 = results.get(1).getHistoryId();
+
+    // ... yet the parameters keep the rows distinct (so they are never collapsed into one),
+    // and neither equals the bare-testId hash (the parameters are part of the identity).
+    assertThat(historyId0, is(not(historyId1)));
+    assertThat(historyId0, is(not(md5("OUTLINE-1"))));
+    assertThat(historyId1, is(not(md5("OUTLINE-1"))));
+  }
+
+  @Test
+  void scenarioWithoutTestId_historyId_stillIncludesLine() {
+    final List<TestResult> results = runFeature("classpath:features/tagged_scenario.feature");
+
+    final TestResult noTag = results.stream()
+        .filter(r -> r.getTestCaseId() == null)
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("scenario without testId not found"));
+
+    // Unchanged behaviour: without a stable id the uri + line is the identity, so the
+    // historyId is present and is not the testId-style hash.
+    assertThat(noTag.getHistoryId(), is(notNullValue()));
+    assertThat(noTag.getHistoryId(), is(not(md5("TC-001"))));
   }
 
   @Test

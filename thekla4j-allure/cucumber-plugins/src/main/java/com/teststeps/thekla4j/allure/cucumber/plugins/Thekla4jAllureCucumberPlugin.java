@@ -338,7 +338,6 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
   }
 
   private String getHistoryId(final TestCase testCase, final TestResult result) {
-    final String testCaseLocation = getTestCaseUri(testCase) + COLON + testCase.getLocation().getLine();
     final String historyId;
 
     String parameterList = result.getParameters()
@@ -349,8 +348,11 @@ public class Thekla4jAllureCucumberPlugin implements ConcurrentEventListener {
     String parameterHistoryString = parameterList.isEmpty() ? "" : COLON + parameterList;
 
     if (result.getTestCaseId() != null && !result.getTestCaseId().isEmpty()) {
-      historyId = result.getTestCaseId() + COLON + testCase.getLocation().getLine() + parameterHistoryString;
+      // A scenario carrying a @TEST_ID is identified by that id, so the line number is
+      // left out: it only causes history churn when the scenario moves within the feature.
+      historyId = result.getTestCaseId() + parameterHistoryString;
     } else {
+      // Without a stable id the feature uri + line is the most reliable identity.
       historyId = getTestCaseUri(testCase) + COLON + testCase.getLocation().getLine() + parameterHistoryString;
     }
 
