@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 
@@ -420,6 +421,108 @@ public class TestActivitySee {
     log.info("Duration was: {}", duration);
     assertThat("Duration should be at least 10 seconds", duration.toSeconds() >= 9);
     assertThat("Duration should be less than 15 seconds", duration.toSeconds() < 12);
+  }
+
+  @Test
+  public void multipleUnnamedChecksWithFirstFailingValidation() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifValue("TestData")
+          .is(Expected.to.pass(x -> x.equals("nope")))
+          .is(Expected.to.pass(x -> x.equals("TestData"))));
+
+    assertThat("Either is left", result.isLeft());
+    assertThat("Error message contains the failing unnamed predicate", result.getLeft().getMessage(),
+      containsString("expect unnamed predicate to pass on \nTestData"));
+  }
+
+  @Test
+  public void multipleUnnamedChecksWithSecondFailingValidation() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifValue("TestData")
+          .is(Expected.to.pass(x -> x.equals("TestData")))
+          .is(Expected.to.pass(x -> x.equals("nope")))
+          .is(Expected.to.pass(x -> x.length() == 8)));
+
+    assertThat("Either is left", result.isLeft());
+    assertThat("Error message contains the failing unnamed predicate", result.getLeft().getMessage(),
+      containsString("expect unnamed predicate to pass on \nTestData"));
+  }
+
+  @Test
+  public void multipleUnnamedChecksWithBothFailingValidations() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifValue("TestData")
+          .is(Expected.to.pass(x -> x.equals("nope")))
+          .is(Expected.to.equal("other")));
+
+    assertThat("Either is left", result.isLeft());
+    assertThat("Error message contains the failing unnamed predicate", result.getLeft().getMessage(),
+      containsString("expect unnamed predicate to pass on \nTestData"));
+    assertThat("Error message contains the failing equal check", result.getLeft().getMessage(),
+      containsString("Error comparing values:"));
+  }
+
+  @Test
+  public void multipleUnnamedChecksAllPassing() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifValue("TestData")
+          .is(Expected.to.pass(x -> x.equals("TestData")))
+          .is(Expected.to.pass(x -> x.length() == 8)));
+
+    assertThat("Either is right", result.isRight());
+
+    ActivityLogNode log = tester.activityLog.getLogTree();
+
+    assertThat("first element of See is a Validation activity", log.activityNodes.get(0).activityNodes.get(0).name,
+      equalTo("ValidateResult"));
+    assertThat("first element of See is a passed activity", log.activityNodes.get(0).activityNodes.get(0).status,
+      equalTo(ActivityStatus.passed));
+    assertThat("first element of See has out message", log.activityNodes.get(0).activityNodes.get(0).output,
+      equalTo("expected to match validation: true \nexpected to match validation: true \n"));
+  }
+
+  @Test
+  public void multipleNamedChecksWithSameReasonFirstFailing() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifValue("TestData")
+          .is(Expected.to.pass(x -> x.equals("nope"), "same reason"))
+          .is(Expected.to.pass(x -> x.equals("TestData"), "same reason")));
+
+    assertThat("Either is left", result.isLeft());
+    assertThat("Error message contains the failing named predicate", result.getLeft().getMessage(),
+      containsString("expect predicate 'same reason' to pass on \nTestData"));
+  }
+
+  @Test
+  public void multipleUnnamedChecksWithRetryDoNotAccumulate() {
+    Actor tester = Actor.named("Tester");
+
+    Either<ActivityError, Void> result = tester.attemptsTo(
+      See.ifThe(TaskSucceeding.after(3))
+          .forAsLongAs(Duration.ofSeconds(5))
+          .every(Duration.ofMillis(50))
+          .is(Expected.to.pass(x -> x >= 3))
+          .is(Expected.to.pass(x -> x > 0)));
+
+    assertThat("Either is right", result.isRight());
+
+    ActivityLogNode log = tester.activityLog.getLogTree();
+    int lastIndex = log.activityNodes.get(0).activityNodes.size() - 1;
+    ActivityLogNode lastChild = log.activityNodes.get(0).activityNodes.get(lastIndex);
+
+    assertThat("last child of See is the ValidateResult of the successful attempt", lastChild.name, equalTo("ValidateResult"));
+    assertThat("matcher list did not accumulate entries across retry attempts", lastChild.output,
+      equalTo("expected to match validation: true \nexpected to match validation: true \n"));
   }
 
 }

@@ -7,7 +7,8 @@ import com.teststeps.thekla4j.assertions.lib.SeeAssertion;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.collection.LinkedHashMap;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 class ValidateResult<M> extends Interaction<M, String> {
 
   @Called(name = "reason")
-  private final LinkedHashMap<String, SeeAssertion<M>> matcher;
+  private final List<Tuple2<String, SeeAssertion<M>>> matcher;
 
   @Override
   protected Either<ActivityError, String> performAs(Actor actor, M result) {
@@ -31,7 +32,7 @@ class ValidateResult<M> extends Interaction<M, String> {
 
 
     if (error.isEmpty()) {
-      String success = matcher.keySet().foldLeft("", (acc, key) -> acc + key + ": true \n");
+      String success = matcher.foldLeft("", (acc, t) -> acc + t._1 + ": true \n");
       return Either.right(success);
     } else {
       return Either.left(AssertionError.of("\n" + error + "\n"));
@@ -45,11 +46,11 @@ class ValidateResult<M> extends Interaction<M, String> {
    * @param <M2>    the type of the result
    * @return the new ValidateResult
    */
-  public static <M2> ValidateResult<M2> with(LinkedHashMap<String, SeeAssertion<M2>> matcher) {
+  public static <M2> ValidateResult<M2> with(List<Tuple2<String, SeeAssertion<M2>>> matcher) {
     return new ValidateResult<>(matcher);
   }
 
-  private ValidateResult(LinkedHashMap<String, SeeAssertion<M>> matcher) {
+  private ValidateResult(List<Tuple2<String, SeeAssertion<M>>> matcher) {
     this.matcher = matcher;
   }
 }

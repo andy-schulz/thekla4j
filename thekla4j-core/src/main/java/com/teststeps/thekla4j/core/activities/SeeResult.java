@@ -11,8 +11,9 @@ import com.teststeps.thekla4j.core.base.activities.Interaction;
 import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function0;
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import io.vavr.collection.LinkedHashMap;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.time.Duration;
@@ -34,7 +35,7 @@ public class SeeResult<P, M> extends Interaction<P, M> {
   @Called(name = "activity")
   private final Activity<P, M> activity;
 
-  private LinkedHashMap<String, SeeAssertion<M>> matchers = LinkedHashMap.empty();
+  private List<Tuple2<String, SeeAssertion<M>>> matchers = List.empty();
 
   @Called(name = "retries")
   private Duration duration = Duration.of(0, SECONDS);
@@ -95,7 +96,7 @@ public class SeeResult<P, M> extends Interaction<P, M> {
    * @return this SeeResult for chaining
    */
   public SeeResult<P, M> is(SeeAssertion<M> matcher) {
-    this.matchers = this.matchers.put("expected to match validation", matcher);
+    this.matchers = this.matchers.append(Tuple.of("expected to match validation", matcher));
     return this;
   }
 
@@ -106,7 +107,7 @@ public class SeeResult<P, M> extends Interaction<P, M> {
    * @return this SeeResult for chaining
    */
   public SeeResult<P, M> is(Tuple2<String, SeeAssertion<M>> matcher) {
-    this.matchers = this.matchers.put(matcher);
+    this.matchers = this.matchers.append(matcher);
     return this;
   }
 

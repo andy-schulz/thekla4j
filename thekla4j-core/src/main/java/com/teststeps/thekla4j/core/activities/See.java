@@ -13,9 +13,10 @@ import com.teststeps.thekla4j.core.base.persona.Activity;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.Function0;
 import io.vavr.Function3;
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.Value;
-import io.vavr.collection.LinkedHashMap;
+import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import java.time.Duration;
@@ -36,7 +37,7 @@ public class See<P, M> extends Interaction<P, P> {
   @Called(name = "activity")
   private final Activity<P, M> activity;
 
-  private LinkedHashMap<String, SeeAssertion<M>> matchers2 = LinkedHashMap.empty();
+  private List<Tuple2<String, SeeAssertion<M>>> matchers2 = List.empty();
 
 
   @Called(name = "retries")
@@ -130,7 +131,7 @@ public class See<P, M> extends Interaction<P, P> {
    * @return the new See activity
    */
   public See<P, M> is(SeeAssertion<M> matcher) {
-    this.matchers2 = this.matchers2.put("expected to match validation", matcher);
+    this.matchers2 = this.matchers2.append(Tuple.of("expected to match validation", matcher));
 
     return this;
   }
@@ -142,7 +143,7 @@ public class See<P, M> extends Interaction<P, P> {
    * @return the new See activity
    */
   public See<P, M> is(Tuple2<String, SeeAssertion<M>> matcher) {
-    this.matchers2 = this.matchers2.put(matcher);
+    this.matchers2 = this.matchers2.append(matcher);
     return this;
   }
 

@@ -197,4 +197,63 @@ public class TestActivityIs {
     assertThat("task passes with retry configuration", result.isRight());
     assertThat("result value is correct", result.get(), equalTo(5));
   }
+
+  @Test
+  public void taskIsMethodWithMultipleUnnamedAssertionsFirstFailing() {
+    Actor actor = Actor.named("Test Actor");
+
+    Either<ActivityError, String> result = actor.attemptsTo(
+      StaticStringTask.with("TestData")
+          .is(Expected.to.pass(x -> x.equals("nope")))
+          .is(Expected.to.pass(x -> x.equals("TestData"))));
+
+    assertThat("first failing unnamed assertion fails the task", result.isLeft());
+  }
+
+  @Test
+  public void taskIsMethodWithMultipleUnnamedAssertionsSecondFailing() {
+    Actor actor = Actor.named("Test Actor");
+
+    Either<ActivityError, String> result = actor.attemptsTo(
+      StaticStringTask.with("TestData")
+          .is(Expected.to.pass(x -> x.equals("TestData")))
+          .is(Expected.to.pass(x -> x.equals("nope")))
+          .is(Expected.to.pass(x -> x.length() == 8)));
+
+    assertThat("second failing unnamed assertion fails the task", result.isLeft());
+    assertThat("error message contains the failing unnamed predicate", result.getLeft().getMessage(),
+      containsString("expect unnamed predicate to pass on \nTestData"));
+  }
+
+  @Test
+  public void taskIsMethodWithMultipleUnnamedAssertionsAllPassing() {
+    Actor actor = Actor.named("Test Actor");
+
+    Either<ActivityError, String> result = actor.attemptsTo(
+      StaticStringTask.with("TestData")
+          .is(Expected.to.pass(x -> x.equals("TestData")))
+          .is(Expected.to.pass(x -> x.length() == 8)));
+
+    assertThat("both unnamed assertions pass", result.isRight());
+    assertThat("result value is correct", result.get(), equalTo("TestData"));
+
+    ActivityLogNode log = actor.activityLog.getLogTree();
+
+    assertThat("ValidateResult shows both unnamed assertion results", log.activityNodes.get(0).activityNodes.get(1).output,
+      equalTo("expected to match validation: true \nexpected to match validation: true \n"));
+  }
+
+  @Test
+  public void taskIsMethodWithDuplicateNamedAssertionsFirstFailing() {
+    Actor actor = Actor.named("Test Actor");
+
+    Either<ActivityError, String> result = actor.attemptsTo(
+      StaticStringTask.with("TestData")
+          .is(Expected.to.pass(x -> x.equals("nope"), "same reason"))
+          .is(Expected.to.pass(x -> x.equals("TestData"), "same reason")));
+
+    assertThat("first failing duplicate named assertion fails the task", result.isLeft());
+    assertThat("error message contains the shared reason", result.getLeft().getMessage(),
+      containsString("same reason"));
+  }
 }
