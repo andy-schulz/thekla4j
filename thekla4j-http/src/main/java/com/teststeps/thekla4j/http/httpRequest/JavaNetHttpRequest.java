@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
 
@@ -38,6 +39,10 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
   }
 
   private Try<HttpResult> send(HttpRequest.Builder requestBuilder) {
+    return send(requestBuilder, Map.of());
+  }
+
+  private Try<HttpResult> send(HttpRequest.Builder requestBuilder, Map<String, String> requestHeaders) {
 
     String url = getUrl(httpOptions.baseUrl, httpOptions.port, resource, httpOptions.queryParameters, httpOptions.pathParameters);
     log.debug("Using url: {}", url);
@@ -49,6 +54,10 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
     requestBuilder.timeout(httpOptions.getResponseTimeout());
 
     httpOptions.headers.forEach(requestBuilder::setHeader);
+
+    // headers of the request method itself, like the multipart content type, are set last
+    // so that they are not overwritten by the configured options
+    requestHeaders.forEach(requestBuilder::setHeader);
 
     HttpRequest req = requestBuilder.build();
 
@@ -111,9 +120,8 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
       part.value(),
       part.contentType().asString()));
 
-    requestBuilder.setHeader("Content-Type", "multipart/form-data; boundary=" + publisher.getBoundary());
-
-    return send(requestBuilder.POST(publisher.build()));
+    return send(requestBuilder.POST(publisher.build()),
+      Map.of("Content-Type", "multipart/form-data; boundary=" + publisher.getBoundary()));
   }
 
   private HttpRequest.BodyPublisher bodyPublisher(String body) {
