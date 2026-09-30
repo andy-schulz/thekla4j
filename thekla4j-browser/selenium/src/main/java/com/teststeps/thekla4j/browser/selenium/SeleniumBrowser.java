@@ -13,8 +13,11 @@ import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.core.logListener.BrowserLog;
 import com.teststeps.thekla4j.browser.core.logListener.LogEntry;
+import com.teststeps.thekla4j.browser.core.network.BrowserNetwork;
+import com.teststeps.thekla4j.browser.core.network.NetworkCall;
 import com.teststeps.thekla4j.browser.selenium.element.HighlightContext;
 import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.NetworkManager;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
@@ -39,7 +42,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
  * Selenium based browser implementation
  */
 @Log4j2(topic = "Browser")
-public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
+public class SeleniumBrowser implements Browser, BrowserLog, BrowserNetwork, SeleniumDriver {
 
   private final DriverLoader driverLoader;
   private final HighlightContext highlightContext = new HighlightContext();
@@ -825,6 +828,47 @@ public class SeleniumBrowser implements Browser, BrowserLog, SeleniumDriver {
   @Override
   public Try<Void> cleanUp() {
     return driverLoader.logManager().flatMap(LogManager::cleanUp);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> initNetworkListener() {
+    return driverLoader.activateNetworkListener();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> recordCalls(String urlPattern) {
+    return driverLoader.networkManager().flatMap(manager -> manager.recordCalls(urlPattern));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<List<NetworkCall>> recordedCalls() {
+    return driverLoader.networkManager().map(NetworkManager::recordedCalls);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @Synchronized
+  public Try<Void> clearRecordedCalls() {
+    return driverLoader.networkManager().flatMap(NetworkManager::clearRecordedCalls);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> cleanUpNetworkListener() {
+    return driverLoader.networkManager().flatMap(NetworkManager::cleanUp);
   }
 
   @Override

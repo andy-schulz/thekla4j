@@ -12,6 +12,8 @@ import com.teststeps.thekla4j.browser.selenium.logListener.BidiLogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.EmptyLogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.SeleniumLogManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.BidiNetworkManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.NetworkManager;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import io.vavr.Function1;
 import io.vavr.Function2;
@@ -56,6 +58,7 @@ public class SeleniumLoader implements DriverLoader {
 
   Try<RemoteWebDriver> driver = null;
   Try<LogManager> logManager = null;
+  Try<NetworkManager> networkManager = null;
 
   /** Configuration for the browser to be used */
   protected BrowserConfig browserConfig;
@@ -73,6 +76,11 @@ public class SeleniumLoader implements DriverLoader {
       d -> Try.failure(new RuntimeException("LogManager not initialized"));
 
   private boolean shallListenToBrowserLogs = false;
+
+  private Function1<RemoteWebDriver, Try<NetworkManager>> initNetworkManager =
+      d -> Try.failure(new RuntimeException("NetworkManager not initialized"));
+
+  private boolean shallListenToNetworkTraffic = false;
 
   /** Path to the download directory if file download is enabled */
   protected Option<Path> downloadPath = Option.none();
@@ -209,6 +217,7 @@ public class SeleniumLoader implements DriverLoader {
         .map(dr -> driverUpdates.foldLeft(dr, (drv, update) -> update.apply(drv)));
 
     if (shallListenToBrowserLogs) logManager();
+    if (shallListenToNetworkTraffic) networkManager();
 
     return driver;
   }
@@ -220,6 +229,52 @@ public class SeleniumLoader implements DriverLoader {
     } else {
       this.logManager = driver().flatMap(initLogManager);
       return logManager;
+    }
+  }
+
+  @Override
+  public Try<Void> activateNetworkListener() {
+
+    if (driver != null) {
+      String errorMessage = """
+          Driver is already initialized.
+          The ListenToNetworkTraffic ability must be assigned before you are interacting with the browser the first time.
+
+          Browser browser = Selenium.browser().build();
+
+          Actor actor = Actor
+              .named("actors name")
+              .whoCan(BrowseTheWeb.with(browser))
+              .whoCan(ListenToNetworkTraffic.of(browser));
+
+          actor.attemptsTo(
+            RecordNetworkCalls.all(),
+            Navigate.to("https://www.google.com")
+          );
+
+          """;
+      log.error(() -> errorMessage);
+      return Try.failure(new IllegalStateException(errorMessage));
+    }
+
+    this.optionUpdates = optionUpdates.append(o -> {
+      o.setCapability("webSocketUrl", true);
+      return o;
+    });
+
+    this.initNetworkManager = d -> Try.of(() -> BidiNetworkManager.init(d));
+    this.shallListenToNetworkTraffic = true;
+
+    return Try.success(null);
+  }
+
+  @Override
+  public Try<NetworkManager> networkManager() {
+    if (!Objects.isNull(networkManager)) {
+      return networkManager;
+    } else {
+      this.networkManager = driver().flatMap(initNetworkManager);
+      return networkManager;
     }
   }
 

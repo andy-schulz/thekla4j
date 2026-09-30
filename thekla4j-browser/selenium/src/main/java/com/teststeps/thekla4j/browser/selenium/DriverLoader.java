@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.NetworkManager;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.nio.file.Path;
@@ -54,6 +55,20 @@ public interface DriverLoader {
    */
 
   Try<LogManager> logManager();
+
+  /**
+   * Initializes the network listener for the driver, if supported.
+   *
+   * @return A Try indicating success or failure.
+   */
+  Try<Void> activateNetworkListener();
+
+  /**
+   * Provides the NetworkManager recording the network calls of the driver.
+   *
+   * @return A Try of NetworkManager.
+   */
+  Try<NetworkManager> networkManager();
 
   /**
    * Checks if video recording is active for the driver, if supported.

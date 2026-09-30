@@ -59,6 +59,16 @@ The following activities are currently implemented to interact with a browser.
 | [SwitchToNewBrowser](#switchtonewbrowser) | Switch to a new browser tab or window.                  |
 | [Resize](#resize)                         | Resize the browser window to a specific size.           |
 
+### Network Monitoring
+
+Requires the `ListenToNetworkTraffic` ability. See
+[Network Traffic Monitoring]({{ site.baseurl }}/features/web/browser/#network-traffic-monitoring).
+
+| activity                                      | activity description                                        |
+|-----------------------------------------------|-------------------------------------------------------------|
+| [RecordNetworkCalls](#recordnetworkcalls)     | Record the network calls the browser makes                  |
+| [NetworkCalls](#networkcalls)                 | Get the recorded network calls                              |
+
 ___
 ___
 
@@ -1287,3 +1297,117 @@ class TestSuite {
 
 **Note:** Window resizing is not supported on mobile devices (Appium). Attempting to resize a mobile browser window will result in an error.
 
+___
+___
+
+## Network Monitoring
+
+Both activities need the `ListenToNetworkTraffic` ability, which has to be assigned **before** the actor interacts with
+the browser for the first time. Recording is passive and never blocks a request.
+
+### RecordNetworkCalls
+
+Starts recording the network calls the browser makes. The url pattern is matched against the whole url, where `*` matches
+any sequence of characters; every other character is taken literally.
+
+| method                                    | description                                            |
+|-------------------------------------------|--------------------------------------------------------|
+| `RecordNetworkCalls.matching(urlPattern)` | record every call whose url matches the pattern        |
+| `RecordNetworkCalls.all()`                | record every call the browser makes                    |
+| `RecordNetworkCalls.clear()`              | drop the calls recorded so far, keep recording         |
+
+```java
+import com.teststeps.thekla4j.browser.spp.abilities.ListenToNetworkTraffic;
+import com.teststeps.thekla4j.browser.spp.activities.RecordNetworkCalls;
+
+public class TestRecordNetworkCalls {
+
+  private Actor actor;
+
+  @BeforeEach
+  void setup() {
+    Browser browser = Selenium.browser().build();
+
+    actor = Actor.named("NetworkTester")
+        .whoCan(BrowseTheWeb.with(browser))
+        .whoCan(ListenToNetworkTraffic.of(browser));
+  }
+
+  @Test
+  void recordApiCalls() {
+    actor.attemptsTo(
+        RecordNetworkCalls.matching("https://api.example.com/*"),
+
+        Navigate.to("https://example.com/profile"));
+  }
+
+  @Test
+  void recordEverythingAndResetBetweenSteps() {
+    actor.attemptsTo(
+        RecordNetworkCalls.all(),
+
+        Navigate.to("https://example.com/first"));
+
+    actor.attemptsTo(
+        RecordNetworkCalls.clear(),
+
+        Navigate.to("https://example.com/second"));
+  }
+}
+```
+
+### NetworkCalls
+
+Returns the recorded calls, in the order the requests were sent.
+
+| method                                 | description                                      |
+|----------------------------------------|--------------------------------------------------|
+| `NetworkCalls.recorded()`              | all calls recorded so far                        |
+| `NetworkCalls.recordedFor(urlPattern)` | only the recorded calls matching the pattern     |
+
+Network events arrive asynchronously, so a response may not have been recorded yet when the next activity runs. Use
+`Retry` to wait for it rather than asserting straight away.
+
+```java
+import com.teststeps.thekla4j.browser.core.network.NetworkCall;
+import com.teststeps.thekla4j.browser.spp.activities.NetworkCalls;
+import com.teststeps.thekla4j.core.activities.Retry;
+
+public class TestNetworkCalls {
+
+  @Test
+  void assertThatTheProfilePageCallsTheUserEndpoint() {
+
+    List<NetworkCall> calls = actor.attemptsTo(
+        RecordNetworkCalls.matching("https://api.example.com/*"),
+
+        Navigate.to("https://example.com/profile"),
+
+        Retry.task(NetworkCalls.recordedFor("https://api.example.com/*"))
+            .until(c -> c.exists(call -> call.url().endsWith("/v1/user")), "the user endpoint was called")
+            .forAsLongAs(Duration.ofSeconds(5))
+            .every(Duration.ofMillis(200)))
+
+        .getOrElseThrow(Function.identity());
+
+    assertThat("the user endpoint answered with 200",
+      calls.head().status().get(), equalTo(200));
+  }
+
+  @Test
+  void assertThatNoApiCallFailed() {
+    actor.attemptsTo(
+        NetworkCalls.recordedFor("https://api.example.com/*")
+            .is(Expected.to.pass(
+                calls -> calls.forAll(c -> c.status().exists(s -> s < 400)),
+                "no API call returned an error status")));
+  }
+}
+```
+
+A `NetworkCall` carries `method`, `url` and `requestHeaders`, plus `status`, `statusText`, `responseHeaders`, `mimeType`,
+`responseBodySize` and `fromCache` as `Option`s that are filled once the response has completed.
+
+**Note:** There is no response body. WebDriver BiDi reports the size of a response body but never its content, so
+asserting on a response payload is not possible. Stubbing, blocking and rewriting requests are not supported either, see
+[What is not supported]({{ site.baseurl }}/features/web/browser/#what-is-not-supported).

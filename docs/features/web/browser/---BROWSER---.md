@@ -166,6 +166,141 @@ System.setProperty("thekla4j.browser.selenium.bidi.log", "true");
 - **Resource management**: Automatic cleanup prevents memory leaks
 
 
+## Network Traffic Monitoring
+
+### ListenToNetworkTraffic Ability
+
+The `ListenToNetworkTraffic` ability lets actors record the network calls a browser makes, so a test can assert that a
+request was actually sent and what the server answered. It uses the WebDriver BiDi protocol and works on Chrome, Edge and
+Firefox.
+
+Recording is passive: no request is ever blocked or delayed, so page load behaviour is unchanged.
+
+#### Setting up Network Monitoring
+
+Assign the `ListenToNetworkTraffic` ability alongside `BrowseTheWeb`, then say which calls shall be recorded:
+
+```java
+Browser browser = Selenium.browser().build();
+
+Actor actor = Actor.named("NetworkMonitoringActor")
+    .whoCan(BrowseTheWeb.with(browser))
+    .whoCan(ListenToNetworkTraffic.of(browser));
+
+actor.attemptsTo(
+    RecordNetworkCalls.matching("https://api.example.com/*"),
+
+    Navigate.to("https://example.com/profile")
+);
+```
+
+#### Requirements
+
+- The browser instance must implement the `BrowserNetwork` interface
+- The ability must be assigned **before** the first interaction with the browser, because it changes the capabilities the
+  browser session is created with. Assigning it too late fails with an explanatory error.
+- No property has to be enabled. Assigning the ability is the opt-in.
+- Not supported for Appium sessions. The calls are then simply not recorded and a warning is logged.
+
+### Recording network calls
+
+`RecordNetworkCalls` starts recording and has three forms:
+
+| Activity | Description |
+|----------|-------------|
+| `RecordNetworkCalls.matching(urlPattern)` | record every call whose url matches the pattern |
+| `RecordNetworkCalls.all()` | record every call the browser makes |
+| `RecordNetworkCalls.clear()` | drop the calls recorded so far, keep recording |
+
+The url pattern is matched against the whole url, where `*` matches any sequence of characters. Every other character is
+taken literally, so `?` and `.` mean exactly themselves:
+
+```java
+RecordNetworkCalls.matching("https://api.example.com/v1/*")   // everything below /v1
+RecordNetworkCalls.matching("*")                              // the same as RecordNetworkCalls.all()
+```
+
+Calling `matching` more than once adds further patterns.
+
+### Reading the recorded calls
+
+`NetworkCalls` is a question returning the recorded calls in the order the requests were sent:
+
+| Activity | Description |
+|----------|-------------|
+| `NetworkCalls.recorded()` | all calls recorded so far |
+| `NetworkCalls.recordedFor(urlPattern)` | only the recorded calls matching the pattern |
+
+Network events arrive asynchronously, so a response may not be recorded yet when the next activity runs. Use `Retry` to
+wait for it instead of asserting straight away:
+
+```java
+List<NetworkCall> calls = actor.attemptsTo(
+
+    RecordNetworkCalls.matching("https://api.example.com/*"),
+
+    Navigate.to("https://example.com/profile"),
+
+    Retry.task(NetworkCalls.recordedFor("https://api.example.com/*"))
+        .until(c -> c.exists(call -> call.url().endsWith("/v1/user")), "the user endpoint was called")
+        .forAsLongAs(Duration.ofSeconds(5))
+        .every(Duration.ofMillis(200)))
+
+    .getOrElseThrow(Function.identity());
+```
+
+Because `NetworkCalls` is a `SupplierTask`, it also composes with the usual assertions:
+
+```java
+actor.attemptsTo(
+    NetworkCalls.recordedFor("https://api.example.com/*")
+        .is(Expected.to.pass(
+            calls -> calls.forAll(c -> c.status().exists(s -> s < 400)),
+            "no API call returned an error status")));
+```
+
+### The NetworkCall record
+
+| Component | Type | Description |
+|-----------|------|-------------|
+| `method()` | `String` | the HTTP method of the request |
+| `url()` | `String` | the url the request was sent to |
+| `requestHeaders()` | `Map<String, String>` | the headers the request was sent with |
+| `status()` | `Option<Integer>` | the HTTP status code, none until the response completed |
+| `statusText()` | `Option<String>` | the reason phrase, none until the response completed |
+| `responseHeaders()` | `Map<String, String>` | the headers of the response, empty until it completed |
+| `mimeType()` | `Option<String>` | the mime type of the response |
+| `responseBodySize()` | `Option<Long>` | the size of the response body in bytes |
+| `fromCache()` | `Option<Boolean>` | whether the response was served from the browser cache |
+
+A call is assembled from two events: the request is known when it is sent, the response components arrive later. That is
+why every response component is an `Option`.
+
+> **There is no response body.** WebDriver BiDi reports the *size* of a response body but never its content, so
+> `responseBodySize()` is as close as it gets. Asserting on a response payload is not possible through this ability.
+
+### What is not supported
+
+Stubbing a response, blocking a request and rewriting an outgoing request are **not** part of this ability. WebDriver BiDi
+does define those operations, but releasing a blocked request is currently broken in the Selenium java client: the request
+is blocked and the event is delivered, yet both `continueRequest` and `provideResponse` time out, which leaves the page
+load hanging. Only observation is therefore offered, and the interception activities will be added once that is fixed
+upstream.
+
+#### Recorded calls in the activity log
+
+The recorded calls are attached to the activity log automatically, next to the screenshot `BrowseTheWeb` contributes, so
+a failing test shows what the browser requested without any extra code.
+
+#### Benefits
+
+- **Assert on real traffic**: verify that a page actually called the endpoints it should
+- **No interference**: recording never blocks or delays a request
+- **Cross browser**: Chrome, Edge and Firefox through one API
+- **Integrated reporting**: recorded calls appear in the activity log
+- **Resource management**: the listener is closed when the ability is destroyed
+
+
 # Browser Configurations
 
 ## Configuring the Browser

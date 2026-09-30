@@ -12,8 +12,11 @@ import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
 import com.teststeps.thekla4j.browser.core.logListener.BrowserLog;
 import com.teststeps.thekla4j.browser.core.logListener.LogEntry;
+import com.teststeps.thekla4j.browser.core.network.BrowserNetwork;
+import com.teststeps.thekla4j.browser.core.network.NetworkCall;
 import com.teststeps.thekla4j.browser.selenium.SeleniumBrowser;
 import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.NetworkManager;
 import com.teststeps.thekla4j.browser.spp.activities.Rectangle;
 import com.teststeps.thekla4j.browser.spp.activities.State;
 import com.teststeps.thekla4j.browser.spp.activities.keyActions.KeyAction;
@@ -37,7 +40,7 @@ import lombok.extern.log4j.Log4j2;
  * A Browser implementation for mobile devices
  */
 @Log4j2(topic = "Mobile Browser")
-public class MobileBrowser implements Browser, BrowserLog {
+public class MobileBrowser implements Browser, BrowserLog, BrowserNetwork {
 
   private final BrowserConfig browserConfig;
 
@@ -517,5 +520,45 @@ public class MobileBrowser implements Browser, BrowserLog {
   @Override
   public Try<Void> cleanUp() {
     return appiumLoader.logManager().flatMap(LogManager::cleanUp);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> initNetworkListener() {
+    return appiumLoader.activateNetworkListener();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> recordCalls(String urlPattern) {
+    return appiumLoader.networkManager().flatMap(manager -> manager.recordCalls(urlPattern));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<List<NetworkCall>> recordedCalls() {
+    return appiumLoader.networkManager().map(NetworkManager::recordedCalls);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> clearRecordedCalls() {
+    return appiumLoader.networkManager().flatMap(NetworkManager::clearRecordedCalls);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<Void> cleanUpNetworkListener() {
+    return appiumLoader.networkManager().flatMap(NetworkManager::cleanUp);
   }
 }

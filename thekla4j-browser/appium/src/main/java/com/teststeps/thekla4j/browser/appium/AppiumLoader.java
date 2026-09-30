@@ -16,6 +16,8 @@ import com.teststeps.thekla4j.browser.selenium.logListener.BidiLogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.EmptyLogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.LogManager;
 import com.teststeps.thekla4j.browser.selenium.logListener.SeleniumLogManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.EmptyNetworkManager;
+import com.teststeps.thekla4j.browser.selenium.networkListener.NetworkManager;
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
 import com.teststeps.thekla4j.utils.url.UrlHelper;
 import io.appium.java_client.android.AndroidDriver;
@@ -188,6 +190,24 @@ public class AppiumLoader implements DriverLoader {
   /**
    * {@inheritDoc}
    */
+  /**
+   * Network observation is not supported for Appium sessions. WebDriver BiDi does not reach the browser of an Appium
+   * session, so an EmptyNetworkManager is provided and a warning is logged.
+   */
+  private static final String NETWORK_NOT_SUPPORTED =
+      "Observing network traffic is not supported for Appium sessions. Ignoring the recorded network calls.";
+
+  @Override
+  public Try<Void> activateNetworkListener() {
+    log.warn(NETWORK_NOT_SUPPORTED);
+    return Try.success(null);
+  }
+
+  @Override
+  public Try<NetworkManager> networkManager() {
+    return Try.success(EmptyNetworkManager.init(NETWORK_NOT_SUPPORTED));
+  }
+
   @Override
   public Try<LogManager> logManager() {
     if (!Objects.isNull(logManager)) {
