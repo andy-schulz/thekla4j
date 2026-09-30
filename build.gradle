@@ -34,21 +34,18 @@ tasks.register("gitReleaseNotes") {
 
         def range = project.findProperty("tagRange") ?: "v1.7.0..HEAD"
         println "Collecting git release notes for range: ${range}"
-        def stdout = new ByteArrayOutputStream()
-        def stderr = new ByteArrayOutputStream()
         def cmd = ["git", "--no-pager", "log", range, "--pretty=format:%h: %s"]
-        def execResult = exec {
+        def execOutput = providers.exec {
             commandLine cmd
-            standardOutput = stdout
-            errorOutput = stderr
             ignoreExitValue = true
         }
-        if (execResult.exitValue != 0) {
-            println "git log failed (exit=${execResult.exitValue})."
-            println stderr.toString("UTF-8")
+        def exitValue = execOutput.result.get().exitValue
+        if (exitValue != 0) {
+            println "git log failed (exit=${exitValue})."
+            println execOutput.standardError.asText.get()
         } else {
             // Sort commit messages alphabetically
-            def lines = stdout.toString("UTF-8").split('\n')
+            def lines = execOutput.standardOutput.asText.get().split('\n')
             def sortedLines = lines.sort { line ->
                 // Extract commit message (everything after "hash: ")
                 def colonIndex = line.indexOf(': ')
