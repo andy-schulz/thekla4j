@@ -1,7 +1,12 @@
 # Gradle 9, Selenium 4.49 and network interception for `thekla4j-browser`
 
-> Status: **Phase 0 (Gradle 9) is applied and verified. Everything from Part 1 onward is plan,
-> not implemented.** Written 2026-09-30 against `master` at `356e9ab`.
+> Status: **Phase 0 (Gradle 9) and Phase 1 step 1 (the Selenium 4.49.0 / Appium 10.1.1 version
+> bump) are applied and verified. The Grid images, the integration-test runs and everything from
+> Part 3 onward are still plan.** Written 2026-09-30 against `master` at `356e9ab`.
+>
+> Phase 1 step 1 landed earlier than planned, as part of the dependency-security pass: fixing
+> CVE-2026-43910 in `io.appium:java-client` requires 10.1.1, which requires `selenium-api >= 4.42`.
+> The upgrade was therefore forced by a HIGH advisory rather than chosen.
 >
 > Every API claim about Selenium was established by disassembling the actual artifacts —
 > 4.35.0 from the Gradle cache and 4.49.0 from Maven Central — not from documentation. Claims
@@ -101,11 +106,12 @@ Nine of them changed. The rest — including `By`, `WebElement`, `Keys`, `Action
 | `DesiredCapabilities` setters `void` → fluent | Same, in `MobileBrowserFunctions`. **No edit.** |
 | `FirefoxOptions.setProfile` is now `final` | Nothing subclasses `FirefoxOptions`. **No edit.** |
 | `Capabilities` gains `default <T> T get(String)` and `required(String)` | Nothing in the repo implements `Capabilities`. **No edit.** |
-| `HasDownloads` gains abstract `getDownloadedFiles()` | `ElementFunctions.java:497,516` use `HasDownloads` only as a *parameter type*; nothing implements it. **No edit.** |
+| `HasDownloads` gains abstract `getDownloadedFiles()`, and **`getDownloadableFiles()` becomes `@Deprecated`** | `ElementFunctions.java:497,516` use `HasDownloads` only as a *parameter type*; nothing implements it, so the added abstract method costs nothing. But `ElementFunctions.java:523` calls `getDownloadableFiles()`, which now emits a deprecation warning — compiles, does not fail. Migrating to `getDownloadedFiles()` (which returns `List<DownloadedFile>` rather than `List<String>`) is optional and tracked in *Follow-ups*. |
 | `LogInspector` gains `clearListener`/`clearListeners`; `ChromeDriver`/`EdgeDriver`/`FirefoxDriver`/`RemoteWebDriver` gain `ClientConfig` constructors; `SafariOptions` gains `enableBiDi()`; `RemoteWebDriver` gains `fireSessionEvent`, `getHandle`, `getClientConfig` | Purely additive. |
 
 **So the expected source-change cost of the Selenium upgrade is one line: the version string.**
-That is a prediction from signature analysis, and Phase 1 exists to confirm it by compiling.
+Confirmed empirically: all modules compile against 4.49.0 with no source edits. The only new
+compiler output is one deprecation note in `ElementFunctions` for `getDownloadableFiles()`.
 
 ### 1.3 Grid: what actually carries risk
 
@@ -142,8 +148,10 @@ not a pin. 4.49.0 satisfies it, and because `appium/build.gradle` also declares 
 artifacts explicitly at `project.seleniumVersion`, resolution stays deterministic. **No Appium
 change needed.**
 
-For reference, if `java-client` is ever bumped: 10.1.1 requires `[4.42.0, 5.0)`, so it would
-*force* this upgrade. Out of scope here.
+**This is what actually forced the upgrade.** `java-client:10.0.0` carries CVE-2026-43910
+(HIGH — network pivot via an unvalidated `directConnect` redirect in `AppiumCommandExecutor`),
+fixed only in 10.1.1, and 10.1.1 requires `[4.42.0, 5.0)`. So Selenium could not stay on 4.35.0
+without leaving a HIGH advisory open. Both are now at 10.1.1 / 4.49.0.
 
 ### 1.5 The one change that is worth the upgrade
 
@@ -973,9 +981,11 @@ unaffected.
 
 ### Phase 1 — Selenium 4.49.0, classic paths only
 
-1. `thekla4j-browser/build.gradle`: `seleniumVersion = '4.35.0'` → `'4.49.0'`
-   → verify: `./gradlew compileJava compileTestJava` green with **no source edits** (the
-   prediction of 1.2; if anything fails, that is new information and belongs in this document)
+1. ~~`thekla4j-browser/build.gradle`: `seleniumVersion = '4.35.0'` → `'4.49.0'`~~ — **done**,
+   together with `appiumVersion = '10.0.0'` → `'10.1.1'`
+   → verified: `./gradlew compileJava compileTestJava` green, **no source edits**, confirming the
+   prediction of 1.2. The only new compiler output is one deprecation note for
+   `getDownloadableFiles()` (see 1.2 and *Follow-ups*).
 2. Bump `selenium/hub` and `selenium/node-docker` to `4.49.0` in `global_resources/docker-compose.yml`
    and `docker-compose-test.yml`
    → verify: Grid comes up, `./gradlew build` green
@@ -983,7 +993,7 @@ unaffected.
    → verify: `IT_Selenium*` pass, in particular the download tests (`HasDownloads`) and
    `IT_SeleniumActorLogListenerTest.bidiChromeLogTest` / `bidiFirefoxLogTest`
 4. Run the Appium integration tests
-   → verify: `IT_Appium*` unchanged, confirming `java-client:10.0.0` is happy on 4.49
+   → verify: `IT_Appium*` unchanged on `java-client:10.1.1` / Selenium 4.49
 
 ### Phase 2 — Prove BiDi on this infrastructure before building on it
 
@@ -1127,6 +1137,9 @@ always-release unit tests pass; and the docs state the no-response-body limitati
   `BrowserNetwork` is the interface it should implement — and unlike Selenium it *can* read
   response bodies, which would make the 3.1 limitation browser-implementation-specific rather than
   absolute.
+- `HasDownloads.getDownloadableFiles()` is deprecated in 4.49. `ElementFunctions.java:523` still
+  uses it; migrating to `getDownloadedFiles()` means handling `List<DownloadedFile>` instead of
+  `List<String>`, so it is a behavioural change to `getRemoteDownloadedFile`, not a rename.
 - Response-body capture via CDP (3.10.4).
 - `setCacheBehavior(BYPASS)` is available and is often wanted alongside interception; not included
   because it was not asked for.

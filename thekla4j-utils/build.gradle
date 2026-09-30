@@ -6,9 +6,9 @@ plugins {
 
 dependencies {
     api 'com.google.code.gson:gson:2.9.0'
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
-    api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.16.1'
-    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.16.1'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.3'
+    api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.22.3'
+    api group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.22.3'
     api group: 'io.vavr', name: 'vavr-jackson', version: '0.10.3'
 }
 

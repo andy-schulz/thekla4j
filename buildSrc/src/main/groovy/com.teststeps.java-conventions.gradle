@@ -14,14 +14,35 @@ repositories {
 
 dependencies {
     api group: 'io.vavr', name: 'vavr', version: '0.10.6'
-    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.26.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.26.1'
     implementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
 
     testImplementation(platform('org.junit:junit-bom:5.10.+'))
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.+'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.+'
     testImplementation group: "org.mockito", name: "mockito-inline", version: "3.+"
+
+    // Security pins for vulnerable transitive test dependencies. These are test scope only, so
+    // they do not appear in any published POM. Each can be dropped once the dependency that
+    // drags the old version in has been updated upstream.
+    constraints {
+        // CVE-2026-84939 (critical, path traversal in template loading).
+        // Pulled in by io.qameta.allure:allure-plugin-api.
+        testImplementation('org.freemarker:freemarker:2.3.35') {
+            because 'CVE-2026-84939 - FreeMarker template loading path traversal'
+        }
+        // CVE-2021-47621 (XXE). Pulled in via the abandoned io.github.benas:random-beans:3.9.0,
+        // a dependency of io.qameta.allure:allure-java-commons-test, which still pins 4.6.18.
+        testImplementation('io.github.classgraph:classgraph:4.8.196') {
+            because 'CVE-2021-47621 - ClassGraph XML external entity reference'
+        }
+        // allure-plugin-api drags in jackson-bom 2.21.2, which pins jackson below the version
+        // the rest of the build uses. 2.21.2 carries 14 advisories, 3 of them high.
+        testImplementation('com.fasterxml.jackson.core:jackson-databind:2.22.3') {
+            because 'jackson-bom 2.21.2 from allure-plugin-api pins jackson to a vulnerable version'
+        }
+    }
 }
 
 java {
