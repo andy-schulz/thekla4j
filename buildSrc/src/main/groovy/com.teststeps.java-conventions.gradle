@@ -22,6 +22,10 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.+'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.+'
     testImplementation group: "org.mockito", name: "mockito-inline", version: "3.+"
+    // Gradle 9 no longer puts the JUnit Platform launcher on the test runtime classpath
+    // automatically, so it has to be declared or no test task can start. Version comes from the
+    // junit-bom platform above.
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // Security pins for vulnerable transitive test dependencies. These are test scope only, so
     // they do not appear in any published POM. Each can be dropped once the dependency that
