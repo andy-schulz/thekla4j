@@ -362,6 +362,16 @@ public interface Browser {
   Try<String> getSessionId();
 
   /**
+   * Get the details of the running browser session as reported by the driver.
+   *
+   * <p>These are the details the session actually has, which may differ from the
+   * {@link com.teststeps.thekla4j.browser.config.BrowserConfig} that was requested.</p>
+   *
+   * @return a Try containing the details of the browser session
+   */
+  Try<BrowserDetails> details();
+
+  /**
    * Check if video recording is active
    *
    * @return whether video recording is active

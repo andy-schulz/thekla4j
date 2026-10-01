@@ -7,6 +7,7 @@ import static com.teststeps.thekla4j.browser.selenium.FrameFunctions.switchToFra
 
 import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
+import com.teststeps.thekla4j.browser.core.BrowserDetails;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.Frame;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
@@ -630,6 +631,16 @@ public class SeleniumBrowser implements Browser, BrowserLog, BrowserNetwork, Sel
   public Try<String> getSessionId() {
     return driverLoader.driver()
         .map(d -> d.getSessionId().toString());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<BrowserDetails> details() {
+    return driverLoader.driver()
+        .map(RemoteWebDriver::getCapabilities)
+        .map(CapabilityFunctions.toBrowserDetails);
   }
 
   /**

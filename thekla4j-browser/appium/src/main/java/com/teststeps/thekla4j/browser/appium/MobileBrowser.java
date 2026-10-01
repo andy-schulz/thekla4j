@@ -7,6 +7,7 @@ import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.config.OperatingSystem;
 import com.teststeps.thekla4j.browser.core.Browser;
+import com.teststeps.thekla4j.browser.core.BrowserDetails;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.drawing.Shape;
 import com.teststeps.thekla4j.browser.core.drawing.StartPoint;
@@ -399,6 +400,14 @@ public class MobileBrowser implements Browser, BrowserLog, BrowserNetwork {
   @Override
   public Try<String> getSessionId() {
     return seleniumBrowser.getSessionId();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Try<BrowserDetails> details() {
+    return seleniumBrowser.details();
   }
 
   /**
