@@ -357,6 +357,14 @@ public class AppiumLoader implements DriverLoader {
     }
     return Try.success(options);
   };
+
+  private final Function2<BrowserConfig, AppiumOptions, AppiumOptions> setPreferences = (browserConfig, options) -> {
+    if (!isNullSafe(browserConfig::prefs) && !browserConfig.prefs().isEmpty()) {
+      log.warn("Browser preferences are not supported by Appium. Ignoring prefs from BrowserConfig: {}", browserConfig.prefs());
+    }
+    return options;
+  };
+
   private final Function2<BrowserConfig, AppiumOptions, Try<AppiumOptions>> setEnableFileDownload = (browserConfig, options) -> {
     if (browserConfig.enableFileDownload()) {
       Path df = TempFolderUtil.newSubTempFolder(DOWNLOAD_PREFIX);
@@ -474,6 +482,7 @@ public class AppiumLoader implements DriverLoader {
         .flatMap(setBinary.apply(browserConfig))
         .map(setHeadless.apply(browserConfig))
         .map(addArguments.apply(browserConfig))
+        .map(setPreferences.apply(browserConfig))
         .flatMap(setAutomationNameFromConfigs.apply(browserConfig, appConfig))
         .map(setVideoRecording.apply(browserConfig))
         .flatMap(addCapabilities.apply(appiumConfig))

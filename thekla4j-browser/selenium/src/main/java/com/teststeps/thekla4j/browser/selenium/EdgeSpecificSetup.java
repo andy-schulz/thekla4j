@@ -1,9 +1,11 @@
 package com.teststeps.thekla4j.browser.selenium;
 
 import com.teststeps.thekla4j.core.properties.TempFolderUtil;
+import io.vavr.Function1;
 import io.vavr.Function2;
+import io.vavr.collection.LinkedHashMap;
+import io.vavr.collection.Map;
 import java.nio.file.Path;
-import java.util.HashMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -15,15 +17,21 @@ import org.openqa.selenium.edge.EdgeOptions;
 public class EdgeSpecificSetup {
 
   /**
-   * Function to set the file download directory for Edge browser options.
+   * The preferences needed to download files to the given directory without prompting.
    */
-  public static final Function2<Path, EdgeOptions, EdgeOptions> setFileDownloadDir = (downloadPath, options) -> {
-    HashMap<String, Object> prefs = new HashMap<>();
+  public static final Function1<Path, Map<String, Object>> downloadPrefs = downloadPath -> LinkedHashMap.of(
+    "download.default_directory", TempFolderUtil.directory(downloadPath).toAbsolutePath().toString(),
+    "download.prompt_for_download", false);
 
-    prefs.put("download.default_directory", TempFolderUtil.directory(downloadPath).toAbsolutePath().toString());
-    prefs.put("download.prompt_for_download", false);
+  /**
+   * Applies the given preferences to the EdgeOptions.
+   * <p>
+   * Edge accepts all preferences in a single experimental option, so this function is the only place writing it.
+   */
+  public static final Function2<Map<String, Object>, EdgeOptions, EdgeOptions> setPreferences = (prefs, options) -> {
 
-    options.setExperimentalOption("prefs", prefs);
+    if (!prefs.isEmpty())
+      options.setExperimentalOption("prefs", prefs.toJavaMap());
 
     return options;
   };

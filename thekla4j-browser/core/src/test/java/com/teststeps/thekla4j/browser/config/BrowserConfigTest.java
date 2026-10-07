@@ -71,6 +71,50 @@ public class BrowserConfigTest {
   }
 
   @Test
+  public void loadBrowserConfigWithPreferences() {
+
+    String config = """
+          defaultConfig: FirefoxGerman
+
+          FirefoxGerman:
+            browserName: firefox
+            prefs:
+              intl.accept_languages: "de-DE,de"
+              media.autoplay.default: 0
+              media.autoplay.blocking_policy: 0
+              dom.webnotifications.enabled: false
+        """;
+
+    BrowserConfig browserConfig = YAML.jParse(BrowserConfigList.class)
+        .apply(config)
+        .flatMap(list -> list.browserConfigs().get("FirefoxGerman").toTry())
+        .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
+
+    assertThat("all preferences are loaded", browserConfig.prefs().size(), equalTo(4));
+    assertThat("a string preference keeps its type", browserConfig.prefs().get("intl.accept_languages").get(), equalTo("de-DE,de"));
+    assertThat("an integer preference keeps its type", browserConfig.prefs().get("media.autoplay.default").get(), equalTo(0));
+    assertThat("a boolean preference keeps its type", browserConfig.prefs().get("dom.webnotifications.enabled").get(), equalTo(false));
+  }
+
+  @Test
+  public void loadBrowserConfigWithoutPreferencesHasEmptyPreferences() {
+
+    String config = """
+          defaultConfig: Firefox1
+
+          Firefox1:
+            browserName: firefox
+        """;
+
+    BrowserConfig browserConfig = YAML.jParse(BrowserConfigList.class)
+        .apply(config)
+        .flatMap(list -> list.browserConfigs().get("Firefox1").toTry())
+        .getOrElseThrow(x -> new RuntimeException("Error loading BrowserConfig", x));
+
+    assertThat("preferences are empty and not null", browserConfig.prefs().isEmpty(), equalTo(true));
+  }
+
+  @Test
   public void loadMultipleBrowserConfigs() throws IOException {
 
     String config = """
@@ -213,6 +257,7 @@ public class BrowserConfigTest {
           binary: "/path/to/binary" # the path to the binary, <optional>
           headless: true/false # if the browser should be headless, <optional>
           browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
+          prefs: {} # Example: { "intl.accept_languages": "de-DE,de" }, <optional, not supported by safari>
 
           debug: # chrome debugging options, <optional>
             debuggerAddress: "localhost:9222"

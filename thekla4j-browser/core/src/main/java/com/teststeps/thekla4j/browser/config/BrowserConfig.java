@@ -2,7 +2,9 @@ package com.teststeps.thekla4j.browser.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teststeps.thekla4j.utils.yaml.YAML;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import lombok.With;
 
 /**
@@ -18,6 +20,7 @@ import lombok.With;
  * @param binary             - the path to the browser binary
  * @param headless           - if the browser should be headless
  * @param browserArgs        - the arguments for the browser
+ * @param prefs              - the preferences for the browser
  * @param debug              - the chrome debugging options
  * @param video              - the video options
  *
@@ -107,6 +110,14 @@ public record BrowserConfig(
                             List<String> browserArgs,
 
                             /**
+                             * the preferences of the browser, not supported by Safari
+                             *
+                             * @param prefs - the preferences of the browser
+                             * @return - the preferences of the browser
+                             */
+                            Map<String, Object> prefs,
+
+                            /**
                              * the debugging options
                              *
                              * @param debug - the browser debugging options
@@ -142,6 +153,7 @@ public record BrowserConfig(
                              null,
                              false,
                              List.empty(),
+                             LinkedHashMap.empty(),
                              null,
                              null);
   }
@@ -175,6 +187,7 @@ public record BrowserConfig(
           binary: "/path/to/binary" # the path to the binary, <optional>
           headless: true/false # if the browser should be headless, <optional>
           browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
+          prefs: {} # Example: { "intl.accept_languages": "de-DE,de" }, <optional, not supported by safari>
 
           debug: # chrome debugging options, <optional>
         {{DEBUG_OPTIONS}}
@@ -189,7 +202,7 @@ public record BrowserConfig(
    * Create a default BrowserConfig object with Chrome as browser
    */
   public BrowserConfig() {
-    this(BrowserName.CHROME, null, null, null, null, false, false, null, false, List.empty(), null, null);
+    this(BrowserName.CHROME, null, null, null, null, false, false, null, false, List.empty(), LinkedHashMap.empty(), null, null);
   }
 
   /**
@@ -205,11 +218,12 @@ public record BrowserConfig(
    * @param binary             - the path to the browser binary
    * @param headless           - if the browser should be headless
    * @param browserArgs        - the arguments for the browser
+   * @param prefs              - the preferences for the browser
    * @param debug              - the debugging options
    * @param video              - the video options
    */
   public BrowserConfig(
-                       BrowserName browserName, String browserVersion, OperatingSystem platformName, String osVersion, String deviceName, boolean enableFileUpload, boolean enableFileDownload, String binary, boolean headless, List<String> browserArgs, DebugOptions debug, VideoConfig video
+                       BrowserName browserName, String browserVersion, OperatingSystem platformName, String osVersion, String deviceName, boolean enableFileUpload, boolean enableFileDownload, String binary, boolean headless, List<String> browserArgs, Map<String, Object> prefs, DebugOptions debug, VideoConfig video
   ) {
 
     this.browserName = browserName;
@@ -222,6 +236,7 @@ public record BrowserConfig(
     this.binary = binary;
     this.headless = headless;
     this.browserArgs = browserArgs == null ? List.empty() : browserArgs;
+    this.prefs = prefs == null ? LinkedHashMap.empty() : prefs;
     this.debug = debug;
     this.video = video;
   }

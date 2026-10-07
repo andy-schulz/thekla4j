@@ -37,6 +37,7 @@ public class TestDownloadFile {
           binary: "/path/to/binary" # the path to the binary, <optional>
           headless: true/false # if the browser should be headless, <optional>
           browserArgs: [] # Example: ["--no-sandbox", "--disable-dev-shm-usage"], <optional>
+          prefs: {} # Example: { "intl.accept_languages": "de-DE,de" }, <optional, not supported by safari>
 
           debug: # chrome debugging options, <optional>
             debuggerAddress: "localhost:9222"

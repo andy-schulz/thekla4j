@@ -21,6 +21,7 @@ import io.vavr.Tuple;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
+import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.net.URL;
@@ -43,6 +44,7 @@ import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 /**
@@ -55,6 +57,16 @@ import org.openqa.selenium.safari.SafariOptions;
  */
 @Log4j2(topic = "Selenium Driver Loader")
 public class SeleniumLoader implements DriverLoader {
+
+  private static final String SAFARI_PREFS_NOT_SUPPORTED = """
+      Safari does not support browser preferences. The safaridriver does not implement any preference mechanism.
+      Remove the prefs from the browser configuration or use a different browser.
+      """;
+
+  private static final String SAFARI_DOWNLOAD_DIR_NOT_SUPPORTED = """
+      Safari does not support setting a download directory. The safaridriver always downloads into the system download folder.
+      Remove enableFileDownload from the browser configuration or use a different browser.
+      """;
 
   Try<RemoteWebDriver> driver = null;
   Try<LogManager> logManager = null;
@@ -84,6 +96,9 @@ public class SeleniumLoader implements DriverLoader {
 
   /** Path to the download directory if file download is enabled */
   protected Option<Path> downloadPath = Option.none();
+
+  /** Preferences set by the framework itself, e.g. the file download directory */
+  protected Map<String, Object> frameworkPrefs = HashMap.empty();
 
   SeleniumLoader(BrowserConfig browserConfig, Option<SeleniumGridConfig> seleniumGridConfig, Option<BrowserStartupConfig> startupConfig) {
     this.browserConfig = browserConfig;
@@ -200,7 +215,7 @@ public class SeleniumLoader implements DriverLoader {
           case CHROME, CHROMIUM -> new ChromeDriver((ChromeOptions) opts);
           case FIREFOX -> new FirefoxDriver((FirefoxOptions) opts);
           case EDGE -> new EdgeDriver((EdgeOptions) opts);
-          case SAFARI -> new SafariOptions(opts);
+          case SAFARI -> new SafariDriver((SafariOptions) opts);
         })
             .onSuccess(x -> log.warn("Running Browser on Local Machine: {}. Ignoring platform and version information in BrowserConfig. \n{}",
               browserConfig.browserName(), browserConfig))
@@ -319,11 +334,12 @@ public class SeleniumLoader implements DriverLoader {
         .map(setOsVersion)
         .map(setDeviceName)
         .flatMap(startDebugSession)
-        .flatMap(setEnableFileUpload)
+        .map(setEnableFileUpload)
         .flatMap(setEnableFileDownload)
         .flatMap(setBinary)
         .flatMap(setHeadless)
         .flatMap(addArguments)
+        .flatMap(setPreferences)
         .map(setVideoRecording)
         .map(o -> (MutableCapabilities) o)
         .flatMap(addCapabilities.apply(seleniumConfig))
@@ -457,31 +473,23 @@ public class SeleniumLoader implements DriverLoader {
         return Try.success(options);
       };
 
-  private final Function1<AbstractDriverOptions<?>, Try<AbstractDriverOptions<?>>> setEnableFileUpload =
+  private final Function1<AbstractDriverOptions<?>, AbstractDriverOptions<?>> setEnableFileUpload =
       (options) -> {
 
         if (browserConfig.enableFileUpload()) {
           if (isLocalExecution()) {
 
-            Path df = TempFolderUtil.newSubTempFolder(DOWNLOAD_PREFIX);
-
-            return switch (browserConfig.browserName()) {
-
-              case CHROME, CHROMIUM -> Try.of(() -> ChromeSpecificSetup.setFileDownloadDir.apply(df, (ChromeOptions) options));
-              case FIREFOX -> Try.of(() -> FirefoxSpecificSetup.setFileDownloadDir.apply(df, (FirefoxOptions) options));
-
-              default -> Try.failure(new IllegalStateException("Unknown browser configuration: " + browserConfig.browserName()));
-            };
+            log.info("Running Browser on Local Machine: {}. A locally started browser reads the file to upload directly from disk.",
+              browserConfig.browserName());
 
           } else {
-            options.setEnableDownloads(true);
             setDriverUpdates(drv -> {
               drv.setFileDetector(new LocalFileDetector());
               return drv;
             });
           }
         }
-        return Try.success(options);
+        return options;
       };
 
 
@@ -511,14 +519,19 @@ public class SeleniumLoader implements DriverLoader {
               }
             }
 
-            return switch (browserConfig.browserName()) {
+            Try<Map<String, Object>> downloadPrefs = switch (browserConfig.browserName()) {
 
-              case CHROME, CHROMIUM -> Try.of(() -> ChromeSpecificSetup.setFileDownloadDir.apply(downloadPath.get(), (ChromeOptions) options));
-              case FIREFOX -> Try.of(() -> FirefoxSpecificSetup.setFileDownloadDir.apply(downloadPath.get(), (FirefoxOptions) options));
-              case EDGE -> Try.of(() -> EdgeSpecificSetup.setFileDownloadDir.apply(downloadPath.get(), (EdgeOptions) options));
+              case CHROME, CHROMIUM -> Try.of(() -> ChromeSpecificSetup.downloadPrefs.apply(downloadPath.get()));
+              case FIREFOX -> Try.of(() -> FirefoxSpecificSetup.downloadPrefs.apply(downloadPath.get()));
+              case EDGE -> Try.of(() -> EdgeSpecificSetup.downloadPrefs.apply(downloadPath.get()));
 
-              default -> Try.failure(new IllegalStateException("Download for browser " + browserConfig.browserName() + " is not supported yet."));
+              case SAFARI -> Try.failure(new IllegalArgumentException(SAFARI_DOWNLOAD_DIR_NOT_SUPPORTED));
             };
+
+            return downloadPrefs.map(prefs -> {
+              frameworkPrefs = frameworkPrefs.merge(prefs);
+              return options;
+            });
 
           } else {
             setDriverUpdates(drv -> {
@@ -571,6 +584,29 @@ public class SeleniumLoader implements DriverLoader {
       };
     }
     return Try.success(options);
+  };
+
+  private final Function1<AbstractDriverOptions<?>, Try<AbstractDriverOptions<?>>> setPreferences = (options) -> {
+
+    Map<String, Object> configuredPrefs = Objects.isNull(browserConfig.prefs()) ? HashMap.empty() : browserConfig.prefs();
+
+    Set<String> overriddenPrefs = configuredPrefs.keySet().intersect(frameworkPrefs.keySet());
+
+    if (!overriddenPrefs.isEmpty())
+      log.warn("The preferences {} are managed by thekla4j and cannot be set in the browser configuration. Ignoring the configured values.",
+        overriddenPrefs.mkString(", "));
+
+    Map<String, Object> prefs = frameworkPrefs.merge(configuredPrefs);
+
+    if (prefs.isEmpty())
+      return Try.success(options);
+
+    return switch (browserConfig.browserName()) {
+      case CHROME, CHROMIUM -> Try.success(ChromeSpecificSetup.setPreferences.apply(prefs, (ChromeOptions) options));
+      case FIREFOX -> Try.success(FirefoxSpecificSetup.setPreferences.apply(prefs, (FirefoxOptions) options));
+      case EDGE -> Try.success(EdgeSpecificSetup.setPreferences.apply(prefs, (EdgeOptions) options));
+      case SAFARI -> Try.failure(new IllegalArgumentException(SAFARI_PREFS_NOT_SUPPORTED));
+    };
   };
 
   private final Function1<AbstractDriverOptions<?>, AbstractDriverOptions<?>> setVideoRecording = (options) -> {

@@ -51,6 +51,7 @@ Browser browser = Selenium.browser()
 | `binary`             | `String`          | No       | `null`   | Path to custom browser binary                                   |
 | `headless`           | `boolean`         | No       | `false`  | Run browser in headless mode                                    |
 | `browserArgs`        | `List<String>`    | No       | `[]`     | Additional browser command line arguments                       |
+| `prefs`              | `Map<String, Object>` | No   | `{}`     | Browser preferences, not supported by Safari                    |
 | `debug`              | `DebugOptions`    | No       | `null`   | Browser debugging configuration                                 |
 | `video`              | `VideoConfig`     | No       | `null`   | Video recording configuration                                   |
 
@@ -88,6 +89,10 @@ headlessFirefox:
   browserArgs:
     - "--width=1920"
     - "--height=1080"
+  prefs:
+    intl.accept_languages: "de-DE,de"
+    media.autoplay.default: 0
+    dom.webnotifications.enabled: false
 
 # Mobile Safari Configuration
 mobileSafari:
@@ -96,6 +101,40 @@ mobileSafari:
   osVersion: "16.0"
   deviceName: "iPhone 14"
 ```
+
+#### Browser preferences
+
+`prefs` sets the internal preferences of the browser. They are the counterpart of `browserArgs`: `browserArgs` are
+command line switches handed to the browser process, `prefs` are the settings the browser itself keeps, the ones
+Firefox lists in `about:config` and Chrome in `chrome://prefs-internals`.
+
+Values keep their YAML type, so a preference can be a string, a number or a boolean:
+
+```yaml
+germanFirefox:
+  browserName: firefox
+  prefs:
+    intl.accept_languages: "de-DE,de"
+    media.autoplay.default: 0
+    dom.webnotifications.enabled: false
+```
+
+| Browser   | Support | Passed to the driver as                              |
+|-----------|---------|------------------------------------------------------|
+| `chrome`  | yes     | the `prefs` experimental option of `goog:chromeOptions` |
+| `chromium`| yes     | the `prefs` experimental option of `goog:chromeOptions` |
+| `edge`    | yes     | the `prefs` experimental option of `ms:edgeOptions`  |
+| `firefox` | yes     | the `prefs` entry of `moz:firefoxOptions`            |
+| `safari`  | no      | -                                                    |
+
+The safaridriver implements no preference mechanism at all, so a `prefs` entry for Safari is not ignored silently -
+starting the browser fails with an error naming the reason. The same holds for `enableFileDownload` on a locally
+started Safari: the safaridriver always downloads into the system download folder and cannot be pointed somewhere
+else.
+
+A few preferences are managed by thekla4j itself. `enableFileDownload` sets the download directory, for example
+`download.default_directory` for Chrome and Edge and `browser.download.dir` for Firefox. Those always win over a
+value from the browser configuration, and a conflict is logged as a warning.
 
 ### 2. SeleniumGridConfig
 
