@@ -9,6 +9,8 @@ dependencies {
     implementation project(":thekla4j-core")
     implementation(platform("io.qameta.allure:allure-bom:${allureJavaVersion}"))
     implementation 'io.qameta.allure:allure-java-commons'
+
+    testImplementation 'io.qameta.allure:allure-java-commons-test'
 }
 
 publishing {

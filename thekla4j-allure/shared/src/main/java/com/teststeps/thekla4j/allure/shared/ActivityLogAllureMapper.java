@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,17 @@ public final class ActivityLogAllureMapper {
 
   private static final DateTimeFormatter TIMESTAMP_FORMAT =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+
+  /**
+   * System property overriding the maximum length of a step parameter value. A value of 0 or less disables capping.
+   */
+  public static final String MAX_PARAMETER_VALUE_LENGTH_PROPERTY = "thekla4j.allure.maxParameterValueLength";
+
+  /**
+   * Maximum number of characters of a step parameter value that is written into the Allure result. A longer value is
+   * unreadable in the report anyway and makes the result file unparseable, so the remainder is attached instead.
+   */
+  private static final int DEFAULT_MAX_PARAMETER_VALUE_LENGTH = 32768;
 
   private ActivityLogAllureMapper() {
   }
@@ -115,15 +127,18 @@ public final class ActivityLogAllureMapper {
         .setName(stepName)
         .setStatus(mapStatus(node.status));
 
+    final List<ParameterSpill> spills = new ArrayList<>();
+
     if (stepName.endsWith("...")) {
-      addParameterIfNotBlank(step, "description", node.description);
+      addParameterIfNotBlank(step, "description", node.description, spills);
     }
 
-    addParameterIfNotBlank(step, "input", node.input);
-    addParameterIfNotBlank(step, "output", node.output);
+    addParameterIfNotBlank(step, "input", node.input, spills);
+    addParameterIfNotBlank(step, "output", node.output, spills);
 
     lifecycle.startStep(parentUuid, stepUuid, step);
 
+    emitParameterSpills(lifecycle, spills);
     emitAttachments(lifecycle, node.attachments);
     emitVideoAttachments(lifecycle, node.videoAttachments);
 
@@ -215,11 +230,77 @@ public final class ActivityLogAllureMapper {
 
   /**
    * Adds a parameter to the step result if the value is non-null and non-blank.
+   *
+   * <p>A value longer than {@link #MAX_PARAMETER_VALUE_LENGTH_PROPERTY} is truncated and the full value is collected
+   * into {@code spills}, to be attached by {@link #emitParameterSpills} once the step has been started.
    */
-  private static void addParameterIfNotBlank(final StepResult step, final String name, final String value) {
-    if (value != null && !value.trim().isEmpty()) {
-      step.getParameters().add(new Parameter().setName(name).setValue(value));
+  private static void addParameterIfNotBlank(final StepResult step, final String name, final String value, final List<ParameterSpill> spills) {
+    if (value == null || value.trim().isEmpty()) {
+      return;
     }
+
+    final int limit = maxParameterValueLength();
+
+    if (limit <= 0 || value.length() <= limit) {
+      step.getParameters().add(new Parameter().setName(name).setValue(value));
+      return;
+    }
+
+    final String attachmentName = name + " (full)";
+    step.getParameters().add(new Parameter().setName(name).setValue(truncatedValue(value, limit, attachmentName)));
+    spills.add(new ParameterSpill(attachmentName, value));
+  }
+
+  /**
+   * The first {@code limit} characters of the value, followed by a marker naming what was dropped and where the full
+   * value can be found. The cut never splits a surrogate pair.
+   */
+  private static String truncatedValue(final String value, final int limit, final String attachmentName) {
+    final int shown = Character.isHighSurrogate(value.charAt(limit - 1)) ? limit - 1 : limit;
+
+    return value.substring(0, shown) +
+        "\n[thekla4j: truncated - " + shown + " of " + value.length() +
+        " characters shown; full value attached as \"" + attachmentName + "\"]";
+  }
+
+  /**
+   * Emits the full value of every truncated parameter as a text attachment on the current step.
+   *
+   * <p>Must be called after {@code lifecycle.startStep(...)}, because an attachment is bound to the step Allure
+   * currently has open.
+   */
+  private static void emitParameterSpills(final AllureLifecycle lifecycle, final List<ParameterSpill> spills) {
+    for (final ParameterSpill spill : spills) {
+      lifecycle.addAttachment(spill.name(), "text/plain", ".txt", spill.value().getBytes(StandardCharsets.UTF_8));
+    }
+  }
+
+  /**
+   * The configured maximum parameter value length, falling back to the default for a missing or unparseable value.
+   * <p>
+   * Read on each call so that it stays overridable at runtime, which keeps it testable.
+   */
+  private static int maxParameterValueLength() {
+    final String configured = System.getProperty(MAX_PARAMETER_VALUE_LENGTH_PROPERTY);
+
+    if (configured == null || configured.trim().isEmpty()) {
+      return DEFAULT_MAX_PARAMETER_VALUE_LENGTH;
+    }
+
+    try {
+      return Integer.parseInt(configured.trim());
+    } catch (final NumberFormatException e) {
+      return DEFAULT_MAX_PARAMETER_VALUE_LENGTH;
+    }
+  }
+
+  /**
+   * The full value of a parameter that was truncated, waiting to be attached to its step.
+   *
+   * @param name  the attachment name
+   * @param value the complete, untruncated parameter value
+   */
+  private record ParameterSpill(String name, String value) {
   }
 
   /**
