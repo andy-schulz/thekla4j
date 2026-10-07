@@ -48,7 +48,7 @@ public class ConfigFunctions {
                                                              defaultConfig: myBrowserConfig
 
                                                              myBrowserConfig:
-                                                               browserName: Chrome
+                                                               browserName: chrome
                                                              ...
                                                              """
                                                              .replace("$$DEFAULT_CONFIG$$", bcl.defaultConfig())
