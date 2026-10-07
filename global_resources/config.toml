@@ -2,7 +2,7 @@
 # Configs have a mapping between the Docker image to use and the capabilities that need to be matched to
 # start a container with the given image.
 configs = [
-    "selenium/standalone-chrome:136.0", '{"browserName": "chrome", "platformName": "linux", "networkname:applicationName":"node_1"}',
+    "selenium/standalone-chrome:153.0", '{"browserName": "chrome", "platformName": "linux", "networkname:applicationName":"node_1"}',
 ]
 # Share configs of volumes, DNS, extra hosts between node-docker and node browser containers
 host-config-keys = ["Dns", "DnsOptions", "DnsSearch", "ExtraHosts", "Binds"]

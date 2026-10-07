@@ -1,7 +1,7 @@
 services:
 
   node-docker:
-    image: selenium/node-docker:4.35.0
+    image: selenium/node-docker:4.49.0
     volumes:
       - /home/selenium/assets:/opt/selenium/assets
       - ./config.toml:/opt/selenium/docker.toml
@@ -24,7 +24,7 @@ services:
 #      - "localhost:host-gateway"
 
   chrome:
-    image: selenium/node-chrome:136.0
+    image: selenium/node-chrome:153.0
     shm_size: 2gb
     depends_on:
       - selenium-hub
@@ -43,7 +43,7 @@ services:
       - "localhost:host-gateway"
 
   selenium-hub:
-    image: selenium/hub:4.35.0
+    image: selenium/hub:4.49.0
     container_name: selenium-hub
     environment:
       - SE_OPTS=--log-level CONFIG
