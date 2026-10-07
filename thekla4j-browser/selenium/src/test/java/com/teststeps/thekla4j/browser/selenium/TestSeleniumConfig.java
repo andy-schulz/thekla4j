@@ -12,6 +12,8 @@ import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.MutableCapabilities;
@@ -20,8 +22,29 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 @Log4j2
 public class TestSeleniumConfig {
 
+  private static String ambientSeleniumConfig;
+
+  @BeforeAll
+  public static void rememberAmbientProperty() {
+    ambientSeleniumConfig = System.getProperty("thekla4j.browser.selenium.config");
+  }
+
   @BeforeEach
   public void reset() {
+    Thekla4jProperty.resetPropertyCache();
+  }
+
+  /**
+   * This property selects the configuration of the whole test run, so it has to be put back. All tests share one JVM,
+   * and a leaked value would send every test class running afterwards to the wrong browser.
+   */
+  @AfterAll
+  public static void restoreAmbientProperty() {
+    if (ambientSeleniumConfig == null) {
+      System.clearProperty("thekla4j.browser.selenium.config");
+    } else {
+      System.setProperty("thekla4j.browser.selenium.config", ambientSeleniumConfig);
+    }
     Thekla4jProperty.resetPropertyCache();
   }
 

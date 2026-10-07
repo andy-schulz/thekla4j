@@ -15,7 +15,7 @@ public class ResizeExample {
   public static void main(String[] args) {
     // Create an actor with browser capability
     Actor actor = Actor.named("TestUser")
-        .whoCan(BrowseTheWeb.with(BrowserSetup.chromeBrowser()));
+        .whoCan(BrowseTheWeb.with(BrowserSetup.browser()));
 
     // Example 1: Resize to a custom size
     actor.attemptsTo(

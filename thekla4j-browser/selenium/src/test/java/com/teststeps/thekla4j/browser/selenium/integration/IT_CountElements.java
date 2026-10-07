@@ -1,8 +1,7 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
-import static com.teststeps.thekla4j.browser.selenium.BrowserSetup.chromeBrowser;
+import static com.teststeps.thekla4j.browser.selenium.BrowserSetup.browser;
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
@@ -26,14 +25,13 @@ public class IT_CountElements {
   @BeforeAll
   public static void init() {
     Thekla4jProperty.resetPropertyCache();
-    System.clearProperty(SELENIUM_CONFIG.property().name());
   }
 
   @BeforeEach
   public void initActor() {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chromeBrowser()));
+        .whoCan(BrowseTheWeb.with(browser()));
   }
 
   @AfterEach

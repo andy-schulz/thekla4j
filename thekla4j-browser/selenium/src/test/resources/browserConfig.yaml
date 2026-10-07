@@ -1,4 +1,8 @@
-defaultConfig: gridFirefox
+defaultConfig: chrome
+
+# the default of the integration tests, it works locally and on the grid
+chrome:
+  browserName: "chrome"
 
 localChrome:
   browserName: "chrome"

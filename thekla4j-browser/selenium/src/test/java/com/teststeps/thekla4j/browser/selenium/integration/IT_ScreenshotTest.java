@@ -1,18 +1,12 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.config.BrowserName;
-import com.teststeps.thekla4j.browser.config.BrowserStartupConfig;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.locator.By;
-import com.teststeps.thekla4j.browser.selenium.DriverLoader;
-import com.teststeps.thekla4j.browser.selenium.SeleniumBrowser;
-import com.teststeps.thekla4j.browser.selenium.SeleniumLoader;
+import com.teststeps.thekla4j.browser.selenium.BrowserSetup;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.browser.spp.activities.TakeScreenshot;
@@ -20,7 +14,6 @@ import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,7 +30,6 @@ public class IT_ScreenshotTest {
   @BeforeAll
   public static void cleanupOldTests() {
     Thekla4jProperty.resetPropertyCache();
-    System.clearProperty(SELENIUM_CONFIG.property().name());
   }
 
   @AfterEach
@@ -48,18 +40,15 @@ public class IT_ScreenshotTest {
     }
   }
 
-  private Browser chrome() {
-    BrowserStartupConfig conf = BrowserStartupConfig.startMaximized();
-    BrowserConfig browserConfig = BrowserConfig.of(BrowserName.CHROME);
-    DriverLoader loader = SeleniumLoader.of(browserConfig, Option.none(), Option.of(conf));
-    return SeleniumBrowser.load(loader, browserConfig);
+  private Browser browser() {
+    return BrowserSetup.browser();
   }
 
   @Test
   public void createScreenshot() throws IOException {
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chrome()));
+        .whoCan(BrowseTheWeb.with(browser()));
 
 
     Either<ActivityError, File> file = actor.attemptsTo$(
@@ -86,7 +75,7 @@ public class IT_ScreenshotTest {
     Element button = Element.found(By.xpath("//*[text()='Alle akzeptieren']"));
 
     actor = Actor.named("Test Actor")
-        .whoCan(BrowseTheWeb.with(chrome()));
+        .whoCan(BrowseTheWeb.with(browser()));
 
 
     Either<ActivityError, File> file = actor.attemptsTo$(

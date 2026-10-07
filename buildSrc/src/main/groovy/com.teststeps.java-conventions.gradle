@@ -72,6 +72,14 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+    // Forward the properties selecting the configuration to the test JVM. A -D on the gradle
+    // command line only reaches the gradle JVM, so without this a test run cannot be switched
+    // between a local browser and the selenium grid from the command line.
+    ['thekla4j.browser.config', 'thekla4j.browser.selenium.config', 'thekla4j.test.appUrl'].each { key ->
+        if (System.getProperty(key) != null) {
+            systemProperty key, System.getProperty(key)
+        }
+    }
 }
 
 jacocoTestReport {

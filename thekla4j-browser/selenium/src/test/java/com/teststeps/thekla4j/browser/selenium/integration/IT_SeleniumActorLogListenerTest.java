@@ -11,14 +11,12 @@ import static org.hamcrest.Matchers.equalTo;
 import com.teststeps.thekla4j.activityLog.data.ActivityLogNode;
 import com.teststeps.thekla4j.activityLog.data.NodeAttachment;
 import com.teststeps.thekla4j.activityLog.data.StacktraceAttachment;
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
 import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.Element;
 import com.teststeps.thekla4j.browser.core.logListener.BrowserLog;
 import com.teststeps.thekla4j.browser.core.logListener.LogLevel;
-import com.teststeps.thekla4j.browser.selenium.SeleniumBrowser;
-import com.teststeps.thekla4j.browser.selenium.SeleniumLoader;
+import com.teststeps.thekla4j.browser.selenium.BrowserSetup;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.abilities.ListenToBrowserLogs;
 import com.teststeps.thekla4j.browser.spp.activities.Click;
@@ -26,7 +24,6 @@ import com.teststeps.thekla4j.browser.spp.activities.Navigate;
 import com.teststeps.thekla4j.commons.error.ActivityError;
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import com.teststeps.thekla4j.core.base.persona.Actor;
-import io.vavr.control.Option;
 import java.util.List;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
@@ -57,23 +54,19 @@ public class IT_SeleniumActorLogListenerTest {
   }
 
 
-  private Browser chrome() {
-    BrowserConfig browserConfig = BrowserConfig.of(BrowserName.CHROME);
-    SeleniumLoader loader = SeleniumLoader.of(browserConfig, Option.none(), Option.none());
-    return SeleniumBrowser.load(loader, browserConfig);
+  private Browser browser() {
+    return BrowserSetup.plainBrowser();
   }
 
   private Browser firefox() {
-    BrowserConfig browserConfig = BrowserConfig.of(BrowserName.FIREFOX);
-    SeleniumLoader loader = SeleniumLoader.of(browserConfig, Option.none(), Option.none());
-    return SeleniumBrowser.load(loader, browserConfig);
+    return BrowserSetup.plainBrowser(config -> config.withBrowserName(BrowserName.FIREFOX));
   }
 
   @Test
   public void testChromeWebDriverLogListener() throws ActivityError {
     System.setProperty(SELENIUM_BIDI_LOG.property().name(), "false");
 
-    Browser browser = chrome();
+    Browser browser = browser();
     actor = Actor.named("Selenium Actor")
         .whoCan(BrowseTheWeb.with(browser))
         .whoCan(ListenToBrowserLogs.of(browser));
@@ -121,7 +114,7 @@ public class IT_SeleniumActorLogListenerTest {
 
     System.setProperty(SELENIUM_BIDI_LOG.property().name(), "true");
 
-    Browser browser = chrome();
+    Browser browser = browser();
     actor = Actor.named("Selenium Actor")
         .whoCan(BrowseTheWeb.with(browser))
         .whoCan(ListenToBrowserLogs.of(browser));
@@ -224,7 +217,7 @@ public class IT_SeleniumActorLogListenerTest {
   @Test
   public void testChromeDefaultWebDriverLogListener() throws ActivityError {
 
-    Browser browser = chrome();
+    Browser browser = browser();
     actor = Actor.named("Selenium Actor")
         .whoCan(BrowseTheWeb.with(browser))
         .whoCan(ListenToBrowserLogs.of(browser));

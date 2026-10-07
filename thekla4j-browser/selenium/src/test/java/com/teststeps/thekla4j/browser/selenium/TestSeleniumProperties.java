@@ -11,10 +11,20 @@ import com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniu
 import com.teststeps.thekla4j.commons.properties.Thekla4jProperty;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestSeleniumProperties {
+
+  private static String ambientSeleniumConfig;
+  private static String ambientBidiLog;
+
+  @BeforeAll
+  public static void rememberAmbientProperties() {
+    ambientSeleniumConfig = System.getProperty(SELENIUM_CONFIG.property().name());
+    ambientBidiLog = System.getProperty(SELENIUM_BIDI_LOG.property().name());
+  }
 
   @BeforeEach
   public void init() {
@@ -23,11 +33,23 @@ public class TestSeleniumProperties {
     System.clearProperty(SELENIUM_BIDI_LOG.property().name());
   }
 
+  /**
+   * These properties select the configuration of the whole test run, so they have to be put back. All tests share one
+   * JVM, and a cleared property would send every test class running afterwards to a local browser.
+   */
   @AfterAll
   public static void cleanUp() {
+    restore(SELENIUM_CONFIG.property().name(), ambientSeleniumConfig);
+    restore(SELENIUM_BIDI_LOG.property().name(), ambientBidiLog);
     Thekla4jProperty.resetPropertyCache();
-    System.clearProperty(SELENIUM_CONFIG.property().name());
-    System.clearProperty(SELENIUM_BIDI_LOG.property().name());
+  }
+
+  private static void restore(final String name, final String value) {
+    if (value == null) {
+      System.clearProperty(name);
+    } else {
+      System.setProperty(name, value);
+    }
   }
 
   @Test

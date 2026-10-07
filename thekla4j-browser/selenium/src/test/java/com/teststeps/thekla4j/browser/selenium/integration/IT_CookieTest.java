@@ -1,14 +1,9 @@
 package com.teststeps.thekla4j.browser.selenium.integration;
 
 import static com.teststeps.thekla4j.browser.selenium.Constants.FRAMEWORKTESTER;
-import static com.teststeps.thekla4j.browser.selenium.properties.DefaultThekla4jSeleniumProperties.SELENIUM_CONFIG;
 
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
-import com.teststeps.thekla4j.browser.selenium.DriverLoader;
-import com.teststeps.thekla4j.browser.selenium.SeleniumBrowser;
-import com.teststeps.thekla4j.browser.selenium.SeleniumLoader;
+import com.teststeps.thekla4j.browser.selenium.BrowserSetup;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.activities.AddCookie;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -30,7 +25,6 @@ public class IT_CookieTest {
   @BeforeAll
   public static void init() {
     Thekla4jProperty.resetPropertyCache();
-    System.clearProperty(SELENIUM_CONFIG.property().name());
   }
 
   @AfterAll
@@ -39,18 +33,15 @@ public class IT_CookieTest {
         .peek(Actor::cleansStage);
   }
 
-  private Browser chrome() {
-    BrowserConfig browserConfig = BrowserConfig.of(BrowserName.CHROME);
-    DriverLoader loader = SeleniumLoader.of(browserConfig, Option.none(), Option.none());
-    return SeleniumBrowser.load(loader, browserConfig);
-
+  private Browser browser() {
+    return BrowserSetup.plainBrowser();
   }
 
   @Test
   public void testAddCookie() throws ActivityError {
 
     actor = Actor.named("TestUser")
-        .whoCan(BrowseTheWeb.with(chrome()));
+        .whoCan(BrowseTheWeb.with(browser()));
 
 
     Cookie c1 = Cookie.of("Cookie1", "CookieValue1")

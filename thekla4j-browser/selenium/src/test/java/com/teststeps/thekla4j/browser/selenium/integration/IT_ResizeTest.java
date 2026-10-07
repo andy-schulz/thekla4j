@@ -27,7 +27,7 @@ public class IT_ResizeTest {
   @BeforeAll
   public static void setup() {
     actor = Actor.named("TestActor")
-        .whoCan(BrowseTheWeb.with(BrowserSetup.chromeBrowser()));
+        .whoCan(BrowseTheWeb.with(BrowserSetup.browser()));
   }
 
   @AfterAll

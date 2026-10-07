@@ -5,12 +5,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
-import com.teststeps.thekla4j.browser.config.BrowserConfig;
-import com.teststeps.thekla4j.browser.config.BrowserName;
 import com.teststeps.thekla4j.browser.core.Browser;
 import com.teststeps.thekla4j.browser.core.network.NetworkCall;
-import com.teststeps.thekla4j.browser.selenium.SeleniumBrowser;
-import com.teststeps.thekla4j.browser.selenium.SeleniumLoader;
+import com.teststeps.thekla4j.browser.selenium.BrowserSetup;
 import com.teststeps.thekla4j.browser.spp.abilities.BrowseTheWeb;
 import com.teststeps.thekla4j.browser.spp.abilities.ListenToNetworkTraffic;
 import com.teststeps.thekla4j.browser.spp.activities.Navigate;
@@ -21,7 +18,6 @@ import com.teststeps.thekla4j.core.activities.Retry;
 import com.teststeps.thekla4j.core.base.persona.Actor;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import java.time.Duration;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
@@ -44,14 +40,12 @@ public class IT_SeleniumNetworkObservationTest {
       actor.cleansStage();
   }
 
-  private Browser chrome() {
-    BrowserConfig browserConfig = BrowserConfig.of(BrowserName.CHROME);
-    SeleniumLoader loader = SeleniumLoader.of(browserConfig, Option.none(), Option.none());
-    return SeleniumBrowser.load(loader, browserConfig);
+  private Browser browser() {
+    return BrowserSetup.plainBrowser();
   }
 
   private Actor actorObservingTheNetwork() {
-    Browser browser = chrome();
+    Browser browser = browser();
     return Actor.named("Network Actor")
         .whoCan(BrowseTheWeb.with(browser))
         .whoCan(ListenToNetworkTraffic.of(browser));
@@ -167,7 +161,7 @@ public class IT_SeleniumNetworkObservationTest {
 
   @Test
   public void theAbilityHasToBeAssignedBeforeTheBrowserIsUsed() {
-    Browser browser = chrome();
+    Browser browser = browser();
     actor = Actor.named("Network Actor").whoCan(BrowseTheWeb.with(browser));
 
     // using the browser first creates the session, so the capabilities can no longer be changed
