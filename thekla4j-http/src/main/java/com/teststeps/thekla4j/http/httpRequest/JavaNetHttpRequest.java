@@ -61,7 +61,7 @@ public class JavaNetHttpRequest implements com.teststeps.thekla4j.http.core.Http
 
     HttpRequest req = requestBuilder.build();
 
-    return Try.of(() -> client.send(req, HttpResponse.BodyHandlers.ofString()))
+    return Try.of(() -> client.send(req, HttpResponse.BodyHandlers.ofByteArray()))
         .onFailure(x -> log.error(x.getMessage()))
         .map(JavaNetHttpResult::new);
   }

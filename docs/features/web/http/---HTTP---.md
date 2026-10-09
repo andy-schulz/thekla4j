@@ -295,6 +295,31 @@ performer.attemptsTo(
 
 ```
 
+## Binary Responses
+
+`result.response()` decodes the body using the character set of the `Content-Type` response header,
+falling back to UTF-8 if the header is absent or names an unsupported character set. Bytes that are
+not valid in that character set are replaced, which destroys binary content irreversibly.
+
+To read a binary response, such as a downloaded file, use `result.responseBytes()` instead. It
+returns the undecoded body, from which `result.response()` is derived:
+
+```java
+HttpResult result = performer.attemptsTo(
+    Get.from(Request.on("/reports/sales.xlsx"))
+);
+
+Files.write(Path.of("sales.xlsx"), result.responseBytes().get());
+```
+
+`responseBytes()` returns an `Option` because not every `HttpClient` implementation keeps the bytes.
+The `JavaNetHttpClient` always does; the `HcHttpClient` returns `Option.none()`, so binary downloads
+need the `JavaNetHttpClient`.
+
+No content encoding is applied to the bytes. If the response carries a `Content-Encoding` such as
+`gzip`, for example because the request asked for it with `AcceptEncoding.GZIP`, then
+`responseBytes()` returns the compressed bytes and they have to be decompressed before use.
+
 ## Multipart Requests
 
 For file uploads and complex form data:
