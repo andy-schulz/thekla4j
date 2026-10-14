@@ -119,11 +119,10 @@ tests, tests switched off by an `ExecutionCondition`, and tests aborted by an as
 in `@BeforeAll` or `@BeforeEach`. Such tests therefore stay in their place in the Suites
 tree instead of appearing at the top level under their class name.
 
-> **Note:** for a skipped test Allure writes its own class-name suite label, which the
-> extension cannot remove because its callbacks are not invoked. The test is listed under
-> both the `@Suite` value and the class name. Adding a JUnit `@DisplayName` with the same
-> value as `@Suite` to the test class makes both labels equal and the two entries collapse
-> into one.
+For such a test Allure writes its own class-name suite label next to the annotation value,
+which would list the test under two suites. `Thekla4jAllureSuiteLabelListener`, registered
+via `META-INF/services/io.qameta.allure.listener.TestLifecycleListener`, removes it before
+the result is written, so each test is listed exactly once.
 
 ### @TestId
 

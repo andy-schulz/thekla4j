@@ -1,9 +1,11 @@
 package com.teststeps.thekla4j.allure.junit5.extensions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -333,9 +335,9 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     assertThat(result.path("status").asText(), is("skipped"));
     assertThat(labelValues(result, "parentSuite"), is(List.of("SkippedParentSuite")));
     assertThat(labelValues(result, "subSuite"), is(List.of("SkippedSubSuite")));
-    // Allure adds the class name as suite label on its own and the extension cannot
-    // remove it for a test that never starts, so the @Suite value is one of two.
-    assertThat(labelValues(result, "suite"), hasItem("SkippedSuite"));
+    // Allure adds the class name as suite label on its own for a test that never starts;
+    // Thekla4jAllureSuiteLabelListener drops it again.
+    assertThat(labelValues(result, "suite"), is(List.of("SkippedSuite")));
   }
 
   @Test
@@ -345,6 +347,14 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     assertThat(result.path("status").asText(), is("skipped"));
     assertThat(labelValues(result, "parentSuite"), is(List.of("AbortedParentSuite")));
     assertThat(labelValues(result, "subSuite"), is(List.of("AbortedSubSuite")));
-    assertThat(labelValues(result, "suite"), hasItem("AbortedSuite"));
+    assertThat(labelValues(result, "suite"), is(List.of("AbortedSuite")));
+  }
+
+  @Test
+  void fileOutput_disabledTest_dropsTheAllureClassNameSuiteLabel(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputDisabledFixture.class, tempDir);
+
+    assertThat(labelValues(result, "suite"),
+      not(hasItem(containsString(FileOutputDisabledFixture.class.getSimpleName()))));
   }
 }
