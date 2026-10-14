@@ -1,5 +1,6 @@
 package com.teststeps.thekla4j.allure.junit5.extensions.tags;
 
+import io.qameta.allure.LabelAnnotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -14,6 +15,7 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
+@LabelAnnotation(name = "parentSuite")
 @Target({ElementType.TYPE})
 public @interface ParentSuite {
   /**

@@ -113,6 +113,18 @@ junit.jupiter.extensions.autodetection.enabled=true
 | `@TestId`       | class, method | Appends test ID to name and sets `testCaseId`; method overrides class      |
 | `@AllureActor`  | field         | Marks an `Actor` field for activity log mapping to Allure steps            |
 
+`@ParentSuite`, `@Suite` and `@SubSuite` are additionally marked as Allure label
+annotations, so their labels are also written for tests that never start - `@Disabled`
+tests, tests switched off by an `ExecutionCondition`, and tests aborted by an assumption
+in `@BeforeAll` or `@BeforeEach`. Such tests therefore stay in their place in the Suites
+tree instead of appearing at the top level under their class name.
+
+> **Note:** for a skipped test Allure writes its own class-name suite label, which the
+> extension cannot remove because its callbacks are not invoked. The test is listed under
+> both the `@Suite` value and the class name. Adding a JUnit `@DisplayName` with the same
+> value as `@Suite` to the test class makes both labels equal and the two entries collapse
+> into one.
+
 ### @TestId
 
 Appends the test ID to the test name in the Allure report and sets the `testCaseId` field.

@@ -24,6 +24,8 @@ test {
         excludeTestsMatching("*ActivityErrorFixture*")
         excludeTestsMatching("*FileOutputFixture*")
         excludeTestsMatching("*FileOutputMethodOverrideFixture*")
+        excludeTestsMatching("*FileOutputDisabledFixture*")
+        excludeTestsMatching("*FileOutputAssumptionAbortedFixture*")
         excludeTestsMatching("*SingleActorFixture*")
         excludeTestsMatching("*NoAnnotationFixture*")
         excludeTestsMatching("*MultipleActorsFixture*")

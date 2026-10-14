@@ -1,6 +1,7 @@
 package com.teststeps.thekla4j.allure.junit5.extensions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
@@ -24,6 +25,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -101,6 +105,34 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
     @Reqs({"REQ-M-1", "REQ-M-2"})
     @Test
     void annotatedTest() {
+    }
+  }
+
+  /** Fixture: a disabled test never starts, so the extension callbacks do not run for it. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Suite("SkippedSuite")
+  @SubSuite("SkippedSubSuite")
+  @ParentSuite("SkippedParentSuite")
+  static class FileOutputDisabledFixture {
+    @Disabled("fixture for the skipped-test label assertions")
+    @Test
+    void disabledTest() {
+    }
+  }
+
+  /** Fixture: an assumption in {@code @BeforeEach} aborts the test before the extension callbacks run. */
+  @ExtendWith(Thekla4jAllureJunit5Extension.class)
+  @Suite("AbortedSuite")
+  @SubSuite("AbortedSubSuite")
+  @ParentSuite("AbortedParentSuite")
+  static class FileOutputAssumptionAbortedFixture {
+    @BeforeEach
+    void abort() {
+      Assumptions.assumeTrue(false, "fixture for the skipped-test label assertions");
+    }
+
+    @Test
+    void abortedTest() {
     }
   }
 
@@ -290,5 +322,29 @@ class AllureThekla4jExtensionFileOutputIntegrationTest {
         System.setProperty(THEKLA_REQUIREMENT_LINK_PATTERN_PROPERTY, previousPattern);
       }
     }
+  }
+
+  // ===== Tests: skipped tests keep the suite hierarchy =====
+
+  @Test
+  void fileOutput_disabledTest_keepsSuiteHierarchyLabels(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputDisabledFixture.class, tempDir);
+
+    assertThat(result.path("status").asText(), is("skipped"));
+    assertThat(labelValues(result, "parentSuite"), is(List.of("SkippedParentSuite")));
+    assertThat(labelValues(result, "subSuite"), is(List.of("SkippedSubSuite")));
+    // Allure adds the class name as suite label on its own and the extension cannot
+    // remove it for a test that never starts, so the @Suite value is one of two.
+    assertThat(labelValues(result, "suite"), hasItem("SkippedSuite"));
+  }
+
+  @Test
+  void fileOutput_assumptionAbortedTest_keepsSuiteHierarchyLabels(@TempDir final Path tempDir) throws IOException {
+    JsonNode result = runFixtureAndReadResult(FileOutputAssumptionAbortedFixture.class, tempDir);
+
+    assertThat(result.path("status").asText(), is("skipped"));
+    assertThat(labelValues(result, "parentSuite"), is(List.of("AbortedParentSuite")));
+    assertThat(labelValues(result, "subSuite"), is(List.of("AbortedSubSuite")));
+    assertThat(labelValues(result, "suite"), hasItem("AbortedSuite"));
   }
 }
